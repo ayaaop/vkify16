@@ -1997,7 +1997,9 @@ u(document).on('click', '.post.reply', function(e) {
     let authorNm  = (comment.data('mention-name') || '').trim();
     let fromGroup = comment.attr('data-from-group') === 'true';
     let postId    = comment.data('post-id');
-    let inputbox  = postId == null ? u('#write textarea') : u('#wall-post-input' + (postId || ''));
+    let inputbox  = postId == null ? u('#standaloneCommentBox textarea') : u('#wall-post-input' + postId);
+    if (!inputbox.nodes.length) return;
+
     let mention   = ('[' + (fromGroup ? 'club' : 'id') + authorId + '|' + authorNm + '], ');
     let attachments = inputbox.closest('.model_content_textarea').find('.post-buttons');
 
@@ -2008,7 +2010,7 @@ u(document).on('click', '.post.reply', function(e) {
     inputbox.closest('.model_content_textarea').addClass('shown');
 
     let attachReply = attachments.find('[name="reply_to_comment"]');
-    attachReply.nodes[0].value = commentId;
+    if (attachReply.nodes.length) attachReply.nodes[0].value = commentId;
 
     attachments.find('.post-replyto').html(`
         <span>${window.tr?.('in_reply')}</span>

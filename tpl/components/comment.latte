@@ -2,7 +2,7 @@
 {var $Club  = openvk\Web\Models\Entities\Club::class}
 {var $likesCount = $comment->getLikesCount()}
 {var $target = $comment->getTarget()}
-{var $postId = $target instanceof \openvk\Web\Models\Entities\Post ? $target->getId() : NULL}
+{var $postId = $target ? $target->getId() : NULL}
 {var $correctLink = $correctLink ?? true}
 <div data-id="1_{$comment->getId()}" class="post reply scroll_node" data-uniqueid="reply_{$comment->getId()}" id="_comment{$comment->getId()}" data-comment-id="{$comment->getId()}" data-owner-id="{$author->getId()}" data-from-group="{$author instanceof $Club ? 'true' : 'false'}" n:attr="data-post-id => $postId, data-mention-name => ($author instanceof $Club ? $author->getName() : $author->getFirstName())">
     <div class="reply_wrap">
