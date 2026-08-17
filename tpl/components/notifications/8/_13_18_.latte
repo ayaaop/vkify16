@@ -1,0 +1,7 @@
+{extends "@default.latte"}
+{var $photo = $notification->getModel(0)->getTarget()}
+{var $comment = $notification->getModel(0)}
+
+{block under}
+    <a href="/photo{$photo->getPrettyId()}#_comment{$comment->getId()}">{_nt_photo_instrumental}</a>
+{/block}

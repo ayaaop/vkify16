@@ -2006,6 +2006,7 @@ table,
     margin: 0;
     align-items: center;
     z-index: 0;
+    flex: 1 1 0;
 }
 
 .model_content_textarea #wallAttachmentMenu img {
@@ -2073,6 +2074,7 @@ table,
 }
 
 .post-source #remove_source_button,
+.post-replyto #remove_reply_button,
 #small_remove_button {
     background: url(../resource/icons/attach_icons.png?4) no-repeat 0 0;
     width: 9px;
@@ -2378,9 +2380,34 @@ table,
     font-size: 12.5px;
 }
 
-.post_removed {
-    padding: 15px 20px !important;
-    color: var(--muted-text-color);
+
+.post-deleted {
+  padding: 15px 20px;
+  color: var(--muted-text-color);
+  font-size: 13px;
+  text-align: center;
+  opacity: 1;
+  animation-name: post-deleted;
+  animation-duration: 4.5s;
+}
+
+.post-replyto {
+  padding: 6px 12px;
+  font-size: 12.5px;
+  color: var(--muted-text-color);
+  text-align: right;
+}
+.post-replyto:empty {
+  display: none;
+}
+.post-replyto #remove_reply_button {
+  float: right;
+  margin: 2px 0 0 3px;
+}
+
+.post-buttons .post-bottom-acts + .post-replyto {
+  margin-top: -15px;
+  padding: 12px 27px 12px 15px;
 }
 
 .vkify-post-loader {
@@ -2550,7 +2577,7 @@ table,
 .reply_date {
     color: var(--muted-text-color-2);
 }
-.reply_date .reply_link {
+.reply_date .reply_link,.reply_to {
     color: var(--muted-text-color);
 }
 
@@ -2821,14 +2848,11 @@ table,
 }
 .post.copy_quote .post_header {
     min-height: 40px;
-    padding: 0;
+    padding: 0 0 11px;
 }
 .post.copy_quote .post_header_info {
     margin-left: 52px;
     padding-top: 3px;
-}
-.post.copy_quote .wall_text {
-    padding: 11px 0 0;
 }
 .post.copy_quote .wall_post_text {
     padding-top: 0;
@@ -2837,6 +2861,7 @@ table,
 .post.copy_quote .sourceDiv,
 .post.copy_quote .post-geo {
     margin: 0;
+    padding-bottom: 0;
 }
 
 .written {
@@ -3057,14 +3082,16 @@ h4.gifts_section_header {
 }
 .reply_author {
     font-size: 12.5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     margin-bottom: 5px;
     background: none;
     border: 0;
     padding: 0;
     line-height: inherit;
+}
+.reply_author .author {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .reply .attachments {
     padding-top: 5px;
@@ -5000,4 +5027,37 @@ hr {
 body.banned {
     --layout-width: 795px;
     --page-width: 795px;
+}
+
+/* wall_tt-style post/reply preview tooltip */
+.tippy-box.wall_tt,
+.tippy-box[data-theme~="wall_tt"] {
+    color: #000;
+}
+
+.tippy-box.wall_tt .tippy-content,
+.tippy-box[data-theme~="wall_tt"] .tippy-content {
+    padding: 0;
+}
+
+.wall_tt .content {
+    min-width: 80px;
+    max-width: 380px;
+    overflow: hidden;
+    line-height: 140%;
+}
+
+.wall_tt .post {
+    display: block;
+}
+.wall_tt .reply_date {
+    float: none;
+}
+
+.wall_tt .header {
+    font-weight: 700;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow: hidden;
+    margin: 0 0 9px;
 }

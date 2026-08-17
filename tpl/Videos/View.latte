@@ -31,6 +31,8 @@
                 {if isset($thisUser)}
                     {if $thisUser->getId() != $video->getOwner()->getId()}
                         {var $canReport = true}
+                    {else}
+                        {var $canEdit = true}
                     {/if}
                     {var $liked = $video->hasLikeFrom($thisUser)}
                     {var $likesCount = $video->getLikesCount()}
@@ -46,10 +48,10 @@
                     <span class="video_info_more_actions" data-tippy-content-id="videoMoreActionsTooltip">
                         <div class="button button_light _more_wrap">{_show_more}</div>
                         <div id="videoMoreActionsTooltip" class="tippy-menu tippy-content-template">
-                            <a href="javascript:showEditVideoModal('{$video->getPrettyId()}')">
+                            <a n:if="$canEdit ?? false" href="javascript:showEditVideoModal('{$video->getPrettyId()}')">
                                 {tr('edit')}
                             </a>
-                            <a n:if="$thisUser->getId() === $video->getOwner()->getId()" href="/video{$video->getPrettyId()}/remove">
+                            <a n:if="$canEdit ?? false" href="/video{$video->getPrettyId()}/remove">
                                 {tr('delete')}
                             </a>
                             <a n:if="$canReport ?? false" href="javascript:reportVideo({$video->getId()})">

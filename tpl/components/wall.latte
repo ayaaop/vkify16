@@ -93,11 +93,10 @@
                     {include "../components/post.latte", post => $post, commentSection => true, onWallOf => true}
                 {/foreach}
                 {include "../components/paginator.latte", conf => $paginatorConf}
-            {else}
-				<div class="page_block">
-					{include "../components/content_error.latte", description => tr("no_posts_abstract")}
-				</div>
             {/if}
+            <div class="page_block placeholder {if sizeof($visiblePosts) > 0}hidden{/if}">
+                {include "../components/content_error.latte", description => tr("no_posts_abstract")}
+            </div>
         </div>
     </div>
 </div> 

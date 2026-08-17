@@ -44,6 +44,8 @@ const modules = [
     'ui/graffiti.js',
 
     'features/attachment-picker.js',
+    'features/poll.js',
+    'features/post-count.js',
     'features/wall.js',
     'features/player.js',
 

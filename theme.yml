@@ -1,5 +1,5 @@
 id: vkify16
-version: "3.3.5.8"
+version: "3.3.6.0"
 openvk_version: 0
 enabled: 1
 override_templates: true

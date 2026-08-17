@@ -1,0 +1,9 @@
+{var $user = $notification->getModel(1)}
+{var $comment = $notification->getModel(0)}
+<div class="feedback_header">   
+    <a href="{$user->getURL()}"><b>{$user->getCanonicalName()}</b></a>
+    {_nt_replied_yours} {include under}: "{$comment->getText()}".
+</div>
+<div class="feedback_footer">
+    {$notification->getDateTime()}
+</div>

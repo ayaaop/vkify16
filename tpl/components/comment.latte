@@ -4,7 +4,7 @@
 {var $target = $comment->getTarget()}
 {var $postId = $target instanceof \openvk\Web\Models\Entities\Post ? $target->getId() : NULL}
 {var $correctLink = $correctLink ?? true}
-<div data-id="1_{$comment->getId()}" class="post reply scroll_node" data-uniqueid="reply_{$comment->getId()}" id="_comment{$comment->getId()}" data-comment-id="{$comment->getId()}" data-owner-id="{$author->getId()}" data-from-group="{$author instanceof $Club ? 'true' : 'false'}" n:attr="data-post-id => $postId">
+<div data-id="1_{$comment->getId()}" class="post reply scroll_node" data-uniqueid="reply_{$comment->getId()}" id="_comment{$comment->getId()}" data-comment-id="{$comment->getId()}" data-owner-id="{$author->getId()}" data-from-group="{$author instanceof $Club ? 'true' : 'false'}" n:attr="data-post-id => $postId, data-mention-name => ($author instanceof $Club ? $author->getName() : $author->getFirstName())">
     <div class="reply_wrap">
         <a class="reply_image{if !$author instanceof $Club && $author->isOnline()} online{/if}" href="{$author->getURL()}">
             {include 'avatar.latte', author => $author, size => 'miniscule', width => 30, class => 'reply_img'}
@@ -22,6 +22,7 @@
                     <b class="post-author-name">{$author->getCanonicalName()}</b>
                 </a>
                 <a class="page_verified" n:if="$author->isVerified()" href="/verify"></a>
+                <a n:if="$comment->getReplyToId() !== null" href="{$comment->getTargetURL()}#_comment{$comment->getReplyToId()}" class="reply_to" data-reply-to-owner-id="{($comment->getTarget()->getOwner() instanceof $Club ? -1 : 1) * $comment->getTarget()->getOwner()->getId()}" onmouseover="wall.postTooltip(this, '1_{$comment->getReplyToId()}', &#123;reply: 1&#125;)" onclick="return wall.showReply(this, '1_{$comment->getReplyToId()}', '1_{$comment->getId()}', event)">{_in_reply}</a>
                 <span n:if="$comment->canBeEditedBy($thisUser)" class="wall_edit_label"><span class="divider"></span>{_logs_editing|lower}</span>
             </div>
             <div class="post-content" id="{$comment->getId()}">
@@ -62,7 +63,7 @@
                     </a>
                 </div>
                 <div n:if="isset($thisUser)" class="reply_link_wrap">
-                    <a n:if="!($no_reply_button ?? false)" class="comment-reply reply_link">
+                    <a n:if="!($no_reply_button ?? false)" class="reply_link">
                         {_reply}
                     </a>
                 </div>

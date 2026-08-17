@@ -1,0 +1,7 @@
+{extends "@default.latte"}
+{var $video = $notification->getModel(0)->getTarget()}
+{var $comment = $notification->getModel(0)}
+
+{block under}
+    <a href="/video{$video->getPrettyId()}#_comment{$comment->getId()}">{_video}</a>
+{/block}

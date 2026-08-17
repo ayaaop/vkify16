@@ -260,11 +260,15 @@ function resetWallComposer(form) {
     const vertical = form.querySelector('.post-vertical');
     const source = form.querySelector('.post-source');
     const geo = form.querySelector('.post-has-geo');
+    const replyto = form.querySelector('.post-replyto');
+    const replyToInput = form.querySelector('input[name="reply_to_comment"]');
 
     if (horizontal) horizontal.innerHTML = '';
     if (vertical) vertical.innerHTML = '';
     if (source) source.innerHTML = '';
     if (geo) geo.innerHTML = '';
+    if (replyto) replyto.innerHTML = '';
+    if (replyToInput) replyToInput.value = '';
 
     resetWallCheckboxStates(form);
 }
@@ -1216,222 +1220,10 @@ vkify.once('reportPost', () => {
     };
 });
 
-function bindPostDeleteConfirmOnce() {
-    if (!vkify.bindOnce('postDeleteConfirm', bindPostDeleteConfirmOnce)) return;
-
-    document.addEventListener('click', (e) => {
-        const deleteLink = e.target.closest('a.delete');
-        if (!deleteLink || deleteLink.dataset.deleting) return;
-
-        const href = deleteLink.getAttribute('href');
-        if (!href?.includes('/wall')) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-
-        let postElement = deleteLink.closest('.post');
-        if (!postElement) {
-            const match = href.match(/wall(-?\d+_\d+)/);
-            if (match?.[1]) {
-                postElement = document.querySelector(`.post[data-id="${match[1]}"]`);
-            }
-        }
-        if (!postElement) return;
-
-        deleteLink.dataset.deleting = '1';
-
-        MessageBox(tr("confirm"), window.vkifylang.postremove, [tr("yes"), tr("cancel")], [
-            async () => {
-                let contentWrapper = null;
-
-                try {
-                    postElement.style.position = 'relative';
-                    
-                    contentWrapper = document.createElement('div');
-                    contentWrapper.style.opacity = '0.25';
-                    while (postElement.firstChild) {
-                        contentWrapper.appendChild(postElement.firstChild);
-                    }
-                    postElement.appendChild(contentWrapper);
-                    
-                    LoaderUtils.show(postElement, { className: 'vkify-post-loader' });
-                    const deleteRes = await ky.post(href, { throwHttpErrors: false });
-                    if (!deleteRes.ok && !deleteRes.redirected) throw new Error('Delete failed');
-
-                    const contentDiv = contentWrapper.querySelector('.post-content') || contentWrapper;
-                    const originalHeight = postElement.offsetHeight;
-
-                    postElement.style.height = `${originalHeight}px`;
-                    postElement.style.maxHeight = `${originalHeight}px`;
-                    postElement.style.overflow = 'hidden';
-
-                    contentDiv.style.transition = 'opacity 300ms ease';
-                    contentDiv.style.opacity = '0';
-
-                    await new Promise(resolve => {
-                        const handler = evt => {
-                            if (evt.propertyName === 'opacity') {
-                                contentDiv.removeEventListener('transitionend', handler);
-                                resolve();
-                            }
-                        };
-                        contentDiv.addEventListener('transitionend', handler);
-                    });
-
-                    postElement.innerHTML = `<div>${window.vkifylang.postremoved}</div>`;
-                    postElement.classList.add('post_removed');
-
-                    const removedDiv = postElement.firstElementChild;
-                    if (removedDiv) {
-                        removedDiv.style.transition = 'opacity 300ms ease';
-                        removedDiv.style.opacity = '0';
-                        void removedDiv.offsetHeight;
-                        removedDiv.style.opacity = '1';
-
-                        await new Promise(resolve => {
-                            const handler = evt => {
-                                if (evt.propertyName === 'opacity') {
-                                    removedDiv.removeEventListener('transitionend', handler);
-                                    resolve();
-                                }
-                            };
-                            removedDiv.addEventListener('transitionend', handler);
-                        });
-
-                        const newHeight = removedDiv.offsetHeight;
-                        postElement.style.transition = 'max-height 300ms ease';
-                        postElement.style.maxHeight = `${newHeight}px`;
-
-                        await Promise.race([
-                            new Promise(resolve => {
-                                const handler = evt => {
-                                    if (evt.propertyName === 'max-height') {
-                                        postElement.removeEventListener('transitionend', handler);
-                                        resolve();
-                                    }
-                                };
-                                postElement.addEventListener('transitionend', handler);
-                            }),
-                            new Promise(resolve => setTimeout(resolve, 350))
-                        ]);
-
-                        postElement.style.height = '';
-                        postElement.style.maxHeight = '';
-                        postElement.style.overflow = '';
-                        postElement.style.transition = '';
-                    }
-
-                    const countEl = document.querySelector('.ui_tab_sel .ui_tab_count');
-                    if (countEl) {
-                        const count = parseInt(countEl.textContent, 10);
-                        if (!Number.isNaN(count)) countEl.textContent = Math.max(0, count - 1);
-                    }
-                } catch (err) {
-                    console.error('Failed to delete post:', err);
-                } finally {
-                    LoaderUtils.hide(postElement);
-                    if (contentWrapper && contentWrapper.parentNode === postElement) {
-                        while (contentWrapper.firstChild) {
-                            postElement.appendChild(contentWrapper.firstChild);
-                        }
-                        contentWrapper.remove();
-                    }
-                    postElement.style.position = '';
-                    postElement.style.height = '';
-                    postElement.style.maxHeight = '';
-                    postElement.style.minHeight = '';
-                    postElement.style.overflow = '';
-                    postElement.style.transition = '';
-                    deleteLink.dataset.deleting = '';
-                }
-            },
-            () => deleteLink.dataset.deleting = ''
-        ]);
-    }, true);
-}
-
-bindPostDeleteConfirmOnce();
-
 vkify.onPageLifecycle('afterPageReady', () => {
     if (window.postPopupManager && !window.postPopupManager.currentModal) {
         window.postPopupManager.checkInitialUrl();
-        bindPostDeleteConfirmOnce();
     }
-}, 'after');
-
-function bindPostArchiveOnce() {
-    if (!vkify.bindOnce('postArchive', bindPostArchiveOnce)) return;
-
-    document.addEventListener('click', (e) => {
-        const archiveLink = e.target.closest('a.archive_post');
-        if (!archiveLink || archiveLink.dataset.archiving) return;
-
-        const href = archiveLink.getAttribute('href');
-        if (!href?.includes('/wall')) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-
-        const postElement = archiveLink.closest('.post');
-        if (!postElement) return;
-
-        archiveLink.dataset.archiving = '1';
-
-        (async () => {
-            try {
-                LoaderUtils.show(postElement, { className: 'vkify-post-loader' });
-
-                const url = new URL(href, location.origin);
-                url.searchParams.set('ajax', '1');
-
-                const response = await fetch(url, { method: 'POST' });
-                const data = await response.json().catch(() => null);
-                if (!response.ok || !data?.success) {
-                    throw new Error('Failed to toggle post archive state');
-                }
-
-                LoaderUtils.hide(postElement);
-
-                const originalHeight = postElement.offsetHeight;
-                postElement.style.overflow = 'hidden';
-                postElement.style.height = `${originalHeight}px`;
-                postElement.style.transition = 'opacity 200ms ease, height 250ms ease, margin 250ms ease, padding 250ms ease';
-                postElement.style.opacity = '0';
-
-                void postElement.offsetHeight;
-
-                postElement.style.height = '0px';
-                postElement.style.marginTop = '0';
-                postElement.style.marginBottom = '0';
-                postElement.style.paddingTop = '0';
-                postElement.style.paddingBottom = '0';
-
-                await new Promise(resolve => setTimeout(resolve, 260));
-
-                postElement.remove();
-
-                const countEl = document.querySelector('.ui_tab_sel .ui_tab_count');
-                if (countEl) {
-                    const count = parseInt(countEl.textContent, 10);
-                    if (!Number.isNaN(count)) countEl.textContent = Math.max(0, count - 1);
-                }
-
-                window.dispatchEvent(new CustomEvent('archive:changed', { detail: data }));
-            } catch (err) {
-                console.error('Failed to toggle post archive state:', err);
-                LoaderUtils.hide(postElement);
-                archiveLink.dataset.archiving = '';
-            }
-        })();
-    }, true);
-}
-
-bindPostArchiveOnce();
-
-vkify.onPageLifecycle('afterPageReady', () => {
-    bindPostArchiveOnce();
 }, 'after');
 
 vkify.once('editMenuLayout', () => {
@@ -2074,5 +1866,216 @@ vkify.bindOnce('ignoreFeedFix', () => {
         }
     }, true);
 });
+
+const replyTooltipCache = new Map();
+const replyTooltipPending = new Map();
+
+async function buildReplyTooltipContent(replyId, ownerId) {
+    const cached = replyTooltipCache.get(replyId);
+    if (cached) {
+        return cached;
+    }
+
+    const pending = replyTooltipPending.get(replyId);
+    if (pending) {
+        return await pending;
+    }
+
+    const promise = (async () => {
+        try {
+            const { items: [comment] = [], profiles = [] } = await window.OVKAPI.call('wall.getComment', {
+                owner_id: parseInt(ownerId, 10) || 1,
+                comment_id: replyId,
+                extended: 1,
+                fields: 'sex,screen_name,photo_50,photo_100,online_info,online,verified'
+            });
+
+            if (!comment) {
+                throw new Error('No comment');
+            }
+
+            const profile = profiles.find(p => p.id === comment.from_id) || {};
+            const name = escapeHtml(((profile.first_name || '') + ' ' + (profile.last_name || '')).trim()) || '...';
+            const domain = escapeHtml(profile.screen_name || ('id' + comment.from_id));
+            const photo = escapeHtml(profile.photo_50 || '/assets/packages/static/openvk/img/avatar.png');
+            const verified = profile.verified ? '<a class="page_verified" href="/verify"></a>' : '';
+            const date = new Date((comment.date || 0) * 1000).toLocaleString();
+            const text = comment.text ? `<div class="text reply_text" id="text${comment.id}" style="white-space:pre-wrap;word-break:break-word;">${comment.text}</div>` : '';
+
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = `
+                <div class="content">
+                    <div class="post reply" data-id="1_${comment.id}" data-uniqueid="reply_${comment.id}" data-comment-id="${comment.id}" data-owner-id="${comment.from_id}">
+                        <div class="reply_wrap">
+                            <a class="reply_image" href="/${domain}">
+                                <img src="${photo}" width="30" class="avatar reply_img" alt="">
+                            </a>
+                            <div class="reply_content">
+                                <div class="reply_author post-author">
+                                    <a class="author" href="/${domain}"><b class="post-author-name">${name}</b></a>
+                                    ${verified}
+                                </div>
+                                <div class="post-content" id="${comment.id}">${text}</div>
+                                <div class="reply_footer clear_fix">
+                                    <div class="reply_date"><a href="#" class="reply_link" onclick="return false;">${escapeHtml(date)}</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            const content = wrapper.firstElementChild;
+            replyTooltipCache.set(replyId, content);
+            return content;
+        } catch (err) {
+            const errorEl = document.createElement('div');
+            errorEl.style.padding = '8px';
+            errorEl.textContent = window.tr?.('error') || 'Error';
+            return errorEl;
+        } finally {
+            replyTooltipPending.delete(replyId);
+        }
+    })();
+
+    replyTooltipPending.set(replyId, promise);
+    return await promise;
+}
+
+window.wall = window.wall || {};
+
+window.wall.postTooltip = function(el, post, opts = {}, tooltipOpts = {}) {
+    if (!opts.reply) return;
+
+    const replyId = String(post).split('_')[1] || String(post);
+    const ownerId = el.dataset.replyToOwnerId;
+    if (!replyId) return;
+
+    if (el._tippy) {
+        el._tippy.show();
+        return;
+    }
+
+    if (typeof tippy === 'undefined' || !window.OVKAPI) return;
+
+    const loading = document.createElement('div');
+    loading.style.cssText = 'min-width:180px;min-height:60px;padding:8px;display:flex;align-items:center;justify-content:center;';
+    window.LoaderUtils?.show?.(loading, { size: 'small' });
+
+    const instance = tippy(el, {
+        theme: 'light vk',
+        trigger: 'mouseenter',
+        interactive: true,
+        maxWidth: 380,
+        allowHTML: true,
+        appendTo: document.body,
+        animation: 'up_down',
+        duration: [100, 100],
+        content: loading,
+        onCreate(inst) {
+            inst.popper?.querySelector('.tippy-box')?.classList.add('wall_tt');
+        },
+        async onShow(inst) {
+            const content = await buildReplyTooltipContent(replyId, ownerId);
+            inst.setContent(content.cloneNode(true));
+        }
+    });
+
+    instance.show();
+};
+
+window.wall.showReply = () => true;
+
+u(document).on('click', '.post.reply', function(e) {
+    const target = u(e.target);
+    if (target.closest('a[href], .reply_action, .post_like, .attachment a, input, textarea, button').length) {
+        return;
+    }
+
+    let comment   = u(this);
+    let authorId  = comment.data('owner-id');
+    let commentId = comment.data('comment-id');
+    let authorNm  = (comment.data('mention-name') || '').trim();
+    let fromGroup = comment.attr('data-from-group') === 'true';
+    let postId    = comment.data('post-id');
+    let inputbox  = postId == null ? u('#write textarea') : u('#wall-post-input' + (postId || ''));
+    let mention   = ('[' + (fromGroup ? 'club' : 'id') + authorId + '|' + authorNm + '], ');
+    let attachments = inputbox.closest('.model_content_textarea').find('.post-buttons');
+
+    inputbox.nodes.forEach(node => {
+        node.value = node.value.replace(/(^\[([A-Za-z0-9]+)\|([\p{L} 0-9@]+)\], |^)/u, mention);
+    });
+    inputbox.trigger('focusin');
+    inputbox.closest('.model_content_textarea').addClass('shown');
+
+    let attachReply = attachments.find('[name="reply_to_comment"]');
+    attachReply.nodes[0].value = commentId;
+
+    attachments.find('.post-replyto').html(`
+        <span>${window.tr?.('in_reply')}</span>
+        <div id='remove_reply_button'></div>
+    `);
+
+    attachments.find('.post-replyto #remove_reply_button').on('click', (e) => {
+        attachments.find('.post-replyto').html('');
+        attachments.find('input[name="reply_to_comment"]').attr('value', '');
+        inputbox.nodes.forEach(node => {
+            node.value = node.value.replace(/^\[[A-Za-z0-9]+\|[\p{L} 0-9@]+\], /u, '');
+        });
+    });
+});
+
+function bindArchivePostPageOnce() {
+    if (!vkify.bindOnce('archivePostPage', bindArchivePostPageOnce)) return;
+
+    document.addEventListener('click', (e) => {
+        const clicked = e.target instanceof Element ? e.target : e.target.parentElement;
+        const archiveLink = clicked?.closest('.archive_post');
+        if (!archiveLink) return;
+
+        if (!archiveLink.hasAttribute('data-post-page')) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        MessageBox(tr('warning'), tr('question_confirm'), [tr('yes'), tr('no')], [
+            async () => {
+                const baseHref = archiveLink.getAttribute('href');
+                const ajaxUrl = baseHref + (baseHref.includes('?') ? '&' : '?') + 'ajax=1';
+
+                try {
+                    const response = await ky.get(ajaxUrl);
+                    const json = await response.json();
+
+                    if (!json.success) {
+                        if (json.flash && json.flash.message) {
+                            fastError(json.flash.message);
+                        }
+                        return;
+                    }
+
+                    const wallMatch = baseHref.match(/^\/wall(-?\d+)_\d+\/archive/);
+                    const wall = wallMatch ? wallMatch[1] : null;
+                    if (!wall) {
+                        location.assign(baseHref);
+                        return;
+                    }
+
+                    const isArchived = Boolean(json.archived);
+                    const redirectUrl = isArchived
+                        ? `/wall${wall}?type=archive`
+                        : (Number(wall) < 0 ? `/club${Math.abs(Number(wall))}` : `/id${wall}`);
+
+                    window.router.route(redirectUrl);
+                } catch (err) {
+                    console.error('Archive request failed:', err);
+                    fastError(err.message);
+                }
+            },
+            Function.noop
+        ]);
+    }, true);
+}
+
+bindArchivePostPageOnce();
 
 })();

@@ -4,7 +4,6 @@ vkify.once('mediaModals', function () {
     const escapeHtml = window.escapeHtml;
     const LoaderUtils = window.LoaderUtils;
     const fastError = window.fastError;
-    const findAuthor = window.find_author;
     const CF = window.ContentFetcher;
     const ModalUtils = window.ModalUtils;
 
@@ -16,38 +15,7 @@ vkify.once('mediaModals', function () {
             loader.show();
             const video_owner = video_arr[0];
             const video_id = video_arr[1];
-            let video_api = null;
-            let isPrivacyRestricted = await ModalUtils.checkPrivacyRestriction(video_owner, 'user');
-
-            if (!isPrivacyRestricted) {
-                try {
-                    video_api = await window.OVKAPI.call('video.get', { 'videos': `${video_owner}_${video_id}`, 'extended': 1 });
-
-                    if (!video_api.items || !video_api.items[0]) {
-                        throw new Error('Not found');
-                    }
-                } catch (e) {
-                    const errorMessage = e.message ? e.message.toLowerCase() : '';
-                    if (errorMessage.includes('access') || errorMessage.includes('private') ||
-                        errorMessage.includes('permission') || errorMessage.includes('forbidden') ||
-                        errorMessage.includes('denied') || e.code === 15 || e.code === 18) {
-                        isPrivacyRestricted = true;
-                    } else {
-                        loader.hide();
-                        fastError(e.message);
-                        return;
-                    }
-                }
-            }
-
-            const video_object = video_api?.items?.[0];
-            if (!video_object) {
-                loader.hide();
-                fastError(tr('access_denied'));
-                return;
-            }
-
-            const pretty_id = `${video_object.owner_id}_${video_object.id}`;
+            const pretty_id = `${video_owner}_${video_id}`;
 
             function updateVideoUrl(videoId) {
                 CF.updateUrlParam('z', `video${videoId}`, { skip: skipUrlUpdate });
@@ -57,80 +25,126 @@ vkify.once('mediaModals', function () {
                 CF.clearUrlParam('z');
             }
 
-            const author = findAuthor(video_object.owner_id, video_api?.profiles, video_api?.groups);
+            let doc;
+            try {
+                doc = await CF.fetchPageContent(`/video${pretty_id}`, null, { ajaxQuery: true, showLoader: false });
+            } catch (e) {
+                loader.hide();
+                if (e.message !== 'Page redirected') {
+                    fastError(e.message);
+                }
+                return;
+            }
+
+            const titleEl = doc.querySelector('.video_info_title');
+            const videoTitle = titleEl?.textContent?.trim() || tr('video');
+
+            const authorEl = doc.querySelector('.video_info_author_name a');
+            const authorName = authorEl?.textContent?.trim() || '';
 
             let player_html = '';
-            if (init_player) {
-                if (video_object.platform == 'youtube') {
-                    const video_url = new URL(video_object.player);
-                    const video_id = video_url.pathname.replace('/', '');
+            let isYoutube = false;
+
+            const videoBlock = doc.querySelector('.video_block_layout');
+            if (videoBlock && init_player) {
+                const videoEl = videoBlock.querySelector('video');
+                const iframeEl = videoBlock.querySelector('iframe');
+
+                if (videoEl) {
+                    const playerUrl = videoEl.dataset.src || videoEl.getAttribute('src') || '';
+                    const bsdnDiv = videoBlock.querySelector('.bsdn');
+                    const dataId = bsdnDiv?.dataset?.id || pretty_id;
+                    const dataName = bsdnDiv?.dataset?.name || videoTitle;
+                    const dataAuthor = bsdnDiv?.dataset?.author || authorName;
                     player_html = `
-                <div class="video-player-container" style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%;">
-                    <iframe
-                       style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
-                       src="https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1&start=${Math.floor(startAtTime)}"
-                       frameborder="0"
-                       sandbox="allow-same-origin allow-scripts allow-popups"
-                       allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                       allowfullscreen></iframe>
-                </div>
-            `;
-                } else {
-                    if (!video_object.is_processed) {
-                        player_html = `<span class='gray'>${tr('video_processing')}</span>`;
-                    } else {
-                        const author_name = `${author.first_name} ${author.last_name}`;
-                        player_html = `
                     <div class="video-player-container" style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%;">
-                        <div class='bsdn media' data-id="${pretty_id}" data-name="${escapeHtml(video_object.title)}" data-author="${escapeHtml(author_name)}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
-                            <video class='media' data-src='${video_object.player}' style="width: 100%; height: 100%; object-fit: contain;"></video>
+                        <div class='bsdn media' data-id="${escapeHtml(dataId)}" data-name="${escapeHtml(dataName)}" data-author="${escapeHtml(dataAuthor)}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                            <video class='media' data-src='${escapeHtml(playerUrl)}' style="width: 100%; height: 100%; object-fit: contain;"></video>
                         </div>
                     </div>
                 `;
-                    }
+                } else if (iframeEl) {
+                    isYoutube = true;
+                    const iframeSrc = iframeEl.getAttribute('src') || '';
+                    player_html = `
+                    <div class="video-player-container" style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%;">
+                        <iframe
+                           style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+                           src="${escapeHtml(iframeSrc)}"
+                           frameborder="0"
+                           sandbox="allow-same-origin allow-scripts allow-popups"
+                           allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                           allowfullscreen></iframe>
+                    </div>
+                `;
                 }
             }
+
+            const videoInfo = doc.querySelector('.video_info');
+            let videoInfoHtml = '';
+            if (videoInfo) {
+                const viewButton = `
+            <a href="/video${pretty_id}" class="video_view_button button button_light">
+                <span class="video_view_link" style="display: inline!important">${tr("view_video")}</span>
+            </a>`;
+                const moreActions = videoInfo.querySelector('.video_info_more_actions');
+                if (moreActions) {
+                    moreActions.insertAdjacentHTML('beforebegin', viewButton);
+                } else {
+                    videoInfo.insertAdjacentHTML('beforeend', viewButton);
+                }
+                videoInfoHtml = videoInfo.innerHTML;
+            }
+
+            const videoComments = doc.querySelector('.video_comments');
+            const videoCommentsHtml = videoComments ? videoComments.innerHTML : '';
 
             const content = `
         <div class="page_block">
             <div class="video_block_layout">
                 ${player_html}
             </div>
-            <div class="video_info"></div>
-            <div class="clear_fix video_comments" id="video_comments_section" style="display: none;">
-                <div class="pr pr_medium"><div class="pr_bt"></div><div class="pr_bt"></div><div class="pr_bt"></div></div>
+            <div class="video_info">${videoInfoHtml}</div>
+            <div class="clear_fix video_comments" id="video_comments_section" style="${videoCommentsHtml ? '' : 'display: none;'}">
+                ${videoCommentsHtml || '<div class="pr pr_medium"><div class="pr_bt"></div><div class="pr_bt"></div><div class="pr_bt"></div></div>'}
             </div>
         </div>`;
 
             const msgbox = ModalUtils.createModal({
                 type: 'video',
-                title: escapeHtml(video_object.title),
+                title: escapeHtml(videoTitle),
                 content: content,
-                isPrivate: isPrivacyRestricted,
                 showMinimize: true,
                 closeOnButtons: false,
                 warnOnExit: false
             });
 
-            if (video_object.platform != 'youtube' && video_object.is_processed) {
-                bsdnInitElement(msgbox.getNode().find('.bsdn').nodes[0]);
-                const modalPlayer = msgbox.getNode().find('.bsdn > video').nodes[0];
-                if (modalPlayer && startAtTime > 0) {
-                    if (!modalPlayer.src && modalPlayer.dataset.src) {
-                        modalPlayer.src = modalPlayer.dataset.src;
-                        modalPlayer.load();
-                    }
-                    modalPlayer.addEventListener('loadedmetadata', function() {
-                        modalPlayer.currentTime = startAtTime;
-                        modalPlayer.play();
-                    }, { once: true });
-                    if (modalPlayer.readyState >= 1) {
-                        modalPlayer.currentTime = startAtTime;
-                        modalPlayer.play();
+            if (!isYoutube) {
+                const bsdnNode = msgbox.getNode().find('.bsdn').nodes[0];
+                if (bsdnNode) {
+                    bsdnInitElement(bsdnNode);
+                    const modalPlayer = msgbox.getNode().find('.bsdn > video').nodes[0];
+                    if (modalPlayer && startAtTime > 0) {
+                        if (!modalPlayer.src && modalPlayer.dataset.src) {
+                            modalPlayer.src = modalPlayer.dataset.src;
+                            modalPlayer.load();
+                        }
+                        modalPlayer.addEventListener('loadedmetadata', function() {
+                            modalPlayer.currentTime = startAtTime;
+                            modalPlayer.play();
+                        }, { once: true });
+                        if (modalPlayer.readyState >= 1) {
+                            modalPlayer.currentTime = startAtTime;
+                            modalPlayer.play();
+                        }
                     }
                 }
             }
 
+            bsdnHydrate();
+            setTimeout(() => {
+                window.reinitializeTooltips();
+            }, 200);
 
             async function loadVideoInfo() {
                 const videoInfoTarget = msgbox.getNode().find('.video_info');
@@ -160,7 +174,7 @@ vkify.once('mediaModals', function () {
                                 window.reinitializeTooltips();
                             }, 200);
                         } else {
-                            videoInfoTarget.html(`<div class="video_info_title">${escapeHtml(video_object.title)}</div>`);
+                            videoInfoTarget.html(`<div class="video_info_title">${escapeHtml(videoTitle)}</div>`);
                         }
 
                         const videoComments = results.find('.video_comments');
@@ -175,15 +189,13 @@ vkify.once('mediaModals', function () {
                         }
                     }
                 });
-
-                window._currentMediaModalRefresh = () => {
-                    if (document.contains(msgbox.getNode().nodes[0])) {
-                        loadVideoInfo();
-                    }
-                };
             }
 
-            loadVideoInfo();
+            window._currentMediaModalRefresh = () => {
+                if (document.contains(msgbox.getNode().nodes[0])) {
+                    loadVideoInfo();
+                }
+            };
 
             ModalUtils.setupCloseButton(msgbox, '#__modalPlayerClose');
             ModalUtils.setupDimmerClose(msgbox);
@@ -198,7 +210,7 @@ vkify.once('mediaModals', function () {
                 const miniplayer = u(`
                     <div class="miniplayer">
                         <div class="miniplayer-head">
-                            <b>${escapeHtml(video_object.title)}</b>
+                            <b>${escapeHtml(videoTitle)}</b>
                             <div class="miniplayer-head-buttons">
                                 <div id="__miniplayer_return"></div>
                                 <div id="__miniplayer_close"></div>
@@ -287,6 +299,15 @@ vkify.once('mediaModals', function () {
             let photoOwnerId = parseInt(photo_id.split('_')[0]);
             let photoRealId = parseInt(photo_id.split('_')[1]);
             const currentUserId = window.openvk?.current_id || 0;
+
+            try {
+                await CF.fetchPageContent(`/photo${photo_id}`, null, { ajaxQuery: true, showLoader: false });
+            } catch (e) {
+                if (e.message !== 'Page redirected') {
+                    console.warn('Could not check photo access:', e);
+                }
+                return;
+            }
 
             let content;
             if (window.isMobile && window.isMobile()) {

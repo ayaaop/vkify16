@@ -1368,6 +1368,9 @@ select:focus {
 }
 
 /* tippy tooltip */
+.tippy-box {
+  font-size: 12.5px;
+}
 .tippy-box[data-animation="fade"][data-state="hidden"] {
   opacity: 0;
 }
@@ -1819,4 +1822,19 @@ select:focus {
 .avatar {
   border-radius: 50%;
   object-fit: cover;
+}
+
+/* Progress bar */
+.progress {
+    width: 250px;
+    height: 18px;
+    margin: auto;
+    background: #fff;
+    border: 1px solid #ccc;
+}
+.progress .progress-bar {
+    height: 18px;
+    background: #597da3 url(../progress_grad.gif) repeat;
+    border: 1px solid #45688e;
+    margin: -1px;
 }

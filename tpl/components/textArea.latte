@@ -81,6 +81,7 @@
             <input type="hidden" name="poll" value="none" autocomplete="off" />
             <input type="hidden" id="source" name="source" value="none" autocomplete="off" />
             <input type="hidden" name="geo" value="" autocomplete="off" />
+            <input type="hidden" name="reply_to_comment" value="" autocomplete="off" />
             <input type="hidden" name="type" value="1" autocomplete="off" />
             <input type="hidden" name="hash" value="{$csrfToken}" />
 
@@ -121,7 +122,7 @@
                                     <div class="post-attach-menu__icon"></div>
                                     {_graffiti}
                                 </a>
-                                <a n:if="$pollsEnabled" class="attach_poll" onclick="initPoll(event);">
+                                <a n:if="$pollsEnabled" class="attach_poll" onclick="initVkifyPoll(event);">
                                     <div class="post-attach-menu__icon"></div>
                                     {_poll}
                                 </a>
@@ -162,7 +163,7 @@
                                 <div class="post-attach-menu__icon"></div>
                                 {_graffiti}
                             </a>
-                            <a n:if="$pollsEnabled" class="attach_poll" onclick="initPoll(event);">
+                            <a n:if="$pollsEnabled" class="attach_poll" onclick="initVkifyPoll(event);">
                                 <div class="post-attach-menu__icon"></div>
                                 {_poll}
                             </a>
@@ -207,6 +208,8 @@
                     {/if}
                 </div>
 
+                <div class="post-replyto" n:if="!$attachMenuInTooltip"></div>
+
                 <div class="post-bottom-buttons">
                     {if $isPostComposer}
                         <div class="post_settings" id="postOptsTrigger{$textAreaId}" role="button" data-tippy-content-id="postOptsTooltip{$textAreaId}" data-tippy-append-to="body">
@@ -214,7 +217,7 @@
                         </div>
                         <div class="post-opts tippy-menu tippy-content-template" id="postOptsTooltip{$textAreaId}">
                             {if $showGroupPostOpts}
-                                <label class="checkbox">
+                                <label class="checkbox" n:if="!$club || $club->getWallType() == 1">
                                     <input type="checkbox" name="as_group" form="write-form-{$textAreaId}" onchange="window.onWallAsGroupClick(this)" />
                                     <span>{_post_as_group}</span>
                                 </label>
@@ -251,6 +254,7 @@
                     <input type="submit" value="{_send}" class="button" />
                 </div>
             </div>
+            <div class="post-replyto" n:if="$attachMenuInTooltip"></div>
         </div>
     </form>
 </div>

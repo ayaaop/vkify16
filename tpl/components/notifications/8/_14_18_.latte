@@ -1,0 +1,7 @@
+{extends "@default.latte"}
+{var $post = $notification->getModel(0)->getTarget()}
+{var $comment = $notification->getModel(0)}
+
+{block under}
+    <a href="/wall{$post->getPrettyId()}#_comment{$comment->getId()}">{_nt_post_instrumental}</a>
+{/block}

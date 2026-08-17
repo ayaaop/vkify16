@@ -74,12 +74,12 @@
                     <script>
                         window.__current_page_audio_context = {
                             'name': 'classic_search_context',
-                            'order': {$order|noescape},
-                            'query': {$query|noescape},
-                            'genre': {$_REQUEST['genre'] ?? 'any'|noescape},
+                            'order': {json_encode($order)|noescape},
+                            'query': {json_encode($query)|noescape},
+                            'genre': {json_encode($_REQUEST['genre'] ?? 'any')|noescape},
                             'invert': {$invert ? 1 : 0},
-                            'only_performers': {$_REQUEST['only_performers'] ?? false|noescape},
-                            'with_lyrics': {$_REQUEST['with_lyrics'] ?? false|noescape},
+                            'only_performers': {($_REQUEST['only_performers'] ?? false) ? 1 : 0},
+                            'with_lyrics': {($_REQUEST['with_lyrics'] ?? false) ? 1 : 0},
                             'page': {$page}
                         }
                     </script>

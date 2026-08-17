@@ -9,7 +9,7 @@
         ['title' => tr("upload_video")]
     ]}
     <div id="_video_upload_form" class="form_group page_padding">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" id="videoUploadForm">
             <div class="form_field">
                 <div class="form_label">{_name}</div>
                 <div class="form_data">
@@ -37,11 +37,17 @@
                     <input type="text" name="link" placeholder="https://www.youtube.com/watch?v=9FWSRQEqhKE" />
                 </div>
             </div>
+            <div id="percentage" class="form_field" style="visibility: collapse; margin-top: 15px;">
+                <div class="progress" style="width: 100%;">
+                    <div class="progress-bar" style="width: 0%;"></div>
+                </div>
+            </div>
             <div class="settings_save_footer">
                 <input type="hidden" name="hash" value="{$csrfToken}" />
-                <input type="submit" class="button" name="submit" value="{_upload_button}" />
+                <input type="submit" class="button" name="submit" id="uploadVideo" value="{_upload_button}" />
             </div>
         </form>
     </div>
 </div>
+{script "js/al_videos.js"}
 {/block}

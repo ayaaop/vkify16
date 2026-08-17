@@ -165,9 +165,11 @@ vkify.once('modalUtils', function() {
                 if (type === 'user') {
                     const userInfo = await window.OVKAPI.call('users.get', {
                         'user_ids': ownerId,
-                        'fields': 'is_closed'
+                        'fields': 'is_closed,can_access_closed'
                     });
-                    return userInfo?.[0]?.is_closed || false;
+                    const user = userInfo?.[0];
+                    if (!user?.is_closed) return false;
+                    return !user?.can_access_closed;
                 } else if (type === 'photo') {
                     const photoUrl = `/photo${ownerId}`;
                     const response = await fetch(photoUrl, { method: 'HEAD' });

@@ -17,6 +17,7 @@
     {var $deac = "post_deact_silent"}
 {/if}
 {var $compact = $compact ?? false}
+{var $postPage = $postPage ?? false}
 {var $club = $club ?? NULL}
 {var $is2018 = ($_COOKIE['vkify16_2018mode'] ?? '0') === '1'}
 {var $onlinePlatform = (!$post->isPostedOnBehalfOfGroup() && $author->isOnline()) ? $author->getOnlinePlatform(true) : null}
@@ -86,13 +87,15 @@
                     {if $post->canBeEditedBy($thisUser) && !($forceNoEditLink ?? false)}
                         <a class="edit" id="editPost">{_edit}</a>
                     {/if}
-                    <a n:if="$canBeDeleted && !($forceNoDeleteLink ?? false)" class="delete" href="/wall{$post->getPrettyId()}/delete">{_delete}</a>
+                    <a n:if="$canBeDeleted && !($forceNoDeleteLink ?? false)" class="delete" n:attr="id => $postPage ? '_ajaxDelete' : '_wallDelete', data => $postPage ? null : $post->getPrettyId()" href="/wall{$post->getPrettyId()}/delete">{_delete}</a>
                     {if $canBeArchived && !($forceNoDeleteLink ?? false)}
+                    <a n:attr="data-post-page => $postPage ? '1' : null" class="archive_post" href="/wall{$post->getPrettyId()}/archive?hash={rawurlencode($csrfToken)}">
                         {if $post->isArchived()}
-                            <a class="archive_post" href="/wall{$post->getPrettyId()}/archive?hash={rawurlencode($csrfToken)}">{_unarchive_action}</a>
+                            {_unarchive_action}
                         {else}
-                            <a class="archive_post" href="/wall{$post->getPrettyId()}/archive?hash={rawurlencode($csrfToken)}">{_archive_action}</a>
+                            {_archive_action}
                         {/if}
+                    </a>
                     {/if}
                     {if $canBePinned && !($forceNoPinLink ?? false)}
                         {if $post->isPinned()}

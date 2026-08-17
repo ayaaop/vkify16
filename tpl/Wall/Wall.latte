@@ -114,15 +114,12 @@
                                 {include "../components/post.latte", post => $post, commentSection => true}
                             {/foreach}
                             {include "../components/paginator.latte", conf => $paginatorConf}
-                        {elseif $type != 'search'}
-                            <div class="page_block">
-                                {include "../components/content_error.latte", description => tr("no_posts_abstract")}
-                            </div>
-                        {else}
-                            <div class="page_block">
-                                {include "../components/content_error.latte", description => tr("no_found")}
-                            </div>
                         {/if}
+                        <div class="page_block placeholder {if sizeof($wallPosts) !== 0}hidden{/if}">
+                            {include "../components/content_error.latte",
+                                description => $type == 'search' ? tr('no_found') : tr('no_posts_abstract')
+                            }
+                        </div>
                     </div>
                 {/capture}
 

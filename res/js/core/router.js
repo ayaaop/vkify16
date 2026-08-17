@@ -297,7 +297,14 @@ window.router = new class Router {
     async _integratePage(scrolling = 0) {
         window.temp_y_scroll = null;
         u('.toTop').removeClass('has_down');
-        window.scrollTo(0, scrolling);
+
+        const hash = window.location.hash;
+        if (hash) {
+            window.location.hash = '';
+            window.location.hash = hash;
+        } else {
+            window.scrollTo(0, scrolling);
+        }
 
         if (typeof bsdnHydrate === 'function') {
             bsdnHydrate();
@@ -422,8 +429,9 @@ u(document).on('submit', 'form', async (e) => {
     if (e.defaultPrevented || u('#ajloader').hasClass('shown')) return;
 
     const form = e.target;
-    const method = (form.method || 'GET').toUpperCase();
-    const action = new URL(form.action, location.origin);
+    const method = (form.getAttribute('method') || 'GET').toUpperCase();
+    const rawAction = form.getAttribute('action');
+    const action = new URL(rawAction && rawAction.trim() ? rawAction : location.href, location.origin);
     if (form.dataset.pjax === 'false' || form.target || form.onsubmit || action.origin !== location.origin || !window.router.checkUrl(action)) return;
 
     const target = u(form);
@@ -447,8 +455,21 @@ u(document).on('submit', 'form', async (e) => {
         history: 'push',
     });
     u('#ajloader').removeClass('shown');
-    if (result.fullLoad || result.error) {
+    if (result.fullLoad) {
         location.assign(result.url || action);
+        return;
+    }
+    if (result.error) {
+        if (method === 'GET') {
+            location.assign(action);
+        } else {
+            console.error('AJAX form submission failed:', result.error);
+            if (typeof showSystemMsg === 'function') {
+                showSystemMsg(window.tr?.('something_not_right') || window.tr?.('error') || 'Error submitting form', 'err');
+            } else if (typeof MessageBox === 'function') {
+                MessageBox(window.tr?.('error') || 'Error', window.tr?.('something_not_right') || 'Error submitting form', [window.tr?.('close') || 'Close'], [Function.noop]);
+            }
+        }
         return;
     }
     if (window.jQuery) window.jQuery(e.target).trigger('submitted');

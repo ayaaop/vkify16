@@ -36,8 +36,11 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
             <span class="bsdn_contextMenuElement" onclick="window.open('https://github.com/celestora');">
                 - celestora
             </span>
+            <span class="bsdn_contextMenuElement" onclick="window.open('https://github.com/ayaaop/vkify16/issues/new');">
+                - ayato (vkify16 addon)
+            </span>
             <hr/>
-            <span class="bsdn_contextMenuElement" onclick="window.open('https://github.com/ayaaop/vkify-theme-2016/issues/new');">
+            <span class="bsdn_contextMenuElement" onclick="window.open('https://github.com/ayaaop/vkify16/issues/new');">
                 Report a problem...
             </span>
             <span class="bsdn_contextMenuElement" onclick="window.open('https://youtu.be/VvVThrMhnuE?t=16');">About Adobe Flash Player...</span>
@@ -142,8 +145,91 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
         return h > 0 ? (h + ':' + pad2(m) + ':' + pad2(s)) : (m + ':' + pad2(s));
     };
 
+    var getFullscreenElement = function() {
+        return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+    };
+
+    var exitFullscreen = function() {
+        if (document.exitFullscreen) return document.exitFullscreen();
+        if (document.webkitExitFullscreen) return document.webkitExitFullscreen();
+        if (document.mozCancelFullScreen) return document.mozCancelFullScreen();
+    };
+
+    var requestFullscreen = function(el) {
+        if (el.requestFullscreen) return el.requestFullscreen();
+        if (el.webkitRequestFullscreen) return el.webkitRequestFullscreen();
+        if (el.mozRequestFullScreen) return el.mozRequestFullScreen();
+    };
+
+    var KEY_MAP = {
+        'ArrowRight': 'seekForward',
+        'ArrowLeft':  'seekBackward',
+        'ArrowUp':    'volumeUp',
+        'ArrowDown':  'volumeDown',
+        'Space':      'togglePlay',
+        'KeyF':       'toggleFullscreen',
+        'KeyM':       'toggleMute'
+    };
+
+    var KEY_ALIASES = {
+        'right': 'ArrowRight', 'left': 'ArrowLeft',
+        'up': 'ArrowUp', 'down': 'ArrowDown',
+        ' ': 'Space', 'spacebar': 'Space',
+        'f': 'KeyF', 'm': 'KeyM'
+    };
+
+    var KEYCODE_MAP = { 39: 'ArrowRight', 37: 'ArrowLeft', 38: 'ArrowUp', 40: 'ArrowDown', 32: 'Space', 70: 'KeyF', 77: 'KeyM' };
+
+    var resolveKeyAction = function(e) {
+        var code = e.code || KEYCODE_MAP[e.keyCode] || KEY_ALIASES[(e.key || '').toLowerCase()] || KEY_ALIASES[e.key];
+        return code ? KEY_MAP[code] : null;
+    };
+
     vkify.hook(window, '_bsdnEventListenerFactory', function(el, v) {
         var listeners = originalFactory(el, v);
+
+        var player = el.querySelector('.bsdn-player');
+        if (player) player.tabIndex = 0;
+
+        if (player) {
+            player.addEventListener('keydown', function(e) {
+                if (e.target !== e.currentTarget) return;
+                if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+                var action = resolveKeyAction(e);
+                if (!action) return;
+                e.preventDefault();
+
+                switch (action) {
+                    case 'seekForward':
+                    case 'seekBackward':
+                        var step = action === 'seekForward' ? 5 : -5;
+                        if (Number.isFinite(v.duration) && v.duration > 0 && Number.isFinite(v.currentTime)) {
+                            v.currentTime = Math.max(0, Math.min(v.duration, v.currentTime + step));
+                        }
+                        break;
+                    case 'volumeUp':
+                        v.volume = Math.min(1, v.volume + 0.05);
+                        break;
+                    case 'volumeDown':
+                        v.volume = Math.max(0, v.volume - 0.05);
+                        break;
+                    case 'togglePlay':
+                        if (clickTimeout) return;
+                        if (v.paused) v.play();
+                        else v.pause();
+                        break;
+                    case 'toggleFullscreen':
+                        var fsBtn = el.querySelector('.bsdn_fullScreenButton');
+                        if (fsBtn) fsBtn.click();
+                        break;
+                    case 'toggleMute':
+                        var muteBtn = el.querySelector('.bsdn_soundIcon');
+                        if (muteBtn) muteBtn.click();
+                        break;
+                }
+            }, { passive: false });
+        }
 
         if (!v.__playWrapped) {
             v.__playWrapped = true;
@@ -205,7 +291,7 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
                 dragTip.style.display = 'none';
             }
 
-            var parent = document.fullscreenElement || document.body;
+            var parent = getFullscreenElement() || document.body;
             if (dragTip.parentNode !== parent) parent.appendChild(dragTip);
             return dragTip;
         };
@@ -294,6 +380,7 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
                         clickTimeout = null;
                         if (v.paused) v.play();
                         else v.pause();
+                        if (player) player.focus({ preventScroll: true });
                     }, 250);
                 }
             ];
@@ -311,47 +398,24 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
                         clickTimeout = null;
                     }
 
-                    var isFs = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-                    if (isFs) {
-                        if (document.exitFullscreen) document.exitFullscreen();
-                        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-                        else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+                    if (getFullscreenElement()) {
+                        exitFullscreen();
                     } else {
                         var player = el.querySelector(".bsdn-player");
-                        if (player.requestFullscreen) player.requestFullscreen();
-                        else if (player.webkitRequestFullscreen) player.webkitRequestFullscreen();
-                        else if (player.mozRequestFullScreen) player.mozRequestFullScreen();
+                        requestFullscreen(player);
                     }
                 }
             ];
 
-            listeners[".bsdn-player"].fullscreenchange = [
-                function() {
-                    var player = el.querySelector(".bsdn-player");
-                    if (player) {
-                        var isFs = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-                        player.classList.toggle("bsdn-fullscreen", !!isFs);
-                    }
+            var handleFullscreenChange = function() {
+                var player = el.querySelector(".bsdn-player");
+                if (player) {
+                    player.classList.toggle("bsdn-fullscreen", !!getFullscreenElement());
                 }
-            ];
-            listeners[".bsdn-player"].webkitfullscreenchange = [
-                function() {
-                    var player = el.querySelector(".bsdn-player");
-                    if (player) {
-                        var isFs = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-                        player.classList.toggle("bsdn-fullscreen", !!isFs);
-                    }
-                }
-            ];
-            listeners[".bsdn-player"].mozfullscreenchange = [
-                function() {
-                    var player = el.querySelector(".bsdn-player");
-                    if (player) {
-                        var isFs = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-                        player.classList.toggle("bsdn-fullscreen", !!isFs);
-                    }
-                }
-            ];
+            };
+            listeners[".bsdn-player"].fullscreenchange = [handleFullscreenChange];
+            listeners[".bsdn-player"].webkitfullscreenchange = [handleFullscreenChange];
+            listeners[".bsdn-player"].mozfullscreenchange = [handleFullscreenChange];
 
             if (listeners[".bsdn-player"].contextmenu) {
                 listeners[".bsdn-player"].contextmenu = [
@@ -372,8 +436,7 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
                         var rect = el.querySelector(".bsdn-player").getBoundingClientRect();
                         var h = rect.height, w = rect.width;
                         var x, y;
-                        var isFs = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-                        if (isFs) {
+                        if (getFullscreenElement()) {
                             x = e.screenX;
                             y = e.screenY;
                         } else {
@@ -476,22 +539,18 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
             click: [function() {
                 if (v.paused) v.play();
                 else v.pause();
+                if (player) player.focus({ preventScroll: true });
             }]
         };
 
         // Cross-browser fullscreen toggle
         listeners[".bsdn_fullScreenButton"] = {
             click: [function() {
-                var isFs = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-                if (isFs) {
-                    if (document.exitFullscreen) document.exitFullscreen();
-                    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-                    else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+                if (getFullscreenElement()) {
+                    exitFullscreen();
                 } else {
                     var player = el.querySelector(".bsdn-player");
-                    if (player.requestFullscreen) player.requestFullscreen();
-                    else if (player.webkitRequestFullscreen) player.webkitRequestFullscreen();
-                    else if (player.mozRequestFullScreen) player.mozRequestFullScreen();
+                    requestFullscreen(player);
                 }
             }]
         };
@@ -552,13 +611,11 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
             }
         };
 
+        var DRAG_HANDLERS = { seek: seekFromOuter, volume: volumeFromOuter };
+
         var handleDocumentMouseMove = function(e) {
-            if (!dragState.mode) return;
-            if (dragState.mode === 'seek') {
-                seekFromOuter(e);
-            } else if (dragState.mode === 'volume') {
-                volumeFromOuter(e);
-            }
+            var handler = DRAG_HANDLERS[dragState.mode];
+            if (handler) handler(e);
         };
 
         var handleDocumentMouseUp = function() {
@@ -595,21 +652,21 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
                 syncRepeatUi();
             });
         }
+        var copyToClipboard = async function(url) {
+            if (!navigator.clipboard) { prompt("URL:", url); return false; }
+            try {
+                await navigator.clipboard.writeText(url);
+                return true;
+            } catch(e) {
+                prompt("URL:", url);
+                return false;
+            }
+        };
+
         var copyUrlWithNotification = async function(url, defaultSuccessMsg) {
-            var fallback = function() { prompt("URL:", url); };
-            if (typeof navigator.clipboard == "undefined") {
-                fallback();
-            } else {
-                try {
-                    await navigator.clipboard.writeText(url);
-                    if (window.NewNotification) {
-                        window.NewNotification('', defaultSuccessMsg, null, () => {}, 3000, false);
-                    } else {
-                        if (typeof window.confirm === "function") confirm("👍🏼");
-                    }
-                } catch(e) {
-                    fallback();
-                }
+            var ok = await copyToClipboard(url);
+            if (ok && window.NewNotification) {
+                window.NewNotification('', defaultSuccessMsg, null, () => {}, 3000, false);
             }
         };
 

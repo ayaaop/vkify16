@@ -1,0 +1,7 @@
+{extends "@default.latte"}
+{var $note = $notification->getModel(0)->getTarget()}
+{var $comment = $notification->getModel(0)}
+
+{block under}
+    <a href="/note{$note->getPrettyId()}#_comment{$comment->getId()}">{_nt_note_instrumental}</a>
+{/block}

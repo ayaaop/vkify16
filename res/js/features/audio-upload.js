@@ -60,6 +60,13 @@ const audioFrameTpl = Hb.compile(
                         <label class="checkbox"><input type="checkbox" name="unlisted"><span>{{lbl_unlisted}}</span></label>
                     </td>
                 </tr>
+                <tr id="percentage" style="visibility: collapse;">
+                    <td width="120" valign="top" colspan="2">
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 0%;"></div>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>`
@@ -261,11 +268,24 @@ vkify.once("showAudioUploadPopup", () => {
                 fd.append('ajax', 1);
                 fd.append('hash', window.router?.csrf || u('meta[name=csrf]').attr('value'));
 
+                elemU.find("#percentage").nodes[0].style.visibility = "visible";
+                const xhr = new XMLHttpRequest();
+
                 try {
-                    const result = await ContentFetcher.postForm(uploadPage, fd, {
-                        responseType: 'json',
-                        csrf: false
+                    const rawResult = await new Promise((resolve) => {
+                        xhr.upload.addEventListener("progress", (event) => {
+                            if (event.lengthComputable) {
+                                elemU.find(".progress-bar").nodes[0].style.width = (event.loaded / event.total * 100) + "%";
+                            }
+                        });
+                        xhr.addEventListener("loadend", () => {
+                            resolve(xhr);
+                        });
+                        xhr.open("POST", uploadPage, true);
+                        xhr.send(fd);
                     });
+
+                    const result = JSON.parse(rawResult.response);
 
                     if (result.success) {
                         endRedir = result.redirect_link;
