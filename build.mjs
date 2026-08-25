@@ -42,9 +42,9 @@ const modules = [
     'utils/modal-utils.js',
     'ui/media-modals.js',
     'ui/graffiti.js',
+    'ui/action-menu.js',
 
     'features/attachment-picker.js',
-    'features/poll.js',
     'features/post-count.js',
     'features/wall.js',
     'features/player.js',
