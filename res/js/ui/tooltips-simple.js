@@ -7,40 +7,11 @@ if (!vkify.simpleTooltips) {
 
 vkify.once('simpleTooltips', () => {
 
-    function getOptimalPlacement(element) {
-        const rect = element.getBoundingClientRect();
-        const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-
-        const space = {
-            top: rect.top,
-            bottom: viewportHeight - rect.bottom,
-            left: rect.left,
-            right: viewportWidth - rect.right,
-        };
-
-        let placement = 'top';
-
-        if (space.bottom > space.top && space.bottom > 100) {
-            placement = 'bottom';
-        } else if (space.right > space.left && space.right > 100) {
-            placement = 'right';
-        } else if (space.left > space.right && space.left > 100) {
-            placement = 'left';
-        }
-
-        if (rect.top < 50 && placement === 'top') {
-            placement = 'bottom';
-        }
-
-        return placement;
-    }
-
     function getPlacement(element) {
         const align = element.getAttribute('data-align');
         if (align === 'top-center') return 'top';
         if (align === 'bottom-center') return 'bottom';
-        return align || getOptimalPlacement(element);
+        return align || vkify.getOptimalPlacement(element);
     }
 
     function getDelayMs(element) {

@@ -114,19 +114,21 @@
             </a>
             {var $hasActions = ($club->getOwner()->getId() != $user->getId() && $manager && $thisUser->getId() == $club->getOwner()->getId()) || $manager || ($club->getOwner()->getId() === $user->getId())}
             {if $hasActions}
-                <button class="button button_gray profile_more_btn" data-tippy-placement="bottom-end" data-tippy-content-id="followers_actions_menu_{$x->getId()}">
-                    &nbsp;
-                </button>
-                <div id="followers_actions_menu_{$x->getId()}" class="tippy-menu tippy-content-template">
-                    {if $club->getOwner()->getId() != $user->getId() && $manager && $thisUser->getId() == $club->getOwner()->getId()}
-                        <a href="javascript:changeOwner({$club->getId()}, {$user->getId()}, '{$user->getCanonicalName()}')">
-                            {_promote_to_owner}
-                        </a>
-                    {/if}
-                    {if $manager}
-                        <a href="javascript:setClubAdminComment('{$club->getId()}', '{$manager->getUserId()}', '{rawurlencode($csrfToken)}')">{_set_comment}</a>
-                    {/if}
-                    <a n:if="$club->getOwner()->getId() === $user->getId()" href="javascript:setClubAdminComment('{$club->getId()}', '{$club->getOwner()->getId()}', '{rawurlencode($csrfToken)}')">{_set_comment}</a>
+                <div class="ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+                    <button class="button button_gray profile_more_btn">
+                        &nbsp;
+                    </button>
+                    <div id="followers_actions_menu_{$x->getId()}" class="ui_actions_menu">
+                        {if $club->getOwner()->getId() != $user->getId() && $manager && $thisUser->getId() == $club->getOwner()->getId()}
+                            <a href="javascript:changeOwner({$club->getId()}, {$user->getId()}, '{$user->getCanonicalName()}')">
+                                {_promote_to_owner}
+                            </a>
+                        {/if}
+                        {if $manager}
+                            <a href="javascript:setClubAdminComment('{$club->getId()}', '{$manager->getUserId()}', '{rawurlencode($csrfToken)}')">{_set_comment}</a>
+                        {/if}
+                        <a n:if="$club->getOwner()->getId() === $user->getId()" href="javascript:setClubAdminComment('{$club->getId()}', '{$club->getOwner()->getId()}', '{rawurlencode($csrfToken)}')">{_set_comment}</a>
+                    </div>
                 </div>
             {/if}
         </div>

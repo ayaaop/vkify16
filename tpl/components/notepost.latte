@@ -22,11 +22,11 @@
                         <span n:if="$note->getEditTime() > $note->getPublicationTime()" class="edited editedMark" title="{$note->getEditTime()}">({_edited_short})</span>
                     </a>
                 </div>
-                <div class="post_actions" n:if="$thisUser">
-                    <div class="post_actions_icon" data-tippy-content-id="note_actions_menu_{$note->getId()}"></div>
-                    <div id="note_actions_menu_{$note->getId()}" class="tippy-menu tippy-content-template">
+                <div class="post_actions ui_actions_menu_wrap" n:if="$thisUser" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+                    <div class="post_actions_icon"></div>
+                    <div id="note_actions_menu_{$note->getId()}" class="ui_actions_menu">
                         <a n:if="$note->canBeModifiedBy($thisUser)" href="/note{$note->getOwner()->getId()}_{$note->getVirtualId()}/edit" rel='nofollow'>{_edit}</a>
-                        <a n:if="$note->canBeModifiedBy($thisUser) && !($forceNoDeleteLink ?? false)" class="delete" href="/note{$note->getOwner()->getId()}_{$note->getId()}/delete">{_delete}</a>
+                        <a n:if="$note->canBeModifiedBy($thisUser) && !($forceNoDeleteLink ?? false)" id="_noteDelete" class="delete" href="/note{$note->getOwner()->getId()}_{$note->getId()}/delete">{_delete}</a>
                         <a n:if="$thisUser->getId() != $note->getOwner()->getId()" class="report" href="javascript:reportNote({$note->getId()})">{_report}</a>
                     </div>
                 </div>

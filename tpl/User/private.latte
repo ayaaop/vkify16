@@ -7,7 +7,7 @@
 {block appbar_extra}
 {ifset $thisUser}
 <div class="mobileonly" id="profile_appbar_extra">
-    <button class="appbar-extra-btn" id="profileAppbarMoreBtn" aria-label="More actions">
+    <button class="appbar-extra-btn ui_actions_menu_wrap ui_actions_menu_no_chevron" id="profileAppbarMoreBtn" aria-label="More actions" onclick='{="uiActionsMenu.toggle(this, null, {menuId: \"profile_actions_tooltip\", noAnimate: true});"|noescape}'>
         <svg viewBox="0 0 12 24" width="22" height="22" fill="currentColor"><use href="#more-vertical-24"></use></svg>
     </button>
 </div>

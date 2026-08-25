@@ -126,14 +126,14 @@ body.dark-mode input[type="radio"]:not(:checked) {
 	filter: invert(1) contrast(70%) grayscale(1);
 }
 
-body.dark-mode .button .profile_gift_icon, .bigPlayer .playButtons .playButton .playIcon, [src*="/icons/no_music.svg"] {
+body.dark-mode .button .profile_gift_icon, .video_like_button .action_icon, .bigPlayer .playButtons .playButton .playIcon, [src*="/icons/no_music.svg"] {
 	filter: invert(1)!important
 }
 body.dark-mode input[type="radio"] {
 	filter: invert(1) hue-rotate(180deg) brightness(140%);
 }
 
-body.dark-mode .tippy-menu a,body.dark-mode .tippy-menu form button,.ovk-diag-head a,.ovk-diag-head .divider::before {
+body.dark-mode .ovk-diag-head a,body.dark-mode .ovk-diag-head .divider::before {
 	color: var(--text-color)
 }
 body.dark-mode .ovk-diag-head {

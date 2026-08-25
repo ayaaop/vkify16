@@ -39,14 +39,16 @@
                         <a id="_photoDelete" href="/photo{$photo->getPrettyId()}/delete?hash={rawurlencode($csrfToken)}">{_delete}</a>
                         <span class="divider"></span>
                     {/if}
-                    <span class="pv_actions_more" role="button" data-tippy-content-id="pv_actions_more_menu" data-tippy-theme="dark vk">
-                        {=vkifyTr('more')}
+                    <span class="ui_actions_menu_wrap" onmouseover="{='uiActionsMenu.show(this, null, {autopos: true, align: "right"});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
+                        <span class="pv_actions_more" role="button">
+                            {=vkifyTr('more')}
+                        </span>
+                        <div id="pv_actions_more_menu" class="ui_actions_menu dark">
+                            <a n:if="isset($thisUser) && $thisUser->getId() === $photo->getOwner()->getId()" href="javascript:showEditPhotoModal('{$photo->getPrettyId()}')">{_edit}</a>
+                            <a href="{$photo->getURL()}" target="_blank">{_open_original}</a>
+                            <a n:if="isset($thisUser) && $thisUser->getId() != $photo->getOwner()->getId()" href="javascript:reportPhoto({$photo->getId()})">{_report}</a>
+                        </div>
                     </span>
-                    <div id="pv_actions_more_menu" class="tippy-menu tippy-content-template">
-                        <a n:if="isset($thisUser) && $thisUser->getId() === $photo->getOwner()->getId()" href="javascript:showEditPhotoModal('{$photo->getPrettyId()}')">{_edit}</a>
-                        <a href="{$photo->getURL()}" target="_blank">{_open_original}</a>
-                        <a n:if="isset($thisUser) && $thisUser->getId() != $photo->getOwner()->getId()" href="javascript:reportPhoto({$photo->getId()})">{_report}</a>
-                    </div>
                 </div>
             </div>
         </div>

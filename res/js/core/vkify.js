@@ -242,6 +242,41 @@
         };
     }
 
+    // Shared by any popup/menu/tooltip system that needs to pick a side of the
+    // trigger with enough room in the viewport (tooltips.js, tooltips-simple.js,
+    // action-menu.js).
+    function getOptimalPlacement(element) {
+        const rect = element.getBoundingClientRect();
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+        const space = {
+            top: rect.top,
+            bottom: viewportHeight - rect.bottom,
+            left: rect.left,
+            right: viewportWidth - rect.right,
+        };
+
+        const minSpace = 100;
+        let placement = 'top';
+
+        if (space.bottom > space.top && space.bottom > minSpace) {
+            placement = 'bottom';
+        } else if (space.top > minSpace) {
+            placement = 'top';
+        } else if (space.right > space.left && space.right > minSpace) {
+            placement = 'right';
+        } else if (space.left > minSpace) {
+            placement = 'left';
+        }
+
+        if (rect.top < 50 && placement === 'top') {
+            placement = 'bottom';
+        }
+
+        return placement;
+    }
+
     function ready(fn) {
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', fn, { once: true });
@@ -356,6 +391,7 @@
         navigate: navigate,
         getCsrf: getCsrf,
         debounce: debounce,
+        getOptimalPlacement: getOptimalPlacement,
 
         resourceUrl: getResourceUrl,
         themeUrl: getThemeUrl,

@@ -162,10 +162,6 @@ vkify.once('contentFetcher', function() {
                     bsdnHydrate();
                 }
 
-                if (options.reinitTooltips && window.reinitializeTooltips) {
-                    setTimeout(() => window.reinitializeTooltips(), options.tooltipDelay || 200);
-                }
-
                 return content;
             } catch (err) {
                 if (typeof options.onError === 'function') {

@@ -88,15 +88,14 @@
             <div class="post-bottom-acts">
                 <div id="wallAttachmentMenu" class="page_add_media post-attach-menu {if !$attachMenuInTooltip}post-attach-menu--inline{/if}">
                     {if $attachMenuInTooltip}
-                        <span
-                            class="post-attach-menu__trigger"
-                            id="moreAttachTrigger{$textAreaId}"
-                            tabindex="0"
-                            role="button"
-                            data-tippy-content-id="moreAttachTooltip{$textAreaId}"
-                            data-tippy-append-to="body"
-                        ></span>
-                        <div class="tippy-menu tippy-content-template" id="moreAttachTooltip{$textAreaId}">
+                        <div class="ui_actions_menu_wrap" onmouseover="{='uiActionsMenu.show(this, null, {autopos: true});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
+                            <span
+                                class="post-attach-menu__trigger"
+                                id="moreAttachTrigger{$textAreaId}"
+                                tabindex="0"
+                                role="button"
+                            ></span>
+                            <div class="ui_actions_menu" id="moreAttachTooltip{$textAreaId}">
                             <a id="__vkifyPhotoAttachment" class="attach_photo" n:attr="data-club => $clubDataId">
                                 <div class="post-attach-menu__icon"></div>
                                 {_photo}
@@ -122,7 +121,7 @@
                                     <div class="post-attach-menu__icon"></div>
                                     {_graffiti}
                                 </a>
-                                <a n:if="$pollsEnabled" class="attach_poll" onclick="initVkifyPoll(event);">
+                                <a n:if="$pollsEnabled" class="attach_poll" onclick="initPoll(event);">
                                     <div class="post-attach-menu__icon"></div>
                                     {_poll}
                                 </a>
@@ -131,6 +130,7 @@
                                     {_geo_place}
                                 </a>
                             {/if}
+                        </div>
                         </div>
                     {elseif $isPostComposer}
                         <a id="__vkifyPhotoAttachment" class="attach_photo"
@@ -147,30 +147,32 @@
                            n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"></div>
                         </a>
-                        <a class="post-attach-menu__trigger" id="moreAttachTrigger{$textAreaId}" data-tippy-content-id="moreAttachTooltip{$textAreaId}" data-tippy-append-to="body">
-                            {=vkifyTr('more')}
-                        </a>
-                        <div class="tippy-menu tippy-content-template" id="moreAttachTooltip{$textAreaId}">
-                            <a n:if="$docsEnabled" id="__vkifyDocumentAttachment" class="attach_document" n:attr="data-club => $clubDataRealId">
-                                <div class="post-attach-menu__icon"></div>
-                                {_document}
+                        <div class="ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+                            <a class="post-attach-menu__trigger" id="moreAttachTrigger{$textAreaId}">
+                                {=vkifyTr('more')}
                             </a>
-                            <a n:if="$notesEnabled" id="__vkifyNotesAttachment" class="attach_note">
-                                <div class="post-attach-menu__icon"></div>
-                                {_note}
-                            </a>
-                            <a n:if="$graffitiEnabled" class="attach_graffiti" onclick="window.vkifyGraffiti(event);">
-                                <div class="post-attach-menu__icon"></div>
-                                {_graffiti}
-                            </a>
-                            <a n:if="$pollsEnabled" class="attach_poll" onclick="initVkifyPoll(event);">
-                                <div class="post-attach-menu__icon"></div>
-                                {_poll}
-                            </a>
-                            <a n:if="$geoEnabled" id="__geoAttacher" class="attach_geo">
-                                <div class="post-attach-menu__icon"></div>
-                                {_geo_place}
-                            </a>
+                            <div class="ui_actions_menu" id="moreAttachTooltip{$textAreaId}">
+                                <a n:if="$docsEnabled" id="__vkifyDocumentAttachment" class="attach_document" n:attr="data-club => $clubDataRealId">
+                                    <div class="post-attach-menu__icon"></div>
+                                    {_document}
+                                </a>
+                                <a n:if="$notesEnabled" id="__vkifyNotesAttachment" class="attach_note">
+                                    <div class="post-attach-menu__icon"></div>
+                                    {_note}
+                                </a>
+                                <a n:if="$graffitiEnabled" class="attach_graffiti" onclick="window.vkifyGraffiti(event);">
+                                    <div class="post-attach-menu__icon"></div>
+                                    {_graffiti}
+                                </a>
+                                <a n:if="$pollsEnabled" class="attach_poll" onclick="initPoll(event);">
+                                    <div class="post-attach-menu__icon"></div>
+                                    {_poll}
+                                </a>
+                                <a n:if="$geoEnabled" id="__geoAttacher" class="attach_geo">
+                                    <div class="post-attach-menu__icon"></div>
+                                    {_geo_place}
+                                </a>
+                            </div>
                         </div>
                     {else}
                         <a id="__vkifyPhotoAttachment" class="attach_photo"
@@ -194,13 +196,13 @@
                         </a>
                     {/if}
                     {if $showCommentAsGroup}
-                        <div class="post-opts-trigger">
-                            <div class="post_settings" id="postOptsTrigger{$textAreaId}" role="button" data-tippy-content-id="postOptsTooltip{$textAreaId}" data-tippy-append-to="body">
+                        <div class="post-opts-trigger ui_actions_menu_wrap" onmouseover="{='uiActionsMenu.show(this, null, {align: "left"});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
+                            <div class="post_settings" id="postOptsTrigger{$textAreaId}" role="button">
                                 <div class="common_icon"></div>
                             </div>
-                            <div class="post-opts tippy-content-template" id="postOptsTooltip{$textAreaId}">
+                            <div class="post-opts ui_actions_menu" id="postOptsTooltip{$textAreaId}">
                                 <label class="checkbox">
-                                    <input type="checkbox" name="as_group" form="write-form-{$textAreaId}" onchange="window.onWallAsGroupClick(this)" />
+                                    <input type="checkbox" name="as_group" form="write-form-{$textAreaId}" onchange="window.handleWallAsGroupClick(this)" />
                                     <span>{_comment_as_group}</span>
                                 </label>
                             </div>
@@ -212,13 +214,14 @@
 
                 <div class="post-bottom-buttons">
                     {if $isPostComposer}
-                        <div class="post_settings" id="postOptsTrigger{$textAreaId}" role="button" data-tippy-content-id="postOptsTooltip{$textAreaId}" data-tippy-append-to="body">
-                            <div class="common_icon"></div>
-                        </div>
-                        <div class="post-opts tippy-menu tippy-content-template" id="postOptsTooltip{$textAreaId}">
+                        <div class="ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+                            <div class="post_settings" id="postOptsTrigger{$textAreaId}" role="button">
+                                <div class="common_icon"></div>
+                            </div>
+                            <div class="post-opts ui_actions_menu" id="postOptsTooltip{$textAreaId}">
                             {if $showGroupPostOpts}
                                 <label class="checkbox" n:if="!$club || $club->getWallType() == 1">
-                                    <input type="checkbox" name="as_group" form="write-form-{$textAreaId}" onchange="window.onWallAsGroupClick(this)" />
+                                    <input type="checkbox" name="as_group" form="write-form-{$textAreaId}" onchange="window.handleWallAsGroupClick(this)" />
                                     <span>{_post_as_group}</span>
                                 </label>
                                 <label class="checkbox" id="forceSignOpt" style="display: none;">
@@ -228,7 +231,7 @@
                             {/if}
 
                             <label n:if="$anonEnabled" class="checkbox" id="octoberAnonOpt">
-                                <input type="checkbox" name="anon" form="write-form-{$textAreaId}" onchange="window.onWallAnonClick(this)" />
+                                <input type="checkbox" name="anon" form="write-form-{$textAreaId}" onchange="window.handleWallAnonClick(this)" />
                                 <span>{_as_anonymous}</span>
                             </label>
 
@@ -244,6 +247,7 @@
                                     {_set_source}
                                 </a>
                             {/if}
+                        </div>
                         </div>
                     {/if}
 

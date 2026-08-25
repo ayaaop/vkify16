@@ -486,96 +486,6 @@ window.addEventListener('popstate', async (e) => {
     if (result.fullLoad || result.error) location.assign(result.url || location.href);
 });
 
-window.reinitializeTooltips = function (container = document) {
-    const elementsWithTippy = container.querySelectorAll('[aria-describedby]');
-    elementsWithTippy.forEach(element => {
-        if (element._tippy) {
-            element._tippy.destroy();
-            delete element._tippy;
-        }
-    });
-
-    const tippyRoots = document.querySelectorAll('[data-tippy-root]');
-    tippyRoots.forEach(root => {
-        if (!document.body.contains(root)) {
-            root.remove();
-        }
-    });
-
-    if (window.tippy?.instances) {
-        window.tippy.instances = window.tippy.instances.filter(instance => {
-            if (!instance.reference.isConnected) {
-                instance.destroy();
-                return false;
-            }
-            return true;
-        });
-    }
-
-    if (window.Tooltips?.reinitializeTooltips) {
-        try {
-            window.Tooltips.reinitializeTooltips(container);
-        } catch (error) {
-            console.warn('Error reinitializing declarative tooltips:', error);
-        }
-    }
-
-    if (window.initializeTippys) {
-        try {
-            window.initializeTippys();
-        } catch (error) {
-            console.warn('Error reinitializing tooltips:', error);
-        }
-    }
-};
-
-window.destroyTooltipsInContainer = function (container) {
-    if (!container) return;
-
-    const elementsWithTippy = container.querySelectorAll('[aria-describedby]');
-    elementsWithTippy.forEach(element => {
-        if (element._tippy) {
-            element._tippy.destroy();
-            delete element._tippy;
-        }
-    });
-
-    if (window.Tooltips?.cleanupTooltips) {
-        try {
-            window.Tooltips.cleanupTooltips(container, false);
-        } catch (error) {
-            console.warn('Error cleaning up declarative tooltips in container:', error);
-        }
-    }
-};
-
-window.cleanupModalTooltips = function (modalContainer) {
-    if (!modalContainer) return;
-
-    if (window.Tooltips?.cleanupTooltips) {
-        try {
-            window.Tooltips.cleanupTooltips(modalContainer, false);
-        } catch (error) {
-            console.warn('Error cleaning up declarative tooltips in modal:', error);
-        }
-    }
-
-    window.destroyTooltipsInContainer(modalContainer);
-
-    const allTippyRoots = document.querySelectorAll('[data-tippy-root]');
-    allTippyRoots.forEach(root => {
-        if (!root.isConnected) {
-            root.remove();
-        }
-    });
-
-    if (window.tippy?.instances) {
-        window.tippy.instances = window.tippy.instances.filter(instance => instance.reference.isConnected);
-    }
-
-    setTimeout(window.reinitializeTooltips, 50);
-};
-
 window.processVkifyLocTags = function() {
     if (!window.vkifylang) return;
     
@@ -705,7 +615,6 @@ vkify.ready(function () {
 
     const observer = new MutationObserver(mutations => {
         let shouldProcessLoc = false;
-        let shouldReinitTooltips = false;
 
         mutations.forEach(mutation => {
             mutation.addedNodes.forEach(node => {
@@ -713,15 +622,11 @@ vkify.ready(function () {
                     if (node.tagName === 'VKIFYLOC' || node.querySelector('vkifyloc')) {
                         shouldProcessLoc = true;
                     }
-                    if (node.classList?.contains('scroll_node') || node.querySelector('.post_actions_icon')) {
-                        shouldReinitTooltips = true;
-                    }
                 }
             });
         });
 
         if (shouldProcessLoc) window.processVkifyLocTags?.();
-        if (shouldReinitTooltips) setTimeout(window.reinitializeTooltips, 100);
     });
 
     observer.observe(document.body, { childList: true, subtree: true });

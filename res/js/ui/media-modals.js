@@ -142,10 +142,6 @@ vkify.once('mediaModals', function () {
             }
 
             bsdnHydrate();
-            setTimeout(() => {
-                window.reinitializeTooltips();
-            }, 200);
-
             async function loadVideoInfo() {
                 const videoInfoTarget = msgbox.getNode().find('.video_info');
 
@@ -170,9 +166,7 @@ vkify.once('mediaModals', function () {
                             videoInfoTarget.html(videoInfo.html());
                             bsdnHydrate();
 
-                            setTimeout(() => {
-                                window.reinitializeTooltips();
-                            }, 200);
+
                         } else {
                             videoInfoTarget.html(`<div class="video_info_title">${escapeHtml(videoTitle)}</div>`);
                         }
@@ -183,9 +177,7 @@ vkify.once('mediaModals', function () {
                             msgbox.getNode().find('#video_comments_section').attr('style', '');
                             bsdnHydrate();
 
-                            setTimeout(() => {
-                                window.reinitializeTooltips();
-                            }, 200);
+
                         }
                     }
                 });
@@ -253,7 +245,7 @@ vkify.once('mediaModals', function () {
             ModalUtils.setupCleanup(msgbox, () => {
                 ModalUtils.unregisterModal(msgbox);
                 clearVideoUrl();
-                window.cleanupModalTooltips?.(msgbox.getNode().nodes[0]);
+
                 window._currentMediaModalRefresh = null;
             });
 
@@ -859,7 +851,7 @@ vkify.once('mediaModals', function () {
             ModalUtils.setupCleanup(msgbox, () => {
                 ModalUtils.unregisterModal(msgbox);
                 clearPhotoUrl();
-                window.cleanupModalTooltips?.(msgbox.getNode().nodes[0]);
+
                 window._currentMediaModalRefresh = null;
             });
 
@@ -917,11 +909,13 @@ vkify.once('mediaModals', function () {
 
                                 if (moreHtml) {
                                     msgbox.getNode().find('.pv_actions_more_wrap').html(`
-                                        <div class="pv_actions_more mobile-three-dots" role="button" data-tippy-content-id="pv_actions_more_menu_mobile" data-tippy-theme="dark vk" style="display:flex; align-items:center;">
-                                            <svg width="28" height="28" viewBox="0 0 28 28"><use href="#more-vertical-28"></use></svg>
-                                        </div>
-                                        <div id="pv_actions_more_menu_mobile" class="tippy-menu tippy-content-template">
-                                            ${moreHtml}
+                                        <div class="ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this, null, {autopos: true});" onmouseout="uiActionsMenu.hide(this);">
+                                            <div class="pv_actions_more mobile-three-dots" role="button" style="display:flex; align-items:center;">
+                                                <svg width="28" height="28" viewBox="0 0 28 28"><use href="#more-vertical-28"></use></svg>
+                                            </div>
+                                            <div id="pv_actions_more_menu_mobile" class="ui_actions_menu dark">
+                                                ${moreHtml}
+                                            </div>
                                         </div>
                                     `).attr('style', 'display:block; cursor:pointer;');
                                 } else {
@@ -946,8 +940,6 @@ vkify.once('mediaModals', function () {
                 } catch (e) {
                     // Already handled via onError above.
                 }
-
-                setTimeout(window.reinitializeTooltips, 200);
 
                 window._currentMediaModalRefresh = () => {
                     if (document.contains(msgbox.getNode().nodes[0])) {

@@ -167,15 +167,15 @@
                                     <a href="/logout?hash={urlencode($csrfToken)}">{_header_log_out}</a>
                                 </div>
                             {else}
-                                <div class="link">
-                                    <a id="userMenuTrigger" data-tippy-content-id="userMenuTooltip" data-tippy-trigger="click" data-tippy-placement="bottom-end">
-                                        <div id="userMenuName">{$thisUser->getFirstName()}</div>
-                                        {include 'components/avatar.latte', author => $thisUser, size => 'miniscule', id => 'userMenuAvatar'}
-                                        <div id="userMenuArrow"></div>
-                                    </a>
-                                </div>
-                                <div id="userMenuTooltip" class="tippy-content-template">
-                                    <div class="tippy-menu">
+                                <div class="ui_actions_menu_wrap" onclick="{='uiActionsMenu.toggle(this, null, {align: "right"});'|noescape}">
+                                    <div class="link">
+                                        <a id="userMenuTrigger">
+                                            <div id="userMenuName">{$thisUser->getFirstName()}</div>
+                                            {include 'components/avatar.latte', author => $thisUser, size => 'miniscule', id => 'userMenuAvatar'}
+                                            <div id="userMenuArrow"></div>
+                                        </a>
+                                    </div>
+                                    <div id="userMenuTooltip" class="ui_actions_menu">
                                         {if $thisUser->isBanned()}
                                             <a href="/support">{_menu_help}</a>
                                             <a href="{if $userTainted}/setSID/unset?hash={rawurlencode($csrfToken)}{else}/logout?hash={urlencode($csrfToken)}{/if}">{_menu_logout}</a>
@@ -382,10 +382,9 @@
                             <div class="left_menu_nav_wrap">
                                 <a href="/club1">{_footer_blog|firstUpper}</a>
                                 <a href="/terms">{_footer_rules|firstUpper}</a>
-                                <a href="javascript:void(0);" id="moreOptionsLink" data-tippy-content-id="moreOptionsContent" data-tippy-placement="bottom-start" data-tippy-append-to="body">{=vkifyTr('more')}</a>
-                                
-                                <div id="moreOptionsContent" class="tippy-content-template">
-                                    <div class="tippy-menu">
+                                <div class="ui_actions_menu_wrap" onmouseover="{='uiActionsMenu.show(this, null, {autopos: true});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
+                                    <a href="javascript:void(0);" id="moreOptionsLink">{=vkifyTr('more')}</a>
+                                    <div id="moreOptionsContent" class="ui_actions_menu">
                                         <a href="/about">{_footer_about_instance|firstUpper}</a>
                                         <a href="/about:openvk">{_admin_about_version} ({$theme->getVersion()})</a>
                                         <a href="/language" 

@@ -109,10 +109,11 @@
 .pv_left .pv_bottom_actions > a:hover,
 .pv_left .pv_bottom_actions > span:hover,
 .pv_left .pv_bottom_actions > .pv_actions_more:hover,
-.pv_left .pv_bottom_actions span[aria-expanded="true"] {
+.pv_left .pv_bottom_actions span.shown {
   opacity: 1;
   text-decoration: none;
 }
+
 .pv_album_name {
   color: #cccccc;
   margin-right: 10px;
@@ -209,7 +210,6 @@
 .pv_comments {
   border-top: 1px solid var(--border-color);
   flex: 1 1 0;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -376,14 +376,6 @@
   border: 0;
   color: #fff;
 }
-.tippy-box[data-theme="dark vk"] .tippy-menu a,
-.tippy-box[data-theme="dark vk"] .tippy-menu a:hover {
-  color: #fff;
-}
-.tippy-box[data-theme="dark vk"] .tippy-menu a:hover {
-  background: #555555;
-}
-
 /* Video modal */
 .ovk-modal-video-window {
   width: var(--page-width);

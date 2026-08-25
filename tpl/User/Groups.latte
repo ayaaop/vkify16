@@ -72,9 +72,9 @@
 {/block}
 
 {block actions}
-    <div class="post_actions">
-        <div class="post_actions_icon" data-tippy-placement="bottom-end" data-tippy-content-id="group_actions_menu_{$x->getId()}"></div>
-        <div id="group_actions_menu_{$x->getId()}" class="tippy-menu tippy-content-template">
+    <div class="post_actions ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+        <div class="post_actions_icon"></div>
+        <div id="group_actions_menu_{$x->getId()}" class="ui_actions_menu">
             {if $x->canBeModifiedBy($thisUser ?? NULL)}
                 {var $clubPinned = $thisUser->isClubPinned($x)}
                 <a href="/groups_pin?club={$x->getId()}&hash={rawurlencode($csrfToken)}" n:if="$clubPinned || $thisUser->getPinnedClubCount() <= 10" id="_pinGroup" data-group-name="{$x->getName()}" data-group-url="{$x->getUrl()}">
@@ -86,14 +86,14 @@
                 </a>
             {/if}
             {if $x->getSubscriptionStatus($thisUser) == false}
-                <a href="javascript:void(0)" onclick="this.closest('.tippy-menu').querySelector('form[data-action=add]').submit()">{_join_community}</a>
+                <a href="javascript:void(0)" onclick="this.closest('.ui_actions_menu').querySelector('form[data-action=add]').submit()">{_join_community}</a>
                 <form style="display: none" data-action="add" action="/setSub/club" method="post">
                     <input type="hidden" name="act" value="add" />
                     <input type="hidden" name="id" value="{$x->getId()}" />
                     <input type="hidden" name="hash" value="{$csrfToken}" />
                 </form>
             {else}
-                <a href="javascript:void(0)" onclick="this.closest('.tippy-menu').querySelector('form[data-action=rem]').submit()">{_leave_community}</a>
+                <a href="javascript:void(0)" onclick="this.closest('.ui_actions_menu').querySelector('form[data-action=rem]').submit()">{_leave_community}</a>
                 <form style="display: none" data-action="rem" action="/setSub/club" method="post">
                     <input type="hidden" name="act" value="rem" />
                     <input type="hidden" name="id" value="{$x->getId()}" />

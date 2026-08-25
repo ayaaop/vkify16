@@ -81,9 +81,9 @@
                     {_post_is_ad}
                 </div>
             </div>
-            <div class="post_actions" n:if="$compact == false && $thisUser">
-                <div class="post_actions_icon" data-tippy-placement="bottom-end" data-tippy-content-id="post_actions_menu_{$post->getId()}"></div>
-                <div n:ifcontent id="post_actions_menu_{$post->getId()}" class="tippy-menu tippy-content-template">
+            <div class="post_actions ui_actions_menu_wrap" n:if="$compact == false && $thisUser" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+                <div class="post_actions_icon"></div>
+                <div n:ifcontent id="post_actions_menu_{$post->getId()}" class="ui_actions_menu">
                     {if $post->canBeEditedBy($thisUser) && !($forceNoEditLink ?? false)}
                         <a class="edit" id="editPost">{_edit}</a>
                     {/if}
@@ -133,10 +133,13 @@
             </div>
 
             <div n:ifcontent class="attachments attachments_m">
-                <div class="attachment" n:foreach="$attachmentsLayout->extras as $attachment" n:if="!($attachment instanceof \openvk\Web\Models\Entities\Audio)">
+                <div class="attachment" n:foreach="$attachmentsLayout->extras as $attachment" n:if="!($attachment instanceof \openvk\Web\Models\Entities\Audio) && !($attachment instanceof \openvk\Web\Models\Entities\Note)">
                     {include "attachment.latte", attachment => $attachment, post => $post}
                 </div>
                 <div class="attachment audios_attachment" n:foreach="$attachmentsLayout->extras as $attachment" n:if="$attachment instanceof \openvk\Web\Models\Entities\Audio">
+                    {include "attachment.latte", attachment => $attachment, post => $post}
+                </div>
+                <div class="attachment notes_attachment" n:foreach="$attachmentsLayout->extras as $attachment" n:if="$attachment instanceof \openvk\Web\Models\Entities\Note">
                     {include "attachment.latte", attachment => $attachment, post => $post}
                 </div>
             </div>

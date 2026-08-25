@@ -29,9 +29,9 @@
                             </div>
                         </div>
                         <div class="messenger-app-header--actions">
-                            <div class="messenger-app-header--more-actions">
-                                <div id="profile_more_btn" class="messenger-app-header--more-actions--trigger" data-tippy-content-id="profile_actions_tooltip" data-tippy-placement="bottom-end" data-tippy-trigger="click"></div>
-                                <div id="profile_actions_tooltip" class="tippy-menu tippy-content-template">
+                            <div class="messenger-app-header--more-actions ui_actions_menu_wrap" onclick="uiActionsMenu.toggle(this, null);">
+                                <div id="profile_more_btn" class="messenger-app-header--more-actions--trigger"></div>
+                                <div id="profile_actions_tooltip" class="ui_actions_menu">
                                     {if $correspondent->isBlacklistedby($thisUser)}
                                         <a id="_bl_toggler" data-val="0" data-id="{$correspondent->getRealId()}">
                                             {_bl_remove}

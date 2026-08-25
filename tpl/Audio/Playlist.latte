@@ -89,13 +89,15 @@
                         <button class="AudioPlaylistSnippet__actionButton ActionButton--share" onclick="shareAudioPlaylist(event, {$playlist->getOwner()->getId()}, {$playlist->getId()}); event.preventDefault(); event.stopPropagation(); return false;">
                             <span class="ActionButton--share__text">{_share}</span>
                         </button>
-                        <button class="AudioPlaylistSnippet__actionButton ActionButton--more" id="playlist_more_actions_trigger" data-tippy-content-id="playlist_more_actions_menu" data-tippy-placement="bottom-end" n:if="$canEdit">
-                            <span class="ActionButton--more__text">{_show_more}</span>
-                        </button>
-                        <div id="playlist_more_actions_menu" class="tippy-menu tippy-content-template" n:if="$canEdit">
-                            <a  href="/playlist{$playlist->getPrettyId()}/edit" onclick="return showEditPlaylistModal({$playlist->getPrettyId()}, event);">{_edit_playlist}</a>
-                            <a  href="/player/upload?playlist={$playlist->getId()}">{_upload_audio}</a>
-                            <a  id="_deletePlaylist" data-id="{$playlist->getId()}">{tr('delete_playlist', 'Delete playlist')}</a>
+                        <div class="ui_actions_menu_wrap" n:if="$canEdit" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+                            <button class="AudioPlaylistSnippet__actionButton ActionButton--more" id="playlist_more_actions_trigger">
+                                <span class="ActionButton--more__text">{_show_more}</span>
+                            </button>
+                            <div id="playlist_more_actions_menu" class="ui_actions_menu">
+                                <a  href="/playlist{$playlist->getPrettyId()}/edit" onclick="return showEditPlaylistModal({$playlist->getPrettyId()}, event);">{_edit_playlist}</a>
+                                <a  href="/player/upload?playlist={$playlist->getId()}">{_upload_audio}</a>
+                                <a  id="_deletePlaylist" data-id="{$playlist->getId()}">{tr('delete_playlist', 'Delete playlist')}</a>
+                            </div>
                         </div>
                     {/ifset}
                 </div>

@@ -31,12 +31,12 @@
                             </div>
                             <input type="file" class="postFileSel" id="postFilePic" name="_pic_attachment" accept="image/*" style="display: none;" />
                             <input n:if="!\OPENVK_ROOT_CONF['openvk']['preferences']['videos']['disableUploading']" type="file" class="postFileSel" id="postFileVid" name="_vid_attachment" accept="video/*" style="display: none;" />
-                            <div>
-                                <a id="moreAttachTrigger" data-tippy-content-id="moreAttachTooltip" data-tippy-append-to="body">
+                            <div class="ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+                                <a id="moreAttachTrigger">
                                     {_attach}
                                 </a>
 
-                                <div class="tippy-menu tippy-content-template" id="moreAttachTooltip">
+                                <div class="ui_actions_menu" id="moreAttachTooltip">
                                     <a class="attach_photo" href="javascript:void(document.querySelector('#post-buttons1 input[name=_pic_attachment]').click());">
                                         <div class="post-attach-menu__icon"></div>
                                         {_attach_photo}

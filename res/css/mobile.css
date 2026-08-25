@@ -884,10 +884,7 @@
         border: 0;
         box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.12), 0px 16px 16px rgba(0, 0, 0, 0.16);
     }
-    .tippy-content:has(.tippy-menu) {
-        padding: 12px 0;
-    }
-    .post .tippy-menu a, .tippy-menu a, #ctx_menu a, .tippy-menu form button {
+    #ctx_menu a {
         padding: 8px 16px;
         height: unset;
         font-size: 16px;
@@ -1188,6 +1185,7 @@
         text-shadow: 0 1px 4px rgba(0,0,0,0.5);
         display: -webkit-box;
         -webkit-line-clamp: 3;
+        line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
         display: flex;
@@ -1236,6 +1234,8 @@
         gap: 8px;
         width: 100%;
         box-sizing: border-box;
+        position: relative;
+        min-height: 32px;
     }
     .mobile_profile_action_primary {
         flex: 1 1 50%;
@@ -1258,15 +1258,16 @@
     .mobile_profile_actions .button_wide {
         width: 100%;
     }
-    .tippy-menu ._add_image::before {
-        display: none;
-    }
     .guest_actions {
         padding-bottom: 8px;
     }
 
     .mobile_profile_actions .profile_sub_wrapper {
         width: 100%;
+    }
+
+    .profile_sub_wrapper.ui_actions_menu_wrap.shown .ui_actions_menu {
+        max-width: unset;
     }
 
     /* profile info rows */
@@ -1812,16 +1813,67 @@
 
     /* mobile hover effects */
     .mobile-info-row, .mobile-scroll-card,.ui_tabs .ui_tab,.sidebar_inner .link,
-    .tippy-menu a, #ctx_menu a {
+    .ui_actions_menu a, #ctx_menu a {
         transition: background-color 250ms;
     }
     .mobile-info-row:hover,.mobile-scroll-card:hover,.ui_tabs .ui_tab:hover,.sidebar_inner .link:hover,
-    .tippy-menu a:hover, #ctx_menu a:hover,.tippy-menu form button:hover {
+    .ui_actions_menu a:hover, #ctx_menu a:hover {
         background-color: rgba(122,122,122,.1);
     }
     .mobile-info-row:active,.mobile-scroll-card:active,.ui_tabs .ui_tab:active,.sidebar_inner .link:active,
-    .tippy-menu a:active, #ctx_menu a:active,.tippy-menu form button:active {
+    .ui_actions_menu a:active, #ctx_menu a:active {
         background-color: rgba(122,122,122,.2);
+    }
+
+    .ui_actions_menu {
+        min-width: 112px;
+        max-width: 280px;
+        padding: 8px 0;
+        border: 0;
+        border-radius: 4px;
+        z-index: 10;
+        box-shadow: 0 5px 5px -3px rgba(0,0,0,.2),0 8px 10px 1px rgba(0,0,0,.14),0 3px 14px 2px rgba(0,0,0,.12)
+    }
+
+    .ui_actions_menu:before,
+    .ui_actions_menu:after {
+        display: none !important;
+    }
+
+    .ui_actions_menu a,
+    .ui_actions_menu .ui_actions_menu_item,
+    .ui_actions_menu form button {
+        padding: 0 20px 0 16px;
+        font-size: 14px;
+        line-height: 48px;
+        height: 48px;
+        color: var(--text-color);
+    }
+
+    .ui_actions_menu .separator,
+    .ui_actions_menu .ui_actions_menu_sep {
+        margin: 8px 0;
+    }
+
+    .ui_actions_menu {
+        right: 0 !important;
+        left: auto !important;
+    }
+
+    .ui_actions_menu_left_align .ui_actions_menu,
+    .ui_actions_menu_left .ui_actions_menu {
+        right: auto !important;
+        left: 0 !important;
+    }
+
+    /* repost bottom sheet options menu opens upward */
+    #__vkifyRepostOptsTooltip {
+        top: auto !important;
+        bottom: calc(100% + 8px) !important;
+    }
+
+    #__vkifyRepostOptsTooltip.ui_actions_menu_hiding {
+        bottom: calc(100% + 16px) !important;
     }
 }
 @keyframes slideUpBottomSheet {

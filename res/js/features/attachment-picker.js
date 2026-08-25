@@ -1534,22 +1534,7 @@ window.attachmentAdapters = adapters;
 window.openAttachmentPicker = openPicker;
 
 vkify.bindOnce('pickerButtons', () => {
-    const resolveForm = (el) => {
-        if (!el) return u();
-        let form = u(el).closest('form');
-        if (form.length) return form;
-
-        const tippyBox = el.closest?.('.tippy-box');
-        if (tippyBox) {
-            const contentId = tippyBox.getAttribute('data-tippy-content-id');
-            if (contentId) {
-                const escaped = window.CSS?.escape ? window.CSS.escape(contentId) : contentId.replace(/[^a-zA-Z0-9_\u00A0-\uFFFF-]/g, '\\$&');
-                const trigger = document.querySelector(`[data-tippy-content-id="${escaped}"]:not(.tippy-box)`);
-                if (trigger) form = u(trigger).closest('form');
-            }
-        }
-        return form;
-    };
+    const resolveForm = (el) => (el ? u(el).closest('form') : u());
     const getForm = (e) => resolveForm(e.currentTarget && e.currentTarget !== document ? e.currentTarget : e.target);
 
     u(document).on('click', '#__vkifyPhotoAttachment', async (e) => {
@@ -1579,9 +1564,6 @@ vkify.bindOnce('pickerButtons', () => {
         await openPicker('audio', u('.PE_wrapper'), 0, { playlistMode: true });
     });
 
-    // Documents and notes are inside tippy menus. Tippy's hideAll() (in tooltips.js)
-    // removes the popper from the DOM before UmbrellaJS delegation can find the element.
-    // Use capture phase so we grab e.target before tippy's bubble-phase handler destroys it.
     document.addEventListener('click', (e) => {
         const docBtn = e.target.closest('#__vkifyDocumentAttachment, .attach_document');
         if (!docBtn || e.__vkifyHandled) return;
@@ -1589,7 +1571,7 @@ vkify.bindOnce('pickerButtons', () => {
         const club = Number(docBtn.dataset.club ?? 0);
         const form = resolveForm(docBtn);
         openPicker('document', form, club);
-    }, true);
+    });
 
     document.addEventListener('click', (e) => {
         const noteBtn = e.target.closest('#__vkifyNotesAttachment, .attach_note');
@@ -1597,7 +1579,7 @@ vkify.bindOnce('pickerButtons', () => {
         e.__vkifyHandled = true;
         const form = resolveForm(noteBtn);
         openPicker('note', form);
-    }, true);
+    });
 });
 
 })();

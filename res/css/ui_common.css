@@ -729,7 +729,7 @@ h2.page_block_h2.tabs_header {
   margin: 0;
   list-style: none;
   user-select: none;
-  z-index: 1;
+  z-index: 0;
 }
 .ui_tabs li {
   list-style: none;
@@ -1412,30 +1412,8 @@ select:focus {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.tippy-menu {
-  display: none;
-}
-.tippy-box .tippy-menu {
-  display: block;
-}
-
-/* Applied by tooltips.js to the trigger's nearest .post/.reply/
-   .model_content_textarea ancestor for as long as its tooltip is visible
-   (see elevateStackContext/restoreStackContext), so a tooltip appended to
-   its parent isn't painted over by a later sibling (e.g. the next post in
-   a feed). Scoped to show/hide rather than a static state class, since
-   several siblings can share a state (e.g. multiple posts being edited at
-   once) but only one tooltip is ever visible at a time. */
-.tippy-stack-elevated {
-  z-index: 3;
-}
-
 .home_navigation .tippy-box[data-theme~="vk"] .tippy-content {
   padding: 0;
-}
-
-.tippy-content:has(.tippy-menu) {
-  padding: 4px 0;
 }
 
 .post_settings label {
@@ -1443,14 +1421,6 @@ select:focus {
   cursor: pointer;
 }
 
-.tippy-menu .separator {
-  height: 1px;
-  background-color: var(--border-color);
-  margin: 4px 13px;
-}
-
-.tippy-menu a,
-.tippy-menu form button,
 #ctx_menu a {
   text-overflow: ellipsis;
   overflow: hidden;
@@ -1466,29 +1436,10 @@ select:focus {
   font-size: 12.5px;
   color: var(--link-color);
 }
-.tippy-menu form button {
-  border: 0;
-  background-color: transparent;
-  width: 100%;
-  cursor: pointer;
-}
-.post .tippy-menu a {
-  font-size: 13px;
-}
 
-.tippy-menu a:hover,
-.tippy-menu form button:hover,
 #ctx_menu a:hover {
   text-decoration: none !important;
   background-color: var(--button-background-color);
-}
-
-.tippy-menu label {
-  padding-inline: 13px;
-  width: auto;
-}
-.tippy-menu label + .separator {
-  margin: 10px 13px 6px;
 }
 
 .tippy-box[data-theme="special vk"],
@@ -1837,4 +1788,199 @@ select:focus {
     background: #597da3 url(../progress_grad.gif) repeat;
     border: 1px solid #45688e;
     margin: -1px;
+}
+
+/* VK-style uiActionsMenu */
+.ui_actions_menu_wrap {
+    --ui-actions-menu-chevron-inset: 0px;
+    position: relative;
+    cursor: pointer;
+}
+
+.ui_actions_menu {
+    position: relative;
+    font-weight: 400;
+    position: absolute;
+    visibility: hidden;
+    min-width: 150px;
+    max-width: 250px;
+    width: -webkit-max-content;
+    width: -moz-max-content;
+    width: max-content;
+    top: calc(var(--ui-actions-menu-vertical-offset, 25px) + var(--ui-actions-menu-distance, 5px) + 5px);
+    right: calc(0px - var(--ui-actions-menu-chevron-inset));
+    background: var(--module-background-color);
+    z-index: var(--action-menu-z-index, 5);
+    border: 1px solid var(--border-color-2);
+    padding: 4px 0;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
+    opacity: 0;
+    -webkit-transition: opacity 100ms linear, top 100ms linear, bottom 100ms linear, visibility 100ms linear;
+    -o-transition: opacity 100ms linear, top 100ms linear, bottom 100ms linear, visibility 100ms linear;
+    transition: opacity 100ms linear, top 100ms linear, bottom 100ms linear, visibility 100ms linear;
+    pointer-events: none;
+}
+
+.ui_actions_menu:before,
+.ui_actions_menu:after {
+    position: absolute;
+    pointer-events: none;
+    border: solid transparent;
+    content: '';
+    height: 0;
+    width: 0;
+    bottom: 100%;
+    right: calc(var(--ui-actions-menu-arrow-offset, 30.5px) + var(--ui-actions-menu-chevron-inset));
+}
+
+.ui_actions_menu:before {
+    border-width: 6px;
+    margin: 0 -6px;
+    border-bottom-color: var(--border-color-2);
+}
+
+.ui_actions_menu:after {
+    border-width: 5px;
+    margin: 0 -5px;
+    border-bottom-color: var(--module-background-color);
+}
+
+.ui_actions_menu_wrap.shown .ui_actions_menu {
+    visibility: visible;
+    opacity: 1;
+    display: block !important;
+    top: calc(var(--ui-actions-menu-vertical-offset, 25px) + var(--ui-actions-menu-distance, 5px));
+    filter: none;
+    pointer-events: auto;
+}
+
+.ui_actions_menu_wrap.shown .ui_actions_menu.ui_actions_menu_hiding {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    top: calc(var(--ui-actions-menu-vertical-offset, 25px) + var(--ui-actions-menu-distance, 5px) + 5px);
+}
+
+.ui_actions_menu_wrap.ui_actions_menu_top.shown .ui_actions_menu.ui_actions_menu_hiding {
+    top: auto;
+    bottom: calc(var(--ui-actions-menu-vertical-offset, 25px) + var(--ui-actions-menu-distance, 5px) + 5px);
+}
+
+.ui_actions_menu_top .ui_actions_menu {
+    top: auto !important;
+    bottom: calc(var(--ui-actions-menu-vertical-offset, 25px) + var(--ui-actions-menu-distance, 5px) + 5px);
+    position: relative;
+    position: absolute;
+}
+
+.ui_actions_menu_top.shown .ui_actions_menu {
+    bottom: calc(var(--ui-actions-menu-vertical-offset, 25px) + var(--ui-actions-menu-distance, 5px));
+}
+
+.ui_actions_menu_top .ui_actions_menu:before,
+.ui_actions_menu_top .ui_actions_menu:after {
+    position: absolute;
+    pointer-events: none;
+    border: solid transparent;
+    content: '';
+    height: 0;
+    width: 0;
+    top: 100%;
+    right: calc(var(--ui-actions-menu-arrow-offset, 30.5px) + var(--ui-actions-menu-chevron-inset));
+    border-bottom-color: transparent;
+}
+
+.ui_actions_menu_top .ui_actions_menu:before {
+    border-width: 6px;
+    margin: 0 -6px;
+    border-top-color: var(--border-color-2);
+}
+
+.ui_actions_menu_top .ui_actions_menu:after {
+    border-width: 5px;
+    margin: 0 -5px;
+    border-top-color: var(--module-background-color);
+}
+
+.ui_actions_menu_left_align .ui_actions_menu {
+    right: auto;
+    left: calc(0px - var(--ui-actions-menu-chevron-inset));
+}
+
+.ui_actions_menu_left_align .ui_actions_menu:before,
+.ui_actions_menu_left_align .ui_actions_menu:after {
+    right: auto;
+    left: calc(var(--ui-actions-menu-arrow-offset-left, 30.5px) + var(--ui-actions-menu-chevron-inset));
+}
+
+.ui_actions_menu_left .ui_actions_menu {
+    right: auto;
+    left: calc(100% - var(--ui-actions-menu-chevron-inset));
+}
+
+.ui_actions_menu_left .ui_actions_menu:before,
+.ui_actions_menu_left .ui_actions_menu:after {
+    right: auto;
+    left: calc(var(--ui-actions-menu-arrow-offset-left, 30.5px) + var(--ui-actions-menu-chevron-inset));
+}
+
+.ui_actions_menu_no_chevron.ui_actions_menu_wrap .ui_actions_menu:before,
+.ui_actions_menu_no_chevron.ui_actions_menu_wrap .ui_actions_menu:after,
+.ui_actions_menu_no_chevron .ui_actions_menu:before,
+.ui_actions_menu_no_chevron .ui_actions_menu:after {
+    display: none;
+}
+
+.ui_actions_menu_no_animate.ui_actions_menu_wrap .ui_actions_menu,
+.ui_actions_menu_no_animate .ui_actions_menu {
+    transition: none !important;
+}
+
+.ui_actions_menu a,
+.ui_actions_menu .ui_actions_menu_item,
+.ui_actions_menu form button {
+    text-overflow: ellipsis;
+    text-align: start;
+    overflow: hidden;
+    display: block;
+    white-space: nowrap;
+    position: relative;
+    height: 30px;
+    line-height: 30px;
+    font-weight: normal;
+    padding: 0 15px;
+    color: var(--link-color);
+    text-decoration: none;
+    outline: none;
+    cursor: pointer;
+}
+.ui_actions_menu label {
+    padding: 6px 15px;
+    box-sizing: border-box;
+}
+
+.ui_actions_menu a:hover,
+.ui_actions_menu .ui_actions_menu_item:hover,
+.ui_actions_menu form button:hover {
+    text-decoration: none;
+    background-color: var(--button-background-color);
+}
+
+.ui_actions_menu_sep,
+.ui_actions_menu .separator {
+    border-top: 1px solid var(--border-color);
+    margin: 4px 13px;
+}
+
+.ui_actions_menu.dark {
+    --module-background-color: #333;
+    --border-color-2: #333;
+    --link-color: #fff;
+    --button-background-color: #555;
+}
+
+.ui_actions_menu.dark .separator,
+.ui_actions_menu.dark .ui_actions_menu_sep {
+    border-top-color: var(--border-color);
 }

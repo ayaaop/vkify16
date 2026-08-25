@@ -3,8 +3,7 @@
   clip-path: unset;
 }
 
-.avatar_block .button,
-.avatar_block .tippy-menu a {
+.avatar_block .button {
   transition: none;
 }
 
@@ -734,7 +733,7 @@ div.avatar_block:hover .avatar_variants {
   text-indent: -9999px;
   justify-content: start;
 }
-.profile_more_wrapper.profile_more_active .button.profile_more_btn {
+.profile_more_wrapper.shown .button.profile_more_btn {
   text-indent: 0;
   width: 100%;
   position: relative;
@@ -769,7 +768,7 @@ div.avatar_block:hover .avatar_variants {
   position: relative;
 }
 
-.profile_more_wrapper.profile_more_active {
+.profile_more_wrapper.shown {
   position: absolute;
   width: 100%;
   border: 1px solid var(--border-color-2);
@@ -780,6 +779,24 @@ div.avatar_block:hover .avatar_variants {
   background: var(--button-background-color);
 }
 
+.profile_sub_wrapper.ui_actions_menu_wrap.shown .ui_actions_menu {
+  width: 100%;
+  position: static;
+  box-shadow: none;
+  border: 0;
+}
+
+.profile_sub_wrapper.ui_actions_menu_wrap.shown .profile_sub_arrow {
+  transform: rotate(180deg);
+}
+
+.profile_more_wrapper.ui_actions_menu_wrap.shown .ui_actions_menu {
+	width: 100%;
+	position: static;
+	box-shadow: none;
+	border: 0;
+  border-top: 1px solid var(--border-color-2)
+}
 
 .profile_actions_split [data-tippy-root], .profile_actions_standalone [data-tippy-root] {
   width: 200px;
@@ -1066,7 +1083,7 @@ a.page_module_upload:hover .page_upload_label,
 .profile_sub_wrapper {
 	position: relative;
 }
-.profile_sub_wrapper.profile_sub_active {
+.profile_sub_wrapper.shown {
 	position: absolute;
 	width: 100%;
 	border: 1px solid var(--border-color-2);
@@ -1076,7 +1093,7 @@ a.page_module_upload:hover .page_upload_label,
 	margin: -1px -0.5px 0;
 	background: var(--button-background-color);
 }
-.profile_sub_wrapper.profile_sub_active .button {
+.profile_sub_wrapper.shown .button {
 	position: relative;
 	z-index: 11;
 	border-radius: var(--button-border-radius) var(--button-border-radius) 0 0;

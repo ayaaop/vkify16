@@ -6,7 +6,7 @@
 
 {block appbar_extra}
 <div class="mobileonly" id="group_appbar_extra">
-    <button class="appbar-extra-btn" id="groupAppbarMoreBtn" aria-label="More actions">
+    <button class="appbar-extra-btn ui_actions_menu_wrap" id="groupAppbarMoreBtn" aria-label="More actions" onclick='{="uiActionsMenu.toggle(this, null, {menuId: \"profile_actions_tooltip\"});"|noescape}'>
         <svg viewBox="0 0 12 24" width="24" height="24" fill="currentColor"><use href="#more-vertical-24"></use></svg>
     </button>
 </div>
@@ -32,11 +32,11 @@
                                 <input type="submit" value="{if $club->isEvent()}{_ill_come_to_meeting}{else}{_join_community}{/if}" class="button button_wide mobile_profile_action_btn" />
                             </form>
                         {else}
-                            <div class="profile_sub_wrapper">
+                            <div class="profile_sub_wrapper ui_actions_menu_wrap" onclick="uiActionsMenu.toggle(this, null);">
                             <button class="profile_sub_btn button button_wide mobile_profile_action_btn button_gray" id="mobile_profile_sub_btn">
                                 {if $club->isEvent()}{if $eventFlag == 1}{_i_might_come_to_meeting}{else}{_ill_come_to_meeting}{/if}{else}{_leave_community}{/if} <span class="profile_sub_arrow"></span>
                             </button>
-                            <div id="mobile_profile_sub_tooltip" class="tippy-menu tippy-content-template" data-club-id="{$club->getId()}" data-current-flag="{$eventFlag}">
+                            <div id="mobile_profile_sub_tooltip" class="ui_actions_menu" data-club-id="{$club->getId()}" data-current-flag="{$eventFlag}">
                                 <form style="display:none" data-action="going" action="/setSub/club" method="post">
                                     <input type="hidden" name="act" value="add" />
                                     <input type="hidden" name="flag" value="0" />
@@ -413,11 +413,11 @@
 										<input type="submit" value="{if $club->isEvent()}{_ill_come_to_meeting}{else}{_join_community}{/if}" class="button button_wide" />
 									</form>
 								{else}
-									<div class="profile_sub_wrapper">
+									<div class="profile_sub_wrapper ui_actions_menu_wrap ui_actions_menu_no_chevron" onclick='{="uiActionsMenu.toggle(this, null, {noAnimate: true});"|noescape}'>
 										<button class="button button_wide button_gray fl_l profile_sub_btn" id="profile_sub_btn">
 											{if $club->isEvent()}{if $eventFlag == 1}{_i_might_come_to_meeting}{else}{_ill_come_to_meeting}{/if}{else}{_leave_community}{/if} <span class="profile_sub_arrow"></span>
 										</button>
-										<div id="profile_sub_tooltip" class="tippy-menu tippy-content-template" data-club-id="{$club->getId()}" data-current-flag="{$eventFlag}">
+										<div id="profile_sub_tooltip" class="ui_actions_menu" data-club-id="{$club->getId()}" data-current-flag="{$eventFlag}">
 											<form style="display:none" data-action="going" action="/setSub/club" method="post">
 												<input type="hidden" name="act" value="add" />
 												<input type="hidden" name="flag" value="0" />
@@ -449,13 +449,12 @@
 										</div>
 									</div>
 								{/if}
-								<div class="profile_more_wrapper">
+								<div class="profile_more_wrapper ui_actions_menu_wrap ui_actions_menu_no_chevron" onclick='{="uiActionsMenu.toggle(this, null, {noAnimate: true});"|noescape}'>
 									<button class="button button_gray profile_more_btn fl_r" id="profile_more_btn">
 										{_actions}
 										<span class="clear_fix">&nbsp;</span>
 									</button>
-									<div id="profile_actions_tooltip" class="tippy-content-template">
-										<div class="tippy-menu">
+									<div id="profile_actions_tooltip" class="ui_actions_menu">
 											{if $canEdit}
 												<a href="/club{$club->getId()}/edit">{_edit_group}</a>
 												<a href="/club{$club->getId()}/stats" rel="nofollow">{_statistics}</a>
@@ -475,7 +474,6 @@
 											{/if}
 											{var $canReport = $thisUser->getId() != $club->getOwner()->getId()}
 											<a n:if="$canReport" href="javascript:reportClub({$club->getId()})">{_report}</a>
-										</div>
 									</div>
 								</div>
 							</div>

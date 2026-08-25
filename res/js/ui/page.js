@@ -79,7 +79,6 @@ window.allLangsPopup = window.allLangsPopup || async function () {
             $('.ovk-msg-all[data-id]').css('width', '700px');
             $('.ovk-diag-body')[0].style.setProperty('padding', '20px 0 20px 30px', 'important');
             $('.ovk-diag-action').prepend('<a class="button button_light" style="float: left; margin: 0;" href="https://hosted.weblate.org/projects/openvk/" target="_blank">' + tr('language_add_strings') + '</a>');
-            window.reinitializeTooltips?.();
         }, 0);
     } catch (e) {
         console.error('Failed to load languages:', e);

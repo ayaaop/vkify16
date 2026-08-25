@@ -6,7 +6,7 @@
         'url' => '#',
         'class' => 'archive_actions',
         'condition' => $type == 'archive' && ($archiveYear ?? null) === $year,
-        'content' => '<span class="archive_actions_icon" data-tippy-content-id="archive_year_actions_' . $year . '" data-tippy-placement="bottom-end" data-tippy-append-to="body"></span>',
+        'content' => '<span class="archive_actions_icon ui_actions_menu_wrap" onclick="uiActionsMenu.toggle(this, null, {menuId: \'archive_year_actions_' . $year . '\'});"></span>',
         'onclick' => 'event.preventDefault(); event.stopPropagation();'
     ]}
 {var $archiveMenuSubitems = array_map(fn($year) => [
@@ -18,7 +18,7 @@
     ], $archiveYears ?? [])
 }
 {capture $archiveAllActionsMenu}
-    <div id="archive_all_actions_menu" class="tippy-menu tippy-content-template">
+    <div id="archive_all_actions_menu" class="ui_actions_menu">
         <form method="post" action="/wall{$owner}/archive/manage">
             <input type="hidden" name="hash" value="{$csrfToken}">
             <input type="hidden" name="action" value="archive_all">
@@ -28,7 +28,7 @@
 {/capture}
 {capture $archiveYearActionsMenus}
     {foreach $archiveYears ?? [] as $year}
-        <div id="archive_year_actions_{$year}" class="tippy-menu tippy-content-template">
+        <div id="archive_year_actions_{$year}" class="ui_actions_menu">
             <form method="post" action="/wall{$owner}/archive/manage">
                 <input type="hidden" name="hash" value="{$csrfToken}">
                 <input type="hidden" name="action" value="archive_year">
@@ -48,7 +48,7 @@
     'url' => '#',
     'class' => 'archive_actions',
     'condition' => $type == 'archive',
-    'content' => '<span class="archive_actions_icon" data-tippy-content-id="archive_all_actions_menu" data-tippy-placement="bottom-end" data-tippy-append-to="body"></span>',
+    'content' => '<span class="archive_actions_icon ui_actions_menu_wrap" onclick="uiActionsMenu.toggle(this, null, {menuId: \'archive_all_actions_menu\'});"></span>',
     'onclick' => 'event.preventDefault(); event.stopPropagation();'
 ]}
 {var $menuItems = [
