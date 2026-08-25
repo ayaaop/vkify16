@@ -528,7 +528,7 @@
         padding-inline: 16px;
     }
     .post .post_header {
-        padding: 16px 16px 11px;
+        padding: 16px 16px 0;
     }
     .post-nsfw .post-content::after, .deleted_content .content_page_error {
         margin: 0 16px;
