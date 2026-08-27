@@ -1381,6 +1381,7 @@ body.scrolled .toTop:hover #wrap {
 .sidebar_inner {
     width: 149px;
     position: relative;
+    z-index: 5; /* i don't even know anymore */
 }
 
 .sidebar_inner .link {
@@ -1622,10 +1623,6 @@ body.scrolled .toTop:hover #wrap {
     margin-bottom: 10px;
     line-height: 1.5;
     color: var(--muted-text-color-2)
-}
-
-.sidebar_inner {
-    z-index: 2;
 }
 
 .footer_wrap {

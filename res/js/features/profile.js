@@ -62,12 +62,6 @@ window.Profile = {
         }
     },
 
-    // Profile "more actions" (#profile_more_btn / #profileAppbarMoreBtn /
-    // #groupAppbarMoreBtn) and "subscribe" (#profile_sub_btn /
-    // #mobile_profile_sub_btn) menus are wired declaratively via
-    // data-menu-content-id in their templates now, discovered by
-    // action-menu.js like everything else - nothing to do here anymore.
-
     initEventStatus: function() {
         if (Profile._eventStatusInited) return;
         Profile._eventStatusInited = true;
