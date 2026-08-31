@@ -1405,3 +1405,149 @@ vkify.once('mediaModals', function () {
     window.PostPopupManager = PostPopupManager;
     window.postPopupManager = new PostPopupManager();
 });
+
+vkify.once('documentPageActions', function () {
+    if (typeof window.OVKAPI === 'undefined') {
+        return;
+    }
+
+    async function handleDocAdd(e) {
+        const addBtn = e.target.closest('#vkifyAdd');
+        if (!addBtn) {
+            return;
+        }
+
+        e.preventDefault();
+
+        if (addBtn.classList.contains('lagged')) {
+            return;
+        }
+
+        addBtn.classList.add('lagged');
+        const item = addBtn.closest('.document_actions');
+        const [ownerId, docId, accessKey] = item.dataset.id.split('_');
+
+        try {
+            await window.OVKAPI.call('docs.add', {
+                owner_id: ownerId,
+                doc_id: docId,
+                access_key: accessKey
+            });
+        } catch (err) {
+            window.fastError(window.tr('error_file_adding_copied'));
+            addBtn.classList.remove('lagged');
+            return;
+        }
+
+        addBtn.classList.remove('lagged');
+        addBtn.id = 'vkifyRemove';
+        addBtn.classList.replace('post_add', 'post_remove');
+        const label = addBtn.querySelector('.action_label');
+        if (label) {
+            label.textContent = tr('remove');
+        }
+    }
+
+    async function handleDocRemove(e) {
+        const removeBtn = e.target.closest('#vkifyRemove');
+        if (!removeBtn) {
+            return;
+        }
+
+        e.preventDefault();
+
+        if (removeBtn.classList.contains('lagged')) {
+            return;
+        }
+
+        removeBtn.classList.add('lagged');
+        const item = removeBtn.closest('.document_actions');
+        const [ownerId, docId] = item.dataset.id.split('_');
+
+        const res = await window.OVKAPI.call('docs.delete', {
+            owner_id: ownerId,
+            doc_id: docId
+        });
+
+        removeBtn.classList.remove('lagged');
+
+        if (res == 1) {
+            removeBtn.id = 'vkifyAdd';
+            removeBtn.classList.replace('post_remove', 'post_add');
+            const label = removeBtn.querySelector('.action_label');
+            if (label) {
+                label.textContent = tr('add');
+            }
+        }
+    }
+
+    document.addEventListener('click', handleDocAdd);
+    document.addEventListener('click', handleDocRemove);
+});
+
+vkify.once('documentViewer', function () {
+    const CF = window.ContentFetcher;
+    const ModalUtils = window.ModalUtils;
+    const escapeHtml = window.escapeHtml;
+    const fastError = window.fastError;
+    const u = window.u;
+
+    async function openDocumentViewer(url) {
+        try {
+            if (ModalUtils.hasActiveModal()) {
+                const active = ModalUtils.getActiveModal();
+                if (active && typeof active.close === 'function') {
+                    active.close();
+                }
+            }
+
+            const content = await CF.fetchPageContent(url, '.document_preview_page', { showLoader: true });
+            const docId = content.dataset.id || '';
+
+            const template = u(`
+                <div class="ovk-photo-view-dimmer ovk-msg-all" data-id="${escapeHtml(docId)}">
+                    <div class="ovk-modal-video-window">
+                        <div id="video_top_controls_wrapper">
+                            <div id="video_top_controls">
+                                <div id="__modalDocClose" class="video_top_button video_top_close" role="button" tabindex="0" aria-label="Close">
+                                    <div class="video_close_icon"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page_block">
+                            ${content.innerHTML}
+                        </div>
+                    </div>
+                </div>
+            `);
+
+            const modal = new CMessageBox({
+                title: '',
+                custom_template: template,
+                close_on_buttons: false,
+                warn_on_exit: false,
+                unique_name: 'document_viewer'
+            });
+
+            ModalUtils.registerModal(modal, 'document');
+            ModalUtils.setupCloseButton(modal, '#__modalDocClose');
+            ModalUtils.setupDimmerClose(modal);
+        } catch (err) {
+            if (err.message !== 'Page redirected') {
+                fastError(err.message);
+            }
+        }
+    }
+
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('.docListViewItem a.viewerOpener, a.docGalleryItem');
+        if (!link) {
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        openDocumentViewer(link.href);
+    }, true);
+});

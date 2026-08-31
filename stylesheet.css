@@ -2765,7 +2765,8 @@ table,
     margin-right: 6px;
     padding: 4px 7px 5px;
     border-radius: var(--button-border-radius);
-    display: block;
+    display: flex;
+    align-items: center;
     line-height: 15px;
 }
 .action_button:last-child {
@@ -2823,7 +2824,7 @@ table,
     background: url(../resource/icons/post_icon.png) no-repeat 0 0;
     width: 16px;
     height: 13px;
-    margin: 2px 0 1px;
+    margin: 0;
     float: left;
     opacity: 0.35;
 }
@@ -3836,10 +3837,42 @@ h4.gifts_section_header {
     height: 100% !important;
 }
 
-.ovk-photo-view {
-    background-color: var(--module-background-color);
-    pointer-events: all;
-    max-width: 80vw;
+.photo-page-wrapper-photo {
+	padding: 15px 0;
+	min-height: 400px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.media-page-wrapper-description {
+	padding: 0 22px 15px;
+}
+.document_actions .post_full_like_wrap {
+    border: 0;
+    padding: 0 15px;
+    margin: 0;
+}
+
+.post_add .action_icon,
+.post_remove .action_icon,
+.post_edit .action_icon {
+	background-image: url(../resource/icons/video_actions.png);
+	background-repeat: no-repeat;
+	opacity: 0.85;
+}
+.post_add .action_icon {
+	background-position: 0 -15px;
+}
+.post_add#unbookmarkPlaylist .action_icon,
+.post_remove .action_icon {
+	background-position: 0 -30px;
+}
+.post_edit .action_icon {
+	background-position: 0 -60px;
+}
+.post_download .action_icon {
+	background-image: url(../resource/icons/download_icon.png);
+    opacity: .85;
 }
 
 /* discussion boards */

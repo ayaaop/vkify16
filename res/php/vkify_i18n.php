@@ -87,6 +87,7 @@ if (!function_exists('vkifyGetStrings')) {
                     'users_posts' => 'Posts from user',
                     'vkify_settings' => 'VKify16 settings',
                     'other_results' => 'Other results...',
+                    'document_preview_unavailable' => 'The preview for this document is not available.'
                 ],
                 'ru' => [
                     'add_tracks' => 'Добавить аудиозаписи',
@@ -167,6 +168,7 @@ if (!function_exists('vkifyGetStrings')) {
                     'users_posts' => 'Записи от пользователя',
                     'vkify_settings' => 'Настройки VKify16',
                     'other_results' => 'Другие результаты...',
+                    'document_preview_unavailable' => 'Предпросмотр этого документа недоступен.'
                 ],
                 'uk' => [
                     'add_tracks' => 'Додати аудіозаписи',

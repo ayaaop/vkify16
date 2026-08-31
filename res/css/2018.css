@@ -100,7 +100,7 @@ body {
 .video_delete_button .action_icon {
 	background-position: 0 -24px !important;
 }
-.video_edit_button .action_icon {
+.video_edit_button .action_icon, .post_edit .action_icon {
 	background-image: url("data:image/svg+xml;utf8,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23828a99' fill-rule='evenodd' clip-rule='evenodd' d='M21.782 3.335a3 3 0 0 0-2.724 0c-.428.218-.8.591-1.23 1.023L4.677 17.508c-.354.355-.609.609-.818.897a4.5 4.5 0 0 0-.804 1.94C3 20.698 3 21.058 3 21.558v1.124c-.001.282-.002.628.098.937a2 2 0 0 0 1.284 1.284c.309.1.655.1.937.098h1.124c.5 0 .86 0 1.211-.055a4.5 4.5 0 0 0 1.941-.804c.288-.21.542-.464.896-.818l13.151-13.15c.432-.431.805-.803 1.023-1.231a3 3 0 0 0 0-2.724c-.218-.428-.591-.8-1.023-1.23l-.63-.63c-.43-.432-.802-.805-1.23-1.023zm-1.816 1.782a1 1 0 0 1 .908 0c.106.054.237.168.819.75l.44.44c.582.582.696.713.75.819a1 1 0 0 1 0 .908c-.054.106-.168.237-.75.819l-.858.858-2.986-2.986.858-.858c.582-.582.713-.696.82-.75zm-3.091 3.023L6.142 18.872c-.425.425-.56.564-.665.708a2.5 2.5 0 0 0-.446 1.079c-.028.176-.03.369-.03.97v.971c-.001.197 0 .305.004.383v.012h.012c.078.005.186.005.383.005h.97c.602 0 .795-.003.971-.03a2.5 2.5 0 0 0 1.079-.447c.144-.105.283-.24.708-.665l10.733-10.733z'/%3E%3C/svg%3E");
 	background-position: 0 0;
 }
@@ -180,7 +180,7 @@ body.dark-mode .button:not(.post_like, .button_light) i {
 }
 
 /* 2018 Mode overrides for Playlist Page Action Buttons */
-.mode-2018 .AudioPlaylistSnippet__actions .AudioPlaylistSnippet__actionButton {
+.mode-2018 .AudioPlaylistSnippet__actions .action_button {
 	height: 26px;
 	padding: 0 3px;
 	display: flex;
@@ -197,46 +197,56 @@ body.dark-mode .button:not(.post_like, .button_light) i {
 	-moz-osx-font-smoothing: auto;
 	line-height: 16px;
 }
-.mode-2018 .AudioPlaylistSnippet__actions .AudioPlaylistSnippet__actionButton:hover {
+.mode-2018 .AudioPlaylistSnippet__actions .action_button .action_icon {
+	background-size: auto!important;
+}
+.mode-2018 .AudioPlaylistSnippet__actions .action_button:hover {
 	background: none;
 }
-.mode-2018 .AudioPlaylistSnippet__actions .ActionButton--add__text,
-.mode-2018 .AudioPlaylistSnippet__actions .ActionButton--share__text,
-.mode-2018 .AudioPlaylistSnippet__actions .ActionButton--more__text {
+.mode-2018 .AudioPlaylistSnippet__actions .action_button .action_label,
+.document_actions .action_label {
 	font-size: 14px;
 	display: inline-block;
 	vertical-align: middle;
+	margin-left: 0;
 }
-.mode-2018 .AudioPlaylistSnippet__actions .ActionButton--add:before,
-.mode-2018 .AudioPlaylistSnippet__actions .ActionButton--share:before {
+.mode-2018 .post_add .action_icon,
+.mode-2018 .post_share .action_icon {
 	display: inline-block;
 	vertical-align: middle;
-	content: "";
 	width: 24px;
 	height: 24px;
 	background-repeat: no-repeat;
 	opacity: 0.8;
 	margin: 0 6px 0 0;
 }
-.mode-2018 .AudioPlaylistSnippet__actions .ActionButton--add:hover:before,
-.mode-2018 .AudioPlaylistSnippet__actions .ActionButton--share:hover:before {
+.mode-2018 .post_add:hover .action_icon,
+.mode-2018 .post_share:hover .action_icon {
 	opacity: 1;
 }
-.mode-2018 .AudioPlaylistSnippet__actions .ActionButton--add:before {
+.mode-2018 .post_add .action_icon,
+.mode-2018 .post_remove .action_icon {
 	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D%2224%22%20height%3D%2248%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%20%3D%22evenodd%22%20opacity%3D%22.8%22%3E%3Cpath%20opacity%3D%22.4%22%20d%3D%22M0%200h24v24H0z%22%2F%3E%3Cpath%20d%3D%22M13%2011h7a1%201%200%200%201%200%202h-7v7a1%201%200%200%201-2%200v-7H4a1%201%200%200%201%200-2h7V4a1%201%200%200%201%202%200v7z%22%20fill%3D%22%23828A99%22%20fill-rule%3D%22nonzero%22%2F%3E%3Cg%3E%3Cpath%20opacity%3D%22.4%22%20d%3D%22M0%2024h24v24H0z%22%2F%3E%3Cpath%20stroke%3D%22%23828A99%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20d%3D%22M5%2037l4%204%2010-10%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E");
-	background-size: 24px 48px;
-	background-position: 0 0;
+	background-size: 24px 48px!important;
+	background-position: 0 0!important;
 	transition: background-position 0.15s ease;
 }
-.mode-2018 .AudioPlaylistSnippet__actions .ActionButton--add--added::before {
-	background-position: 0 -24px;
+.mode-2018 .post_remove .action_icon,
+.mode-2018 .post_add#unbookmarkPlaylist .action_icon {
+	background-position: 0 -24px!important;
 }
-.mode-2018 .AudioPlaylistSnippet__actions .ActionButton--share:before {
+.mode-2018 .post_share .action_icon {
 	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%20%3D%22evenodd%22%20opacity%3D%221%22%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%2F%3E%3Cpath%20d%3D%22M13%208.75V4.402a.417.417%200%200%201%20.687-.318l8.94%207.598a.417.417%200%200%201%200%20.636l-8.94%207.598a.417.417%200%200%201-.687-.318V15.25c-5.361%200-9.16%201.04-11.398%203.121a.25.25%200%200%201-.413-.241C2.685%2011.877%206.623%208.75%2013%208.75z%22%20stroke%3D%22%23828a99%22%20stroke-width%3D%221.8%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
-	background-size: 24px 24px;
-    background-position: 0 0;
+	background-size: 24px 24px!important;
+    background-position: 0 0!important;
 }
-.mode-2018 .AudioPlaylistSnippet__actions .ActionButton--more:after {
+.mode-2018 .post_more .action_icon {
+	display: none;
+}
+.mode-2018 .post_more .action_label {
+	margin-left: 0;
+}
+.mode-2018 .post_more::after {
 	display: inline-block;
 	vertical-align: middle;
 	content: "";

@@ -81,25 +81,28 @@
                     {nl2br($playlist->getDescriptionHTML())|noescape}
                 </div>
 
-                <div class="AudioPlaylistSnippet__actions">
-                    {ifset $thisUser}
-                        <button class="AudioPlaylistSnippet__actionButton ActionButton--add {if $isBookmarked}ActionButton--add--added{/if}" id="{if $isBookmarked}unbookmarkPlaylist{else}bookmarkPlaylist{/if}" data-id="{$playlist->getId()}">
-                            <span class="ActionButton--add__text">{if $isBookmarked}{_unbookmark}{else}{_bookmark}{/if}</span>
-                        </button>
-                        <button class="AudioPlaylistSnippet__actionButton ActionButton--share" onclick="shareAudioPlaylist(event, {$playlist->getOwner()->getId()}, {$playlist->getId()}); event.preventDefault(); event.stopPropagation(); return false;">
-                            <span class="ActionButton--share__text">{_share}</span>
-                        </button>
+                <div class="post_full_like_wrap AudioPlaylistSnippet__actions" n:ifset="$thisUser">
+                    <div class="post_full_like">
+                        <a class="action_button post_add" id="{if $isBookmarked}unbookmarkPlaylist{else}bookmarkPlaylist{/if}" data-id="{$playlist->getId()}">
+                            <i class="action_icon"></i>
+                            <span class="action_label">{if $isBookmarked}{_unbookmark}{else}{_bookmark}{/if}</span>
+                        </a>
+                        <a class="action_button post_share" onclick="shareAudioPlaylist(event, {$playlist->getOwner()->getId()}, {$playlist->getId()}); event.preventDefault(); event.stopPropagation(); return false;">
+                            <i class="action_icon"></i>
+                            <span class="action_label">{_share}</span>
+                        </a>
                         <div class="ui_actions_menu_wrap" n:if="$canEdit" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
-                            <button class="AudioPlaylistSnippet__actionButton ActionButton--more" id="playlist_more_actions_trigger">
-                                <span class="ActionButton--more__text">{_show_more}</span>
-                            </button>
+                            <a class="action_button post_more" id="playlist_more_actions_trigger">
+                                <i class="action_icon"></i>
+                                <span class="action_label">{_show_more}</span>
+                            </a>
                             <div id="playlist_more_actions_menu" class="ui_actions_menu">
-                                <a  href="/playlist{$playlist->getPrettyId()}/edit" onclick="return showEditPlaylistModal({$playlist->getPrettyId()}, event);">{_edit_playlist}</a>
-                                <a  href="/player/upload?playlist={$playlist->getId()}">{_upload_audio}</a>
-                                <a  id="_deletePlaylist" data-id="{$playlist->getId()}">{tr('delete_playlist', 'Delete playlist')}</a>
+                                <a href="/playlist{$playlist->getPrettyId()}/edit" onclick="return showEditPlaylistModal({$playlist->getPrettyId()}, event);">{_edit_playlist}</a>
+                                <a href="/player/upload?playlist={$playlist->getId()}">{_upload_audio}</a>
+                                <a id="_deletePlaylist" data-id="{$playlist->getId()}">{tr('delete_playlist', 'Delete playlist')}</a>
                             </div>
                         </div>
-                    {/ifset}
+                    </div>
                 </div>
 
                 <div class="AudioPlaylistSnippet__body">

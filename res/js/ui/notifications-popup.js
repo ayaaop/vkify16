@@ -15,7 +15,7 @@ function parseNotifyCount(text) {
 
 vkify.ready(() => {
     const customSoundId = "vkify_notification";
-    createjs.Sound.registerSound("../bb1.mp3", customSoundId);
+    createjs.Sound.registerSound(vkify.resourceUrl("bb1.mp3"), customSoundId);
 
     vkify.actualPlayNotifSound = function() {
         createjs.Sound.play(customSoundId);
