@@ -94,16 +94,14 @@
                                 <div class="ui_ownblock_hint">{$item['additionalInfo']}</div>
                             </div>
                         {else}
-                            <span>
-                                {if isset($item['extraItem']) && (!isset($item['extraItem']['condition']) || $item['extraItem']['condition'])}
-                                    <span class="ui_rmenu_extra_item {$item['extraItem']['class']}"
-                                          data-href="{$item['extraItem']['url']}"
-                                          n:attr="onclick => !isset($item['extraItem']['onclick']) ? 'event.stopPropagation(); window.location.href=this.dataset.href;' : $item['extraItem']['onclick']">
-                                        {$item['extraItem']['content']|noescape}
-                                    </span>
-                                {/if}
-                                {if isset($item['translate']) && $item['translate'] === false}{$item['title']}{else}{_$item['title']}{/if}
-                            </span>
+                            {if isset($item['extraItem']) && (!isset($item['extraItem']['condition']) || $item['extraItem']['condition'])}
+                                <span class="ui_rmenu_extra_item {$item['extraItem']['class']}"
+                                      data-href="{$item['extraItem']['url']}"
+                                      n:attr="onclick => !isset($item['extraItem']['onclick']) ? 'event.stopPropagation(); window.location.href=this.dataset.href;' : $item['extraItem']['onclick']">
+                                    {$item['extraItem']['content']|noescape}
+                                </span>
+                            {/if}
+                            <span class="ui_rmenu_item_text">{if isset($item['translate']) && $item['translate'] === false}{$item['title']}{else}{_$item['title']}{/if}</span>
                         {/if}
                     </a>
                     {if isset($item['subitems']) && is_array($item['subitems'])}
@@ -119,7 +117,7 @@
                                                 {$subitem['extraItem']['content']|noescape}
                                             </span>
                                         {/if}
-                                        {if isset($subitem['translate']) && $subitem['translate'] === false}{$subitem['title']}{else}{_$subitem['title']}{/if}
+                                        <span class="ui_rmenu_item_text">{if isset($subitem['translate']) && $subitem['translate'] === false}{$subitem['title']}{else}{_$subitem['title']}{/if}</span>
                                     </a>
                                 {/if}
                             {/foreach}

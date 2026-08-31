@@ -6,7 +6,7 @@
         'url' => '#',
         'class' => 'archive_actions',
         'condition' => $type == 'archive' && ($archiveYear ?? null) === $year,
-        'content' => '<span class="archive_actions_icon ui_actions_menu_wrap" onclick="uiActionsMenu.toggle(this, null, {menuId: \'archive_year_actions_' . $year . '\'});"></span>',
+        'content' => '<span class="archive_actions_icon ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this, null, {menuId: \'archive_year_actions_' . $year . '\', align: \'right\', appendParentCls: \'page_body\'});" onmouseout="uiActionsMenu.hide(this);"></span>',
         'onclick' => 'event.preventDefault(); event.stopPropagation();'
     ]}
 {var $archiveMenuSubitems = array_map(fn($year) => [
@@ -48,7 +48,7 @@
     'url' => '#',
     'class' => 'archive_actions',
     'condition' => $type == 'archive',
-    'content' => '<span class="archive_actions_icon ui_actions_menu_wrap" onclick="uiActionsMenu.toggle(this, null, {menuId: \'archive_all_actions_menu\'});"></span>',
+    'content' => '<span class="archive_actions_icon ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this, null, {menuId: \'archive_all_actions_menu\', align: \'right\', appendParentCls: \'page_body\'});" onmouseout="uiActionsMenu.hide(this);"></span>',
     'onclick' => 'event.preventDefault(); event.stopPropagation();'
 ]}
 {var $menuItems = [

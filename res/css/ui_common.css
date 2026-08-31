@@ -861,9 +861,6 @@ h2.page_block_h2.tabs_header {
 .ui_rmenu_item,
 .ui_rmenu_subitem {
   display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   height: 32px;
   line-height: 31px;
   padding: 0 5px 0 20px;
@@ -901,6 +898,14 @@ h2.page_block_h2.tabs_header {
   color: var(--text-color);
   padding-left: 28px;
 }
+
+.ui_rmenu_item_text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .ui_rmenu_sep {
   border-top: 1px solid var(--border-color);
   margin: 6px 15px;
@@ -1963,6 +1968,11 @@ select:focus {
 .ui_actions_menu label {
     padding: 6px 15px;
     box-sizing: border-box;
+}
+.ui_actions_menu form button {
+	background: none;
+	border: 0;
+	width: 100%;
 }
 
 .ui_actions_menu a:hover,

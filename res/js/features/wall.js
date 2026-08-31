@@ -34,7 +34,7 @@ function renderEditMenuLayout(apiPost, type, postId) {
 
     const postOptsItems = `${nsfwOpt}${asGroupOpt}`;
     const postOptsTrigger = type === 'post' && postOptsItems
-        ? `<div class="post-opts-trigger ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+        ? `<div class="post-opts-trigger ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this, null, {align: 'left'});" onmouseout="uiActionsMenu.hide(this);">
             <div class="post_settings" id="postOptsTrigger${postId}" role="button">
                 <div class="common_icon"></div>
             </div>

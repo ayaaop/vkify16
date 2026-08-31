@@ -178,32 +178,31 @@ vkify.once('uiActionsMenu', function() {
     function positionDummyMenu(dummyWrap) {
         const origEl = data(dummyWrap, 'origMenu');
         const menu = geByClass1('ui_actions_menu', dummyWrap);
-        const menuWrap = domClosest('ui_actions_menu_wrap', origEl);
         const appendEl = domClosest(data(dummyWrap, 'appendParentCls'), menu);
-        if (!menu || !appendEl) return;
+        if (!menu || !appendEl || !origEl) return;
 
         menu.style.display = 'block';
 
+        const origRect = rectOf(origEl);
         const appendRect = rectOf(appendEl);
-        const wrapRect = rectOf(menuWrap || dummyWrap);
-        const menuSize = { width: menu.offsetWidth, height: menu.offsetHeight };
-        const bounds = computeBounds(appendEl);
+        const appendPos = getStyle(appendEl, 'position');
 
-        const savedTop = data(menu, 'top') || 0;
-        const savedLeft = data(menu, 'left') || 0;
-        const savedRight = data(menu, 'right') || 0;
+        dummyWrap.style.position = 'absolute';
+        dummyWrap.style.width = origRect.width + 'px';
+        dummyWrap.style.height = origRect.height + 'px';
+        dummyWrap.style.zIndex = 'calc(var(--action-menu-z-index, 5) + 1)';
 
-        let left = savedRight
-            ? appendRect.right - savedRight - menuSize.width
-            : appendRect.left + savedLeft;
-        let top = appendRect.top + savedTop;
+        if (appendPos === 'static' || appendPos === '') {
+            dummyWrap.style.top = (origRect.top + window.scrollY) + 'px';
+            dummyWrap.style.left = (origRect.left + window.scrollX) + 'px';
+        } else {
+            dummyWrap.style.top = (origRect.top - appendRect.top) + 'px';
+            dummyWrap.style.left = (origRect.left - appendRect.left) + 'px';
+        }
 
-        const clamped = clampToBounds({ left, top }, menuSize, bounds);
-
-        const styles = { display: 'block', top: (clamped.top - appendRect.top) + 'px' };
-        styles.left = (clamped.left - appendRect.left) + 'px';
-        styles.right = '';
-        Object.assign(menu.style, styles);
+        menu.style.top = '';
+        menu.style.left = '';
+        menu.style.right = '';
     }
 
     window.uiActionsMenu = {
@@ -310,6 +309,10 @@ vkify.once('uiActionsMenu', function() {
                 delete window.__uiActionsMenuShowTimeout;
             }
 
+            if (options && options.menuId) {
+                ensureMenu(el, options.menuId);
+            }
+
             if (options && options.appendParentCls) {
                 let menu = geByClass1('ui_actions_menu', el);
                 if (menu) {
@@ -344,10 +347,6 @@ vkify.once('uiActionsMenu', function() {
                 }
 
                 positionDummyMenu(el);
-            }
-
-            if (options && options.menuId) {
-                ensureMenu(el, options.menuId);
             }
 
             const menu = geByClass1('ui_actions_menu', el);
