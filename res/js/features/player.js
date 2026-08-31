@@ -4,6 +4,9 @@ let currentlyHydratingBsdnElement = null;
 if (window.bsdnInitElement) {
     var originalBsdnInitElement = window.bsdnInitElement;
     window.bsdnInitElement = function(el) {
+        if (el.querySelector(".bdsn-hydrated")) {
+            return;
+        }
         currentlyHydratingBsdnElement = el;
         try {
             originalBsdnInitElement(el);

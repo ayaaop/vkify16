@@ -222,7 +222,10 @@ vkify.onPageLifecycle('afterPageSwap', async () => {
         smallBlockObserver.observe(smallBlock);
     }
 
-    if (window.player) {
+    if (window.player && window.openvk?.current_id) {
+        if (!window.player.audioPlayer) {
+            await window.player.init(window.__current_page_audio_context);
+        }
         window.player.dump();
         await window.player._handlePageTransition();
     }
