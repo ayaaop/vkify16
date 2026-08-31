@@ -258,6 +258,10 @@
 	counter-reset: audionumber;
 	margin: 3px 0 0;
 }
+.AudioPlaylistSnippet__actions .post_share .action_icon {
+	margin: 0;
+	margin-right: 2px;
+}
 .AudioPlaylistSnippet .ActionButton--all {
 	display: none;
 }

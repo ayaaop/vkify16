@@ -83,7 +83,7 @@
 
                 <div class="post_full_like_wrap AudioPlaylistSnippet__actions" n:ifset="$thisUser">
                     <div class="post_full_like">
-                        <a class="action_button post_add" id="{if $isBookmarked}unbookmarkPlaylist{else}bookmarkPlaylist{/if}" data-id="{$playlist->getId()}">
+                        <a class="action_button {if $isBookmarked}post_remove{else}post_add{/if}" id="{if $isBookmarked}unbookmarkPlaylist{else}bookmarkPlaylist{/if}" data-id="{$playlist->getId()}">
                             <i class="action_icon"></i>
                             <span class="action_label">{if $isBookmarked}{_unbookmark}{else}{_bookmark}{/if}</span>
                         </a>

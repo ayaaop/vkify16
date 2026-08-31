@@ -2767,7 +2767,7 @@ table,
     border-radius: var(--button-border-radius);
     display: flex;
     align-items: center;
-    line-height: 15px;
+    line-height: 17px;
 }
 .action_button:last-child {
     margin-right: 0;
@@ -3859,13 +3859,13 @@ h4.gifts_section_header {
 	background-image: url(../resource/icons/video_actions.png);
 	background-repeat: no-repeat;
 	opacity: 0.85;
+    width: 13px;
 }
 .post_add .action_icon {
 	background-position: 0 -15px;
 }
-.post_add#unbookmarkPlaylist .action_icon,
 .post_remove .action_icon {
-	background-position: 0 -30px;
+	background-position: 0 -29px;
 }
 .post_edit .action_icon {
 	background-position: 0 -60px;

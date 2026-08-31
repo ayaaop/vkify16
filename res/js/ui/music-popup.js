@@ -970,8 +970,8 @@ function updatePlaylistBookmarkButton(el, wasUnbookmark) {
     const label = el.querySelector('.action_label');
     if (label) {
         label.innerHTML = isBookmarked ? tr('unbookmark') : tr('bookmark');
-        el.classList.toggle('video_add_button', !isBookmarked);
-        el.classList.toggle('video_delete_button', isBookmarked);
+        el.classList.toggle('post_add', !isBookmarked);
+        el.classList.toggle('post_remove', isBookmarked);
         return;
     }
 
