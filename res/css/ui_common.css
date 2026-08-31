@@ -1937,6 +1937,11 @@ select:focus {
     transition: none !important;
 }
 
+.toTop.inactive,
+.toTop.inactive * {
+    pointer-events: none;
+}
+
 .ui_actions_menu a,
 .ui_actions_menu .ui_actions_menu_item,
 .ui_actions_menu form button {

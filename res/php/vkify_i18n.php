@@ -86,6 +86,7 @@ if (!function_exists('vkifyGetStrings')) {
                     'themepack_warn' => 'Please set "VKify16" in the <a href="/settings?act=interface">styles settings</a> again, or <a href="#" onclick="location.reload(); return false;">reload the page</a> if you just switched to it.',
                     'users_posts' => 'Posts from user',
                     'vkify_settings' => 'VKify16 settings',
+                    'other_results' => 'Other results...',
                 ],
                 'ru' => [
                     'add_tracks' => 'Добавить аудиозаписи',
@@ -165,6 +166,7 @@ if (!function_exists('vkifyGetStrings')) {
                     'themepack_warn' => 'Пожалуйста, выберите тему «VKify16» в <a href="/settings?act=interface">настройках оформления</a> заново или <a href="#" onclick="location.reload(); return false;">обновите страницу</a>, если вы только что переключились на нее.',
                     'users_posts' => 'Записи от пользователя',
                     'vkify_settings' => 'Настройки VKify16',
+                    'other_results' => 'Другие результаты...',
                 ],
                 'uk' => [
                     'add_tracks' => 'Додати аудіозаписи',
@@ -243,6 +245,7 @@ if (!function_exists('vkifyGetStrings')) {
                     'themepack_warn' => 'Будь ласка, оберіть тему «VKify16» в <a href="/settings?act=interface">налаштуваннях оформлення</a> заново або <a href="#" onclick="location.reload(); return false;">оновіть сторінку</a>, якщо ви щойно переключилися на неї.',
                     'users_posts' => 'Дописи користувача',
                     'vkify_settings' => 'Налаштування VKify16',
+                    'other_results' => 'Інші результати...'
                 ],
                 'kk' => [
                     'add_tracks' => 'Әндерді қосу',
@@ -322,6 +325,7 @@ if (!function_exists('vkifyGetStrings')) {
                     'themepack_warn' => '<a href="/settings?act=interface">Баптау бетінде</a> «VKify16» стилін қайта таңдаңыз, немесе, стильді енді ғана ауыстырған болсаңыз, <a href="#" onclick="location.reload(); return false;">бетті қайта жүктеңіз</a>.',
                     'users_posts' => 'Пайдаланушы жазбалары',
                     'vkify_settings' => 'VKify16 баптаулары',
+                    'other_results' => 'Басқа нәтижелер...'
                 ],
             ];
         }

@@ -153,51 +153,6 @@ window.switchProfileInfo = window.switchProfileInfo || function () {
     }
 };
 
-window.updateToTopArea = function () {
-    const layout = document.querySelector('.layout');
-    if (!layout) return;
-
-    const leftOffset = layout.getBoundingClientRect().left;
-    document.documentElement.style.setProperty(
-        '--to-top-width',
-        (leftOffset > 114 ? leftOffset : 114) + 'px'
-    );
-};
-
-let toTopAreaRafPending = false;
-window.addEventListener('resize', () => {
-    if (toTopAreaRafPending) return;
-    toTopAreaRafPending = true;
-    requestAnimationFrame(() => {
-        toTopAreaRafPending = false;
-        window.updateToTopArea();
-    });
-});
-
-// Defer until after paint so the post-navigation layout (async stylesheets, fonts,
-// scrollbar) has settled, then re-check shortly after to catch late shifts.
-vkify.onPage(() => {
-    requestAnimationFrame(window.updateToTopArea);
-    setTimeout(window.updateToTopArea, 300);
-});
-
-window.updateToTopOpacity = function () {
-    const scrollY = window.scrollY || window.pageYOffset;
-    const opacity = Math.min(Math.max((scrollY - 200) / 300, 0), 1);
-    document.documentElement.style.setProperty('--to-top-opacity', opacity);
-};
-
-let toTopOpacityRafPending = false;
-window.addEventListener('scroll', () => {
-    if (toTopOpacityRafPending) return;
-    toTopOpacityRafPending = true;
-    requestAnimationFrame(() => {
-        toTopOpacityRafPending = false;
-        window.updateToTopOpacity();
-    });
-}, { passive: true });
-vkify.onPage(window.updateToTopOpacity);
-
 function initLocalStorageCheckboxes() {
     document.querySelectorAll('input[data-act="localstorage_item"]').forEach((input) => {
         const stored = localStorage.getItem(input.name);

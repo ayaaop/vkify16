@@ -36,19 +36,7 @@ vkify.once('simpleTooltips', () => {
     }
 
     function getBoundary(element) {
-        const explicit = element.closest('[data-tip-boundary]');
-        if (explicit) return explicit;
-
-        for (let node = element.parentElement; node && node !== document.body; node = node.parentElement) {
-            try {
-                const cs = window.getComputedStyle(node);
-                if (!cs) continue;
-                const oy = cs.overflowY, ox = cs.overflowX;
-                if ((oy && oy !== 'visible') || (ox && ox !== 'visible')) return node;
-            } catch (e) { break; }
-        }
-
-        return null;
+        return element.closest('[data-tip-boundary]') || 'clippingParents';
     }
 
     function getTheme(element) {
@@ -58,7 +46,10 @@ vkify.once('simpleTooltips', () => {
 
     function initializeSimpleTooltips(container = document) {
         const root = container && container.querySelectorAll ? container : document;
-        const elements = root.querySelectorAll('[data-tip="simple-black"]');
+        const elements = Array.from(root.querySelectorAll('[data-tip="simple-black"]'));
+        if (root !== document && root.matches && root.matches('[data-tip="simple-black"]')) {
+            elements.unshift(root);
+        }
         elements.forEach(element => {
             if (element._tippy || element.hasAttribute('aria-describedby') || element.dataset.vkifySimpleTipInit === '1') {
                 return;
@@ -104,28 +95,21 @@ vkify.once('simpleTooltips', () => {
         vkify.simpleTooltips.observerBound = true;
 
         vkify.observeDOM((mutations) => {
-            let shouldReinit = false;
             for (const mutation of mutations) {
-                if (shouldReinit) break;
                 for (const node of mutation.addedNodes) {
                     if (node.nodeType === Node.ELEMENT_NODE) {
-                        if ((node.hasAttribute && node.hasAttribute('data-tip')) ||
-                            (node.querySelector && node.querySelector('[data-tip="simple-black"]'))) {
-                            shouldReinit = true;
-                            break;
-                        }
+                        initializeSimpleTooltips(node);
                     }
                 }
             }
-            if (shouldReinit) initializeSimpleTooltips(document);
         }, {
             filter: m => m.type === 'childList' && m.addedNodes.length > 0
         });
     };
 
-    vkify.onPageLifecycle('afterPageReady', ({ container = document }) => {
+    vkify.onPageLifecycle('afterPageReady', ({ pageBody, container = document }) => {
         bindObserverOnce();
-        initializeSimpleTooltips(container);
+        initializeSimpleTooltips(pageBody || container);
     }, 'after');
 
     vkify.ready(() => {

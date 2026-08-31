@@ -3487,6 +3487,18 @@ h4.gifts_section_header {
 #searchBoxFastTips .fastresult:hover {
     background: var(--button-background-color--light);
 }
+#searchBoxFastTips .video_module .module_body {
+    padding: 0;
+}
+
+.fasttipswrap {
+    padding: 20px;
+    text-align: center;
+}
+
+.fastnoresults {
+    color: var(--muted-text-color-2);
+}
 
 /* Search Bar Component Styles */
 .ui_filters_block {

@@ -43,6 +43,7 @@ const modules = [
     'ui/media-modals.js',
     'ui/graffiti.js',
     'ui/action-menu.js',
+    'utils/openvk-cls.js',
 
     'features/attachment-picker.js',
     'features/post-count.js',

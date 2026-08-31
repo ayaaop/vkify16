@@ -115,7 +115,7 @@ const isPaginatorNearViewport = (el) => {
     return rect.top < window.innerHeight + PAGINATOR_ROOT_MARGIN && rect.bottom > -PAGINATOR_ROOT_MARGIN;
 };
 
-const getPaginatorElement = () => u('.vkify-paginator:not(.vkify-paginator-at-top)').nodes[0];
+const getPaginatorElement = () => document.querySelector('.vkify-paginator:not(.vkify-paginator-at-top)');
 
 const getScrollContainer = (paginatorEl) => {
     if (paginatorEl) {
@@ -125,7 +125,7 @@ const getScrollContainer = (paginatorEl) => {
         const scoped = scope?.querySelector('.scroll_container');
         if (scoped) return scoped;
     }
-    return u('.scroll_container').nodes[0] || null;
+    return document.querySelector('.scroll_container');
 };
 
 const getPaginatorInsertAnchor = (containerEl, paginatorEl) => {
@@ -199,7 +199,7 @@ const shouldAllowAutoScroll = () => {
         || window.openvk?.disable_ajax === 1;
 
     if (autoScrollDisabled || ajaxRoutingDisabled) return false;
-    if (u('.scroll_container').length < 1) return false;
+    if (!document.querySelector('.scroll_container')) return false;
 
     const currentUrl = new URL(location.href);
     const pageParam = parseInt(currentUrl.searchParams.get('p'), 10);
@@ -364,10 +364,11 @@ if (!paginatorAutoScrollInit) {
     let scrollCheckTimer = null;
 
     const checkPaginatorInView = () => {
+        if (!shouldAllowAutoScroll()) return;
+
         const paginators = document.querySelectorAll('.vkify-paginator:not(.vkify-paginator-at-top)');
         paginators.forEach(paginatorEl => {
             if (!isPaginatorTriggerZone(paginatorEl)) return;
-            if (!shouldAllowAutoScroll()) return;
             if (!canLoadNextPage(paginatorEl)) return;
 
             const btn = u(paginatorEl).find('.vkify-paginator-loader');
@@ -395,6 +396,7 @@ if (!paginatorAutoScrollInit) {
 
     const schedulePaginatorCheckSoon = () => {
         if (scrollCheckScheduled) return;
+        if (!getPaginatorElement()) return;
         scrollCheckScheduled = true;
         requestAnimationFrame(() => {
             scrollCheckScheduled = false;
