@@ -18,7 +18,7 @@ const yearDelimiterTpl = Hb.compile(
 
 const photoElementTpl = Hb.compile(
     `<div class="album-photo masonry-item scroll_node" data-photo-id="{{id}}">
-        <a href="/photo{{id}}" onclick="OpenMiniature(event, '{{url_large}}', null, '{{id}}', null)">
+        <a href="/photo{{id}}" onclick="vkify.media.openPhotoLegacy(event, '{{url_large}}', null, '{{id}}', null)">
             <img class="album-photo--image" src="{{url_small}}" alt="{{description}}" loading="lazy">
         </a>
     </div>`

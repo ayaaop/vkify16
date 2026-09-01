@@ -1,9 +1,9 @@
 id: vkify16
-version: "3.3.6.5"
+version: "3.3.6.21"
 openvk_version: 0
 enabled: 1
 override_templates: true
-inherit_master: true
+inherits_master: false
 metadata:
   name:
     _: "VKify16 (unstable)"

@@ -45,7 +45,7 @@
             <div class="AudioPlaylistSnippet__left">
                 <div class="AudioPlaylistSnippet__covers">
                     {if $cover}
-                        <a href="{$cover_url}" target="_blank" onclick="OpenMiniature(event, {$cover_url}, null, {$cover->getPrettyId()}, null); return false;">
+                        <a href="{$cover_url}" target="_blank" onclick="vkify.media.openPhotoLegacy(event, {$cover_url}, null, {$cover->getPrettyId()}, null); return false;">
                             <div class="AudioPlaylistSnippet__cover" style="background-image: url('{$cover_url}');"></div>
                         </a>
                     {else}

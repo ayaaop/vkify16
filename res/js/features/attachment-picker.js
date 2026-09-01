@@ -79,7 +79,7 @@ const appendHorizontal = (form, { type, id, preview, fullsize_url }) => {
     if (!form?.length || !type || !id) return;
     const isVideo = type === 'video';
     form.find('.post-horizontal').append(`
-        <a ${isVideo ? 'id="videoOpen"' : ''} ${type === 'photo' ? `onclick="if(!event.target.closest('.upload-delete'))OpenMiniature(event,'${fullsize_url}',null,'${id}',null)"` : ''} 
+        <a ${isVideo ? 'id="videoOpen"' : ''} ${type === 'photo' ? `onclick="if(!event.target.closest('.upload-delete'))vkify.media.openPhotoLegacy(event,'${fullsize_url}',null,'${id}',null)"` : ''} 
            draggable="true" href="/${type}${id}" class="upload-item" data-type='${type}' data-id="${id}">
             <span class="upload-delete">×</span>
             ${isVideo ? `<div class='play-button'><div class='play-button-ico'></div></div>` : ''}

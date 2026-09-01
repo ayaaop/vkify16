@@ -129,7 +129,7 @@
                             mobileHeroWrap.classList.add("has-avatar-photo");
                             mobileHeroWrap.onclick = (event) => {
                                 event.preventDefault();
-                                OpenMiniature(event, response.url, null, response.new_photo, null);
+                                vkify.media.openPhotoLegacy(event, response.url, null, response.new_photo, null);
                             };
                         }
                         const mobileHeroEdit = document.querySelector(".mobile-hero-avatar-edit");

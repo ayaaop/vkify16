@@ -201,9 +201,7 @@ body {
     width: var(--layout-width);
 }
 
-.page_body,
-.messenger-app,
-.crp-list {
+.page_body {
     width: var(--page-width);
 }
 .page_content {

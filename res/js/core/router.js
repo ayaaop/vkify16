@@ -35,8 +35,11 @@ window.router = new class Router {
     }
 
     _historyState(url, kind, state = {}) {
+        const inherited = kind === 'page'
+            ? {}
+            : (history.state && typeof history.state === 'object' ? history.state : {});
         return {
-            ...(history.state && typeof history.state === 'object' ? history.state : {}),
+            ...inherited,
             ...state,
             vkify: { kind, url: new URL(url, location.origin).href }
         };
@@ -311,6 +314,10 @@ window.router = new class Router {
         }
 
         await this._handleVKifyContentUpdate();
+    }
+
+    isAjaxDisabled() {
+        return window.openvk?.disable_ajax === 1 || parseInt(localStorage.getItem('ux.disable_ajax_routing') ?? '0', 10) === 1;
     }
 
     checkUrl(url) {

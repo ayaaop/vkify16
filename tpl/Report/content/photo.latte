@@ -1,7 +1,7 @@
 {block content}
 <div class="content">
     <center style="margin-bottom: 8pt;">
-        <a onclick="OpenMiniature(event, {$photo->getURLBySizeId('large')}, null, {$photo->getPrettyId()}, null)"  href="/photo{$photo->getPrettyId()}">
+        <a onclick="vkify.media.openPhotoLegacy(event, {$photo->getURLBySizeId('large')}, null, {$photo->getPrettyId()}, null)"  href="/photo{$photo->getPrettyId()}">
             <img src="{$photo->getURLBySizeId('large')}" style="max-width: 80%; max-height: 60vh;" />
         </a>
     </center>

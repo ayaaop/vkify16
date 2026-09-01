@@ -44,7 +44,7 @@
                                 &times;
                             </a>
                             
-                            <a href="/photo{$photo->getPrettyId()}?from=album{$album->getId()}" onclick="OpenMiniature(event, {$photo->getURLBySizeId('large')}, {$album->getPrettyId()}, {$photo->getPrettyId()}, 'album')">
+                            <a href="/photo{$photo->getPrettyId()}?from=album{$album->getId()}" onclick="vkify.media.openPhotoLegacy(event, {$photo->getURLBySizeId('large')}, {$album->getPrettyId()}, {$photo->getPrettyId()}, 'album')">
                                 <img class="album-photo--image" src="{$photo->getURLBySizeId('small')}" alt="{$photo->getDescription()}" loading="lazy" />
                             </a>
                         </div>

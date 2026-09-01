@@ -13,7 +13,6 @@ import * as esbuild from 'esbuild';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import fs from 'node:fs';
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const jsRoot = path.join(__dirname, 'res', 'js');
 const outFile = path.join(jsRoot, 'dist', 'vkify16.bundle.js');
@@ -69,6 +68,7 @@ for (const rel of modules) {
         process.exit(1);
     }
 }
+
 
 const entryContents = modules.map(rel => `import './${rel}';`).join('\n') + '\n';
 

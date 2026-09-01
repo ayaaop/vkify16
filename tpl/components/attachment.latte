@@ -2,7 +2,7 @@
     {if !$attachment->isDeleted()}
         {var $link = "/photo" . ($attachment->isAnonymous() ? ("s/" . base_convert((string) $attachment->getId(), 10, 32)) : $attachment->getPrettyId())}
         {var $photoDims = $attachment->getDimensions()}
-        <a class="media-href" style="line-height: 0; --post-image: url({$attachment->getURLBySizeId('normal')|noescape})" href="{$link}" onclick="OpenMiniature(event, {$attachment->getURLBySizeId('large')}, {$parent->getPrettyId()}, {$attachment->getPrettyId()}, {$parentType})">
+        <a class="media-href" style="line-height: 0; --post-image: url({$attachment->getURLBySizeId('normal')|noescape})" href="{$link}" onclick="vkify.media.openPhotoLegacy(event, {$attachment->getURLBySizeId('large')}, {$parent->getPrettyId()}, {$attachment->getPrettyId()}, {$parentType})">
             <img n:class="media, $tilesCount > 1 ? media_makima" src="{$attachment->getURLBySizeId('normal')}" alt="{$attachment->getDescription()}" width="{$photoDims[0]}" height="{$photoDims[1]}" loading=lazy />
         </a>
     {else}

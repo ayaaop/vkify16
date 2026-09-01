@@ -1,0 +1,36 @@
+
+<div id="load_skeleton" class="im_page_loader">
+    <div class="pr">
+        <div class="pr_bt"></div>
+        <div class="pr_bt"></div>
+        <div class="pr_bt"></div>
+    </div>
+</div>
+<script>
+    function loadPage() {
+        const n_url = new URL(location.href);
+
+        if (window.im_class == null) {
+            const o_url = new URL(location.href);
+            return setTimeout(() => {
+                console.log("IM | Delay init")
+                if (o_url.href == n_url.href) {
+                    this.loadPage();
+                }
+            }, 1000);
+        }
+
+        window.im_class.insertIn(document.querySelector('.page_content .page_block'), n_url.searchParams.get("as"));
+        
+        document.querySelector('.page_block_h2').style.display = 'none';
+        document.querySelector('.page_block').classList.remove('page_block');
+    }
+
+    document.addEventListener("DOMContentLoaded", (e) => {
+        loadPage();
+    });
+
+    if (window.im_class != null) {
+        loadPage();
+    }
+</script>

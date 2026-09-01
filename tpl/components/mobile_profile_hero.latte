@@ -1,6 +1,6 @@
 <div class="mobile-profile-hero mobileonly">
     {var $avPhoto = $entity->getAvatarPhoto()}
-    {var $avOnclick = $avPhoto && !($disablePhotoViewer ?? false) ? "event.preventDefault(); OpenMiniature(event, '" . $entity->getAvatarUrl('large') . "', null, '" . $avPhoto->getPrettyId() . "', null);" : null}
+    {var $avOnclick = $avPhoto && !($disablePhotoViewer ?? false) ? "event.preventDefault(); vkify.media.openPhotoLegacy(event, '" . $entity->getAvatarUrl('large') . "', null, '" . $avPhoto->getPrettyId() . "', null);" : null}
     <div class="mobile-hero-img-wrap{if $avPhoto} has-avatar-photo{/if}" n:attr="onclick => $avOnclick">
         {include '../components/avatar.latte', author => $entity, size => 'large', class => 'mobile-hero-img', width => false, height => false, alt => ($alt ?? $name)}
         <div class="mobile-hero-gradient"></div>

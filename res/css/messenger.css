@@ -1,0 +1,17 @@
+/* vkify16 overrides for the new messenger */
+
+/* try to mimic wide/narrow column layout */
+#im_container.at_page {
+    display: grid;
+    grid-template-columns: 1fr 230px;
+    grid-template-areas: "containers tabs";
+    gap: 15px;
+}
+
+#im_container.at_page #im_page_tabs {
+    grid-area: tabs;
+}
+
+#im_container.at_page #im_page_containers {
+    grid-area: containers;
+}

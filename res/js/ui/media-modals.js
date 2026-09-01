@@ -258,27 +258,6 @@ vkify.once('mediaModals', function () {
         }
     }
 
-    if (typeof window.OpenVideo === 'function') {
-        vkify.hook(window, 'OpenVideo', vkifyOpenVideo, 'replace');
-    } else {
-        window.OpenVideo = vkifyOpenVideo;
-    }
-
-    u(document).on('click', '#videoOpen', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-
-        try {
-            const target = e.target.closest('#videoOpen')
-            const vid = target.dataset.id
-            const split = vid.split('_')
-
-            OpenVideo(split)
-        } catch(ec) {
-            return
-        }
-    });
-
     async function vkifyOpenMiniature(e, photo, post, photo_id, type = "post", skipUrlUpdate = false) {
         if (e && typeof e.preventDefault === 'function') {
             e.preventDefault();
@@ -970,11 +949,57 @@ vkify.once('mediaModals', function () {
         }
     }
 
-    if (typeof window.OpenMiniature === 'function') {
-        vkify.hook(window, 'OpenMiniature', vkifyOpenMiniature, 'replace');
-    } else {
-        window.OpenMiniature = vkifyOpenMiniature;
+    class VKifyPhotoViewer extends PhotoViewer {
+        static open(options = {}) {
+            const selected = options.selected || {};
+            const photoId = options.photoId || (typeof idForItem === 'function' ? idForItem(selected) : `${selected.owner_id}_${selected.id}`);
+            const photoUrl = options.photoUrl || selected.src_xbig || selected.photo_2560 || selected.photo_1280 || selected.photo_604 || selected.photo_130 || selected.url;
+            const context = options.context === 'message' ? null : (options.context || 'post');
+            return vkifyOpenMiniature(options.event || null, photoUrl, options.contextId || null, photoId, context, options.skipUrlUpdate || false);
+        }
     }
+
+    class VKifyVideoViewer extends VideoViewer {
+        static open(options = {}) {
+            const selected = options.selected || {};
+            const videoId = options.videoId || [selected.owner_id, selected.id];
+            return vkifyOpenVideo(Array.isArray(videoId) ? videoId : String(videoId).split('_'), true, options.skipUrlUpdate || false, options.startAtTime || 0);
+        }
+    }
+
+    window.vkify.media = {
+        PhotoViewer: VKifyPhotoViewer,
+        VideoViewer: VKifyVideoViewer,
+        openPhoto: options => VKifyPhotoViewer.open(options),
+        openVideo: options => VKifyVideoViewer.open(options),
+        openPhotoLegacy: (...args) => vkifyOpenMiniature(...args),
+        openVideoLegacy: (...args) => vkifyOpenVideo(...args)
+    };
+
+    document.addEventListener('click', event => {
+        const video = event.target.closest('#videoOpen[data-id]');
+        if (video) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            window.vkify.media.openVideo({ event, videoId: video.dataset.id });
+            return;
+        }
+
+        const photo = event.target.closest('.post .attachment a[href^="/photo"], .photo_preview a[href^="/photo"]');
+        if (!photo) return;
+        const match = photo.getAttribute('href')?.match(/^\/photo(-?\d+_\d+)/);
+        if (!match) return;
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        window.vkify.media.openPhoto({
+            event,
+            photoId: match[1],
+            photoUrl: photo.querySelector('img')?.src,
+            context: 'post',
+            contextId: photo.closest('.post')?.dataset.id || null
+        });
+    }, true);
 
     function clearZParam() {
         const url = new URL(window.location);
@@ -1058,13 +1083,19 @@ vkify.once('mediaModals', function () {
                 const photoUrl = photo.src_xbig || photo.src_big || photo.src;
                 const type = data.contextType || 'photo';
 
-                await window.OpenMiniature(null, photoUrl, data.contextId, data.photoId, type, true);
+                await window.vkify.media.openPhoto({
+                    photoId: data.photoId,
+                    photoUrl,
+                    contextId: data.contextId,
+                    context: type,
+                    skipUrlUpdate: true
+                });
             } catch (err) {
                 clearZParam();
             }
         } else if (data.type === 'video') {
             try {
-                await window.OpenVideo(data.videoId, true, true);
+                await window.vkify.media.openVideo({ videoId: data.videoId, skipUrlUpdate: true });
             } catch (err) {
                 clearZParam();
             }

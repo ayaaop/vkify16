@@ -456,7 +456,7 @@
 							{var $avatarSizes = $avatarPhoto ? $avatarPhoto->getSizes() : null}
 							{var $avatarNormal = $avatarSizes['normal'] ?? null}
 							<a href="{$user->getAvatarLink()|nocheck}" style="display: block; line-height: 0;">
-								{include '../components/avatar.latte', author => $user, size => 'normal', id => 'bigAvatar', width => ($avatarNormal ? $avatarNormal->width : 200), height => ($avatarNormal ? $avatarNormal->height : 200), alt => $user->getCanonicalName(), style => 'width: 100%; image-rendering: -webkit-optimize-contrast;', onclick => ($avatarPhoto ? "event.preventDefault(); OpenMiniature(event, '{$user->getAvatarUrl('normal')}', null, '{$avatarPhoto->getPrettyId()}', null);" : null), class => ''}
+								{include '../components/avatar.latte', author => $user, size => 'normal', id => 'bigAvatar', width => ($avatarNormal ? $avatarNormal->width : 200), height => ($avatarNormal ? $avatarNormal->height : 200), alt => $user->getCanonicalName(), style => 'width: 100%; image-rendering: -webkit-optimize-contrast;', onclick => ($avatarPhoto ? "event.preventDefault(); vkify.media.openPhotoLegacy(event, '{$user->getAvatarUrl('normal')}', null, '{$avatarPhoto->getPrettyId()}', null);" : null), class => ''}
 							</a>
 						</div>
 					</div>
@@ -994,7 +994,7 @@
 					</a>
 					{if $photoCount > 0 }
 						<div class="page_photos_module clear_fix" id="page_photos_grid">
-							<a class="page_square_photo" n:foreach="($photos = iterator_to_array((new \openvk\Web\Models\Repositories\Photos())->getEveryUserPhoto($user, 0, 4))) as $photo" href="{$photo->getPageURL()}" onclick="OpenMiniature(event, {$photo->getURLBySizeId('large')}, null, {$photo->getPrettyId()}, null)" style="background-image: url({$photo->getURLBySizeId('normal')})"></a>
+							<a class="page_square_photo" n:foreach="($photos = iterator_to_array((new \openvk\Web\Models\Repositories\Photos())->getEveryUserPhoto($user, 0, 4))) as $photo" href="{$photo->getPageURL()}" onclick="vkify.media.openPhotoLegacy(event, {$photo->getURLBySizeId('large')}, null, {$photo->getPrettyId()}, null)" style="background-image: url({$photo->getURLBySizeId('normal')})"></a>
 						</div>
 					{else}
 						{if isset($thisUser) && $user->getId() == $thisUser->getId()}
@@ -1058,7 +1058,7 @@
 								var a = document.createElement('a');
 								a.className = 'page_square_photo';
 								a.href = '/photo' + photo.pretty_id;
-								a.setAttribute('onclick', 'OpenMiniature(event, \'' + photo.link + '\', null, \'' + photo.pretty_id + '\', null)');
+								a.setAttribute('onclick', 'vkify.media.openPhotoLegacy(event, \'' + photo.link + '\', null, \'' + photo.pretty_id + '\', null)');
 								a.style.backgroundImage = 'url(' + photo.url + ')';
 								grid.insertBefore(a, grid.firstChild);
 								while (grid.children.length > 4) grid.removeChild(grid.lastChild);

@@ -395,7 +395,7 @@
 							{var $avatarSizes = $avatarPhoto ? $avatarPhoto->getSizes() : null}
 							{var $avatarNormal = $avatarSizes['normal'] ?? null}
 							<a href="{$avatarLink|nocheck}" style="display: block; line-height: 0;">
-								{include '../components/avatar.latte', author => $club, size => 'normal', id => 'bigAvatar', width => ($avatarNormal ? $avatarNormal->width : 200), height => ($avatarNormal ? $avatarNormal->height : 200), style => 'width: 100%; image-rendering: -webkit-optimize-contrast;', onclick => ($avatarPhoto ? "event.preventDefault(); OpenMiniature(event, '{$club->getAvatarUrl('normal')}', null, '{$avatarPhoto->getPrettyId()}', null);" : null)}
+								{include '../components/avatar.latte', author => $club, size => 'normal', id => 'bigAvatar', width => ($avatarNormal ? $avatarNormal->width : 200), height => ($avatarNormal ? $avatarNormal->height : 200), style => 'width: 100%; image-rendering: -webkit-optimize-contrast;', onclick => ($avatarPhoto ? "event.preventDefault(); vkify.media.openPhotoLegacy(event, '{$club->getAvatarUrl('normal')}', null, '{$avatarPhoto->getPrettyId()}', null);" : null)}
 							</a>
 						</div>
 					</div>

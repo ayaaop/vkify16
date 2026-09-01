@@ -24,7 +24,6 @@
         {script "js/l10n.js"}
         {script "js/utils.js"}
         {script "js/node_modules/dashjs/dist/dash.all.min.js"}
-
         <script src="/assets/packages/static/openvk/js/node_modules/cropperjs/dist/cropper.js" type="module"></script>
 
         {css "js/node_modules/tippy.js/dist/backdrop.css"}
@@ -39,6 +38,7 @@
         {css "js/node_modules/leaflet/dist/leaflet.css"}
         {css "js/node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css"}
         {script "js/node_modules/handlebars/dist/handlebars.min.js"}
+        {script_module "js/messages/im.js"}
         {if $isTimezoned == NULL}
             {script "js/timezone.js"}
         {/if}
@@ -641,6 +641,9 @@
         <script>
         </script>
         {script "js/al_wall.js"}
+        {script "js/options.js"}
+        {script "js/stickers.js"}
+        {script "js/messages/related.js"}
 
         <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/ui/page.js"></script>
         <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/ui/tooltips.js"></script>
