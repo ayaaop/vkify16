@@ -22,7 +22,7 @@
 {var $showGroupPostOpts = $isPostComposer && $canModifyClub && ($owner ?? 0) < 0}
 {var $showCommentAsGroup = !$isPostComposer && $canModifyClub}
 
-<div id="write" class="model_content_textarea">
+<div id="write" class="has_emoji_picker model_content_textarea">
     <form id="write-form-{$textAreaId}" action="{$route}" method="post" enctype="multipart/form-data" style="margin:0;">
         {if $thisUser ?? NULL}
             <a class="post_field_user_link" href="{$thisUser->getURL()}">
@@ -68,6 +68,9 @@
             style="resize: none;"
             placeholder="{ifset $placeholder}{$placeholder}{else}{_write}{/ifset}"
         ></textarea>
+        <div class="emoji_picker_entrypoint emoji_smile" role="button">
+            <div class="emoji_smile_icon_vector emoji_smile_icon"></div>
+        </div>
 
         <div id="post-buttons{$textAreaId}" class="post-buttons">
             <div class="post-horizontal"></div>
@@ -96,24 +99,24 @@
                                 role="button"
                             ></span>
                             <div class="ui_actions_menu" id="moreAttachTooltip{$textAreaId}">
-                            <a id="__vkifyPhotoAttachment" class="attach_photo" n:attr="data-club => $clubDataId">
+                            <a id="__photoAttachment" class="attach_photo" n:attr="data-club => $clubDataId">
                                 <div class="post-attach-menu__icon"></div>
                                 {_photo}
                             </a>
-                            <a id="__vkifyVideoAttachment" class="attach_video">
+                            <a id="__videoAttachment" class="attach_video">
                                 <div class="post-attach-menu__icon"></div>
                                 {_video}
                             </a>
-                            <a id="__vkifyAudioAttachment" class="attach_audio" n:attr="data-club => $clubDataId">
+                            <a id="__audioAttachment" class="attach_audio" n:attr="data-club => $clubDataId">
                                 <div class="post-attach-menu__icon"></div>
                                 {_audio}
                             </a>
-                            <a n:if="$docsEnabled" id="__vkifyDocumentAttachment" class="attach_document" n:attr="data-club => $clubDataRealId">
+                            <a n:if="$docsEnabled" id="__documentAttachment" class="attach_document" n:attr="data-club => $clubDataRealId">
                                 <div class="post-attach-menu__icon"></div>
                                 {_document}
                             </a>
                             {if $isPostComposer}
-                                <a n:if="$notesEnabled" id="__vkifyNotesAttachment" class="attach_note">
+                                <a n:if="$notesEnabled" id="__notesAttachment" class="attach_note">
                                     <div class="post-attach-menu__icon"></div>
                                     {_note}
                                 </a>
@@ -133,16 +136,16 @@
                         </div>
                         </div>
                     {elseif $isPostComposer}
-                        <a id="__vkifyPhotoAttachment" class="attach_photo"
+                        <a id="__photoAttachment" class="attach_photo"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_photo}"
                            n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"></div>
                         </a>
-                        <a id="__vkifyVideoAttachment" class="attach_video"
+                        <a id="__videoAttachment" class="attach_video"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_video}">
                             <div class="post-attach-menu__icon"></div>
                         </a>
-                        <a id="__vkifyAudioAttachment" class="attach_audio"
+                        <a id="__audioAttachment" class="attach_audio"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_audio}"
                            n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"></div>
@@ -152,11 +155,11 @@
                                 {=vkifyTr('more')}
                             </a>
                             <div class="ui_actions_menu" id="moreAttachTooltip{$textAreaId}">
-                                <a n:if="$docsEnabled" id="__vkifyDocumentAttachment" class="attach_document" n:attr="data-club => $clubDataRealId">
+                                <a n:if="$docsEnabled" id="__documentAttachment" class="attach_document" n:attr="data-club => $clubDataRealId">
                                     <div class="post-attach-menu__icon"></div>
                                     {_document}
                                 </a>
-                                <a n:if="$notesEnabled" id="__vkifyNotesAttachment" class="attach_note">
+                                <a n:if="$notesEnabled" id="__notesAttachment" class="attach_note">
                                     <div class="post-attach-menu__icon"></div>
                                     {_note}
                                 </a>
@@ -175,21 +178,21 @@
                             </div>
                         </div>
                     {else}
-                        <a id="__vkifyPhotoAttachment" class="attach_photo"
+                        <a id="__photoAttachment" class="attach_photo"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_photo}"
                            n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"></div>
                         </a>
-                        <a id="__vkifyVideoAttachment" class="attach_video"
+                        <a id="__videoAttachment" class="attach_video"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_video}">
                             <div class="post-attach-menu__icon"></div>
                         </a>
-                        <a id="__vkifyAudioAttachment" class="attach_audio"
+                        <a id="__audioAttachment" class="attach_audio"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_audio}"
                            n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"></div>
                         </a>
-                        <a n:if="$docsEnabled" id="__vkifyDocumentAttachment" class="attach_document"
+                        <a n:if="$docsEnabled" id="__documentAttachment" class="attach_document"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_document}"
                            n:attr="data-club => $clubDataRealId">
                             <div class="post-attach-menu__icon"></div>

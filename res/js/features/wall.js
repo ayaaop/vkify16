@@ -45,13 +45,13 @@ function renderEditMenuLayout(apiPost, type, postId) {
 
     const inlineAttachButtons = type === 'post'
         ? `
-            <a class="attach_photo" id="__vkifyPhotoAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('photo')}">
+            <a class="attach_photo" id="__photoAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('photo')}">
                 <div class="post-attach-menu__icon"></div>
             </a>
-            <a class="attach_video" id="__vkifyVideoAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('video')}">
+            <a class="attach_video" id="__videoAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('video')}">
                 <div class="post-attach-menu__icon"></div>
             </a>
-            <a class="attach_audio" id="__vkifyAudioAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('audio')}">
+            <a class="attach_audio" id="__audioAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('audio')}">
                 <div class="post-attach-menu__icon"></div>
             </a>
         `
@@ -65,11 +65,11 @@ function renderEditMenuLayout(apiPost, type, postId) {
 
     const dropdownItems = type === 'post'
         ? `
-            <a class="attach_document" id="__vkifyDocumentAttachment" data-club="${clubId}">
+            <a class="attach_document" id="__documentAttachment" data-club="${clubId}">
                 <div class="post-attach-menu__icon"></div>
                 ${tr('document')}
             </a>
-            <a class="attach_note" id="__vkifyNotesAttachment">
+            <a class="attach_note" id="__notesAttachment">
                 <div class="post-attach-menu__icon"></div>
                 ${tr('note')}
             </a>
@@ -79,19 +79,19 @@ function renderEditMenuLayout(apiPost, type, postId) {
             </a>
         `
         : `
-            <a class="attach_photo" id="__vkifyPhotoAttachment" data-club="${clubId}">
+            <a class="attach_photo" id="__photoAttachment" data-club="${clubId}">
                 <div class="post-attach-menu__icon"></div>
                 ${tr('photo')}
             </a>
-            <a class="attach_video" id="__vkifyVideoAttachment" data-club="${clubId}">
+            <a class="attach_video" id="__videoAttachment" data-club="${clubId}">
                 <div class="post-attach-menu__icon"></div>
                 ${tr('video')}
             </a>
-            <a class="attach_audio" id="__vkifyAudioAttachment" data-club="${clubId}">
+            <a class="attach_audio" id="__audioAttachment" data-club="${clubId}">
                 <div class="post-attach-menu__icon"></div>
                 ${tr('audio')}
             </a>
-            <a class="attach_document" id="__vkifyDocumentAttachment" data-club="${clubId}">
+            <a class="attach_document" id="__documentAttachment" data-club="${clubId}">
                 <div class="post-attach-menu__icon"></div>
                 ${tr('document')}
             </a>
@@ -137,16 +137,16 @@ function renderRepostBottomLayout() {
             <div class="post-bottom-acts">
                 <div class="post-attach-menu">
                     <div id="wallAttachmentMenu">
-                        <a id="__vkifyPhotoAttachment" class="attach_photo" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('photo')}" data-club="0">
+                        <a id="__photoAttachment" class="attach_photo" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('photo')}" data-club="0">
                             <div class="post-attach-menu__icon"></div>
                         </a>
-                        <a id="__vkifyVideoAttachment" class="attach_video" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('video')}" data-club="0">
+                        <a id="__videoAttachment" class="attach_video" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('video')}" data-club="0">
                             <div class="post-attach-menu__icon"></div>
                         </a>
-                        <a id="__vkifyAudioAttachment" class="attach_audio" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('audio')}" data-club="0">
+                        <a id="__audioAttachment" class="attach_audio" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('audio')}" data-club="0">
                             <div class="post-attach-menu__icon"></div>
                         </a>
-                        <a id="__vkifyDocumentAttachment" class="attach_document" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('document')}" data-club="0">
+                        <a id="__documentAttachment" class="attach_document" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('document')}" data-club="0">
                             <div class="post-attach-menu__icon"></div>
                         </a>
                     </div>
@@ -404,61 +404,57 @@ window.handleWallAnonClick = window.handleWallAnonClick || ((el) => {
         syncWallCheckboxHiddenInputs(form);
     });
 
-function bindComposerSubmitOnce() {
-    if (!vkify.bindOnce('composerSubmit', bindComposerSubmitOnce)) return;
+function bumpSelectedTabCountOnNewPost(form) {
+    const countEl = document.querySelector('.ui_tab_sel .ui_tab_count');
+    if (!countEl) return;
 
-    const bumpSelectedTabCountOnNewPost = () => {
-        const countEl = document.querySelector('.ui_tab_sel .ui_tab_count');
-        if (!countEl) return;
+    const initial = parseInt((countEl.textContent || '').trim(), 10);
+    if (Number.isNaN(initial)) return;
 
-        const initial = parseInt((countEl.textContent || '').trim(), 10);
-        if (Number.isNaN(initial)) return;
+    const existingIds = new Set(
+        Array.from(document.querySelectorAll('.post:not(.reply)[data-id]'))
+            .map(n => n.getAttribute('data-id'))
+            .filter(Boolean)
+    );
 
-        const existingIds = new Set(
-            Array.from(document.querySelectorAll('.post:not(.reply)[data-id]'))
-                .map(n => n.getAttribute('data-id'))
-                .filter(Boolean)
-        );
-
-        let done = false;
-        const finalize = () => {
-            if (done) return;
-            done = true;
-            try { observer.disconnect(); } catch (_e) { }
-            try { clearTimeout(timer); } catch (_e) { }
-        };
-
-        const tryIncrement = () => {
-            if (done) return;
-            const nodes = document.querySelectorAll('.post:not(.reply)[data-id]');
-            for (const n of nodes) {
-                const id = n.getAttribute('data-id');
-                if (id && !existingIds.has(id)) {
-                    const current = parseInt((countEl.textContent || '').trim(), 10);
-                    if (!Number.isNaN(current)) {
-                        countEl.textContent = String(current + 1);
-                    }
-                    finalize();
-                    return;
-                }
-            }
-        };
-
-        const observer = new MutationObserver(() => {
-            tryIncrement();
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-
-        const timer = setTimeout(() => {
-            finalize();
-        }, 5000);
+    let done = false;
+    const finalize = () => {
+        if (done) return;
+        done = true;
+        try { observer.disconnect(); } catch (_e) { }
+        try { clearTimeout(timer); } catch (_e) { }
     };
 
-    u(document).on('submit', '#write form', (e) => {
-        syncWallCheckboxHiddenInputs(e.target);
-        bumpSelectedTabCountOnNewPost();
+    const tryIncrement = () => {
+        if (done) return;
+        const nodes = document.querySelectorAll('.post:not(.reply)[data-id]');
+        for (const n of nodes) {
+            const id = n.getAttribute('data-id');
+            if (id && !existingIds.has(id)) {
+                const current = parseInt((countEl.textContent || '').trim(), 10);
+                if (!Number.isNaN(current)) {
+                    countEl.textContent = String(current + 1);
+                }
+                if (form && typeof window.resetVkifyComposer === 'function') {
+                    window.resetVkifyComposer(form);
+                }
+                finalize();
+                return;
+            }
+        }
+    };
+
+    const observer = new MutationObserver(() => {
+        tryIncrement();
     });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    const timer = setTimeout(() => {
+        finalize();
+    }, 5000);
 }
+
+window.bumpSelectedTabCountOnNewPost = bumpSelectedTabCountOnNewPost;
 
 function bindCommentCancelOnce() {
     if (!vkify.bindOnce('commentCancel', bindCommentCancelOnce)) return;
@@ -521,10 +517,33 @@ function bindSourceButtonOrderFix() {
     });
 }
 
+function bindWallAjaxActions() {
+    if (!vkify.bindOnce('wallAjaxActions', bindWallAjaxActions)) return;
+
+    document.addEventListener('click', (e) => {
+        const deleteTarget = e.target.closest('#_wallDelete, #_ajaxDelete, .delete');
+        if (deleteTarget && typeof window.ajax_delete === 'function') {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            window.ajax_delete(e);
+            return;
+        }
+
+        const pinTarget = e.target.closest('.pin');
+        if (pinTarget && typeof window.ajax_pin === 'function') {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            window.ajax_pin(e);
+        }
+    }, true);
+}
+
 setupWallCheckboxListeners();
-bindComposerSubmitOnce();
 bindCommentCancelOnce();
 bindSourceButtonOrderFix();
+bindWallAjaxActions();
 
 let _groupInfoTabsInitialized = false;
 function initGroupInfoTabs() {
@@ -981,9 +1000,11 @@ function bindPostEditOnce() {
         if (edit_place.html() === '') {
             u(editBtn).addClass('lagged');
             try {
-                const params = type === 'post' ? { posts: rawId } : { owner_id: 1, comment_id: id[1] };
+                const params = type === 'post' ? { posts: rawId } : { owner_id: parseInt(id[0], 10) || 1, comment_id: id[1] };
                 const api_req = await window.OVKAPI.call(`wall.${type === 'post' ? 'getById' : 'getComment'}`, params);
-                const api_post = api_req.items[0];
+                const _items = api_req.items || api_req.response?.items || api_req;
+                const api_post = Array.isArray(_items) ? _items[0] : _items;
+                if (!api_post) throw new Error('Post not found');
 
                 edit_place.html(vkify.editMenuLayout(api_post, type, rawId));
 
@@ -1049,7 +1070,14 @@ function bindPostEditOnce() {
                         return;
                     }
 
-                    const new_post_html = await ContentFetcher.request(`/iapi/getPostTemplate/${id[0]}_${id[1]}?type=${type}`, {
+                    let is_at_post_page = false;
+                    try {
+                        if (location.pathname.indexOf('wall') !== -1 && location.pathname.split('_').length === 2) {
+                            is_at_post_page = true;
+                        }
+                    } catch (e) {}
+
+                    const new_post_html = await ContentFetcher.request(`/iapi/getPostTemplate/${id[0]}_${id[1]}?type=${type}&from_page=${is_at_post_page ? 'post' : 'another'}`, {
                         method: 'POST',
                         responseType: 'text',
                         ajaxQuery: false

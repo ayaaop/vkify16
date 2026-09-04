@@ -18,7 +18,7 @@ const yearDelimiterTpl = Hb.compile(
 
 const photoElementTpl = Hb.compile(
     `<div class="album-photo masonry-item scroll_node" data-photo-id="{{id}}">
-        <a href="/photo{{id}}" onclick="vkify.media.openPhotoLegacy(event, '{{url_large}}', null, '{{id}}', null)">
+        <a href="/photo{{id}}" onclick="PhotoViewer.openById('{{viewer_id}}', event)">
             <img class="album-photo--image" src="{{url_small}}" alt="{{description}}" loading="lazy">
         </a>
     </div>`
@@ -79,6 +79,7 @@ vkify.once("initAlbumPhotosLoader", () => {
                 if (!byYear[year]) byYear[year] = [];
                 byYear[year].push({
                     id: `${photo.owner_id}_${photo.id}`,
+                    viewer_id: `${photo.owner_id}_${photo.id}${photo.access_key ? '_' + photo.access_key : ''}`,
                     url_small: photo.src_big || photo.src,
                     url_large: photo.src_xbig || photo.src_big || photo.src,
                     description: photo.text || '',

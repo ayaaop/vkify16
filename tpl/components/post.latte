@@ -35,7 +35,7 @@
 {var $threshold = $compact ? 520 : 1500}
 {var $lineThreshold = $compact ? 10 : 15}
 
-<div data-id="{$post->getPrettyId()}" n:attr="data-uniqueid => (!$compact && $scrollNode) ? $post->getPrettyId() : null" n:class="post, ($post->isExplicit() && (!isset($thisUser) || $thisUser->getNsfwTolerance() < 2)) ? post-nsfw, $compact ? copy_quote, !$compact ? page_block, !$compact && $scrollNode ? scroll_node">
+<div data-id="{$post->getPrettyId()}" n:attr="data-uniqueid => (!$compact && $scrollNode) ? $post->getPrettyId() : null" n:class="post, ($post->isExplicit() && (!isset($thisUser) || $thisUser->getNsfwTolerance() < 2)) ? post-nsfw, $compact ? copy_quote, !$compact ? page_block, !$compact && $scrollNode ? scroll_node, $post->isPinned() ? is-pinned : ''">
     <div class="post_header">
         <a class="post_image{if !$post->isPostedOnBehalfOfGroup() && $author->isOnline()} online{/if}{if in_array($onlinePlatform, ['android', 'iphone', 'mobile'])} mobile{/if}" href="{$author->getURL()}">
             {include 'avatar.latte', author => $author, size => 'miniscule', width => 50, class => 'post-avatar'}
@@ -65,7 +65,7 @@
                             {/if}
                         </a>
                     {/if}
-                    <span n:if="$post->isPinned()" class="wall_fixed_label">{_pinned}</span>
+                    <span n:if="$post->isPinned()" class="pinned_mark">{_pinned}</span>
                     <span n:if="$post->canBeEditedBy($thisUser)" class="wall_edit_label"><span class="divider"></span>{_logs_editing|lower}</span>
                 </span>
             </div>
@@ -99,7 +99,7 @@
                     {/if}
                     {if $canBePinned && !($forceNoPinLink ?? false)}
                         {if $post->isPinned()}
-                            <a class="pin" href="/wall{$post->getPrettyId()}/pin?act=unpin&hash={rawurlencode($csrfToken)}">{_unpin}</a>
+                            <a class="pin unpin" href="/wall{$post->getPrettyId()}/pin?act=unpin&hash={rawurlencode($csrfToken)}">{_unpin}</a>
                         {else}
                             <a class="pin" href="/wall{$post->getPrettyId()}/pin?act=pin&hash={rawurlencode($csrfToken)}">{_pin}</a>
                         {/if}
@@ -134,13 +134,13 @@
 
             <div n:ifcontent class="attachments attachments_m">
                 <div class="attachment" n:foreach="$attachmentsLayout->extras as $attachment" n:if="!($attachment instanceof \openvk\Web\Models\Entities\Audio) && !($attachment instanceof \openvk\Web\Models\Entities\Note)">
-                    {include "attachment.latte", attachment => $attachment, post => $post}
+                    {include "attachment.latte", attachment => $attachment, parent => $post, parentType => "post"}
                 </div>
                 <div class="attachment audios_attachment" n:foreach="$attachmentsLayout->extras as $attachment" n:if="$attachment instanceof \openvk\Web\Models\Entities\Audio">
-                    {include "attachment.latte", attachment => $attachment, post => $post}
+                    {include "attachment.latte", attachment => $attachment, parent => $post, parentType => "post"}
                 </div>
                 <div class="attachment notes_attachment" n:foreach="$attachmentsLayout->extras as $attachment" n:if="$attachment instanceof \openvk\Web\Models\Entities\Note">
-                    {include "attachment.latte", attachment => $attachment, post => $post}
+                    {include "attachment.latte", attachment => $attachment, parent => $post, parentType => "post"}
                 </div>
             </div>
 

@@ -56,13 +56,17 @@
         </div>
         <div class="wide_column_wrap">
             <div class="wide_column post_view_page {if $cCount > 0}with_comments{/if}">
-                {include "../components/post.latte", post => $post, forceNoCommentsLink => TRUE, scrollNode => false, postPage => true}
-                {include "../components/comments.latte",
-                comments => $comments,
-                count => $cCount,
-                page => $cPage,
-                model => "posts",
-                parent => $post }
+                <div id="post_page_main">
+                    {include "../components/post.latte", post => $post, forceNoCommentsLink => TRUE, scrollNode => false, postPage => true, commentSection => false}
+                </div>
+                <div id="post_page_meta">
+                    {include "../components/comments.latte",
+                    comments => $comments,
+                    count => $cCount,
+                    page => $cPage,
+                    model => "posts",
+                    parent => $post }
+                </div>
             </div>
         </div>
     </div>

@@ -39,10 +39,10 @@
 
                     <div n:ifcontent class="attachments attachments_m">
                         <div class="attachment" n:foreach="$attachmentsLayout->extras as $attachment" n:if="!($attachment instanceof \openvk\Web\Models\Entities\Audio)">
-                            {include "attachment.latte", attachment => $attachment, post => $comment}
+                            {include "attachment.latte", attachment => $attachment, parent => $comment, parentType => "comment"}
                         </div>
                         <div class="attachment" n:foreach="$attachmentsLayout->extras as $attachment" n:if="$attachment instanceof \openvk\Web\Models\Entities\Audio">
-                            {include "attachment.latte", attachment => $attachment, post => $comment}
+                            {include "attachment.latte", attachment => $attachment, parent => $comment, parentType => "comment"}
                         </div>
                     </div>
                 </div>

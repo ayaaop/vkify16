@@ -1128,10 +1128,12 @@ input.ui_search_field {
   border-left: 20px solid transparent;
   background-position: 0;
 }
-input.ui_search_field::placeholder {
+input.ui_search_field::placeholder,
+input[type~="text"]::placeholder {
   color: var(--search-placeholder-color);
 }
-input.ui_search_field:focus::placeholder {
+input.ui_search_field:focus::placeholder,
+input[type~="text"]:focus::placeholder {
   color: var(--search-placeholder-focus-color);
 }
 .ui_search_reset {
@@ -1448,8 +1450,7 @@ select:focus {
   background-color: var(--button-background-color);
 }
 
-.tippy-box[data-theme="special vk"],
-.messenger-app--input---messagebox .tippy-box {
+.tippy-box[data-theme="special vk"] {
   background: none !important;
   border-radius: 4px !important;
   box-shadow: none !important;

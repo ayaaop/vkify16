@@ -67,7 +67,7 @@
                                     </div>
                                 {elseif $section == "photos"}
                                     <div class="album-photo masonry-item scroll_node" data-uniqueid="photo-{$dat->getId()}">
-                                        <a href="/photo{$dat->getPrettyId()}" onclick="vkify.media.openPhotoLegacy(event, {$dat->getURLBySizeId('large')}, null, {$dat->getPrettyId()}, null)">
+                                        <a href="/photo{$dat->getPrettyId()}" onclick="PhotoViewer.openById('{= $dat->getPrettyId() . ($dat->getAccessKey() ? '_' . $dat->getAccessKey() : '') |noescape}', event)">
                                             <img class="album-photo--image" src="{$dat->getURLBySizeId('small')}" alt="{$dat->getDescription()}" loading="lazy" />
                                         </a>
                                     </div>

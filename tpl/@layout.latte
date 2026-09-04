@@ -550,6 +550,7 @@
         {script "js/node_modules/msgpack-lite/dist/msgpack.min.js"}
         {script "js/node_modules/soundjs/lib/soundjs.min.js"}
         {script "js/node_modules/ky/umd.js"}
+        <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/utils/openvk-cls.js"></script>
         {script "js/messagebox.js"}
         {script "js/notifications.js"}
         {script "js/player.js"}
@@ -621,6 +622,8 @@
         <script id='_js_ep_script'>
             window.openvk = {
                 "current_language": {getLanguage()},
+                "lang": {php echo json_encode(getLanguage())},
+                "locale": {php echo json_encode(explode(';', tr('__locale'))[0] ?? 'ru_RU.UTF-8')},
                 "audio_genres": {\openvk\Web\Models\Entities\Audio::genres},
                 "at_search": {$atSearch ?? false},
                 "max_attachments": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["wall"]["postSizes"]["maxAttachments"] ?? 10},
@@ -632,6 +635,9 @@
                 "max_add_fields": {ovkGetQuirk("users.max-fields")},
                 "docs_max": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["docs"]["maxSize"]},
                 "docs_allowed": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["docs"]["allowedFormats"]},
+                "dev_id": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["support"]["devAccount"] ?? 1381},
+                "admin_id": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["support"]["adminAccount"] ?? 1},
+                "support_id": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["support"]["supportAccount"] ?? 1},
             }
         </script>
 

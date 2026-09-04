@@ -432,6 +432,26 @@ u(document).on('click', 'a', async (e) => {
     if (result.error) location.assign(url);
 });
 
+function resetVkifyComposer(form) {
+    const formEl = u(form);
+    formEl.find('input[name="horizontal_attachments"], input[name="vertical_attachments"], input[name="geo"]').forEach(el => el.value = '');
+    formEl.find('.post-horizontal, .post-vertical, .post-source, .post-has-poll, .post-has-geo').forEach(el => { el.innerHTML = ''; });
+
+    const textarea = formEl.find('textarea[name="text"]').nodes[0];
+    if (textarea) textarea.value = '';
+
+    const container = formEl.closest('.model_content_textarea');
+    if (container.length) container.removeClass('shown');
+
+    const root = formEl.closest('#write');
+    if (root.length) {
+        root.find('.post-opts input[type="checkbox"]:not([name="as_group"])').forEach(el => { el.checked = false; });
+        root.find('input[type="hidden"][name="nsfw"], input[type="hidden"][name="force_sign"], input[type="hidden"][name="anon"], input[type="hidden"][name="as_group"]').forEach(el => el.remove());
+    }
+}
+
+window.resetVkifyComposer = resetVkifyComposer;
+
 u(document).on('submit', 'form', async (e) => {
     if (e.defaultPrevented || u('#ajloader').hasClass('shown')) return;
 
@@ -442,8 +462,31 @@ u(document).on('submit', 'form', async (e) => {
     if (form.dataset.pjax === 'false' || form.target || form.onsubmit || action.origin !== location.origin || !window.router.checkUrl(action)) return;
 
     const target = u(form);
-    if (target.closest('#write').first() && typeof collect_attachments_node === 'function') {
-        collect_attachments_node(target);
+    if (target.closest('#write').first()) {
+        e.preventDefault();
+
+        if (typeof window.syncWallCheckboxHiddenInputs === 'function') {
+            window.syncWallCheckboxHiddenInputs(form);
+        }
+
+        if (typeof window.ajax_posting === 'function') {
+            if (typeof window.bumpSelectedTabCountOnNewPost === 'function') {
+                window.bumpSelectedTabCountOnNewPost(form);
+            }
+
+            try {
+                await window.ajax_posting(e, target);
+            } catch (err) {
+                console.error('ajax_posting failed:', err);
+                u('#ajloader').removeClass('shown');
+                if (typeof showSystemMsg === 'function') {
+                    showSystemMsg(window.tr?.('something_not_right') || window.tr?.('error') || 'Error', 'err');
+                }
+                return;
+            }
+        }
+
+        return;
     }
 
     e.preventDefault();
@@ -512,6 +555,16 @@ window.processVkifyLocTags = function() {
         }
     });
 };
+
+window.isLoadedFirstly = false;
+
+window.addEventListener('DOMContentLoaded', () => {
+    if (window.isLoadedFirstly) return;
+    window.isLoadedFirstly = true;
+
+    _checkViewers();
+    CMessageBox.toggleLoader(false);
+});
 
 window.initializeSearchOptions = function () {
     const searchForm = ge('real_search_form');

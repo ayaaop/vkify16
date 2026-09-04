@@ -1931,6 +1931,9 @@ table,
     scrollbar-width: thin;
     scrollbar-color: var(--border-color-2) var(--module-background-color);
 }
+.has_emoji_picker.model_content_textarea textarea {
+	padding: 16px 37px 16px 12px;
+}
 
 .model_content_textarea textarea::-webkit-scrollbar {
     width: 4px;
@@ -2046,6 +2049,16 @@ table,
     align-items: center;
     gap: 10px;
 }
+.model_content_textarea.has_emoji_picker .emoji_picker_entrypoint {
+	display: none;
+}
+.model_content_textarea.has_emoji_picker.expanded-textarea .emoji_picker_entrypoint {
+	cursor: pointer;
+	position: absolute;
+	right: 20px;
+	top: 15px;
+    display: block;
+}
 .post_settings {
     opacity: 0.7;
 }
@@ -2095,7 +2108,7 @@ table,
     padding: 15px 20px;
 }
 
-.model_content_textarea:not(.shown) #wallAttachmentMenu a:not(#__vkifyPhotoAttachment, #__vkifyVideoAttachment, #__vkifyAudioAttachment, .tippy-box a),
+.model_content_textarea:not(.shown) #wallAttachmentMenu a:not(#__photoAttachment, #__videoAttachment, #__audioAttachment, .tippy-box a),
 .model_content_textarea #wallAttachmentMenu .header,
 .model_content_textarea .menu_toggler_vkify {
     display: none;
@@ -4309,378 +4322,10 @@ a.poll-retract-vote,
     width: 550px;
 }
 
-/* dialogi */
-ul.im-page--dcontent {
-    padding: 0;
-    margin: 0;
-}
-.nim-peer {
-    width: 46px;
-    height: 46px;
-    position: relative;
-    border-color: inherit;
-    background-color: inherit;
-}
-.nim-peer .nim-peer--photo-w {
-    overflow: hidden;
-    border-radius: 50%;
-}
-.nim-peer .im_grid {
-    display: block;
-    float: left;
-}
-.nim-peer .nim-peer--photo {
-    background-color: inherit;
-    overflow: hidden;
-    margin-left: -2px;
-    margin-bottom: -1px;
-}
-.nim-peer .nim-peer--photo .im_grid > img {
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    -moz-force-broken-image-icon: 0;
-    position: relative;
-    background-color: inherit;
-}
-.nim-peer img {
-    width: 46px;
-    height: 46px;
-    display: block;
-}
-.nim-peer .im_grid img {
-    margin-left: 2px;
-    margin-bottom: 1px;
-}
-.nim-peer.nim-peer_smaller {
-    width: 30px;
-    height: 30px;
-}
-.nim-peer.nim-peer_smaller .nim-peer--photo {
-    background-color: inherit;
-    overflow: hidden;
-    margin-left: -2px;
-    margin-bottom: -1px;
-}
-.nim-dialog {
-    height: 63px;
-    box-sizing: border-box;
-    padding: 0 0 0 15px;
-    display: block;
-    width: 100%;
-    cursor: pointer;
-}
-.nim-dialog.nim-dialog--unread {
-    background: var(--button-background-color);
-}
-.nim-dialog .nim-dialog--content {
-    padding-right: 15px;
-    margin-left: 57px;
-    position: relative;
-    display: block;
-    text-decoration: none;
-}
-.nim-dialog .nim-dialog--photo {
-    padding: 9px 7px 7px 0;
-    float: left;
-}
-.nim-dialog .nim-dialog--date {
-    opacity: 0.7;
-}
-.nim-dialog .nim-dialog--name {
-    font-size: 12.5px;
-    font-weight: 500;
-    -webkit-font-smoothing: subpixel-antialiased;
-    -moz-osx-font-smoothing: auto;
-    margin-bottom: 7px;
-    margin-top: 3px;
-    width: 100%;
-    height: 18px;
-    position: relative;
-}
-.nim-dialog .nim-dialog--name .nim-dialog--name-w {
-    color: var(--text-color);
-    max-width: 70%;
-    white-space: nowrap;
-    display: inline-block;
-    vertical-align: top;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    padding-bottom: 1px;
-}
-.nim-dialog .nim-dialog--cw {
-    padding: 8px 0;
-    position: relative;
-}
-.nim-dialog .nim-dialog--cw .nim-dialog--date_wrapper {
-    display: flex;
-    position: absolute;
-    top: 11px;
-    right: 0;
-}
-.nim-dialog .nim-dialog--who {
-    color: var(--muted-text-color);
-}
-.nim-dialog .nim-dialog--date {
-    color: var(--muted-text-color);
-    font-size: 12.5px;
-}
-.nim-dialog:not(.nim-dialog_deleted):hover {
-    background: var(--module-background-color--secondary);
-}
-.nim-dialog:not(.nim-dialog_deleted):hover:last-child {
-    border-bottom: solid 1px var(--border-color);
-}
-.nim-dialog .nim-dialog--mute {
-    display: none;
-}
-.nim-dialog.nim-dialog_muted .nim-dialog--name-w {
-    position: relative;
-    padding-right: 9px;
-}
-.nim-dialog.nim-dialog_muted .nim-dialog--name .nim-dialog--name-w {
-    max-width: 59%;
-}
-.nim-dialog .nim-dialog--inner-text:empty {
-    background: 0 0 !important;
-}
-.nim-dialog.nim-dialog_classic {
-    height: 71px;
-    padding-left: 20px;
-}
-.nim-dialog.nim-dialog_classic .nim-dialog--text-preview {
-    margin-top: -2px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-.nim-dialog.nim-dialog_classic.nim-dialog_muted .nim-dialog--name .nim-dialog--name-w {
-    max-width: 75%;
-}
-.nim-dialog.nim-dialog_classic .nim-dialog--cw {
-    height: 71px;
-    box-sizing: border-box;
-    padding: 10px 0;
-    overflow: hidden;
-}
-.nim-dialog.nim-dialog_classic .nim-dialog--name {
-    height: 19px;
-    margin-top: 3px;
-    margin-bottom: 7px;
-}
-.nim-dialog.nim-dialog_classic .nim-dialog--content {
-    margin-left: 64px;
-}
-.nim-dialog.nim-dialog_classic .nim-dialog--photo {
-    padding-right: 14px;
-    padding-top: 11px;
-}
-.nim-dialog.nim-dialog_classic .nim-dialog--photo .nim-peer,
-.nim-dialog.nim-dialog_classic .nim-dialog--photo .nim-peer img {
-    width: 50px;
-    height: 50px;
-}
-.nim-dialog.nim-dialog_classic:hover .nim-dialog--date {
-    display: block;
-}
-.nim-dialog.nim-dialog_classic .nim-dialog--date_wrapper {
-    right: 15px;
-    top: 14px;
-}
-.nim-dialog + .nim-dialog .nim-dialog--content {
-    border-top: solid 1px var(--border-color);
-}
-.im-prebody {
-    display: inline-block;
-    margin-right: 4px;
-    vertical-align: middle;
-}
-.im-prebody img {
-    position: relative;
-    overflow: hidden;
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    -moz-force-broken-image-icon: 0;
-    background-color: var(--module-header-background-color);
-}
-.messenger-app,
-.messenger-app--header {
-    background-color: var(--module-background-color);
-}
-.messenger-app {
-    border-color: var(--border-color);
-    border-radius: var(--module-border-radius);
-    width: 100%;
-}
-.messenger-app--header,
-.messenger-app-header--actions {
-    display: flex;
-}
-.messenger-app--header {
-    border-bottom: 1px solid var(--border-color);
-}
-.messenger-app--header--back:hover {
-    background: linear-gradient(to right, var(--module-background-color--secondary), transparent);
-}
-.messenger-app--header--back a {
-    cursor: pointer;
-    display: block;
-    height: 19px;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgOSAxNiI+PHBhdGggZmlsbD0iIzgyOEE5OSIgZD0iTTggMTUuOWMtLjIgMC0uNC0uMS0uNi0uM2wtNy03Yy0uMy0uMy0uMy0uOSAwLTEuMmw3LTdjLjMtLjMuOS0uMyAxLjIgMCAuMy4zLjMuOSAwIDEuMmwtNi40IDYuNCA2LjQgNi40Yy4zLjMuMy45IDAgMS4yLS4yLjItLjQuMy0uNi4zeiIgb3BhY2l0eT0iLjciLz48L3N2Zz4=");
-    background-color: transparent;
-    color: var(--muted-text-color);
-    font-size: 14px;
-    line-height: 19px;
-    background-position: 13px 16px;
-    background-repeat: no-repeat;
-    padding: 14px 20px 15px 31px;
-    text-decoration: none !important;
-}
-.messenger-app--header--ava img {
-    height: 30px;
-    width: 30px;
-    display: block;
-}
-.messenger-app--header--info {
-    flex: 1;
-    text-align: center;
-    padding: 7px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.messenger-app--header--name a {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    color: var(--text-color);
-    font-weight: 500;
-}
-.messenger-app--header--ava {
-    margin: 9px 15px 6px 0;
-    position: relative;
-}
-.messenger-app--header--ava .messenger-app--header--online {
-    width: 6px;
-    height: 6px;
-    border-radius: 6px;
-    background-color: var(--success-color);
-    border: 2px solid var(--module-background-color);
-    right: -2px;
-    bottom: 2px;
-    position: absolute;
-}
-.messenger-app--header--online {
-    margin-left: 4px;
-    color: var(--muted-text-color);
-}
-.messenger-app-header--more-actions--trigger {
-    height: 48px;
-    width: 48px;
-    background: url(../resource/icons/post_more.png) no-repeat center center;
-    cursor: pointer;
-}
-
-.messenger-app--messages {
-    padding: 0;
-    height: calc(100vh - var(--header-height) - 15px - 49px - 65px);
-}
-.messenger-app--typing-status {
-    color: var(--muted-text-color);
-    margin-left: 50px;
-    margin-bottom: 10px;
-    font-size: 12.5px;
-    transition: opacity 0.25s;
-    opacity: 1;
-}
-.messenger-app--typing-status .pr {
-    margin-right: 5px;
-    vertical-align: middle;
-}
 .pr_gray .pr_bt {
     background-color: var(--muted-text-color);
 }
-.messenger-app--messages---message {
-    margin-bottom: 0 !important;
-    padding: 15px 20px 10px;
-}
-.messenger-app--messages---message.unread {
-    background-color: var(--module-background-color--secondary);
-}
-.messenger-app--messages---message .ava {
-    border-radius: 50%;
-    height: 40px;
-    width: 40px;
-}
-.messenger-app--messages---message,
-.messenger-app--input {
-    justify-content: unset;
-}
-.messenger-app--messages---message ._content {
-    flex: 1;
-    width: 100%;
-    padding-left: 15px;
-}
-.crp-entry--message---text,
-.messenger-app--messages---message .time {
-    color: var(--muted-text-color);
-}
-.messenger-app--input {
-    padding: 12px 20px;
-    background-color: var(--module-header-background-color);
-    border-top: 1px solid var(--border-color);
-    height: unset !important;
-    border-radius: 0 0 var(--module-border-radius) var(--module-border-radius);
-}
-.messenger-app--input .blocked::after {
-    margin: 0;
-    transform: none;
-    position: static;
-    font-weight: 500;
-}
-.messenger-app--input .blocked {
-    text-align: center;
-    padding: 5px 0;
-}
-.messenger-app--input > .ava {
-    border-radius: 50%;
-    height: 40px;
-    width: 40px;
-}
-.messenger-app--input---messagebox {
-    width: 100%;
-    padding: 0 0 0 15px;
-    display: flex;
-}
-.messenger-app--input---messagebox textarea {
-    width: 100%;
-    min-height: 38px;
-    height: 38px !important;
-    padding: 9px 10px;
-    resize: unset;
-    margin-bottom: 0 !important;
-    margin-right: 15px;
-}
-.messenger-app--input---messagebox button {
-    background-color: transparent;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iNDkzIDIwIDI0IDI0Ij48ZGVzYz4gQ3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+PGcgZmlsbD0ibm9uZSI+PHJlY3QgeD0iNDkzIiB5PSIyMCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ii8+PHBhdGggZD0iTTQ5OS4zIDMzLjZDNDk4LjcgMzUuMiA0OTcuOCAzNy42IDQ5Ny41IDM4LjkgNDk3IDQxIDQ5Ni43IDQxLjUgNDk4LjUgNDAuNSA1MDAuMyAzOS41IDUwOSAzNC41IDUxMSAzMy40IDUxMy41IDMxLjkgNTEzLjUgMzIgNTEwLjggMzAuNSA1MDguOCAyOS4zIDUwMC4xIDI0LjQgNDk4LjUgMjMuNSA0OTYuOCAyMi41IDQ5NyAyMyA0OTcuNSAyNS4xIDQ5Ny44IDI2LjQgNDk4LjcgMjguOCA0OTkuMyAzMC4zTDUwNi44IDMyIDQ5OS4zIDMzLjZaIiBmaWxsPSIjODI4QTk5Ii8+PC9nPjwvc3ZnPg==");
-    background-repeat: no-repeat;
-    background-size: 24px 24px;
-    background-position: 50% 50%;
-    margin: -12px -20px -12px -15px;
-    width: 58px;
-    opacity: 0.7;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-}
-.messenger-app--input---messagebox button:hover {
-    opacity: 1;
-}
+
 
 #test-label {
     z-index: 1999;

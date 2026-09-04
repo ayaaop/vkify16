@@ -38,11 +38,9 @@ const modules = [
 
     'ui/search.js',
     'ui/music-popup.js',
-    'utils/modal-utils.js',
     'ui/media-modals.js',
     'ui/graffiti.js',
     'ui/action-menu.js',
-    'utils/openvk-cls.js',
 
     'features/attachment-picker.js',
     'features/post-count.js',
@@ -59,6 +57,7 @@ const modules = [
     'features/avatar-upload.js',
     "features/video-audio-coord.js",
     'features/video-delete.js',
+    'features/messenger.js',
 ];
 
 for (const rel of modules) {

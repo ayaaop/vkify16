@@ -23,71 +23,73 @@
                 {/if}
             {/if}
         </div>
-        <div class="video_info">
-            <div class='video_info_title'>
-                {$video->getName()}
-            </div>
-            <div class="video_info_actions">
-                {if isset($thisUser)}
-                    {if $thisUser->getId() != $video->getOwner()->getId()}
-                        {var $canReport = true}
-                    {else}
-                        {var $canEdit = true}
+        <div class="ovk-vid-details">
+            <div class="video_info">
+                <div class='video_info_title'>
+                    {$video->getName()}
+                </div>
+                <div class="video_info_actions">
+                    {if isset($thisUser)}
+                        {if $thisUser->getId() != $video->getOwner()->getId()}
+                            {var $canReport = true}
+                        {else}
+                            {var $canEdit = true}
+                        {/if}
+                        {var $liked = $video->hasLikeFrom($thisUser)}
+                        {var $likesCount = $video->getLikesCount()}
+                        <a href="/video{$video->getPrettyId()}/like?hash={rawurlencode($csrfToken)}" class="video_like_button button video_like_wrap" data-liked="{(int) $liked}" data-likes="{$likesCount}" data-id="{$video->getPrettyId()}" data-type='video'>
+                            <i class="action_icon" id="{if $liked}liked{/if}"></i>
+                            <span class="action_label">{tr('mobile_like')}</span>
+                            <span class="action_count">{if $likesCount > 0}{$likesCount}{/if}</span>
+                        </a>
+                        <a onclick="javascript:repost({$video->getPrettyId()}, 'video')" class="video_share_button button button_light">
+                            <i class="action_icon"></i>
+                            <span class="action_label">{tr('share')}</span>
+                        </a>
+                        <span class="video_info_more_actions ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+                            <div class="button button_light _more_wrap">{_show_more}</div>
+                            <div id="videoMoreActionsTooltip" class="ui_actions_menu">
+                                <a n:if="$canEdit ?? false" href="javascript:showEditVideoModal('{$video->getPrettyId()}')">
+                                    {tr('edit')}
+                                </a>
+                                <a n:if="$canEdit ?? false" href="/video{$video->getPrettyId()}/remove">
+                                    {tr('delete')}
+                                </a>
+                                <a n:if="$canReport ?? false" href="javascript:reportVideo({$video->getId()})">
+                                    {tr('report')}
+                                </a>
+                                <a n:if="$video->getType() == 0" href="{$video->getURL()}" download="">
+                                    {tr('download_video')}
+                                </a>
+                            </div>
+                        </span>
                     {/if}
-                    {var $liked = $video->hasLikeFrom($thisUser)}
-                    {var $likesCount = $video->getLikesCount()}
-                    <a href="/video{$video->getPrettyId()}/like?hash={rawurlencode($csrfToken)}" class="video_like_button button video_like_wrap" data-liked="{(int) $liked}" data-likes="{$likesCount}" data-id="{$video->getPrettyId()}" data-type='video'>
-                        <i class="action_icon" id="{if $liked}liked{/if}"></i>
-                        <span class="action_label">{tr('mobile_like')}</span>
-                        <span class="action_count">{if $likesCount > 0}{$likesCount}{/if}</span>
+                </div>
+                <div class="video_info_author clear_fix">
+                    <a href="{$video->getOwner()->getURL()}" class="video_info_author_image">
+                        {include '../components/avatar.latte', author => $video->getOwner(), size => 'miniscule', class => 'post-avatar'}
                     </a>
-                    <a onclick="javascript:repost({$video->getPrettyId()}, 'video')" class="video_share_button button button_light">
-                        <i class="action_icon"></i>
-                        <span class="action_label">{tr('share')}</span>
-                    </a>
-                    <span class="video_info_more_actions ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
-                        <div class="button button_light _more_wrap">{_show_more}</div>
-                        <div id="videoMoreActionsTooltip" class="ui_actions_menu">
-                            <a n:if="$canEdit ?? false" href="javascript:showEditVideoModal('{$video->getPrettyId()}')">
-                                {tr('edit')}
-                            </a>
-                            <a n:if="$canEdit ?? false" href="/video{$video->getPrettyId()}/remove">
-                                {tr('delete')}
-                            </a>
-                            <a n:if="$canReport ?? false" href="javascript:reportVideo({$video->getId()})">
-                                {tr('report')}
-                            </a>
-                            <a n:if="$video->getType() == 0" href="{$video->getURL()}" download="">
-                                {tr('download_video')}
-                            </a>
+                    <div class="video_info_author_info">
+                        <div class="video_info_author_name">
+                            <a href="{$video->getOwner()->getURL()}">{$video->getOwner()->getCanonicalName()}</a>
                         </div>
-                    </span>
-                {/if}
-            </div>
-            <div class="video_info_author clear_fix">
-                <a href="{$video->getOwner()->getURL()}" class="video_info_author_image">
-                    {include '../components/avatar.latte', author => $video->getOwner(), size => 'miniscule', class => 'post-avatar'}
-                </a>
-                <div class="video_info_author_info">
-                    <div class="video_info_author_name">
-                        <a href="{$video->getOwner()->getURL()}">{$video->getOwner()->getCanonicalName()}</a>
-                    </div>
-                    <div class="video_info_author_date">
-                        {$video->getPublicationTime()}
+                        <div class="video_info_author_date">
+                            {$video->getPublicationTime()}
+                        </div>
                     </div>
                 </div>
+                <div class="video_info_description" n:if="$video->getDescription()">
+                    {include "../components/truncated_text.latte", html => $video->getDescription(), limit => 500}
+                </div>
             </div>
-            <div class="video_info_description" n:if="$video->getDescription()">
-                {include "../components/truncated_text.latte", html => $video->getDescription(), limit => 500}
+            <div class="clear_fix video_comments">
+                {include "../components/comments.latte",
+                        comments => $comments,
+                        count => $cCount,
+                        page => $cPage,
+                        model => "videos",
+                        parent => $video}
             </div>
-        </div>
-        <div class="clear_fix video_comments">
-            {include "../components/comments.latte",
-                    comments => $comments,
-                    count => $cCount,
-                    page => $cPage,
-                    model => "videos",
-                    parent => $video}
         </div>
     </div>
 {/block}

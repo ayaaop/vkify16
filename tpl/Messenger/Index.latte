@@ -9,12 +9,17 @@
 {/block}
 
 {block content}
-    <div class="im_container page_block">
-        {include "../components/page_block_header.latte" title => $imAvailable ? 'my_messages' : 'section_maintenance'}
-        {if $imAvailable}
+    {if empty($thisUser) && !empty($joinCode)}
+        {include "partials/unauth_invite.latte"}
+    {elseif $imAvailable}
+        <div class="im_load_container page_block">
+            {include "../components/page_block_header.latte" title => 'my_messages'}
             {include "partials/container.latte"}
-        {else}
+        </div>
+    {else}
+        <div class="im_load_container page_block">
+            {include "../components/page_block_header.latte" title => 'section_maintenance'}
             {include "partials/maintenance.latte"}
-        {/if}
-    </div>
+        </div>
+    {/if}
 {/block}

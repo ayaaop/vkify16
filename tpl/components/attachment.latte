@@ -2,7 +2,16 @@
     {if !$attachment->isDeleted()}
         {var $link = "/photo" . ($attachment->isAnonymous() ? ("s/" . base_convert((string) $attachment->getId(), 10, 32)) : $attachment->getPrettyId())}
         {var $photoDims = $attachment->getDimensions()}
-        <a class="media-href" style="line-height: 0; --post-image: url({$attachment->getURLBySizeId('normal')|noescape})" href="{$link}" onclick="vkify.media.openPhotoLegacy(event, {$attachment->getURLBySizeId('large')}, {$parent->getPrettyId()}, {$attachment->getPrettyId()}, {$parentType})">
+        {var $photoViewerId = $attachment->getPrettyId() . ($attachment->getAccessKey() ? '_' . $attachment->getAccessKey() : '')}
+        {var $photoContext = $parent ?? $post ?? null}
+        {var $photoContextType = $parentType ?? 'post'}
+        {var $photoContextId = null}
+        {if $photoContextType === 'comment'}
+            {var $photoContextId = '1_' . $photoContext->getId()}
+        {elseif $photoContext instanceof \openvk\Web\Models\Entities\Post}
+            {var $photoContextId = $photoContext->getPrettyId()}
+        {/if}
+        <a class="media-href" style="line-height: 0; --post-image: url({$attachment->getURLBySizeId('normal')|noescape})" href="{$link}" {if $photoContextType === 'post' && $photoContextId}onclick="OpenMiniature(event, '{$attachment->getURLBySizeId('larger')|noescape}', '{$photoContextId}', '{$photoViewerId}', 'post')"{else}onclick="PhotoViewer.openById('{$photoViewerId}', event)"{/if}>
             <img n:class="media, $tilesCount > 1 ? media_makima" src="{$attachment->getURLBySizeId('normal')}" alt="{$attachment->getDescription()}" width="{$photoDims[0]}" height="{$photoDims[1]}" loading=lazy />
         </a>
     {else}
