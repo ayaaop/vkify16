@@ -7,12 +7,28 @@
     {include "../components/page_crumb_header.latte", crumbs: [
         ['href' => $club->getURL(), 'title' => $club->getCanonicalName()],
         ['href' => "/board{$club->getId()}", 'title' => tr("discussions")],
-        ['title' => $topic->getTitle(), 'count' => $count]
+        ['title' => $topic->getTitle(), 'count' => !isset($chat) ? $count : null]
     ], extra => $editButton
     }
     <div class="page_block_sub_header bt_header">
         {$topic->getTitle()}
     </div>
 </div>
-    {include "../components/comments.latte", comments => $comments, count => $count, page => $page, model => "topics", club => $club, readOnly => $topic->isClosed(), showTitle => false, parent => $topic}
+{if !isset($chat) || !$chat}
+    {include "../components/comments.latte", comments => $comments, count => $count, page => $page, model => "topics", club => $club, readOnly => $topic->isClosed() || ($topic->isRestricted() && !$club->canBeModifiedBy($thisUser)), showTitle => false, parent => $topic}
+{else}
+    <div class="page_block chat_topic_wrap" id="chat-topic">
+        <div class="chat_topic_label">{_topic_going_in_chat}</div>
+        <div class="chat-topic-preview">
+            <img class="avatar" src="{$chat->getPhotoURL("miniscule")}" alt="" />
+            <div>
+                <b>{$chat->getTitle()}</b>
+                <p>{tr("participants", $chat->getMembersCount())}</p>
+            </div>
+        </div>
+        <div class="chat_topic_actions">
+            <input value="{_chat_join}" class="button" type="button" onclick="openChatTopic(event, {$topic->getPrettyId()})" />
+        </div>
+    </div>
+{/if}
 {/block}

@@ -309,18 +309,18 @@
 .pv_right #standaloneCommentBox {
   border-bottom-left-radius: 0;
 }
-.pv_right .model_content_textarea textarea {
+.pv_right .composer.model_content_textarea textarea {
   margin-left: 40px;
   padding: 16px 15px 16px 12px;
 }
 .pv_right .post_field_user_link {
   left: 15px;
 }
-.pv_right .model_content_textarea:not(.shown) #wallAttachmentMenu {
+.pv_right .composer.model_content_textarea:not(.shown) #wallAttachmentMenu {
   padding: 15px 11px;
   position: static;
 }
-.pv_right .model_content_textarea.shown .post-bottom-acts {
+.pv_right .composer.model_content_textarea.shown .post-bottom-acts {
   padding: 15px;
 }
 .pv_wrapper #wallAttachmentMenu > a {
@@ -1219,19 +1219,16 @@ body:not(.dark-mode) {
 }
 
 .post_viewer_page #itemContent {
-  padding: 20px;
   max-height: 50vh;
   overflow-y: auto;
 }
-
-.post_viewer_page #itemContentActions {
-  padding: 10px 20px;
-  border-bottom: 1px solid var(--border-color);
+.post_viewer_page #itemContent .page_block {
+  margin: 0;
 }
 
 .post_viewer_page #itemContentComments {
   max-height: 35vh;
   overflow-y: auto;
-  padding: 10px 20px;
+  border-top: 1px solid var(--border-color);
 }
 

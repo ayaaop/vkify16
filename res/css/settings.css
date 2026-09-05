@@ -96,6 +96,11 @@ label.checkbox .nobold {
     margin: -1px 0 0;
 }
 
+.privacy_setting_tip {
+    color: var(--muted-text-color-2);
+    margin: 5px 0 0;
+}
+
 .settings_privacy_row:first-child {
     border-top: none;
     padding-top: 0;

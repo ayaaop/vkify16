@@ -24,6 +24,11 @@
                         {var $subStatus = $club->getSubscriptionStatus($thisUser)}
                         {var $isMaybe = $thisUser ? $club->getFollowersQuery()->where(['follower' => $thisUser->getId(), 'flags' => 1])->fetch() : null}
                         {var $eventFlag = $subStatus ? ($isMaybe ? 1 : 0) : -1}
+                        {if !$canEdit && $club->canWriteMessage($thisUser)}
+                            <div class="mobile_profile_action_primary">
+                                <a class="button mobile_profile_action_btn" href="/im?sel={$club->getRealId()}">{_send_message}</a>
+                            </div>
+                        {/if}
                         {if !$subStatus}
                             <form action="/setSub/club" method="post" class="mobile_profile_action_primary">
                                 <input type="hidden" name="act" value="add" />
@@ -405,6 +410,11 @@
 							{var $subStatus = $club->getSubscriptionStatus($thisUser)}
 							{var $isMaybe = $thisUser ? $club->getFollowersQuery()->where(['follower' => $thisUser->getId(), 'flags' => 1])->fetch() : null}
 							{var $eventFlag = $subStatus ? ($isMaybe ? 1 : 0) : -1}
+							{if !$canEdit && $club->canWriteMessage($thisUser)}
+								<a class="button button_blue button_wide profile_action_btn" onclick="showUserDialog(event, {$club->getRealId()})" href="/im?sel={$club->getRealId()}">
+									{_send_message}
+								</a>
+							{/if}
 							<div class="profile_actions_split">
 								{if !$subStatus}
 									<form action="/setSub/club" method="post" class="profile_link_form fl_l">
@@ -450,7 +460,7 @@
 										</div>
 									</div>
 								{/if}
-								<div class="profile_more_wrapper ui_actions_menu_wrap ui_actions_menu_no_chevron" onclick='{="uiActionsMenu.toggle(this, null, {noAnimate: true});"|noescape}'>
+								<div class="profile_more_wrapper ui_actions_menu_wrap ui_actions_menu_no_chevron" onclick='{="uiActionsMenu.toggle(this, null, {menuId: \"profile_actions_tooltip\", noAnimate: true, align: \"left\"});"|noescape}'>
 									<button class="button button_gray profile_more_btn fl_r" id="profile_more_btn">
 										{_actions}
 										<span class="clear_fix">&nbsp;</span>
@@ -459,6 +469,9 @@
 											{if $canEdit}
 												<a href="/club{$club->getId()}/edit">{_edit_group}</a>
 												<a href="/club{$club->getId()}/stats" rel="nofollow">{_statistics}</a>
+												{if $club->isMessagesEnabled()}
+													<a href="/im?as={$club->getRealId()}">{_view_group_messages}</a>
+												{/if}
 												{var $clubPinned = $thisUser->isClubPinned($club)}
 												<a href="/groups_pin?club={$club->getId()}&hash={rawurlencode($csrfToken)}" n:if="$clubPinned || $thisUser->getPinnedClubCount() <= 10" id="_pinGroup" data-group-name="{$club->getName()}" data-group-url="{$club->getUrl()}">
 													{if $clubPinned}

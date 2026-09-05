@@ -34,7 +34,7 @@ function renderEditMenuLayout(apiPost, type, postId) {
 
     const postOptsItems = `${nsfwOpt}${asGroupOpt}`;
     const postOptsTrigger = type === 'post' && postOptsItems
-        ? `<div class="post-opts-trigger ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this, null, {align: 'left'});" onmouseout="uiActionsMenu.hide(this);">
+        ? `<div class="post-opts-trigger ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
             <div class="post_settings" id="postOptsTrigger${postId}" role="button">
                 <div class="common_icon"></div>
             </div>
@@ -113,7 +113,12 @@ function renderEditMenuLayout(apiPost, type, postId) {
     return `
         <div class='edit_menu module_body'>
             <form id="${editFormId}">
+                <div class="edit-menu-textarea">
                 <textarea placeholder="${tr('edit')}" name="text" style="width: 100%;resize: none;" class="expanded-textarea small-textarea">${apiPost.text}</textarea>
+                <div class="emoji_picker_entrypoint emoji_smile" role="button">
+                    <div class="emoji_smile_icon_vector emoji_smile_icon"></div>
+                </div>
+            </div>
                 <div class='post-buttons'>
                     <div class="post-horizontal"></div>
                     <div class="post-vertical"></div>
@@ -990,6 +995,10 @@ function bindPostEditOnce() {
             post.removeClass('editing');
             return;
         }
+
+        document.querySelectorAll('#write').forEach(el => {
+            el.classList.remove('expanded-textarea', 'shown');
+        });
 
         const edit_place_l = post.hasClass('reply') ? post.find('.reply_content > .post_edit') : post.children('.post_edit');
         const edit_place = u(edit_place_l.first());

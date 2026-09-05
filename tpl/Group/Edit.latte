@@ -2,10 +2,6 @@
 
 {block title}{_edit_group}{/block}
 
-{block bodyScripts}
-    <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/features/autosave.js"></script>
-{/block}
-
 {block content}
     <div class="wide_column_left">
         <div class="wide_column_left">
@@ -41,7 +37,7 @@
                     <div class="page_block">
                         {include "../components/page_block_header.latte", title => "main_information"}
                         <div class="form_group settings_padding clear_fix label_end">
-                            <form method="POST" enctype="multipart/form-data" data-autosave="true">
+                            <form method="POST" enctype="multipart/form-data">
                                 <div class="form_field">
                                     <div class="form_label">{_name}</div>
                                     <div class="form_data">
@@ -122,6 +118,10 @@
                                             <input type="checkbox" name="display_topics_above_wall" value="1" n:attr="checked => $club->isDisplayTopicsAboveWallEnabled()" />
                                             <span>{_display_list_of_topics_above_wall}</span>
                                         </label>
+                                        <label class="checkbox">
+                                            <input type="checkbox" name="is_messages_enabled" value="1" n:attr="checked => $club->isMessagesEnabled()" />
+                                            <span>{_enable_group_messages}</span>
+                                        </label>
                                     </div>
                                 </div>
                                 <div class="form_separator"></div>
@@ -153,7 +153,13 @@
                                         </label>
                                     </div>
                                 </div>
-                                <input type="hidden" name="hash" value="{$csrfToken}" />
+                                <div class="form_field">
+                                    <div class="form_label"></div>
+                                    <div class="form_data">
+                                        <input type="submit" value="{_save}" class="button" />
+                                        <input type="hidden" name="hash" value="{$csrfToken}" />
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>

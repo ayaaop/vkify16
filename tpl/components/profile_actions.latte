@@ -8,7 +8,7 @@
 					{if $user->getPrivacyPermission('messages.write', $thisUser)}
 						<div class="profile_msg_split">
 							<div class="cut_left">
-								<a class="button button_blue profile_btn_cut_left profile_action_btn button_wide" href="/im?sel={$user->getId()}">
+								<a class="button button_blue profile_btn_cut_left profile_action_btn button_wide" onclick="showUserDialog(event, {$user->getRealId()})" href="/im?sel={$user->getId()}">
 									{_send_message}
 								</a>
 							</div>
@@ -45,7 +45,7 @@
 						<input type="submit" value="{$actions[$subStatus]['label']}" class="button button_wide {if isset($actions[$subStatus]['class'])}{$actions[$subStatus]['class']}{/if}" />
 					</form>
 				{/if}
-				<div class="profile_more_wrapper ui_actions_menu_wrap ui_actions_menu_no_chevron" onclick='{="uiActionsMenu.toggle(this, null, {menuId: \"profile_actions_tooltip\", noAnimate: true});"|noescape}'>
+				<div class="profile_more_wrapper ui_actions_menu_wrap ui_actions_menu_no_chevron" onclick='{="uiActionsMenu.toggle(this, null, {menuId: \"profile_actions_tooltip\", noAnimate: true, align: \"left\"});"|noescape}'>
 					<button class="button button_gray profile_more_btn{if $canAddFriend} fl_r{/if}" id="profile_more_btn" type="button">
 						{_actions}
 						<span class="clear_fix">&nbsp;</span>

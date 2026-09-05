@@ -1886,17 +1886,14 @@ table,
     text-decoration: none !important;
 }
 
-.model_content_textarea {
+.composer.model_content_textarea {
     font-size: 13px;
     position: relative;
     z-index: 1;
 }
-.model_content_textarea:has(.ui_actions_menu_wrap) {
+.composer.model_content_textarea.expanded-textarea:has(.ui_actions_menu_wrap),
+.post.editing {
     z-index: calc(var(--action-menu-z-index, 5) + 1);
-}
-
-.page_block.editing {
-    z-index: 1;
 }
 
 .post_field_user_link {
@@ -1914,7 +1911,7 @@ table,
     transition: none;
 }
 
-.model_content_textarea textarea {
+.composer.model_content_textarea textarea {
     position: relative;
     margin-left: 48px;
     vertical-align: top;
@@ -1931,33 +1928,33 @@ table,
     scrollbar-width: thin;
     scrollbar-color: var(--border-color-2) var(--module-background-color);
 }
-.has_emoji_picker.model_content_textarea textarea {
+.has_emoji_picker.composer.model_content_textarea textarea {
 	padding: 16px 37px 16px 12px;
 }
 
-.model_content_textarea textarea::-webkit-scrollbar {
+.composer.model_content_textarea textarea::-webkit-scrollbar {
     width: 4px;
 }
 
-.model_content_textarea textarea.small-textarea:not(.expanded-textarea) {
+.composer.model_content_textarea textarea.small-textarea:not(.expanded-textarea) {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     padding-right: 120px;
 }
 
-.model_content_textarea.shown textarea {
+.composer.model_content_textarea.shown textarea {
     min-height: 80px;
     max-height: 200px;
 }
 
-.model_content_textarea:not(.shown) .post-buttons {
+.composer.model_content_textarea:not(.shown) .post-buttons {
     display: block !important;
     overflow: hidden;
     height: 0;
 }
 
-.model_content_textarea
+.composer.model_content_textarea
     :is(
         .post-horizontal:not(:empty),
         .post-vertical:not(:empty),
@@ -1969,7 +1966,7 @@ table,
     padding: 0 20px 0;
     margin: 0;
 }
-.model_content_textarea .post-horizontal:not(:empty) + .post-vertical:not(:empty) {
+.composer.model_content_textarea .post-horizontal:not(:empty) + .post-vertical:not(:empty) {
     margin-top: 10px;
 }
 .vertical-attachment.upload-item {
@@ -2031,12 +2028,12 @@ table,
     flex: 1 1 0;
 }
 
-.model_content_textarea #wallAttachmentMenu img {
+.composer.model_content_textarea #wallAttachmentMenu img {
     width: 20px;
     height: 20px;
 }
 
-.model_content_textarea div[style^="float"]:has(.menu_toggler_vkify) {
+.composer.model_content_textarea div[style^="float"]:has(.menu_toggler_vkify) {
     float: none;
     flex-direction: row-reverse;
     justify-content: left;
@@ -2049,15 +2046,29 @@ table,
     align-items: center;
     gap: 10px;
 }
-.model_content_textarea.has_emoji_picker .emoji_picker_entrypoint {
+.composer.model_content_textarea.has_emoji_picker .emoji_picker_entrypoint {
 	display: none;
 }
-.model_content_textarea.has_emoji_picker.expanded-textarea .emoji_picker_entrypoint {
+.composer.model_content_textarea.has_emoji_picker.expanded-textarea .emoji_picker_entrypoint {
 	cursor: pointer;
 	position: absolute;
 	right: 20px;
 	top: 15px;
     display: block;
+}
+.edit-menu-textarea {
+    position: relative;
+}
+.edit-menu-textarea .emoji_picker_entrypoint {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    z-index: 2;
+    display: block;
+}
+.edit-menu-textarea textarea {
+    padding-right: 28px;
+    box-sizing: border-box;
 }
 .post_settings {
     opacity: 0.7;
@@ -2071,11 +2082,11 @@ table,
     margin-left: 10px;
     border-left: 1px solid var(--border-color);
 }
-.model_content_textarea .post-opts-trigger {
+.composer.model_content_textarea .post-opts-trigger {
     margin-left: 6px;
     display: none;
 }
-.model_content_textarea.shown .post-opts-trigger {
+.composer.model_content_textarea.shown .post-opts-trigger {
     display: block;
 }
 
@@ -2100,7 +2111,7 @@ table,
     background: none;
 }
 
-.model_content_textarea:not(.shown) #wallAttachmentMenu {
+.composer.model_content_textarea:not(.shown) #wallAttachmentMenu {
     top: 0;
     right: 0;
     z-index: 2;
@@ -2108,9 +2119,9 @@ table,
     padding: 15px 20px;
 }
 
-.model_content_textarea:not(.shown) #wallAttachmentMenu a:not(#__photoAttachment, #__videoAttachment, #__audioAttachment, .tippy-box a),
-.model_content_textarea #wallAttachmentMenu .header,
-.model_content_textarea .menu_toggler_vkify {
+.composer.model_content_textarea:not(.shown) #wallAttachmentMenu a:not(#__photoAttachment, #__videoAttachment, #__audioAttachment),
+.composer.model_content_textarea #wallAttachmentMenu .header,
+.composer.model_content_textarea .menu_toggler_vkify {
     display: none;
 }
 
@@ -2173,7 +2184,7 @@ table,
 .reply .post-bottom-acts {
     padding-top: 5px;
 }
-.model_content_textarea.shown .post-bottom-acts {
+.composer.model_content_textarea.shown .post-bottom-acts {
     margin-top: 10px;
     background-color: var(--module-header-background-color);
     padding: 15px 20px;
@@ -2247,7 +2258,7 @@ table,
     font-weight: 400;
 }
 .post-has-poll[style="display: block;"],
-.model_content_textarea
+.composer.model_content_textarea
     :is(.post-horizontal:not(:empty), .post-vertical:not(:empty), .post-has-geo:not(:empty), .post-source:not(:empty), .post-has-geo.appended-geo) {
     display: flex !important;
 }
@@ -2573,6 +2584,7 @@ table,
         -1px 0 0 0 var(--shadow-outline-color),
         1px 0 0 0 var(--shadow-outline-color),
         0 1px 0 0 var(--border-color);
+    margin-bottom: 0;
 }
 
 /* posts */
@@ -3220,7 +3232,7 @@ h4.gifts_section_header {
 }
 .reply_actions_wrap {
     position: relative;
-    z-index: 10;
+    z-index: 4;
 }
 .reply_actions {
     height: 11px;
@@ -3894,6 +3906,7 @@ h4.gifts_section_header {
     border-radius: var(--module-border-radius);
     overflow: hidden;
     cursor: pointer;
+    margin: -7px 0 -7px 10px;
 }
 .controls.blist_last:hover {
     background-color: var(--module-background-color--secondary);
@@ -3928,6 +3941,11 @@ h4.gifts_section_header {
 .bt_header {
     border-bottom: 1px solid var(--border-color);
 }
+
+.chat_topic_wrap {
+    margin-top: -15px;
+}
+
 #standaloneCommentBox {
     background: var(--module-background-color);
     border-bottom: 0;
@@ -4261,7 +4279,7 @@ a.poll-retract-vote,
 .tickets_content .reply {
     padding: 0 12px;
 }
-.tickets_content .model_content_textarea textarea {
+.tickets_content .composer.model_content_textarea textarea {
     margin-left: 0;
     padding-left: 20px;
     padding-right: 20px;
@@ -4812,4 +4830,8 @@ body.banned {
     -moz-osx-font-smoothing: grayscale;
     overflow: hidden;
     margin: 0 0 9px;
+}
+
+.stickers_form_btn_save {
+    float: none;
 }

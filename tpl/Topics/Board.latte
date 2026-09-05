@@ -1,15 +1,23 @@
 {extends "../@layout.latte"}
 {var $topics = iterator_to_array($topics)}
 {var $page     = $paginatorConf->page}
+{var $canModify = $club->canBeModifiedBy($thisUser)}
 
 {block title}{_discussions} {$club->getCanonicalName()}{/block}
 
 {block content}
+    {var $extraActions = ''}
+    {if $canModify}
+        {var $extraActions = $extraActions . '<a class="button button_gray" href="javascript:void(0)" onclick="createChatTopic('.$club->getId().'); return false;">'.tr('create_topic_as_chat').'</a> '}
+    {/if}
+    {if $club->isEveryoneCanCreateTopics() || $canModify}
+        {var $extraActions = $extraActions . '<a class="button" href="/board'.$club->getId().'/create" onclick="return showCreateTopicModal(event, '.$club->getId().', '.($canModify ? 'true' : 'false').')">'.tr('create_topic').'</a>'}
+    {/if}
     <div class="page_block">
         {include "../components/page_crumb_header.latte", crumbs: [
             ['href' => $club->getURL(), 'title' => $club->getCanonicalName()], 
             ['title' => tr("discussions"), 'count' => sizeof($topics)]
-        ], extra => ($club->isEveryoneCanCreateTopics() || $club->canBeModifiedBy($thisUser)) ? '<a class="button" href="/board'.$club->getId().'/create" onclick="return showCreateTopicModal(event, '.$club->getId().', '.($club->canBeModifiedBy($thisUser) ? 'true' : 'false').')">'.tr("create_topic").'</a>' : ''
+        ], extra => '<div class="buttons_row">' . $extraActions . '</div>'
         }
         {include "../components/search_bar.latte",
             action => '/board'.$club->getId(),
@@ -33,7 +41,11 @@
                             </a>
                         </div>
                         <div class="labeled">
-                            {tr("messages", $x->getCommentsCount())}
+                            {if $x->isChatAttached()}
+                                {tr("chat")}
+                            {else}
+                                {tr("messages", $x->getCommentsCount())}
+                            {/if}
                         </div>
                         {var $lastComment = $x->getLastComment()}
                     </div>

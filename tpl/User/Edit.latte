@@ -5,10 +5,6 @@
 
 {block title}{_edit_page}{/block}
 
-{block bodyScripts}
-    <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/features/autosave.js"></script>
-{/block}
-
 {block content}
 
     {var $isMain      = $mode === 'main'}
@@ -70,7 +66,7 @@
                 <div class="page_block">
                     {include "../components/page_block_header.latte", title => "main_information"}
                     <div class="form_group settings_padding label_end">
-                        <form action="/edit?act=main" method="POST" enctype="multipart/form-data" data-autosave="true">
+                        <form action="/edit?act=main" method="POST" enctype="multipart/form-data">
                             <div class="form_field">
                                 <div class="form_label">{_name}</div>
                                 <div class="form_data">
@@ -172,7 +168,13 @@
                                     <label class="checkbox"><input type="checkbox" name="broadcast_music" n:attr="checked => $user->isBroadcastEnabled()"><span>{_broadcast_audio}</span></label>
                                 </div>
                             </div>
-                            <input type="hidden" name="hash" value="{$csrfToken}" />
+                            <div class="form_field">
+                                <div class="form_label"></div>
+                                <div class="form_data">
+                                    <input type="submit" value="{_save}" class="button" />
+                                    <input type="hidden" name="hash" value="{$csrfToken}" />
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -181,7 +183,7 @@
                 <div class="page_block">
                     {include "../components/page_block_header.latte", title => "contact_information"}
                     <div class="form_group settings_padding label_end">
-                        <form action="/edit?act=contacts" method="POST" enctype="multipart/form-data" data-autosave="true">
+                        <form action="/edit?act=contacts" method="POST" enctype="multipart/form-data">
                             <div class="form_field">
                                 <div class="form_label">{_email}</div>
                                 <div class="form_data">
@@ -212,7 +214,13 @@
                                     <input type="text" name="address" value="{$user->getPhysicalAddress()}" />
                                 </div>
                             </div>
-                            <input type="hidden" name="hash" value="{$csrfToken}" />
+                            <div class="form_field">
+                                <div class="form_label"></div>
+                                <div class="form_data">
+                                    <input type="submit" value="{_save}" class="button" />
+                                    <input type="hidden" name="hash" value="{$csrfToken}" />
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -220,7 +228,7 @@
                 <div class="page_block">
                     {include "../components/page_block_header.latte", title => "personal_information"}
                     <div class="form_group settings_padding label_end">
-                        <form action="/edit?act=interests" method="POST" enctype="multipart/form-data" data-autosave="true">
+                        <form action="/edit?act=interests" method="POST" enctype="multipart/form-data">
                             <div class="form_field">
                                 <div class="form_label">{_interests}</div>
                                 <div class="form_data">
@@ -269,7 +277,13 @@
                                     <textarea type="text" name="about">{$user->getDescription()}</textarea>
                                 </div>
                             </div>
-                            <input type="hidden" name="hash" value="{$csrfToken}" />
+                            <div class="form_field">
+                                <div class="form_label"></div>
+                                <div class="form_data">
+                                    <input type="submit" value="{_save}" class="button" />
+                                    <input type="hidden" name="hash" value="{$csrfToken}" />
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>

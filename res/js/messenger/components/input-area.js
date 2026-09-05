@@ -1,59 +1,67 @@
-export function createInputArea({ html, tr, AttachmentMenu, getReplySnippet }) {
+import { createInputChrome } from './input-chrome.js';
+
+export function createInputArea({ html, tr, AttachmentMenu, getReplySnippet, getEmojiHex }) {
+    const { ReplyBar, EditBar, ForwardBar, MountainPill, inputEndClass } = createInputChrome({ html, tr, getReplySnippet });
     return function InputArea({ editMsg, replyTo, onRemoveReply, onSend, onKeyPress, currentDraft, onInput, togglePeerInfo, clickOnReply, convo, forwarded_msg, onRemoveForward }) {
         const is_editing = editMsg != null;
-        const isForwarded = forwarded_msg && forwarded_msg.length && forwarded_msg.length > 0;
-        const cls = [
-            "messenger-app-end",
-            (replyTo || editMsg || isForwarded) ? 'm-selected' : '',
-            convo.hasScrollPosition() && (!editMsg && !replyTo) ? "m-mountain m-mountain-fatal" : "",
-        ];
+        const cls = inputEndClass({ editMsg, replyTo, forwarded_msg, convo });
+
+        const hasContentEditable = typeof window !== 'undefined' && window.ContentEditable && typeof window.ContentEditable.isSupported === 'function' && window.ContentEditable.isSupported();
+        let hiddenTextarea = null;
+
+        const textareaRef = (el) => { hiddenTextarea = el; };
+
+        const inputRef = (el) => {
+            if (!el) return;
+            if (hasContentEditable && !el._contentEditable && window.ContentEditable) {
+                new window.ContentEditable(el, { hiddenInput: hiddenTextarea, submitOnEnter: true, placeholder: tr('enter_message') });
+                if (currentDraft != null && typeof el.setText === 'function' && el.getText() !== currentDraft) {
+                    el.setText(currentDraft);
+                }
+            } else if (hasContentEditable && el._contentEditable && currentDraft != null && el.getText() !== currentDraft) {
+                el.setText(currentDraft);
+            }
+        };
+
+        const inputEl = hasContentEditable ? html`
+            <div class="im-chat-input--text-wrap">
+                <textarea
+                    class="small-textarea im_editable"
+                    name="text"
+                    style="display: none;"
+                    ref=${textareaRef}
+                ></textarea>
+                <div
+                    class="small-textarea content-editable im_editable im-chat-input--text"
+                    contenteditable="true"
+                    role="textbox"
+                    aria-multiline="true"
+                    data-placeholder=${tr('enter_message')}
+                    onInput=${onInput}
+                    onKeyDown=${onKeyPress}
+                    ref=${inputRef}
+                ></div>
+            </div>
+        ` : html`
+            <textarea
+                class="small-textarea im_editable im-chat-input--text"
+                name="text"
+                placeholder=${tr('enter_message')}
+                value=${currentDraft}
+                onInput=${onInput}
+                onKeyDown=${onKeyPress}
+            ></textarea>
+        `;
 
         return html`
-        <div class="${cls.join(" ")}">
-            ${replyTo && html`
-                <div class="input-reply input-m" onclick=${(e) => {
-                    if (!e.target.closest('.input-close')) {
-                        clickOnReply(replyTo);
-                    }
-                }}>
-                    <div class="input-reply-content">
-                        <span class="input-type">${tr("reply_to", replyTo.sender ? replyTo.sender.getName() : "")}:</span>
-                        <span class="input-reply-text">${getReplySnippet(replyTo)}</span>
-                    </div>
-                    <span class="input-close" onClick=${(e) => {
-                    e.stopPropagation();
-                    onRemoveReply();
-                }}><div class="cross"></div></span>
-                </div>
-            `}
-            ${editMsg && html`
-                <div class="input-edit input-m" onclick=${(e) => {
-                    if (!e.target.closest('.input-close')) {
-                        clickOnReply(editMsg);
-                    }
-                }}>
-                    <div class="input-reply-content">
-                        <span class="input-type">${tr("edit_of_message")}:</span>
-                        <span class="input-reply-text">${getReplySnippet(editMsg)}</span>
-                    </div>
-                    <span class="input-close" onClick=${(e) => {
-                    e.stopPropagation();
-                    window.im.messenger.cancelEdit();
-                }}><div class="cross"></div></span>
-                </div>
-            `}
-            ${isForwarded ? html`
-                <div class="input-forward input-m">
-                    <span aria-label="link" class="input-type">${tr("forwarded_messages_noun", forwarded_msg.length)}</span>
-                    <span class="input-close" onClick=${onRemoveForward}><div class="cross"></div></span>
-                </div>`
-                : ""}
-            <div class="messenger-mountain im-to-end" onClick=${(e) => { window.im.messenger.view.scrollToEndOfChat(e, convo) }}>
-                <div class="im-to-end--label">${tr("viewing_old_messages")}</div>
-            </div>
+        <div class="${cls}">
+            <${ReplyBar} replyTo=${replyTo} onRemoveReply=${onRemoveReply} clickOnReply=${clickOnReply} />
+            <${EditBar} editMsg=${editMsg} clickOnReply=${clickOnReply} />
+            <${ForwardBar} forwarded_msg=${forwarded_msg} onRemoveForward=${onRemoveForward} />
+            <${MountainPill} convo=${convo} />
             <div class="im-chat-input clear_fix im-chat-input_classic ${is_editing ? 'is_msg_editing' : ''}" id="write">
                 <div class="im-chat-input--textarea messenger-app--input---messagebox">
-                    <div class="im-chat-input--txt-wrap">
+                    <div class="im-chat-input--txt-wrap textareas has_emoji_picker">
                         <div class="im-chat-input--attach">
                             <a class="im-chat-input--attach-label im-attach-photo" tabindex="0" role="button"
                                aria-label=${tr('photo')} title=${tr('photo')}></a>
@@ -66,13 +74,7 @@ export function createInputArea({ html, tr, AttachmentMenu, getReplySnippet }) {
                         <div class="im-chat-input--selector">
                             <${AttachmentMenu} />
                         </div>
-                        <textarea
-                            class="small-textarea im_editable im-chat-input--text"
-                            name="text"
-                            placeholder=${tr('enter_message')}
-                            value=${currentDraft}
-                            onInput=${onInput}
-                            onKeyDown=${onKeyPress}></textarea>
+                        ${inputEl}
                         <button type="button" class="im-send-btn im-chat-input--send"
                                 onClick=${onSend}
                                 aria-label=${!is_editing ? tr('send') : tr('edit_action_lr')}></button>

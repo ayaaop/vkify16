@@ -1,7 +1,8 @@
-export function createChatHeader({ html, tr }) {
-    return function ChatHeader({ peer, page }) {
-        if (!peer) return html``;
+export function createPeerInfoView({ html, tr }) {
+    return function PeerInfoView({ convo, page, togglePeerInfo }) {
+        if (!convo || !convo.peer) return html``;
 
+        const peer = convo.peer;
         const name = typeof peer.getName === 'function' ? peer.getName() : '';
         const url = typeof peer.getPageUrl === 'function' ? peer.getPageUrl() : '';
         const subtitle = typeof peer.getOnlineStatusString === 'function' ? peer.getOnlineStatusString() : '';
@@ -10,8 +11,8 @@ export function createChatHeader({ html, tr }) {
 
         const isUser = peer.supposed_type === 'user';
         const isSelfSaved = typeof peer.isSavedMessages === 'function' && peer.isSavedMessages();
-        const userId = isUser ? peer.data.id : null;
-        const firstName = isUser ? (peer.data.first_name || name) : '';
+        const userId = isUser ? peer.data?.id : null;
+        const firstName = isUser ? (peer.data?.first_name || name) : '';
         const isOnline = isUser && !isSelfSaved && peer.data?.last_seen && (Math.floor(Date.now() / 1000) - peer.data.last_seen.time <= 300);
 
         const onBackClick = (e) => {
@@ -22,7 +23,9 @@ export function createChatHeader({ html, tr }) {
         const onPeerInfoClick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            if (page && typeof page.togglePeerInfo === 'function') {
+            if (typeof togglePeerInfo === 'function') {
+                togglePeerInfo();
+            } else if (page && typeof page.togglePeerInfo === 'function') {
                 page.togglePeerInfo(peer);
             }
         };
@@ -35,7 +38,7 @@ export function createChatHeader({ html, tr }) {
         };
 
         return html`
-            <div class="messenger-app--header">
+            <div class="messenger-app--header messages--peers-header-peer-name">
                 <div class="messenger-app--header--back">
                     <a href="/im" onClick=${onBackClick}>${backLabel}</a>
                 </div>

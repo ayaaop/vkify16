@@ -538,17 +538,17 @@
         border-top: 1px solid var(--border-color)!important;
     }
 
-    .model_content_textarea textarea {
+    .composer.model_content_textarea textarea {
         margin-left: 44px;
         width: calc(100% - 44px);
     }
     .post_field_user_link {
         left: 16px;
     }
-    .model_content_textarea:not(.shown) #wallAttachmentMenu {
+    .composer.model_content_textarea:not(.shown) #wallAttachmentMenu {
         padding: 15px 16px;
     }
-    .model_content_textarea.shown .post-bottom-acts {
+    .composer.model_content_textarea.shown .post-bottom-acts {
         padding: 16px;
     }
 
@@ -1864,6 +1864,12 @@
     .ui_actions_menu_left .ui_actions_menu {
         right: auto !important;
         left: 0 !important;
+    }
+
+    .ui_actions_menu_center_align .ui_actions_menu {
+        right: auto !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
     }
 
     /* repost bottom sheet options menu opens upward */

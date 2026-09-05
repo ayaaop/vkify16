@@ -22,7 +22,7 @@
 {var $showGroupPostOpts = $isPostComposer && $canModifyClub && ($owner ?? 0) < 0}
 {var $showCommentAsGroup = !$isPostComposer && $canModifyClub}
 
-<div id="write" class="has_emoji_picker model_content_textarea">
+<div id="write" class="composer has_emoji_picker model_content_textarea">
     <form id="write-form-{$textAreaId}" action="{$route}" method="post" enctype="multipart/form-data" style="margin:0;">
         {if $thisUser ?? NULL}
             <a class="post_field_user_link" href="{$thisUser->getURL()}">
@@ -150,7 +150,7 @@
                            n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"></div>
                         </a>
-                        <div class="ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+                        <div class="ui_actions_menu_wrap" onmouseover="{='uiActionsMenu.show(this, null, {align: "center"});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
                             <a class="post-attach-menu__trigger" id="moreAttachTrigger{$textAreaId}">
                                 {=vkifyTr('more')}
                             </a>
@@ -217,7 +217,7 @@
 
                 <div class="post-bottom-buttons">
                     {if $isPostComposer}
-                        <div class="ui_actions_menu_wrap" onmouseover="{='uiActionsMenu.show(this, null, {align: "right"});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
+                        <div class="ui_actions_menu_wrap" onmouseover="{='uiActionsMenu.show(this);'|noescape}" onmouseout="uiActionsMenu.hide(this);">
                             <div class="post_settings" id="postOptsTrigger{$textAreaId}" role="button">
                                 <div class="common_icon"></div>
                             </div>

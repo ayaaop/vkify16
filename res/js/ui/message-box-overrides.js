@@ -15,95 +15,23 @@ vkify.bindOnce('messageBoxOverrides', () => {
             return false;
         }
 
-        const newTemplate = function () {
-            return U(
-                `<div class="ovk-diag-cont ovk-msg-all" data-id="${this.id}">
-  <div class="ovk-diag">
-     <div class="ovk-diag-head">${this.title}<div class="ovk-diag-head-close" onclick="window.vkify.closeDialog()"></div></div>
-     <div class="ovk-diag-body">${this.body}</div>
-     <div class="ovk-diag-action"></div>
-  </div>
- </div>`);
-        };
-        newTemplate.__vkifyPatched = true;
-        if (!proto.__vkifyMessageBoxTemplateHooked && typeof proto.__getTemplate === 'function') {
-            proto.__vkifyMessageBoxTemplateHooked = true;
-            vkify.hook(proto, '__getTemplate', newTemplate, 'replace');
-        }
-
-        const closeFn = async function () {
-            const stack = window.messagebox_stack;
-            const msg = Array.isArray(stack) ? stack[stack.length - 1] : null;
-            if (!msg) {
-                return;
-            }
+        const closeMessageBox = async (msg) => {
             if (msg.close_on_buttons) {
                 msg.close();
                 return;
             }
-
-            let shouldWarn = msg.warn_on_exit;
-
-            if (msg.attachmentDialog && typeof msg.attachmentDialog.getSelectionCount === 'function') {
-                const selectionCount = msg.attachmentDialog.getSelectionCount();
-                shouldWarn = selectionCount >= 1;
-            }
-
-            if (shouldWarn) {
-                if (typeof msg.__showCloseConfirmationDialog === 'function') {
-                    const res = await msg.__showCloseConfirmationDialog();
-                    if (res === true) {
-                        msg.close();
-                    }
-                } else {
-                    if (confirm(tr('exit_confirmation'))) {
-                        msg.close();
-                    }
+            if (msg.warn_on_exit && typeof msg.__showCloseConfirmationDialog === 'function') {
+                const res = await msg.__showCloseConfirmationDialog();
+                if (res === true) {
+                    msg.close();
                 }
             } else {
                 msg.close();
             }
         };
-        closeFn.__vkifyPatched = true;
-        vkify.closeDialog = closeFn;
-
-        vkify.bindOnce("dimmerClose", () => {
-            document.addEventListener('click', (e) => {
-                const t = e.target;
-                if (!t) return;
-                if (document.body?.classList.contains('dimmed') && t.classList?.contains('dimmer')) {
-                    e.stopImmediatePropagation();
-                    vkify.closeDialog?.();
-                }
-            }, true);
-        });
-
-        vkify.bindOnce("escClose", () => {
-            document.addEventListener('keyup', (e) => {
-                if (e.key === 'Escape' || e.keyCode === 27) {
-                    if (window.messagebox_stack?.length) {
-                        vkify.closeDialog?.();
-                    }
-                }
-            }, true);
-        });
 
         if (!proto.__vkifyStackingHooked) {
             proto.__vkifyStackingHooked = true;
-
-            const updateDialogVisibility = () => {
-                const dialogs = document.querySelectorAll('.ovk-msg-all');
-                const len = dialogs.length;
-                dialogs.forEach((el, i) => {
-                    if (i < len - 1) {
-                        el.style.display = 'none';
-                        el.classList.add('msgbox-hidden');
-                    } else {
-                        el.style.display = '';
-                        el.classList.remove('msgbox-hidden');
-                    }
-                });
-            };
 
             const origExitDialog = proto.__exitDialog;
             proto.__exitDialog = function () {
@@ -122,19 +50,34 @@ vkify.bindOnce('messageBoxOverrides', () => {
                 origExitDialog.call(this);
             };
 
+            const decorateDialog = (el) => {
+                const head = el.querySelector('.ovk-diag-head');
+                if (!head) return;
+                head.querySelectorAll('#_close, .stickers_modal_close_cross, .ovk-diag-head-close').forEach((btn) => {
+                    const parent = btn.parentElement;
+                    btn.remove();
+                    if (parent && parent !== head && !parent.childNodes.length) {
+                        parent.remove();
+                    }
+                });
+                if (head.querySelector('.ovk-diag-head-close')) return;
+                const close = document.createElement('div');
+                close.className = 'ovk-diag-head-close';
+                close.addEventListener('click', () => {
+                    const msgId = el.dataset?.id;
+                    const msg = window.messagebox_stack?.find(m => String(m.id) === msgId);
+                    if (msg) closeMessageBox(msg);
+                });
+                head.appendChild(close);
+            };
+
             vkify.bindOnce('msgboxStackObserver', () => {
                 const observer = new MutationObserver((mutations) => {
                     for (const m of mutations) {
                         for (const node of m.addedNodes) {
                             if (node.nodeType === 1 && node.classList?.contains('ovk-msg-all')) {
                                 window.tippy?.hideAll?.();
-                                updateDialogVisibility();
-                                return;
-                            }
-                        }
-                        for (const node of m.removedNodes) {
-                            if (node.nodeType === 1 && node.classList?.contains('ovk-msg-all')) {
-                                updateDialogVisibility();
+                                decorateDialog(node);
                                 return;
                             }
                         }

@@ -22,7 +22,7 @@
                         <textarea id="wall-post-input1" name="text" style="width: 100%; resize: none;"></textarea>
                         <div n:if="$club->canBeModifiedBy($thisUser)" class="post-opts">
                             <label class="checkbox" n:if="$club->getWallType() == 1">
-                                <input type="checkbox" name="as_group" onchange="onWallAsGroupClick(this)" /><span>{_post_as_group}</span>
+                                <input type="checkbox" name="as_group" onchange="handleWallAsGroupClick(this)" /><span>{_post_as_group}</span>
                             </label>
                         </div>
                         <div id="post-buttons1">

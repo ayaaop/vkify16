@@ -1,0 +1,27 @@
+{var $items = [
+    [
+        'url' => '/stickers',
+        'title' => 'stickers_store',
+        'active' => $act === 'shop'
+    ],
+    [
+        'url' => '/stickers?act=settings',
+        'title' => 'stickers_manage',
+        'active' => $act === 'settings',
+        'condition' => !is_null($thisUser)
+    ],
+    [
+        'url' => '/stickers?act=author',
+        'title' => 'stickers_tab_author',
+        'active' => $act === 'author',
+        'condition' => !is_null($thisUser) && $thisUser->canCreateStickers(),
+        'extraItem' => [
+            'url' => '/stickers/new',
+            'class' => 'stickers_add_pack_btn',
+            'content' => '<div class="addIcon"></div>',
+            'onclick' => 'event.preventDefault(); window.location.href=this.dataset.href;'
+        ]
+    ]
+]}
+
+{include "../components/ui_rmenu.latte", items => $items, id => 'stickers_rmenu'}

@@ -23,6 +23,7 @@
     {else}
     <div class="page_block comments">
         {include "../components/content_error.latte", icon => "first_comment.png", description=> tr("comments_tip")}
+        <div class='scroll_container'></div>
     </div>
 {/if}
 <div n:ifset="$thisUser" id="standaloneCommentBox">

@@ -183,6 +183,17 @@ class AttachmentPickerBase {
         this.msgbox = null;
     }
 
+    _installCloseGuard() {
+        const msgbox = this.msgbox;
+        if (!msgbox) return;
+        const origShowClose = msgbox.__showCloseConfirmationDialog.bind(msgbox);
+        msgbox.__showCloseConfirmationDialog = async () => {
+            const hasNew = [...this.selected].some(id => !isAttached(this.form, this.type, id, this.playlistMode));
+            if (!hasNew) return true;
+            return origShowClose();
+        };
+    }
+
     addClubToggleLink() {
         const header = this.msgbox.getNode().find('.ovk-diag-head');
         if (!header.length) return;
@@ -361,6 +372,8 @@ class AttachmentPicker extends AttachmentPickerBase {
             buttons: this.adapter.buttons || [],
             callbacks: this.adapter.callbacks?.(this) || []
         });
+
+        this._installCloseGuard();
 
         this.applyWidth();
         this.setupCommonHandlers();
@@ -925,6 +938,7 @@ class PhotoPicker extends AttachmentPickerBase {
             buttons,
             callbacks
         });
+        this._installCloseGuard();
         const node = this.msgbox.getNode();
         node.nodes[0].style.width = '640px';
 

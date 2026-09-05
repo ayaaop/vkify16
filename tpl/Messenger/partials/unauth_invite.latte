@@ -1,0 +1,65 @@
+{if !empty($chatPreview)}
+    <div class="page_block chat_invite_page">
+        <div class="chat_invite_header">
+            {tr('chat_invite_preview_title')}
+        </div>
+
+        <div class="chat_invite_main_avatar">
+            <img
+                class="avatar avatar_big chat_invite_avatar"
+                src="{$chatPreview['photoUrl']}"
+                alt=""
+                onerror="this.src='/assets/packages/static/openvk/img/camera_200.png';"
+            />
+        </div>
+
+        <b class="chat_invite_title">{$chatPreview['chatTitle']}</b>
+
+        <div class="chat_invite_members_count">
+            {tr("members_count", $chatPreview['membersCount'])}
+        </div>
+
+        {if !empty($chatPreview['profiles']) || ($chatPreview['remainingCount'] ?? 0) > 0}
+            <div class="chat_invite_members">
+                <div class="chat_invite_members_grid">
+                    {foreach $chatPreview['profiles'] as $profile}
+                        <img
+                            class="avatar chat_invite_member_avatar"
+                            src="{$profile['avatar']}"
+                            title="{$profile['name']}"
+                            alt="{$profile['name']}"
+                            onerror="this.src='/assets/packages/static/openvk/img/camera_50.png';"
+                        />
+                    {/foreach}
+                    {if ($chatPreview['remainingCount'] ?? 0) > 0}
+                        <div class="chat_invite_remaining" title="+{$chatPreview['remainingCount']}">
+                            +{$chatPreview['remainingCount']}
+                        </div>
+                    {/if}
+                </div>
+            </div>
+        {/if}
+
+        <div class="msg info chat_invite_notice">
+            <b>{tr("chat_invite_unauthorized")}</b><br />
+            {tr("chat_invite_unauth_notice")}
+        </div>
+
+        <div class="chat_invite_actions">
+            <a class="button chat_invite_login_btn" href="/login?jReturnTo={rawurlencode('/im?join=' . $joinCode)}">
+                {tr("chat_invite_login_btn")}
+            </a>
+        </div>
+
+        <div class="chat_invite_footer">
+            {tr("chat_invite_not_registered")} <a href="/reg">{tr("registration")}</a>
+        </div>
+    </div>
+{else}
+    <div class="page_block chat_invite_page">
+        <div class="chat_invite_error">
+            {$chatPreviewError ?? tr("chat_invite_invalid_error")}
+        </div>
+        <a class="button" href="/">{tr("back")}</a>
+    </div>
+{/if}

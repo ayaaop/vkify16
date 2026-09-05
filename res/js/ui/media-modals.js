@@ -468,18 +468,10 @@ vkify.once('mediaModals', function () {
                     </div>
                 </div>
                 <div class="page_block post_viewer_page">
-                    <div class="itemAuthor">
-                        <a><img class="itemAuthorAva"></a>
-                        <div class="itemAuthor2">
-                            <span class="itemAuthorName"><a></a></span>
-                            <a class="itemPostTime"></a>
-                        </div>
-                    </div>
-                    <div class="photo_viewer_wrapper miniplayer-body">
+                    <div class="photo_viewer_wrapper">
                         <div id="itemContent"><div class="pr pr_medium"><div class="pr_bt"></div><div class="pr_bt"></div><div class="pr_bt"></div></div></div>
                     </div>
-                    <div class="ovk-post-details miniplayer-body">
-                        <div id="itemContentActions"></div>
+                    <div class="ovk-post-details">
                         <div id="itemContentComments" class="ovk-modal-details"></div>
                     </div>
                 </div>
@@ -493,9 +485,37 @@ vkify.once('mediaModals', function () {
             custom_template: template,
         });
 
+        this.modal.getNode().find('.post_viewer_page')
+            .addClass('ovk-msg-all')
+            .attr('data-id', this.modal.id);
+
         this.modal.getNode().find('#ovk-photo-close, .ovk-photo-view-overlay').on('click', () => this.close());
         this.modal.getNode().find('#move_back').on('click', () => this.slide(-1));
         this.modal.getNode().find('#move_next').on('click', () => this.slide(1));
+
+        this.modal.getNode().on('click', (e) => {
+            const link = e.target && typeof e.target.closest === 'function' ? e.target.closest('.sort_link') : null;
+            if (!link) return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            const sort = new URL(link.href, location.href).searchParams.get('sort');
+            const postId = this.currentId || this.context.id;
+            if (!sort || !postId) return;
+
+            CMessageBox.toggleLoader(true);
+            this._downloadPage(postId, new URLSearchParams({ sort }))
+                .then((htmls) => {
+                    const it = this.items[postId];
+                    if (it) {
+                        it.html = htmls[0];
+                        it.cached = htmls[1];
+                    }
+                    this._updFrame({ html: htmls[0], cached: htmls[1] });
+                })
+                .catch((err) => console.error(err))
+                .finally(() => CMessageBox.toggleLoader(false));
+        });
     };
 
     PostViewer.prototype._updFrame = function (item, details_only = false) {
@@ -544,4 +564,24 @@ vkify.once('mediaModals', function () {
 
         setClickableHeightForEls(this.modal.getNode(), this.modal.getNode().find('.ovk-photo-view-overlay').nodes, '.photo_viewer_wrapper', -50);
     };
+
+    const _origResetMsgboxDetails = typeof window.reset_msgbox_details === 'function' ? window.reset_msgbox_details : null;
+    window.reset_msgbox_details = function vkifyResetMsgboxDetails(boxTarget) {
+        let msgId = null;
+        if (boxTarget && boxTarget.nodes && boxTarget.nodes[0]) {
+            msgId = boxTarget.nodes[0].dataset.id;
+        } else if (boxTarget && boxTarget.dataset) {
+            msgId = boxTarget.dataset.id;
+        }
+        if (!msgId) return;
+
+        const msg = typeof find_msgbox_by_id === 'function' ? find_msgbox_by_id(msgId) : null;
+        if (msg && msg._viewer && typeof msg._viewer._removeCacheForCurrentEntry === 'function') {
+            msg._viewer._removeCacheForCurrentEntry();
+        }
+    };
+
+    if (_origResetMsgboxDetails) {
+        window.reset_msgbox_details._orig = _origResetMsgboxDetails;
+    }
 });

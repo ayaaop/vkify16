@@ -13,7 +13,7 @@
             <div class="fl_r reply_actions_wrap">
                 <div class="reply_actions" n:if="isset($thisUser)">
                     <a n:if="$comment->canBeEditedBy($thisUser)" class="reply_action reply_edit_action" id="editPost" data-id="{$comment->getId()}" data-tip="simple-black" data-tiptitle="{_edit}"></a>
-                    <a n:if="$comment->canBeDeletedBy($thisUser)" class="reply_action reply_delete_action" href="/comment{$comment->getId()}/delete" data-tip="simple-black" data-tiptitle="{_delete}"></a>
+                    <a n:if="$comment->canBeDeletedBy($thisUser)" onclick="ajax_delete(event)" class="reply_action reply_delete_action" href="/comment{$comment->getId()}/delete" data-tip="simple-black" data-tiptitle="{_delete}"></a>
                     <a n:if="$thisUser->getId() != $author->getRealId()" class="reply_action reply_report_action" href="javascript:reportComment({$comment->getId()})" data-tip="simple-black" data-tiptitle="{_report}"></a>
                 </div>
             </div>
