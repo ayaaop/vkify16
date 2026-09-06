@@ -11,7 +11,7 @@
         {elseif $photoContext instanceof \openvk\Web\Models\Entities\Post}
             {var $photoContextId = $photoContext->getPrettyId()}
         {/if}
-        <a class="media-href" style="line-height: 0; --post-image: url({$attachment->getURLBySizeId('normal')|noescape})" href="{$link}" {if $photoContextType === 'post' && $photoContextId}onclick="OpenMiniature(event, '{$attachment->getURLBySizeId('larger')|noescape}', '{$photoContextId}', '{$photoViewerId}', 'post')"{else}onclick="PhotoViewer.openById('{$photoViewerId}', event)"{/if}>
+        <a class="media-href" style="line-height: 0; --post-image: url({$attachment->getURLBySizeId('normal')|noescape})" href="{$link}" {if $photoContextType === 'post' && $photoContextId}onclick="OpenMiniature(event, '{$attachment->getURLBySizeId('larger')|noescape}', '{$photoContextId|noescape}', '{$photoViewerId|noescape}', 'post')"{else}onclick="PhotoViewer.openById('{$photoViewerId|noescape}', event)"{/if}>
             <img n:class="media, $tilesCount > 1 ? media_makima" src="{$attachment->getURLBySizeId('normal')}" alt="{$attachment->getDescription()}" width="{$photoDims[0]}" height="{$photoDims[1]}" loading=lazy />
         </a>
     {else}

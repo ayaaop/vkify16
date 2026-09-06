@@ -151,7 +151,7 @@
             </a>
         </div>
     {/if}
-    <div class="mobile-rmenu-wrap mobile-rmenu-tabs tabs_header">
+    <div class="mobile-rmenu-wrap mobile-rmenu-tabs tabs_header {isset($additionalCssClass) ? $additionalCssClass : ''}">
         <ul class="ui_tabs clear_fix">
             {foreach $items as $item}
                 {if !isset($item['condition']) || $item['condition']}

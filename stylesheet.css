@@ -716,7 +716,8 @@ body.scrolled .toTop:hover #wrap {
     transform: rotate(180deg);
 }
 
-#userMenuTooltip {
+#userMenuTooltip,
+.messenger-app--header #profile_actions_tooltip {
     --ui-actions-menu-distance: 0;
 }
 
@@ -1920,6 +1921,7 @@ table,
     min-height: 52px;
     max-height: 52px;
     padding: 16px 20px 16px 12px;
+    font-size: 13px;
     background-color: transparent;
     border: 0;
     line-height: 1.462;
@@ -4781,7 +4783,8 @@ hr {
     color: var(--heading-color);
 }
 
-#small_remove_button {
+#small_remove_button,
+.post-source #remove_source_button.post-replyto #remove_reply_button, #small_remove_button, .cross {
     width: 16px;
     height: 16px;
     cursor: pointer;

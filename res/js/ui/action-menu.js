@@ -224,7 +224,7 @@ vkify.once('uiActionsMenu', function () {
   // ——— positioning ———
   function positionArrow(el, options) {
     const menu = geByClass1('ui_actions_menu', el);
-    if (!menu || hasClass(el, 'ui_actions_menu_no_chevron')) return;
+    if (!menu) return;
 
     menu.style.display = 'block';
 
@@ -236,6 +236,13 @@ vkify.once('uiActionsMenu', function () {
 
     const verticalOffset = Math.max(triggerRect.bottom - wrapRect.top, wrapRect.height);
     menu.style.setProperty('--ui-actions-menu-vertical-offset', verticalOffset + 'px');
+    // Offset for upward-opening menus: anchor the menu's bottom edge to the
+    // trigger's top edge rather than the wrap, so the menu hugs the trigger
+    // even when the wrap itself is zero-sized (e.g. absolutely-positioned
+    // triggers like .post_actions_icon inside a 0x0 .post_actions wrap).
+    menu.style.setProperty('--ui-actions-menu-up-offset', (wrapRect.bottom - triggerRect.top) + 'px');
+
+    if (hasClass(el, 'ui_actions_menu_no_chevron')) return;
 
     if (!options?.autopos) {
       let align = options?.align;

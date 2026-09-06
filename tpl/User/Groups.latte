@@ -38,7 +38,7 @@
             ]
         ]}
         {var $createGroupButton = '<a class="button nomobile" href="/groups_create" onclick="showCreateGroupModal(event)">' . tr('create_group') . '</a>'}
-        {include "../components/page_tabs_header.latte", tabs => $tabs, id => 'groups_top_tabs', extra => $createGroupButton}
+        {include "../components/page_tabs_header.latte", tabs => $tabs, id => 'groups_top_tabs', extra => $createGroupButton, additionalCssClass => 'show_as_menu_on_mobile'}
     {else}
         {include "../components/page_block_header.latte", title => 'groups'}
     {/if}

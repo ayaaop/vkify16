@@ -4,6 +4,7 @@
         --layout-width: 100%;
         --page-width: 100%;
         --body-background-color: #ebedf0;
+        font-size: 14px;
     }
     body.mode-2018 {
         --module-border-radius: 6px!important;
@@ -50,17 +51,23 @@
     .narrow_column_wrap,.narrow_column {
         width: 100% !important;
     }
-    .toTop {
+    .toTop,
+    .show_as_menu_on_mobile {
         display: none !important;
     }
     .page_body {
-        margin-top: var(--header-height)
+        margin-top: var(--header-height);
+    }
+    .page_body, center span:only-child, .post-content .text, .post-content, .edit_link, table, .video-wowzer {
+        font-size: 14px;
     }
     svg {
         text-align: center;
     }
 
-    /* appbar */
+    /* appbar — Material Design 2 regular top app bar:
+       56dp container, primary bg, 4dp elevation, 48dp icon targets
+       with 24dp glyphs, 16dp glyph insets, 72dp title keyline */
     .appbar {
         display: flex;
         align-items: center;
@@ -72,8 +79,8 @@
         left: 0;
         width: 100%;
         z-index: 198;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        padding: 0 16px;
+        box-shadow: 0 2px 4px -1px rgba(0,0,0,.2), 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12);
+        padding: 0 4px;
         box-sizing: border-box;
         --appbar-bg-alpha: 1;
     }
@@ -85,9 +92,10 @@
         --accent-text-color: var(--text-color);
     }
     .appbar .hamburger {
-        width: 24px;
-        height: 24px;
-        margin-right: 20px;
+        width: 48px;
+        height: 48px;
+        margin: 0;
+        flex-shrink: 0;
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -99,8 +107,8 @@
     }
     .appbar .hamburger-badge {
         position: absolute;
-        top: -4px;
-        right: -4px;
+        top: 4px;
+        right: 4px;
         min-width: 18px;
         height: 18px;
         padding: 0 5px;
@@ -123,8 +131,12 @@
     }
     .appbar .appbar-title {
         font-size: 20px;
+        line-height: 32px;
         font-weight: 500;
+        letter-spacing: 0.0125em;
         flex: 1;
+        min-width: 0;
+        padding-left: 20px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -137,7 +149,7 @@
         background: none;
         border: none;
         cursor: pointer;
-        padding: 6px;
+        padding: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -171,11 +183,76 @@
     }
     .appbar--scrolled {
         background-color: var(--accent-color) !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.15) !important;
+        box-shadow: 0 2px 4px -1px rgba(0,0,0,.2), 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12) !important;
+    }
+
+    /* appbar tabs dropdown (from .tabs_header.show_as_menu_on_mobile) */
+    .appbar-tabs-menu-wrap {
+        flex: 1;
+        min-width: 0;
+    }
+    .appbar .appbar-title.appbar-title--tabs-menu {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        user-select: none;
+    }
+    .appbar-title--tabs-menu:focus-visible {
+        outline: 2px solid var(--accent-text-color);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+    .appbar-title-label {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 500;
+        min-width: 0;
+    }
+    .appbar-title-chevron {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+    }
+    .appbar-title-chevron svg {
+        display: block;
+        fill: currentColor;
+        transition: transform 150ms ease;
+    }
+    .appbar-tabs-menu-wrap.shown .appbar-title-chevron svg {
+        transform: rotate(180deg);
+    }
+    .appbar-tabs-menu-wrap .appbar-tabs-menu {
+        min-width: 200px;
+    }
+    .appbar-tabs-menu-item {
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+    }
+    .appbar-tabs-menu-label {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+    }
+    .appbar-tabs-menu-count {
+        margin-left: auto;
+        padding-left: 24px;
+        flex-shrink: 0;
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--muted-text-color);
+    }
+    .appbar-tabs-menu-item--active .appbar-tabs-menu-count {
+        color: inherit;
+        opacity: 0.75;
     }
 
     /* sidebar drawer */
-    .sidebar {
+    .sidebar,
+    body.no-scroll .sidebar {
         position: fixed;
         left: -85vw;
         top: 0;
@@ -459,18 +536,20 @@
     h2.page_block_h2,.page_block_header {
         min-height: unset;
     }
+    /* VKUI Group header (size M): 16sp/500 primary title, 16dp sides */
     .page_block_header {
         background-color: var(--module-background-color);
-        color: var(--muted-text-color-2);
+        color: var(--text-color);
         border: 0;
-        font-size: 13px;
-        text-transform: uppercase;
+        font-size: 16px;
+        line-height: 20px;
         font-weight: 500;
-        padding: 16px 16px 0;
+        padding: 12px 16px 8px;
     }
     .page_block_header_count {
         font-size: 13px;
         margin-top: 0;
+        color: var(--muted-text-color-2);
     }
     .page_block_header .button {
         text-transform: none;
@@ -530,6 +609,9 @@
     .post .post_header {
         padding: 16px 16px 0;
     }
+    .post_author {
+        font-weight: 500;
+    }
     .post-nsfw .post-content::after, .deleted_content .content_page_error {
         margin: 0 16px;
         width: calc(100% - 32px);
@@ -552,16 +634,48 @@
         padding: 16px;
     }
 
-    /* buttons */
+    /* buttons — VKUI Button size M: 80dp min-width, 36dp height,
+       16dp padding (12dp for tertiary), 8dp radius, 15sp/500
+       sentence-case label, flat surface, 0.15s state transitions */
     .button, input[class="button"], .profile_link {
-        padding: 7px 16px 9px;
-        min-height: 32px;
+        min-width: 80px;
+        height: 36px;
+        min-height: 36px;
+        padding: 0 16px;
+        border-radius: 8px;
+        font-size: 15px;
+        line-height: 20px;
         font-weight: 500;
-        font-size: 13px;
+        letter-spacing: normal;
+        text-transform: none;
+        box-shadow: none;
+        transition: background-color 0.15s ease-out, color 0.15s ease-out;
+    }
+    body.mode-2018 .button,
+    body.mode-2018 input[class="button"],
+    body.mode-2018 .profile_link {
+        border-radius: 6px;
     }
     .button:not(.profile_more_btn):active, input[class="button"]:active {
-        padding-top: 8px;
-        padding-bottom: 8px;
+        padding-top: 0;
+        padding-bottom: 0;
+        box-shadow: none;
+    }
+    .button.profile_more_btn {
+        min-width: 0;
+    }
+    .button.button_light, .profile_link {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    .button.button_wide {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    .button:disabled, .button[disabled],
+    input[class="button"]:disabled, input[class="button"][disabled] {
+        box-shadow: none;
+        opacity: 0.64;
     }
     .action_links .button {
         padding: 7px 16px 8px
@@ -578,7 +692,8 @@
     .form_group .form_label {
         width: 100%;
         padding: 2px 0 8px;
-        font-size: 13px;
+        font-size: 14px;
+        line-height: 18px;
         color: var(--muted-text-color);
         font-weight: 500;
     }
@@ -592,6 +707,66 @@
     }
     #login_form, .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"]), .form_field:not(.settings_privacy_row) select, .form_field textarea {
         width: 100%;
+    }
+
+    /* form fields — VKUI Input: 44dp field, secondary fill, 8dp radius,
+       hairline border (accent on focus), 16sp/20dp text, 12dp padding */
+    .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"], [type="file"], [type="image"]),
+    #login_form input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"]),
+    .form_field select,
+    .form_field textarea, textarea {
+        height: 44px;
+        padding: 0 12px;
+        font-size: 16px;
+        line-height: 20px;
+        color: var(--text-color);
+        background-color: var(--module-background-color--secondary);
+        border: 1px solid color-mix(in srgb, var(--text-color) 12%, transparent);
+        border-radius: 8px;
+        box-sizing: border-box;
+        outline: none;
+    }
+    .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"], [type="file"], [type="image"])::placeholder,
+    .form_field textarea::placeholder, textarea::placeholder {
+        color: var(--muted-text-color);
+        opacity: 1;
+    }
+    .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"], [type="file"], [type="image"]):focus,
+    .form_field select:focus,
+    .form_field textarea:focus, textarea:focus {
+        border-color: var(--accent-color);
+    }
+    .form_field input:disabled,
+    .form_field select:disabled,
+    .form_field textarea:disabled, textarea:disabled {
+        opacity: 0.48;
+    }
+    .form_field textarea, textarea {
+        height: auto;
+        min-height: 88px;
+        padding: 12px;
+        resize: none;
+    }
+    .form_field select[size],
+    .form_field select[multiple] {
+        height: auto;
+    }
+
+    /* selects — VKUI Select: field visuals plus a trailing chevron */
+    .form_field select {
+        appearance: none;
+        -webkit-appearance: none;
+        padding-right: 40px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Cpath d='M12 13.698 6.64 9.232a1 1 0 0 0-1.28 1.536l6 5a1 1 0 0 0 1.28 0l6-5a1 1 0 1 0-1.28-1.536L12 13.698Z' fill='%23818c99'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 20px 20px;
+    }
+    body.dark-mode .form_field select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Cpath d='M12 13.698 6.64 9.232a1 1 0 0 0-1.28 1.536l6 5a1 1 0 0 0 1.28 0l6-5a1 1 0 1 0-1.28-1.536L12 13.698Z' fill='%2399a2ad'/%3E%3C/svg%3E");
     }
     .label_end .form_label {
         text-align: start;
@@ -1813,26 +1988,30 @@
 
     /* mobile hover effects */
     .mobile-info-row, .mobile-scroll-card,.ui_tabs .ui_tab,.sidebar_inner .link,
-    .ui_actions_menu a, #ctx_menu a {
+    #ctx_menu a {
         transition: background-color 250ms;
     }
     .mobile-info-row:hover,.mobile-scroll-card:hover,.ui_tabs .ui_tab:hover,.sidebar_inner .link:hover,
-    .ui_actions_menu a:hover, #ctx_menu a:hover {
+    #ctx_menu a:hover,
+    .ui_actions_menu a.appbar-tabs-menu-item--active {
         background-color: rgba(122,122,122,.1);
     }
     .mobile-info-row:active,.mobile-scroll-card:active,.ui_tabs .ui_tab:active,.sidebar_inner .link:active,
-    .ui_actions_menu a:active, #ctx_menu a:active {
+    #ctx_menu a:active {
         background-color: rgba(122,122,122,.2);
     }
 
+    /* action menu — VKUI ActionSheet: modal surface, 12dp shape,
+       elevation3, 8dp vertical padding, 48dp items with 16dp padding
+       and 16sp/20dp primary text (negative red for destructive) */
     .ui_actions_menu {
         min-width: 112px;
         max-width: 280px;
         padding: 8px 0;
         border: 0;
-        border-radius: 4px;
+        border-radius: 12px;
         z-index: 10;
-        box-shadow: 0 5px 5px -3px rgba(0,0,0,.2),0 8px 10px 1px rgba(0,0,0,.14),0 3px 14px 2px rgba(0,0,0,.12)
+        box-shadow: 0 0 6px 0 rgba(0,16,61,.06), 0 6px 12px 0 rgba(0,16,61,.06), 0 6px 20px 0 rgba(0,16,61,.06), 0 10px 36px 0 rgba(0,16,61,.08);
     }
 
     .ui_actions_menu:before,
@@ -1843,11 +2022,47 @@
     .ui_actions_menu a,
     .ui_actions_menu .ui_actions_menu_item,
     .ui_actions_menu form button {
-        padding: 0 20px 0 16px;
-        font-size: 14px;
+        padding: 0 16px;
+        font-size: 16px;
         line-height: 48px;
         height: 48px;
+    }
+
+    .ui_actions_menu a:hover,
+    .ui_actions_menu .ui_actions_menu_item:hover,
+    .ui_actions_menu form button:hover {
+        background-color: color-mix(in srgb, currentColor 4%, transparent);
+    }
+
+    /* commenting out because MD 2 ripple is now implemented
+    .ui_actions_menu a:focus-visible,
+    .ui_actions_menu .ui_actions_menu_item:focus-visible,
+    .ui_actions_menu form button:focus-visible {
+        background-color: color-mix(in srgb, currentColor 12%, transparent);
+        outline: none;
+    }
+    .ui_actions_menu a:active,
+    .ui_actions_menu .ui_actions_menu_item:active,
+    .ui_actions_menu form button:active {
+        background-color: color-mix(in srgb, currentColor 12%, transparent);
+    }
+    */
+
+    .ui_actions_menu:not(.dark) a {
         color: var(--text-color);
+    }
+
+    .ui_actions_menu a.delete,
+    .ui_actions_menu button.delete,
+    .ui_actions_menu .ui_actions_menu_item.delete,
+    .ui_actions_menu form button.delete {
+        color: #ED330A;
+    }
+    body.dark-mode .ui_actions_menu a.delete,
+    body.dark-mode .ui_actions_menu button.delete,
+    body.dark-mode .ui_actions_menu .ui_actions_menu_item.delete,
+    body.dark-mode .ui_actions_menu form button.delete {
+        color: #ff5c5c;
     }
 
     .ui_actions_menu .separator,
@@ -1855,31 +2070,29 @@
         margin: 8px 0;
     }
 
-    .ui_actions_menu {
-        right: 0 !important;
-        left: auto !important;
+    /* Material Design 2 touch ripples (surface set up from mobile.js) */
+    .md-ripple {
+        position: relative;
+        overflow: hidden;
     }
-
-    .ui_actions_menu_left_align .ui_actions_menu,
-    .ui_actions_menu_left .ui_actions_menu {
-        right: auto !important;
-        left: 0 !important;
+    .md-ripple--unbounded {
+        overflow: visible;
     }
-
-    .ui_actions_menu_center_align .ui_actions_menu {
-        right: auto !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
+    .md-ripple-ink {
+        position: absolute;
+        display: block;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 225ms cubic-bezier(0, 0, 0.2, 1), opacity 75ms linear;
     }
-
-    /* repost bottom sheet options menu opens upward */
-    #__vkifyRepostOptsTooltip {
-        top: auto !important;
-        bottom: calc(100% + 8px) !important;
-    }
-
-    #__vkifyRepostOptsTooltip.ui_actions_menu_hiding {
-        bottom: calc(100% + 16px) !important;
+    /* Clipping box for ripples on replaced elements (<input> renders no
+       children, so the ripple is painted in an overlay aligned over it) */
+    .md-ripple-ink-clip {
+        position: absolute;
+        overflow: hidden;
+        pointer-events: none;
     }
 }
 @keyframes slideUpBottomSheet {

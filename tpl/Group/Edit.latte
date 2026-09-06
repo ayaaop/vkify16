@@ -9,7 +9,7 @@
                 <div class="narrow_column">
                     {var $menuItems = [
                         [
-                            'url' => "javascript:void(0)",
+                            'url' => "/club{$club->getId()}/edit",
                             'title' => 'main',
                             'active' => true
                         ],
@@ -29,7 +29,7 @@
                             'active' => false
                         ]
                     ]}
-                    {include "../components/ui_rmenu.latte", items => $menuItems, ownblockData => $club}
+                    {include "../components/ui_rmenu.latte", items => $menuItems, ownblockData => $club, additionalCssClass => 'show_as_menu_on_mobile'}
                 </div>
             </div>
             <div class="wide_column_wrap">

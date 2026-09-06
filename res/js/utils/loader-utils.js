@@ -4,10 +4,18 @@
 class LoaderUtils {
     static show(container, options = {}) {
         const { size = 'medium', className = '', theme = null } = options;
+        const root = LoaderUtils._asUmbrella(container);
+        const node = root.nodes && root.nodes[0] ? root.nodes[0] : null;
+        if (node && node.children) {
+            for (const child of node.children) {
+                if (child && child.classList && typeof child.classList.contains === 'function' && child.classList.contains('pr')) {
+                    return root.find('.pr').last();
+                }
+            }
+        }
         const sizeClass = size === 'small' ? 'pr_small' : size === 'large' ? 'pr_large' : 'pr_medium';
         const themeClass = theme === 'baw' ? 'pr_baw' : '';
         const html = `<div class="pr ${sizeClass} ${themeClass} ${className}"><div class="pr_bt"></div><div class="pr_bt"></div><div class="pr_bt"></div></div>`;
-        const root = LoaderUtils._asUmbrella(container);
         root.append(html);
         return root.find('.pr').last();
     }

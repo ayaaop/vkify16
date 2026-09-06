@@ -38,7 +38,7 @@
             ]
         ]}
         {var $createEventButton = '<a class="button nomobile" href="/events_create" onclick="showCreateEventModal(event)">' . tr('create_event') . '</a>'}
-        {include "../components/page_tabs_header.latte", tabs => $tabs, id => 'events_top_tabs', extra => $createEventButton}
+        {include "../components/page_tabs_header.latte", tabs => $tabs, id => 'events_top_tabs', additionalCssClass => 'show_as_menu_on_mobile', extra => $createEventButton}
     {else}
         {include "../components/page_block_header.latte", title => 'meetings'}
     {/if}

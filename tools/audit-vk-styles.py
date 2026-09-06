@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Report and clean unused CSS variables and dead class selectors."""
+"""Report and clean unused CSS variables and dead class selectors.
+
+Counts classes referenced from themepack files, OpenVK stock templates and
+static JS, plus the Preact-rendered IM (upstream Web/static/js/messages and
+the themepack messenger override), whose class names are often composed
+dynamically (cls arrays, ternaries, class=${var}) rather than written as
+literal class="..." attributes.
+"""
 
 import argparse
 import re
@@ -13,6 +20,11 @@ STYLESHEET_PATH = ROOT / "stylesheet.css"
 SKIP_PARTS = frozenset({"vendor", "node_modules", "jquery"})
 
 CLASS_RE = re.compile(r"\.([a-zA-Z_][a-zA-Z0-9_-]*)")
+COMMENT_RE = re.compile(r"/\*.*?\*/", re.S)
+
+
+def strip_comments(sel):
+    return COMMENT_RE.sub("", sel).strip()
 VAR_DEF_RE = re.compile(r"(--[a-zA-Z0-9_-]+)\s*:\s*([^;}]+)")
 VAR_REF_RE = re.compile(r"var\(\s*(--[a-zA-Z0-9_-]+)")
 
@@ -35,11 +47,42 @@ def collect_consumer_files():
     scan(ROOT / "tpl", {".latte", ".js", ".hbs"})
 
     # OpenVK stock files
-    ovk = Path(__file__).resolve().parents[4]
+    ovk = Path(__file__).resolve().parents[3]
     scan(ovk / "Web" / "Presenters" / "templates", {".latte", ".js", ".hbs"})
     scan(ovk / "Web" / "static", {".latte", ".js", ".hbs"})
 
     return sorted(files)
+
+
+def collect_preact_text():
+    """Concatenated source of Preact-rendered IM components.
+
+    Their class names rarely appear as literal class="..." attributes, so
+    they are matched textually (word boundaries) against classes defined in
+    the audited stylesheets instead of going through collect_class_tokens.
+    """
+    ovk = Path(__file__).resolve().parents[3]
+    dirs = [ovk / "Web" / "static" / "js" / "messages", ROOT / "res" / "js" / "messenger"]
+    parts = []
+    for base in dirs:
+        if not base.is_dir():
+            continue
+        for p in sorted(base.rglob("*")):
+            if p.suffix not in {".js", ".mjs"}:
+                continue
+            if any(part in SKIP_PARTS for part in p.parts):
+                continue
+            parts.append(p.read_text(errors="replace"))
+    return "\n".join(parts)
+
+
+def find_word_hits(text, classes):
+    """Subset of classes occurring in text on word boundaries."""
+    classes = sorted(set(classes))
+    if not classes or not text:
+        return set()
+    pattern = re.compile(r"\b(?:" + "|".join(re.escape(c) for c in classes) + r")\b")
+    return set(pattern.findall(text))
 
 
 def read_consumer_text(files):
@@ -202,11 +245,17 @@ def find_removals(css, offset, is_unused):
 
     for b in blocks:
         sel = b['selector']
+        comments = " ".join(COMMENT_RE.findall(sel))
+        if comments:
+            comments += " "
+        # Comments are section headers, not selectors: they pollute display,
+        # fake CLASS_RE hits, and break the @media check below.
+        sel = strip_comments(sel)
 
         if sel.startswith('@') and any(x in sel for x in ('media', 'supports', 'layer')):
             removals.extend(find_removals(b['body'], offset + b['body_start'], is_unused))
             continue
-        if sel.startswith('@'):
+        if sel.startswith('@') or not sel:
             continue
 
         subs = split_selectors(sel)
@@ -222,12 +271,14 @@ def find_removals(css, offset, is_unused):
 
         if not kept and dead:
             removals.append({'type': 'block', 'start': offset + b['start'],
-                           'end': offset + b['end'], 'sel': sel})
+                            'end': offset + b['end'], 'sel': sel,
+                            'dead_classes': sorted({c for sub in dead for c in CLASS_RE.findall(sub) if is_unused(c)})})
         elif dead:
             sep = ",\n" if '\n' in sel else ", "
-            new_sel = sep.join(kept) + " "
+            new_sel = comments + sep.join(kept) + " "
             removals.append({'type': 'selector', 'start': offset + b['selector_start'],
-                           'end': offset + b['selector_end'], 'new_sel': new_sel, 'sel': sel})
+                            'end': offset + b['selector_end'], 'new_sel': new_sel, 'sel': sel,
+                            'dead_classes': sorted({c for sub in dead for c in CLASS_RE.findall(sub) if is_unused(c)})})
 
     return removals
 
@@ -255,11 +306,21 @@ def main():
     classes = collect_class_tokens(consumer)
     dynamic = collect_dynamic_prefixes(consumer)
 
+    css_classes = set()
+    css_texts = {}
+    for path in css_files:
+        text = path.read_text(errors="replace")
+        css_texts[path] = text
+        css_classes.update(CLASS_RE.findall(text))
+    preact_hits = find_word_hits(collect_preact_text(), css_classes)
+    classes |= preact_hits
+    print(f"consumer files: {len(consumer_files)}, preact-covered classes: {len(preact_hits)}")
+
     total_dead_vars = 0
     total_removals = 0
 
     for path in css_files:
-        css = path.read_text(errors="replace")
+        css = css_texts[path]
         dead_vars = find_dead_vars(css, stylesheet, consumer)
 
         # Classes used in pseudo-elements shouldn't be removed
@@ -283,7 +344,9 @@ def main():
         if dead_vars:
             print("  Vars:", ", ".join(dead_vars[:8]))
         if removals:
-            print("  Examples:", [r['sel'].replace('\n', ' ')[:70] for r in removals[:5]])
+            for r in removals[:5]:
+                culprits = " unused=" + ",".join(r.get('dead_classes', [])[:4]) if r.get('dead_classes') else ""
+                print(f"  - {r['sel'].replace(chr(10), ' ')[:80]}{culprits}")
 
         total_dead_vars += len(dead_vars)
         total_removals += len(removals)

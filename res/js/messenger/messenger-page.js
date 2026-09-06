@@ -1,4 +1,5 @@
 import { imImport, fallbackReplySnippet, fallbackEmojiHex, fallbackRecentSmiles, fallbackRecentSmileClick, fallbackPeerAvatar, ensureVideoPreviews } from './shared.js';
+import { isMobileViewport } from './mobile-mode.js';
 import { createPeerInfoView } from './components/peer-info-view.js';
 import { createPinnedMessageBar } from './components/pinned-message-bar.js';
 import { createAttachmentMenu } from './components/attachment-menu.js';
@@ -81,7 +82,7 @@ export async function installMessengerRenderer() {
     const PinnedMessageBar = createPinnedMessageBar({ html, tr });
 
     const use2018 = window.vkify ? window.vkify.getSetting('mode2018') : false;
-    const InputAreaComponent = use2018 ? VkInputArea : StockInputArea;
+    const InputAreaComponent = (use2018 || isMobileViewport()) ? VkInputArea : StockInputArea;
 
     await installClassicTabBar({ html, render, commonMod });
     await installConversationsRenderer({ html, render, h, Fragment, commonMod });

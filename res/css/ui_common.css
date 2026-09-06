@@ -1855,15 +1855,15 @@ select:focus {
 
 .ui_actions_menu_top .ui_actions_menu {
     top: auto !important;
-    bottom: calc(var(--ui-actions-menu-vertical-offset) + var(--ui-actions-menu-distance) + 5px);
+    bottom: calc(var(--ui-actions-menu-up-offset, var(--ui-actions-menu-vertical-offset)) + var(--ui-actions-menu-distance) + 5px);
 }
 .ui_actions_menu_top.shown .ui_actions_menu {
-    bottom: calc(var(--ui-actions-menu-vertical-offset) + var(--ui-actions-menu-distance));
+    bottom: calc(var(--ui-actions-menu-up-offset, var(--ui-actions-menu-vertical-offset)) + var(--ui-actions-menu-distance));
 }
 
 .ui_actions_menu_wrap.ui_actions_menu_top.shown .ui_actions_menu.ui_actions_menu_hiding {
     top: auto;
-    bottom: calc(var(--ui-actions-menu-vertical-offset) + var(--ui-actions-menu-distance) + 5px);
+    bottom: calc(var(--ui-actions-menu-up-offset, var(--ui-actions-menu-vertical-offset)) + var(--ui-actions-menu-distance) + 5px);
 }
 
 .ui_actions_menu_top .ui_actions_menu::before,

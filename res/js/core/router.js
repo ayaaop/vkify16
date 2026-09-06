@@ -271,6 +271,16 @@ window.router = new class Router {
         u('.page_body').html(pageBody.html());
         u('.sidebar').html(sidebar.html());
         u('.appbar').html(appbar.html());
+        // Inner-HTML swaps keep the live element's class list, so propagate
+        // the server-rendered appbar classes (e.g. appbar--transparent).
+        // Dynamic state was already stripped by beforePageLeave handlers.
+        if (appbar.length > 0) {
+            const nextAppbarNode = appbar.nodes[0];
+            const currentAppbarNode = document.getElementById('appbar');
+            if (nextAppbarNode && currentAppbarNode) {
+                currentAppbarNode.className = nextAppbarNode.className;
+            }
+        }
 
         if (backdrop.length > 0) {
             if (u('#backdrop').length === 0) {

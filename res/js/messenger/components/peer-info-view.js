@@ -31,7 +31,13 @@ export function createPeerInfoView({ html, tr }) {
         };
 
         const onActionsClick = (e) => {
+            if (e.target.closest('a, button')) {
+                return;
+            }
             e.stopPropagation();
+            if (window.isMobile && window.isMobile()) {
+                return;
+            }
             if (typeof uiActionsMenu !== 'undefined' && uiActionsMenu.toggle) {
                 uiActionsMenu.toggle(e.currentTarget);
             }
