@@ -1,3 +1,4 @@
+{php if (!function_exists('vkifyFormatCount')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
 {var $author = $comment->getOwner()}
 {var $Club  = openvk\Web\Models\Entities\Club::class}
 {var $likesCount = $comment->getLikesCount()}

@@ -1,4 +1,5 @@
 {extends "../@layout.latte"}
+{php if (!function_exists('vkifyFormatCount')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
 
 {if !$user->isBanned()}
     {var $backdrops = $user->getBackDropPictureURLs()}
