@@ -724,7 +724,7 @@ div.avatar_block:hover .avatar_variants {
 }
 
 .button.profile_more_btn {
-  background-image: url(../icons/more_icon.png);
+  background-image: url(../icons/more_icon.png)!important;
   background-repeat: no-repeat;
   background-position: 100% 13px;
   width: 36px;

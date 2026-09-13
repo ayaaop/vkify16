@@ -199,10 +199,12 @@ body {
 
 .layout {
     width: var(--layout-width);
+    transition: .2s width;
 }
 
 .page_body {
     width: var(--page-width);
+    transition: .2s width;
 }
 .page_content {
     width: 100%;
@@ -465,6 +467,9 @@ textarea:focus {
     visibility: hidden;
     opacity: 0;
 }
+.toTop.inactive {
+    display: none!important;
+}
 .toTop {
     background-color: var(--transparent);
     color: var(--elevator-text-color);
@@ -532,6 +537,7 @@ body.scrolled .toTop:hover #wrap {
 .page_header_inner {
     width: var(--layout-width, 960px);
     height: 100%;
+    transition: .2s width;
 }
 
 .home_button {
@@ -1256,6 +1262,9 @@ body.scrolled .toTop:hover #wrap {
 }
 .audioEntry.nowPlaying .playIcon {
     background-position-y: -15px !important;
+}
+.audioEntry .playerButton .playIcon.paused {
+    background-position-y: -15px;
 }
 
 .audiosDiv {
@@ -2001,7 +2010,7 @@ table,
 .composer.model_content_textarea.has_emoji_picker .emoji_picker_entrypoint {
 	display: none;
 }
-.composer.model_content_textarea.has_emoji_picker.expanded-textarea .emoji_picker_entrypoint {
+.composer.model_content_textarea.has_emoji_picker.shown .emoji_picker_entrypoint {
 	cursor: pointer;
 	position: absolute;
 	right: 20px;

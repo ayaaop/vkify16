@@ -125,7 +125,7 @@
                             <div id="search_box_fr">
                                 <form id="search_form" action="/search" method="get">
                                     <div id="search_and_one_more_wrapper">
-                                        <input autocomplete="off" type="search" maxlength="79" name="q" placeholder="{tr("header_search")}" title="{tr("header_search")} [Alt+Shift+F]" accesskey="f">
+                                        <input n:attr="value => $_REQUEST['q'] ?? NULL" onkeydown="onSearchTipKeydown(event)" oninput="onSearchBoxInput(event)" autocomplete="off" type="search" maxlength="79" name="q" placeholder="{tr("header_search")}" title="{tr("header_search")} [Alt+Shift+F]" accesskey="f">
                                     </div>
                                     <button class="search_box_button">
                                         <span>{tr("header_search")}</span>
@@ -626,7 +626,7 @@
             window.openvk = {
                 "current_language": {getLanguage()},
                 "lang": {php echo json_encode(getLanguage())},
-                "locale": {php echo json_encode(explode(';', tr('__locale'))[0] ?? 'ru_RU.UTF-8')},
+                "locale": {php echo json_encode(str_replace('_', '-', preg_replace('/[.@].*$/', '', explode(';', tr('__locale'))[0] ?? 'ru_RU.UTF-8')))},
                 "audio_genres": {\openvk\Web\Models\Entities\Audio::genres},
                 "at_search": {$atSearch ?? false},
                 "max_attachments": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["wall"]["postSizes"]["maxAttachments"] ?? 10},

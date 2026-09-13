@@ -17,12 +17,14 @@ vkify.ready(() => {
     const customSoundId = "vkify_notification";
     createjs.Sound.registerSound(vkify.resourceUrl("bb1.mp3"), customSoundId);
 
-    vkify.actualPlayNotifSound = function() {
+    function actualPlayNotifSound(type = 'notification') {
         createjs.Sound.play(customSoundId);
-    };
+    }
 
-    if (window.playNotifSound && window.playNotifSound !== Function.noop) {
-        window.playNotifSound = vkify.actualPlayNotifSound;
+    vkify.actualPlayNotifSound = actualPlayNotifSound;
+
+    if (typeof window.__actualPlayNotifSound === 'function') {
+        window.__actualPlayNotifSound = actualPlayNotifSound;
     }
 
 

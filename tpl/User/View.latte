@@ -117,7 +117,7 @@
 						</h3>
 					</a>
 					<div class="module_body">
-						<a href="{if $firstVideo}/video{$firstVideo->getPrettyId()}{else}/videos{$user->getId()}{/if}" id="videoOpen" data-id="{$firstVideo->getPrettyId()}" class="video">
+						<a href="{if $firstVideo}/video{$firstVideo->getPrettyId()}{else}/videos{$user->getId()}{/if}" id="videoOpen" data-id="{if $firstVideo}{$firstVideo->getPrettyId()}{/if}" class="video">
 							{if $firstVideo}
 								<div class="page_video_thumb" style="background-image: url('{$firstVideo->getThumbnailURL()}');"></div>
 								<div class="page_video_play_icon"></div>
