@@ -1612,50 +1612,57 @@ window.openAttachmentPicker = openPicker;
 
 vkify.bindOnce('pickerButtons', () => {
     const resolveForm = (el) => (el ? u(el).closest('#write') : u());
-    const getForm = (e) => resolveForm(e.currentTarget && e.currentTarget !== document ? e.currentTarget : e.target);
 
-    u(document).on('click', '#__vkifyPhotoAttachment', async (e) => {
-        if (e.__vkifyHandled) return;
-        e.__vkifyHandled = true;
-        const club = Number(e.currentTarget.dataset.club ?? 0);
-        const picker = new PhotoPicker({ form: getForm(e), club });
-        await picker.open();
-    });
+    document.addEventListener('click', async (e) => {
+        const photo = e.target.closest('#__photoAttachment');
+        if (photo) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            const club = Number(photo.dataset.club ?? 0);
+            const picker = new PhotoPicker({ form: resolveForm(photo), club });
+            await picker.open();
+            return;
+        }
 
-    u(document).on('click', '#__vkifyVideoAttachment', async (e) => {
-        if (e.__vkifyHandled) return;
-        e.__vkifyHandled = true;
-        await openPicker('video', getForm(e));
-    });
+        const video = e.target.closest('#__videoAttachment');
+        if (video) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            await openPicker('video', resolveForm(video));
+            return;
+        }
 
-    u(document).on('click', '#__vkifyAudioAttachment', async (e) => {
-        if (e.__vkifyHandled) return;
-        e.__vkifyHandled = true;
-        const club = Number(e.currentTarget.dataset.club ?? 0);
-        await openPicker('audio', getForm(e), club);
-    });
+        const audio = e.target.closest('#__audioAttachment');
+        if (audio) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            const club = Number(audio.dataset.club ?? 0);
+            await openPicker('audio', resolveForm(audio), club);
+            return;
+        }
+
+        const docBtn = e.target.closest('#__documentAttachment, .attach_document');
+        if (docBtn) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            const club = Number(docBtn.dataset.club ?? 0);
+            await openPicker('document', resolveForm(docBtn), club);
+            return;
+        }
+
+        const noteBtn = e.target.closest('#__notesAttachment, .attach_note');
+        if (noteBtn) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            await openPicker('note', resolveForm(noteBtn));
+            return;
+        }
+    }, true);
 
     u(document).on('click', '#_vkifyPlaylistAppendTracks', async (e) => {
         if (e.__vkifyHandled) return;
         e.__vkifyHandled = true;
         await openPicker('audio', u('.PE_wrapper'), 0, { playlistMode: true });
-    });
-
-    document.addEventListener('click', (e) => {
-        const docBtn = e.target.closest('#__vkifyDocumentAttachment, .attach_document');
-        if (!docBtn || e.__vkifyHandled) return;
-        e.__vkifyHandled = true;
-        const club = Number(docBtn.dataset.club ?? 0);
-        const form = resolveForm(docBtn);
-        openPicker('document', form, club);
-    });
-
-    document.addEventListener('click', (e) => {
-        const noteBtn = e.target.closest('#__vkifyNotesAttachment, .attach_note');
-        if (!noteBtn || e.__vkifyHandled) return;
-        e.__vkifyHandled = true;
-        const form = resolveForm(noteBtn);
-        openPicker('note', form);
     });
 });
 

@@ -45,13 +45,13 @@ function renderEditMenuLayout(apiPost, type, postId) {
 
     const inlineAttachButtons = type === 'post'
         ? `
-            <a class="attach_photo" id="__vkifyPhotoAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('photo')}">
+            <a class="attach_photo" id="__photoAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('photo')}">
                 <div class="post-attach-menu__icon"></div>
             </a>
-            <a class="attach_video" id="__vkifyVideoAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('video')}">
+            <a class="attach_video" id="__videoAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('video')}">
                 <div class="post-attach-menu__icon"></div>
             </a>
-            <a class="attach_audio" id="__vkifyAudioAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('audio')}">
+            <a class="attach_audio" id="__audioAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('audio')}">
                 <div class="post-attach-menu__icon"></div>
             </a>
         `
@@ -65,11 +65,11 @@ function renderEditMenuLayout(apiPost, type, postId) {
 
     const dropdownItems = type === 'post'
         ? `
-            <a class="attach_document" id="__vkifyDocumentAttachment" data-club="${clubId}">
+            <a class="attach_document" id="__documentAttachment" data-club="${clubId}">
                 <div class="post-attach-menu__icon"></div>
                 ${tr('document')}
             </a>
-            <a class="attach_note" id="__vkifyNotesAttachment">
+            <a class="attach_note" id="__notesAttachment">
                 <div class="post-attach-menu__icon"></div>
                 ${tr('note')}
             </a>
@@ -79,19 +79,19 @@ function renderEditMenuLayout(apiPost, type, postId) {
             </a>
         `
         : `
-            <a class="attach_photo" id="__vkifyPhotoAttachment" data-club="${clubId}">
+            <a class="attach_photo" id="__photoAttachment" data-club="${clubId}">
                 <div class="post-attach-menu__icon"></div>
                 ${tr('photo')}
             </a>
-            <a class="attach_video" id="__vkifyVideoAttachment" data-club="${clubId}">
+            <a class="attach_video" id="__videoAttachment" data-club="${clubId}">
                 <div class="post-attach-menu__icon"></div>
                 ${tr('video')}
             </a>
-            <a class="attach_audio" id="__vkifyAudioAttachment" data-club="${clubId}">
+            <a class="attach_audio" id="__audioAttachment" data-club="${clubId}">
                 <div class="post-attach-menu__icon"></div>
                 ${tr('audio')}
             </a>
-            <a class="attach_document" id="__vkifyDocumentAttachment" data-club="${clubId}">
+            <a class="attach_document" id="__documentAttachment" data-club="${clubId}">
                 <div class="post-attach-menu__icon"></div>
                 ${tr('document')}
             </a>
@@ -137,16 +137,16 @@ function renderRepostBottomLayout() {
             <div class="post-bottom-acts">
                 <div class="post-attach-menu">
                     <div id="wallAttachmentMenu">
-                        <a id="__vkifyPhotoAttachment" class="attach_photo" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('photo')}" data-club="0">
+                        <a id="__photoAttachment" class="attach_photo" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('photo')}" data-club="0">
                             <div class="post-attach-menu__icon"></div>
                         </a>
-                        <a id="__vkifyVideoAttachment" class="attach_video" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('video')}" data-club="0">
+                        <a id="__videoAttachment" class="attach_video" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('video')}" data-club="0">
                             <div class="post-attach-menu__icon"></div>
                         </a>
-                        <a id="__vkifyAudioAttachment" class="attach_audio" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('audio')}" data-club="0">
+                        <a id="__audioAttachment" class="attach_audio" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('audio')}" data-club="0">
                             <div class="post-attach-menu__icon"></div>
                         </a>
-                        <a id="__vkifyDocumentAttachment" class="attach_document" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('document')}" data-club="0">
+                        <a id="__documentAttachment" class="attach_document" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('document')}" data-club="0">
                             <div class="post-attach-menu__icon"></div>
                         </a>
                     </div>
