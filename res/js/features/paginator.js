@@ -121,11 +121,11 @@ const getScrollContainer = (paginatorEl) => {
     if (paginatorEl) {
         const host = paginatorEl.closest('.scroll_container');
         if (host) return host;
-        const scope = paginatorEl.closest('.page_padding, .page_block, #content, main');
+        const scope = paginatorEl.closest('.page_padding, .page_block, .wide_column, #content, main');
         const scoped = scope?.querySelector('.scroll_container');
         if (scoped) return scoped;
     }
-    return document.querySelector('.scroll_container');
+    return document.querySelector('.page_body .scroll_container');
 };
 
 const getPaginatorInsertAnchor = (containerEl, paginatorEl) => {

@@ -8,12 +8,6 @@
     {/if}
 {/block}
 
-{block bodyScripts}
-    {if !$create}
-        <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/features/autosave.js"></script>
-    {/if}
-{/block}
-
 {block content}
     {var $tabs = [
         [
@@ -38,7 +32,7 @@
     {include "../components/page_tabs_header.latte", tabs => $tabs, id => 'apps_top_tabs', extra => '<a class="side_link" href="/app' . $id  . '">' . $name . '</a>'}
     <div class="page_block page_padding">
         <div class="form_group label_end game_edit">
-            <form method="POST" enctype="multipart/form-data"{if !$create} data-autosave="true"{/if}>
+            <form method="POST" enctype="multipart/form-data">
                 <div class="form_field">
                     <div class="form_label">{_name}</div>
                     <div class="form_data">
@@ -81,7 +75,10 @@
                         <input type="submit" value="{_create}" class="button" />
                     </div>
                 {else}
-                    <input type="hidden" name="hash" value="{$csrfToken}" />
+                    <div class="settings_save_footer">
+                        <input type="hidden" name="hash" value="{$csrfToken}" />
+                        <input type="submit" value="{_save}" class="button" />
+                    </div>
                 {/if}
             </form>
             {if !$create}

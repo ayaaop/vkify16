@@ -117,7 +117,7 @@
 						</h3>
 					</a>
 					<div class="module_body">
-						<a href="{if $firstVideo}/video{$firstVideo->getPrettyId()}{else}/videos{$user->getId()}{/if}" id="videoOpen" data-id="{$firstVideo->getPrettyId()}" class="video">
+						<a href="{if $firstVideo}/video{$firstVideo->getPrettyId()}{else}/videos{$user->getId()}{/if}" id="videoOpen" data-id="{if $firstVideo}{$firstVideo->getPrettyId()}{/if}" class="video">
 							{if $firstVideo}
 								<div class="page_video_thumb" style="background-image: url('{$firstVideo->getThumbnailURL()}');"></div>
 								<div class="page_video_play_icon"></div>
@@ -455,7 +455,7 @@
 							{var $avatarPhoto = $user->getAvatarPhoto()}
 							{var $avatarSizes = $avatarPhoto ? $avatarPhoto->getSizes() : null}
 							{var $avatarNormal = $avatarSizes['normal'] ?? null}
-							<a href="{$user->getAvatarLink()|nocheck}" style="display: block; line-height: 0;">
+														<a href="{$user->getAvatarLink()|nocheck}" style="display: block; line-height: 0;">
 								{include '../components/avatar.latte', author => $user, size => 'normal', id => 'bigAvatar', width => ($avatarNormal ? $avatarNormal->width : 200), height => ($avatarNormal ? $avatarNormal->height : 200), alt => $user->getCanonicalName(), style => 'width: 100%; image-rendering: -webkit-optimize-contrast;', onclick => ($avatarPhoto ? "event.preventDefault(); OpenMiniature(event, '{$user->getAvatarUrl('normal')}', null, '{$avatarPhoto->getPrettyId()}', null);" : null), class => ''}
 							</a>
 						</div>

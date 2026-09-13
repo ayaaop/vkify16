@@ -199,12 +199,14 @@ body {
 
 .layout {
     width: var(--layout-width);
+    transition: .2s width;
 }
 
 .page_body,
 .messenger-app,
 .crp-list {
     width: var(--page-width);
+    transition: .2s width;
 }
 .page_content {
     width: 100%;
@@ -467,6 +469,9 @@ textarea:focus {
     visibility: hidden;
     opacity: 0;
 }
+.toTop.inactive {
+    display: none!important;
+}
 .toTop {
     background-color: var(--transparent);
     color: var(--elevator-text-color);
@@ -534,6 +539,7 @@ body.scrolled .toTop:hover #wrap {
 .page_header_inner {
     width: var(--layout-width, 960px);
     height: 100%;
+    transition: .2s width;
 }
 
 .home_button {
@@ -1257,6 +1263,9 @@ body.scrolled .toTop:hover #wrap {
 }
 .audioEntry.nowPlaying .playIcon {
     background-position-y: -15px !important;
+}
+.audioEntry .playerButton .playIcon.paused {
+    background-position-y: -15px;
 }
 
 .audiosDiv {
@@ -2537,6 +2546,7 @@ table,
         -1px 0 0 0 var(--shadow-outline-color),
         1px 0 0 0 var(--shadow-outline-color),
         0 1px 0 0 var(--border-color);
+    margin-bottom: 0;
 }
 
 /* posts */
@@ -2730,6 +2740,7 @@ table,
 .post_full_like {
     display: flex;
     align-items: center;
+    width: 100%;    
 }
 
 .action_button {
@@ -2779,7 +2790,7 @@ table,
     font-size: 13px;
     display: inline-block;
     float: none;
-    margin-left: 3px;
+    margin-left: 6px;
     vertical-align: top;
 }
 .action_count:empty {
@@ -3203,7 +3214,7 @@ h4.gifts_section_header {
 }
 .reply_actions_wrap {
     position: relative;
-    z-index: 10;
+    z-index: 4;
 }
 .reply_actions {
     height: 11px;
@@ -3915,6 +3926,7 @@ h4.gifts_section_header {
 .bt_header {
     border-bottom: 1px solid var(--border-color);
 }
+
 #standaloneCommentBox {
     background: var(--module-background-color);
     border-bottom: 0;
@@ -4681,7 +4693,6 @@ ul.im-page--dcontent {
 .messenger-app--input---messagebox button:hover {
     opacity: 1;
 }
-
 #test-label {
     z-index: 1999;
     color: #000;
@@ -5118,7 +5129,8 @@ hr {
     color: var(--heading-color);
 }
 
-#small_remove_button {
+#small_remove_button,
+.post-source #remove_source_button.post-replyto #remove_reply_button, #small_remove_button, .cross {
     width: 16px;
     height: 16px;
     cursor: pointer;
@@ -5167,4 +5179,8 @@ body.banned {
     -moz-osx-font-smoothing: grayscale;
     overflow: hidden;
     margin: 0 0 9px;
+}
+
+.stickers_form_btn_save {
+    float: none;
 }

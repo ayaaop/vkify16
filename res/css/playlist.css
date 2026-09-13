@@ -262,38 +262,12 @@
 	margin: 0;
 	margin-right: 2px;
 }
-.AudioPlaylistSnippet .ActionButton--all {
-	display: none;
-}
 .AudioPlaylistSnippet__audioPartRow {
 	height: 36px;
 	padding: 0 17px;
 	font-size: 13px;
 	line-height: 36px;
 	color: var(--muted-text-color-3);
-}
-.AudioPlaylistSnippet__audioPartRow:nth-child(1n + 11),
-.AudioPlaylistSnippet__audioRow:nth-child(1n + 11) {
-	display: none;
-}
-.AudioPlaylistSnippet__audioPartRow:nth-child(1n + 11) + .ActionButton--all,
-.AudioPlaylistSnippet__audioRow:nth-child(1n + 11) + .ActionButton--all,
-.AudioPlaylistSnippet__list--all
-	.AudioPlaylistSnippet__audioPartRow:nth-child(1n + 11),
-.AudioPlaylistSnippet__list--all
-	.AudioPlaylistSnippet__audioRow:nth-child(1n + 11) {
-	display: block;
-}
-.AudioPlaylistSnippet__list--all
-	.AudioPlaylistSnippet__audioPartRow:nth-child(1n + 11)
-	+ .ActionButton--all,
-.AudioPlaylistSnippet__list--all
-	.AudioPlaylistSnippet__audioRow:nth-child(1n + 11)
-	+ .ActionButton--all {
-	display: none;
-}
-.AudioPlaylistSnippet .ActionButton--all:before {
-	margin: 0 8px;
 }
 .AudioPlaylistSnippet .ActionButton--shuffle {
 	width: 100%;

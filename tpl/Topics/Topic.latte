@@ -14,5 +14,5 @@
         {$topic->getTitle()}
     </div>
 </div>
-    {include "../components/comments.latte", comments => $comments, count => $count, page => $page, model => "topics", club => $club, readOnly => $topic->isClosed(), showTitle => false, parent => $topic}
+    {include "../components/comments.latte", comments => $comments, count => $count, page => $page, model => "topics", club => $club, readOnly => $topic->isClosed() || ($topic->isRestricted() && !$club->canBeModifiedBy($thisUser)), showTitle => false, parent => $topic}
 {/block}

@@ -2,10 +2,6 @@
 
 {block title}{_edit_topic} "{$topic->getTitle()}"{/block}
 
-{block bodyScripts}
-    <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/features/autosave.js"></script>
-{/block}
-
 {block content} 
     <div class="page_block">
         {include "../components/page_crumb_header.latte", crumbs: [
@@ -14,7 +10,7 @@
             ['title' => $topic->getTitle()]
         ]}
         <div class="form_group label_end settings_padding" style="width: 455px;margin-inline: auto;">
-            <form method="POST" enctype="multipart/form-data" data-autosave="true">
+            <form method="POST" enctype="multipart/form-data">
                 <div class="form_field">
                     <div class="form_label">{_title}</div>
                     <div class="form_data">
@@ -26,11 +22,20 @@
                     <div class="form_data">
                         {if $topic->getClub()->canBeModifiedBy($thisUser)}
                             <label class="checkbox"><input type="checkbox" name="pin" n:attr="checked => $topic->isPinned()" /><span>{_pin_topic}</span></label><br />
+                            {if $topic->isPostedOnBehalfOfGroup()}
+                                <label class="checkbox"><input type="checkbox" name="restrict" n:attr="checked => $topic->isRestricted()" /><span>{_restrict_topic}</span></label><br />
+                            {/if}
                         {/if}
                         <label class="checkbox"><input type="checkbox" name="close" n:attr="checked => $topic->isClosed()" /><span>{_close_topic}</span></label>
                     </div>
                 </div>
-                <input type="hidden" name="hash" value="{$csrfToken}" />
+                <div class="form_field">
+                    <div class="form_label"></div>
+                    <div class="form_data">
+                        <input type="submit" value="{_save}" class="button" />
+                        <input type="hidden" name="hash" value="{$csrfToken}" />
+                    </div>
+                </div>
             </form>
         </div>
     </div>

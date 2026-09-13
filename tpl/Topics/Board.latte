@@ -1,6 +1,7 @@
 {extends "../@layout.latte"}
 {var $topics = iterator_to_array($topics)}
 {var $page     = $paginatorConf->page}
+{var $canModify = $club->canBeModifiedBy($thisUser)}
 
 {block title}{_discussions} {$club->getCanonicalName()}{/block}
 

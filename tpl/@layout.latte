@@ -25,7 +25,6 @@
         {script "js/l10n.js"}
         {script "js/utils.js"}
         {script "js/node_modules/dashjs/dist/dash.all.min.js"}
-
         <script src="/assets/packages/static/openvk/js/node_modules/cropperjs/dist/cropper.js" type="module"></script>
 
         {css "js/node_modules/tippy.js/dist/backdrop.css"}
@@ -123,7 +122,7 @@
                             <div id="search_box_fr">
                                 <form id="search_form" action="/search" method="get">
                                     <div id="search_and_one_more_wrapper">
-                                        <input autocomplete="off" type="search" maxlength="79" name="q" placeholder="{tr("header_search")}" title="{tr("header_search")} [Alt+Shift+F]" accesskey="f">
+                                        <input n:attr="value => $_REQUEST['q'] ?? NULL" autocomplete="off" type="search" maxlength="79" name="q" placeholder="{tr("header_search")}" title="{tr("header_search")} [Alt+Shift+F]" accesskey="f">
                                     </div>
                                     <button class="search_box_button">
                                         <span>{tr("header_search")}</span>

@@ -2,10 +2,6 @@
 
 {block title}{_edit_photo}{/block}
 
-{block bodyScripts}
-    <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/features/autosave.js"></script>
-{/block}
-
 {block content}
     {do $crumbs = [
         ['href' => $photo->getOwner()->getURL(), 'title' => $photo->getOwner()->getCanonicalName()],
@@ -24,14 +20,20 @@
     <div class="page_block">
         {include "../components/page_crumb_header.latte", crumbs => $crumbs}
         <div class="form_group label_end settings_padding">
-            <form method="post" enctype="multipart/form-data" data-autosave="true">
+            <form method="post" enctype="multipart/form-data">
                 <div class="form_field">
                     <div class="form_label">{_description}</div>
                     <div class="form_data">
                         <textarea name="desc">{$photo->getDescription()}</textarea>
                     </div>
                 </div>
-                <input type="hidden" name="hash" value="{$csrfToken}" />
+                <div class="form_field">
+                    <div class="form_label"></div>
+                    <div class="form_data">
+                        <input type="submit" value="{_save}" class="button" />
+                        <input type="hidden" name="hash" value="{$csrfToken}" />
+                    </div>
+                </div>
             </form>
         </div>
     </div>

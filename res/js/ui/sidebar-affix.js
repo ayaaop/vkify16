@@ -5,14 +5,13 @@ vkify.once("updateNarrow", () => {
     let __narrowBar = { bar: null, barBlock: null, wideCol: null, pl: null };
 
     function getNarrowRefs() {
-        if (!__narrowBar.bar || !__narrowBar.bar.isConnected) {
-            const bar = document.querySelector('.narrow_column');
-            __narrowBar = {
-                bar: bar,
-                barBlock: bar ? bar.querySelector('.page_block') : null,
-                wideCol: document.querySelector('.wide_column'),
-                pl: document.querySelector('.layout')
-            };
+        if (!__narrowBar.bar || !__narrowBar.bar.isConnected || !__narrowBar.barBlock || !__narrowBar.barBlock.isConnected) {
+            let bar, barBlock, wideCol, pl;
+            bar = document.querySelector('.narrow_column');
+            barBlock = bar ? bar.querySelector('.page_block') : null;
+            wideCol = document.querySelector('.wide_column');
+            pl = document.querySelector('.layout');
+            __narrowBar = { bar, barBlock, wideCol, pl };
         }
         return __narrowBar;
     }
@@ -24,8 +23,6 @@ vkify.once("updateNarrow", () => {
         if (!bar || !barBlock || !wideCol || !pl) return;
         if (document.querySelector('#ajloader.shown')) return;
         if (document.body.classList.contains('dimmed')) return;
-
-        const doc = document.documentElement;
         const wh = Math.round(window.lastWindowHeight || window.innerHeight || 0);
         const st = Math.round(window.scrollY || 0);
         const headH = 57;
@@ -51,7 +48,7 @@ vkify.once("updateNarrow", () => {
 
         const smallEnough = headH + barMB + barH + barMT + barPB <= wh;
 
-        const scrollLeft = (document.body.scrollLeft || doc.scrollLeft || window.scrollX || 0);
+        const scrollLeft = (document.body.scrollLeft || document.documentElement.scrollLeft || window.scrollX || 0);
         const layoutW = Math.round(pl.offsetWidth);
         const bodyW = Math.round(document.body.clientWidth);
         const marginLeft = Math.round(Math.min(-scrollLeft, Math.max(-scrollLeft, bodyW - layoutW)));
@@ -59,22 +56,40 @@ vkify.once("updateNarrow", () => {
         const toPx = (value) => Math.round(value) + 'px';
 
         if (st - delta < barPT && !(smallEnough && barPos < headH + barMT) || tooBig) {
-            styles = { marginTop: '0px' };
+            styles = {
+                marginTop: '0px',
+                marginLeft: toPx(marginLeft),
+                right: ''
+            };
             needFix = false;
         } else if (st - delta < Math.min(lastSt, barPos - headH - barMT) || smallEnough) {
-            styles = { top: toPx(headH), marginLeft: toPx(marginLeft) };
+            styles = {
+                top: toPx(headH),
+                marginTop: '',
+                marginLeft: toPx(marginLeft),
+                right: ''
+            };
             needFix = true;
         } else if (st + delta > Math.max(lastSt, barPos + barH + barMB - wh) && barBottom < 0) {
-            styles = { bottom: toPx(barMB), marginLeft: toPx(marginLeft) };
+            styles = {
+                bottom: toPx(barMB),
+                marginTop: '',
+                marginLeft: toPx(marginLeft),
+                right: ''
+            };
             needFix = true;
         } else {
             const marginTopValue = (barBottom >= 0)
                 ? (pageH - barH)
                 : Math.min(barPos - pagePos, pageH - barH + (pagePos - headH));
-            styles = { marginTop: toPx(marginTopValue) };
+            styles = {
+                marginTop: toPx(marginTopValue),
+                marginLeft: toPx(marginLeft),
+                right: ''
+            };
         }
 
-        const allKeys = ['top', 'bottom', 'marginTop', 'marginLeft'];
+        const allKeys = ['top', 'bottom', 'marginTop', 'marginLeft', 'right'];
         const same = allKeys.every((key) => (styles[key] || '') === (lastStyles[key] || ''));
         if (!same) {
             for (let i = 0; i < allKeys.length; i++) {
@@ -86,6 +101,7 @@ vkify.once("updateNarrow", () => {
         if (needFix !== isFixed) {
             bar.classList.toggle('fixed', needFix);
         }
+        bar.style.position = needFix ? 'fixed' : '';
 
         window._lastSt = st;
     };
