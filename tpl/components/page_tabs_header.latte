@@ -14,8 +14,9 @@
   @param id           (optional) ID for the <ul> element
   @param extra        (optional) HTML content or button after the tabs
   @param white        (optional) Boolean, if true use white background
+  @param additionalCssClass (optional) Additional CSS classes
 *}
-<h2 class="page_block_h2 tabs_header">
+<h2 class="page_block_h2 tabs_header {$additionalCssClass ?? ''}">
   <ul class="ui_tabs clear_fix {if !isset($white)} ui_tabs_header{/if}" id="{=$id ?? 'apps_top_tabs'}">
     {foreach $tabs as $tab}
       <li{if isset($tab['id'])} id="{$tab['id']}"{/if}>

@@ -98,7 +98,7 @@
 
 {include "../components/ui_rmenu.latte",
     items => $tabMenuItems,
-    additionalCssClass => 'audio_tabs',
+    additionalCssClass => 'show_as_menu_on_mobile audio_tabs',
     id => 'audio_tabs'
 }
 
@@ -121,7 +121,7 @@
 
     {include "../components/ui_rmenu.latte",
         items => $friendsMenuItems,
-        additionalCssClass => 'friends_audio_list',
+        additionalCssClass => 'show_as_menu_on_mobile friends_audio_list',
         id => 'friends_audio_list'
     }
 {/if}

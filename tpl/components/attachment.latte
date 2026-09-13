@@ -2,7 +2,15 @@
     {if !$attachment->isDeleted()}
         {var $link = "/photo" . ($attachment->isAnonymous() ? ("s/" . base_convert((string) $attachment->getId(), 10, 32)) : $attachment->getPrettyId())}
         {var $photoDims = $attachment->getDimensions()}
-        <a class="media-href" style="line-height: 0; --post-image: url({$attachment->getURLBySizeId('normal')|noescape})" href="{$link}" onclick="OpenMiniature(event, {$attachment->getURLBySizeId('large')}, {$parent->getPrettyId()}, {$attachment->getPrettyId()}, {$parentType})">
+        {var $photoContext = $parent ?? $post ?? null}
+        {var $photoContextType = $parentType ?? 'post'}
+        {var $photoContextId = null}
+        {if $photoContextType === 'comment'}
+            {var $photoContextId = $photoContext->getId()}
+        {elseif $photoContext instanceof \openvk\Web\Models\Entities\Post}
+            {var $photoContextId = $photoContext->getPrettyId()}
+        {/if}
+        <a class="media-href" style="line-height: 0; --post-image: url({$attachment->getURLBySizeId('normal')|noescape})" href="{$link}" data-makima-w="{$photoDims[0]}" data-makima-h="{$photoDims[1]}" onclick="OpenMiniature(event, '{$attachment->getURLBySizeId('larger')|noescape}', '{$photoContextId|noescape}', '{$attachment->getPrettyId()|noescape}', '{$photoContextType|noescape}')">
             <img n:class="media, $tilesCount > 1 ? media_makima" src="{$attachment->getURLBySizeId('normal')}" alt="{$attachment->getDescription()}" width="{$photoDims[0]}" height="{$photoDims[1]}" loading=lazy />
         </a>
     {else}
@@ -32,7 +40,8 @@
             </a>
         </div>
     {else}
-        <a class="video_item media-href compact_video" style="--post-image: url({$attachment->getThumbnailURL()|noescape})" id='videoOpen' data-id='{$attachment->getPrettyId()}' href="/video{$attachment->getPrettyId()}">
+        {var $videoDims = $attachment->getDimensions()}
+        <a class="video_item media-href compact_video" n:attr="data-makima-w => $videoDims[0] ?? null, data-makima-h => $videoDims[1] ?? null" style="--post-image: url({$attachment->getThumbnailURL()|noescape})" id='videoOpen' data-id='{$attachment->getPrettyId()}' href="/video{$attachment->getPrettyId()}">
             <div class='video_thumb_play'>
             </div>
             <div class='video_thumb_label' n:if="$attachment->getLength() != NULL">

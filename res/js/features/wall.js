@@ -1250,6 +1250,7 @@ function bindWallSearchOnce() {
         e.stopPropagation();
         e.stopImmediatePropagation();
         header.classList.add('ui_tabs_search_opened');
+        resetTabsScrollPosition(header.querySelector('.ui_tabs'));
         const input = header.querySelector('.ui_search_field');
         if (input) input.focus();
     }, true);

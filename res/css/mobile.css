@@ -4,6 +4,7 @@
         --layout-width: 100%;
         --page-width: 100%;
         --body-background-color: #ebedf0;
+        font-size: 14px;
     }
     body.mode-2018 {
         --module-border-radius: 6px!important;
@@ -50,11 +51,15 @@
     .narrow_column_wrap,.narrow_column {
         width: 100% !important;
     }
-    .toTop {
+    .toTop,
+    .show_as_menu_on_mobile {
         display: none !important;
     }
     .page_body {
-        margin-top: var(--header-height)
+        margin-top: var(--header-height);
+    }
+    .page_body, center span:only-child, .post-content .text, .post-content, .edit_link, table, .video-wowzer {
+        font-size: 14px;
     }
     svg {
         text-align: center;
@@ -72,8 +77,9 @@
         left: 0;
         width: 100%;
         z-index: 198;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        padding: 0 16px;
+        box-shadow: none;
+        transition: box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0 4px;
         box-sizing: border-box;
         --appbar-bg-alpha: 1;
     }
@@ -85,9 +91,10 @@
         --accent-text-color: var(--text-color);
     }
     .appbar .hamburger {
-        width: 24px;
-        height: 24px;
-        margin-right: 20px;
+        width: 48px;
+        height: 48px;
+        margin: 0;
+        flex-shrink: 0;
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -99,8 +106,8 @@
     }
     .appbar .hamburger-badge {
         position: absolute;
-        top: -4px;
-        right: -4px;
+        top: 4px;
+        right: 4px;
         min-width: 18px;
         height: 18px;
         padding: 0 5px;
@@ -123,8 +130,11 @@
     }
     .appbar .appbar-title {
         font-size: 20px;
+        line-height: 32px;
         font-weight: 500;
+        letter-spacing: 0.0125em;
         flex: 1;
+        min-width: 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -137,7 +147,7 @@
         background: none;
         border: none;
         cursor: pointer;
-        padding: 6px;
+        padding: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -150,7 +160,7 @@
         background-color: transparent !important;
         box-shadow: none !important;
     }
-    .appbar:not(.appbar--transparent):not(.appbar--scrolled) {
+    .appbar:not(.appbar--transparent):not(.appbar--scrolled):not(.appbar--elevated) {
         background-color: color-mix(in srgb, var(--accent-color) calc(var(--appbar-bg-alpha) * 100%), transparent) !important;
         box-shadow: none !important;
     }
@@ -169,9 +179,74 @@
     .appbar--transparent .appbar-extra-btn svg {
         filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
     }
-    .appbar--scrolled {
+    .appbar--scrolled,
+    .appbar--elevated {
         background-color: var(--accent-color) !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.15) !important;
+        box-shadow: 0 2px 4px -1px rgba(0,0,0,.2), 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12) !important;
+    }
+
+    /* appbar tabs dropdown (from .tabs_header.show_as_menu_on_mobile) */
+    .appbar-tabs-menu-wrap {
+        flex: 1;
+        min-width: 0;
+    }
+    .appbar .appbar-title.appbar-title--tabs-menu {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        user-select: none;
+    }
+    .appbar-title--tabs-menu:focus-visible {
+        outline: 2px solid var(--accent-text-color);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+    .appbar-title-label {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 500;
+        min-width: 0;
+    }
+    .appbar-title-chevron {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+    }
+    .appbar-title-chevron svg {
+        display: block;
+        fill: currentColor;
+        transition: transform 150ms ease;
+    }
+    .appbar-tabs-menu-wrap.shown .appbar-title-chevron svg {
+        transform: rotate(180deg);
+    }
+    .appbar-tabs-menu-wrap .appbar-tabs-menu {
+        min-width: 200px;
+    }
+    .appbar-tabs-menu-item {
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+    }
+    .appbar-tabs-menu-label {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+    }
+    .appbar-tabs-menu-count {
+        margin-left: auto;
+        padding-left: 24px;
+        flex-shrink: 0;
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--muted-text-color);
+    }
+    .appbar-tabs-menu-item--active .appbar-tabs-menu-count {
+        color: inherit;
+        opacity: 0.75;
     }
 
     /* sidebar drawer */
@@ -202,7 +277,8 @@
         font-size: .875rem;
     }
     .sidebar_inner .link .link_icon {
-	    transform: scale(1.2) translateX(4px);
+        height: 30px;
+        margin-left: -7px;
         filter: grayscale(1) brightness(0.7);
         width: 50px;
     }
@@ -450,18 +526,20 @@
     h2.page_block_h2,.page_block_header {
         min-height: unset;
     }
+    /* VKUI Group header (size M): 16sp/500 primary title, 16dp sides */
     .page_block_header {
         background-color: var(--module-background-color);
-        color: var(--muted-text-color-2);
+        color: var(--text-color);
         border: 0;
-        font-size: 13px;
-        text-transform: uppercase;
+        font-size: 16px;
+        line-height: 20px;
         font-weight: 500;
-        padding: 16px 16px 0;
+        padding: 12px 16px 8px;
     }
     .page_block_header_count {
         font-size: 13px;
         margin-top: 0;
+        color: var(--muted-text-color-2);
     }
     .page_block_header .button {
         text-transform: none;
@@ -569,7 +647,8 @@
     .form_group .form_label {
         width: 100%;
         padding: 2px 0 8px;
-        font-size: 13px;
+        font-size: 14px;
+        line-height: 18px;
         color: var(--muted-text-color);
         font-weight: 500;
     }
@@ -1034,27 +1113,69 @@
     }
 
     /* attachments */
-    .attachments_b {
+    /* Flat-stack fallback for media tiles. Once JS applies the Makima mosaic
+       (.attachments_b.makima, see res/js/features/makima-attachments.js) these
+       rules stop matching; single attachments never get .makima and keep
+       stacking full-width. */
+    .attachments_b:not(.makima) {
         width: 100% !important;
         height: auto !important;
         display: flex !important;
         flex-direction: column !important;
         gap: 8px !important;
     }
-    .attachments_b .attachment {
+    .attachments_b:not(.makima) .attachment {
         width: 100% !important;
         height: auto !important;
         float: none !important;
     }
-    .attachments_b .attachment img.media_makima {
+    .attachments_b:not(.makima) .attachment img.media_makima {
         width: 100% !important;
         height: auto !important;
         max-height: 70vh !important;
         object-fit: contain !important;
     }
-    .attachments_b .attachment .compact_video {
+    .attachments_b:not(.makima) .attachment .compact_video {
         width: 100% !important;
         height: auto !important;
+    }
+
+    .attachments_b.makima {
+        width: 100% !important;
+        height: auto !important;
+        display: flex !important;
+        flex-direction: column;
+        gap: 2px;
+        overflow: hidden;
+    }
+    .attachments_b.makima .makima_row {
+        display: flex;
+        gap: 2px;
+        width: 100%;
+    }
+    .attachments_b.makima .makima_col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+    .attachments_b.makima .attachment {
+        float: none !important;
+        width: auto !important;
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+        background: var(--placeholder, #e9ebed);
+    }
+    .attachments_b.makima .attachment .media {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: none !important;
+        object-fit: cover !important;
+    }
+    .attachments_b.makima .attachment .compact_video {
+        margin: 0;
     }
 
     /* upload / picker / photos */
@@ -1066,7 +1187,7 @@
         margin: 0 -8px;
     }
     .attachment_selector .choose_upload_area {
-        margin: -16px -8px 8px;
+        margin: -8px -8px 8px;
     }
     #albums_content {
         margin-bottom: 16px;
@@ -1191,7 +1312,7 @@
         scrollbar-width: none;
         width: 100%;
         max-width: 100%;
-        padding: 0 10px 0 6px;
+        padding: 0 4px;
         box-sizing: border-box;
     }
     .tabs_header:not(.mobile-rmenu-tabs) .ui_tabs::-webkit-scrollbar {
@@ -1201,16 +1322,43 @@
         display: none;
     }
     .tabs_header:not(.mobile-rmenu-tabs) .ui_tabs > li {
-        flex-shrink: 0;
+        flex: 1 1 0%;
         min-width: max-content;
+    }
+    .tabs_header:not(.mobile-rmenu-tabs) .ui_tabs > li.ui_tabs_extra,
+    .tabs_header:not(.mobile-rmenu-tabs) .ui_tabs > li.ui_tabs_sep {
+        flex: 0 0 auto;
+        min-width: 0;
     }
     .tabs_header:not(.mobile-rmenu-tabs) .ui_tabs .ui_tab,
     .tabs_header:not(.mobile-rmenu-tabs) .ui_tabs .ui_tab_plain {
         float: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-sizing: border-box;
+        height: 48px;
+        min-width: 72px;
+        max-width: 264px;
+        margin: 0 auto;
+        padding: 0 12px;
+        border-bottom: 2px solid transparent;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 16px;
+        overflow: hidden;
+    }
+    .tabs_header:not(.mobile-rmenu-tabs) .ui_tabs .ui_tab_sel,
+    .tabs_header:not(.mobile-rmenu-tabs) .ui_tabs .ui_tab_sel:hover {
+        color: var(--accent-color-3);
+        border-bottom-color: var(--accent-color-3);
+    }
+    .tabs_header:not(.mobile-rmenu-tabs) .ui_tabs.ui_tabs_sliding .ui_tab_sel {
+        border-bottom-color: transparent;
     }
     .tabs_header:not(.mobile-rmenu-tabs) .ui_tabs_extra {
         margin-left: auto;
-        flex-shrink: 0;
     }
 
     /* make all tabs plain and remove the tab slider offset */
@@ -1587,7 +1735,7 @@
         width: 100%;
         box-sizing: border-box;
         position: relative;
-        min-height: 32px;
+        min-height: 36px;
     }
     .mobile_profile_action_primary {
         flex: 1 1 50%;
@@ -1650,7 +1798,7 @@
         margin-left: 4px;
     }
     .mir-icon {
-        width: 20px;
+        width: 24px;
         height: 20px;
         flex-shrink: 0;
         margin-top: 1px;

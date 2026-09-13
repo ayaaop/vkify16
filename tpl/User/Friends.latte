@@ -72,7 +72,7 @@
             'condition' => isset($thisUser) && $thisUser->getId() == $user->getId()
         ]
     ]}
-    {include "../components/ui_rmenu.latte", items => $menuItems, ownblockData => $user}
+    {include "../components/ui_rmenu.latte", items => $menuItems, ownblockData => $user, additionalCssClass => 'show_as_menu_on_mobile' }
 {/block}
 
 {* BEGIN ELEMENTS DESCRIPTION *}
