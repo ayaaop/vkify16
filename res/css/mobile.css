@@ -653,9 +653,12 @@
         margin-left: 8px;
     }
     body.mode-2018 .post .action_button {
-        padding: 12px 16px;
+        padding: 12px 0 12px 16px;
         height: unset;
         margin: 0;
+    }
+    body.mode-2018 .post .action_count:empty {
+        display: block;
     }
 
     body:not(.mode-2018) .post .post_reply {
@@ -1067,10 +1070,6 @@
         gap: 8px;
         padding: 8px 16px;
         white-space: nowrap;
-    }
-    /* a lone action is always the dismissive one — the X/scrim cover it */
-    .ovk-msg-sheet .ovk-diag-action:has(> :only-child) {
-        display: none;
     }
 
     /* audio/notes attachment sheets: tap row to attach, check circle up front */
@@ -1902,7 +1901,6 @@
         width: 100%;
         box-sizing: border-box;
         text-align: center;
-        display: block;
     }
     .mobile_profile_actions .button_wide {
         width: 100%;

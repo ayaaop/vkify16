@@ -1852,7 +1852,7 @@ table,
     position: relative;
     z-index: 1;
 }
-.composer.model_content_textarea.expanded-textarea:has(.ui_actions_menu_wrap),
+.composer.model_content_textarea.shown:has(.ui_actions_menu_wrap),
 .post.editing {
     z-index: calc(var(--action-menu-z-index, 5) + 1);
 }
