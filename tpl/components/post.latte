@@ -81,7 +81,7 @@
                     {_post_is_ad}
                 </div>
             </div>
-            <div class="post_actions ui_actions_menu_wrap" n:if="$compact == false && $thisUser" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+            <div class="post_actions ui_actions_menu_wrap" n:if="$compact == false && $thisUser" onmouseover="{='uiActionsMenu.show(this, null, {align: "right"});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
                 <div class="post_actions_icon"></div>
                 <div n:ifcontent id="post_actions_menu_{$post->getId()}" class="ui_actions_menu">
                     {if $post->canBeEditedBy($thisUser) && !($forceNoEditLink ?? false)}

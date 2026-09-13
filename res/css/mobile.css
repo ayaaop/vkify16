@@ -2165,26 +2165,31 @@
 
     /* mobile hover effects */
     .mobile-info-row, .mobile-scroll-card,.ui_tabs .ui_tab,.sidebar_inner .link,
-    .ui_actions_menu a, #ctx_menu a {
+    #ctx_menu a {
         transition: background-color 250ms;
     }
     .mobile-info-row:hover,.mobile-scroll-card:hover,.ui_tabs .ui_tab:hover,.sidebar_inner .link:hover,
-    .ui_actions_menu a:hover, #ctx_menu a:hover {
+    #ctx_menu a:hover,
+    .ui_actions_menu a.appbar-tabs-menu-item--active {
         background-color: rgba(122,122,122,.1);
     }
     .mobile-info-row:active,.mobile-scroll-card:active,.ui_tabs .ui_tab:active,.sidebar_inner .link:active,
-    .ui_actions_menu a:active, #ctx_menu a:active {
+    #ctx_menu a:active {
         background-color: rgba(122,122,122,.2);
     }
 
+    /* action menu */
     .ui_actions_menu {
+        --ui-actions-menu-distance: 12px;
         min-width: 112px;
         max-width: 280px;
-        padding: 8px 0;
-        border: 0;
-        border-radius: 4px;
+        padding: 1px 0;
+        border: 1px solid var(--border-color-2);
+        border-radius: 2px;
         z-index: 10;
-        box-shadow: 0 5px 5px -3px rgba(0,0,0,.2),0 8px 10px 1px rgba(0,0,0,.14),0 3px 14px 2px rgba(0,0,0,.12)
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.09),
+            0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12), 0 5px 5px -3px rgba(0,0,0,.2);
     }
 
     .ui_actions_menu:before,
@@ -2194,38 +2199,99 @@
 
     .ui_actions_menu a,
     .ui_actions_menu .ui_actions_menu_item,
-    .ui_actions_menu form button {
-        padding: 0 20px 0 16px;
-        font-size: 14px;
-        line-height: 48px;
-        height: 48px;
+    .ui_actions_menu form button,
+    .ui_actions_menu label {
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        font-size: 16px;
+        line-height: 44px;
+        height: 44px;
+        transition: none;
+        box-sizing: border-box;
+    }
+
+    .ui_actions_menu a:hover,
+    .ui_actions_menu .ui_actions_menu_item:hover,
+    .ui_actions_menu form button:hover,
+    .ui_actions_menu label:hover {
+        background-color: color-mix(in srgb, currentColor 4%, transparent);
+    }
+
+    .ui_actions_menu:not(.dark) a {
         color: var(--text-color);
+    }
+
+    .ui_actions_menu a.delete,
+    .ui_actions_menu button.delete,
+    .ui_actions_menu .ui_actions_menu_item.delete,
+    .ui_actions_menu form button.delete {
+        color: #ED330A;
+    }
+    body.dark-mode .ui_actions_menu a.delete,
+    body.dark-mode .ui_actions_menu button.delete,
+    body.dark-mode .ui_actions_menu .ui_actions_menu_item.delete,
+    body.dark-mode .ui_actions_menu form button.delete {
+        color: #ff5c5c;
     }
 
     .ui_actions_menu .separator,
     .ui_actions_menu .ui_actions_menu_sep {
-        margin: 8px 0;
+        border-top: 1px solid var(--border-color);
+        margin: 0;
     }
 
-    .ui_actions_menu {
-        right: 0 !important;
-        left: auto !important;
+    /* Material Design 2 touch ripples (surface set up from mobile.js) */
+    /* keep in sync with RIPPLE_*_SELECTOR in res/js/features/mobile.js */
+    .button, .button *, .profile_link, .profile_link *,
+    .ui_actions_menu a, .ui_actions_menu button, .ui_actions_menu input,
+    .ui_actions_menu label, .ui_actions_menu .ui_actions_menu_item, .ui_actions_menu *,
+    .ui_tab, .ui_tab *, .ui_tab_plain, .ui_tab_plain *,
+    .sidebar_inner .link, .sidebar_inner .link *,
+    .mobile-info-row, .mobile-info-row *, .mobile-scroll-card, .mobile-scroll-card *,
+    .appbar .hamburger, .appbar .hamburger *, .appbar-extra-btn, .appbar-extra-btn *,
+    .ovk-msg-fullscreen .ovk-diag-head-close, .ovk-msg-fullscreen .ovk-diag-head-close *,
+    .ovk-msg-fullscreen .ovk-diag-head-apply, .ovk-msg-fullscreen .ovk-diag-head-apply *,
+    .ovk-msg-sheet .ovk-diag-head-close, .ovk-msg-sheet .ovk-diag-head-close *,
+    .ovk-msg-sheet .ovk-diag-head-apply, .ovk-msg-sheet .ovk-diag-head-apply * {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
     }
-
-    .ui_actions_menu_left_align .ui_actions_menu,
-    .ui_actions_menu_left .ui_actions_menu {
-        right: auto !important;
-        left: 0 !important;
+    .md-ripple {
+        position: relative;
+        overflow: hidden;
     }
-
-    /* repost bottom sheet options menu opens upward */
-    #__vkifyRepostOptsTooltip {
-        top: auto !important;
-        bottom: calc(100% + 8px) !important;
+    .md-ripple--unbounded {
+        overflow: visible;
     }
+    .md-ripple-ink {
+        position: absolute;
+        display: block;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 225ms cubic-bezier(0, 0, 0.2, 1), opacity 75ms linear;
+    }
+    .md-ripple-ink-clip {
+        position: absolute;
+        overflow: hidden;
+        pointer-events: none;
+    }
+}
+/* shown only inside .ovk-msg-fullscreen / .ovk-msg-sheet headers on mobile */
+.ovk-diag-head-close-icon,
+.ovk-diag-head-apply {
+    display: none;
+}
 
-    #__vkifyRepostOptsTooltip.ui_actions_menu_hiding {
-        bottom: calc(100% + 16px) !important;
+@keyframes fullscreenDialogIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
     }
 }
 @keyframes slideUpBottomSheet {
