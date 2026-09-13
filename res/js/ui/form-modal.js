@@ -355,7 +355,9 @@ window.showEditTopicModal = (topicId) => window.showFormModal(`/topic${topicId}/
     requiredField: 'title',
     requiredError: tr('error_segmentation') || 'Title is required',
     fallbackUrl: `/topic${topicId}`,
-    errorMsg: 'Failed to update topic'
+    errorMsg: 'Failed to update topic',
+    skipRedirectError: true,
+    validateResponse: (res) => res.ok && /\/topic-?\d+_\d+/.test(res.url || '')
 });
 
 window.showEditAppModal = (appId) => window.showFormModal(`/editapp?app=${encodeURIComponent(appId)}`, {
@@ -423,9 +425,10 @@ window.showCreateTopicModal = (e, clubId) => {
         requiredError: tr('error_segmentation'),
         submitText: tr('create_topic'),
         errorMsg: 'Failed to create topic',
-        // On success the server redirects to /topic{clubId}_{topicId}.
-        // On failure (flashFail) it redirects to HTTP_REFERER, so res.ok is
-        // still true but we never land on a /topic page.
+        // The server redirects on both success (to /topic{clubId}_{topicId})
+        // and failure (flashFail to HTTP_REFERER), so don't treat the
+        // redirect itself as an access error.
+        skipRedirectError: true,
         validateResponse: (res) => res.ok && /\/topic-?\d+_\d+/.test(res.url || ''),
         // biome-ignore lint/correctness/noUnusedFunctionParameters: event handler
         onReady: (modal, form) => {
@@ -477,6 +480,7 @@ window.showEditPlaylistModal = async (playlistId, e) => {
             close_on_buttons: false,
             warn_on_exit: true
         });
+        modal.getNode().addClass('ovk-msg-sheet');
 
         setTimeout(() => {
             const node = modal.getNode().nodes[0];
@@ -610,6 +614,7 @@ window.showNewPlaylistModal = async (e, gid = null) => {
             close_on_buttons: false,
             warn_on_exit: true
         });
+        modal.getNode().addClass('ovk-msg-sheet');
 
         setTimeout(() => {
             const node = modal.getNode().nodes[0];

@@ -603,46 +603,407 @@
         padding: 0 16px;
     }
 
-    /* dialogs */
+    /* dialogs: MD1 centered dialog by default; .ovk-msg-sheet and
+       .ovk-msg-fullscreen opt into other presentations */
     .ovk-diag-cont {
-        width: 100%!important;
+        width: min(560px, calc(100vw - 80px))!important;
+        min-width: min(280px, calc(100vw - 80px));
         height: auto!important;
+        top: 50%;
+        bottom: auto;
+        left: 50%;
+        margin-right: -50%;
+        transform: translate(-50%, -50%);
+        animation: mdDialogIn 0.2s ease-out;
+        background-color: transparent !important;
+    }
+    .ovk-diag-cont .ovk-diag {
+        width: 100% !important;
+        margin: 0;
+        border: none;
+        border-radius: 2px;
+        box-shadow: 0 11px 15px -7px rgba(0,0,0,0.2), 0 24px 38px 3px rgba(0,0,0,0.14), 0 9px 46px 8px rgba(0,0,0,0.12);
+    }
+    /* 24dp min margin top/bottom; body scrolls inside the flex column */
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag {
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 48px);
+    }
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-head {
+        background: none;
+        color: var(--text-color);
+        height: auto;
+        font-size: 20px;
+        line-height: 28px;
+        font-weight: 500;
+        padding: 24px 24px 20px;
+        border-radius: 0;
+        flex: none;
+    }
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-head a {
+        color: var(--accent-color);
+    }
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-head-close {
+        display: none;
+    }
+    .ovk-diag-cont.ovk-diag-no-title:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-head {
+        display: none;
+    }
+    .ovk-diag-cont.ovk-diag-no-title:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-body {
+        padding-top: 24px;
+    }
+    .ovk-diag-body {
+        height: auto !important;
+        padding: 0 24px 24px!important;
+    }
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-body {
+        font-size: 16px;
+        min-height: 0;
+        flex: 0 1 auto;
+        overflow-y: auto;
+    }
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0;
+        padding: 8px;
+        white-space: nowrap;
+        background: none;
+        flex: none;
+    }
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > .button,
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > button,
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > input[type="button"],
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > input[type="submit"] {
+        width: auto;
+        min-width: 64px;
+        min-height: 36px;
+        height: 36px;
+        margin: 0 0 0 8px;
+        padding: 0 8px !important;
+        background: none;
+        border: none;
+        box-shadow: none;
+        color: var(--accent-color);
+        font-size: 14px;
+        text-transform: uppercase;
+        font-weight: 500;
+        border-radius: 2px;
+    }
+    /* labels exceeding max button width stack full-width, 48dp targets */
+    .ovk-diag-cont.ovk-diag-stacked:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action {
+        flex-direction: column;
+        align-items: stretch;
+        row-gap: 4px;
+    }
+    .ovk-diag-cont.ovk-diag-stacked:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > .button,
+    .ovk-diag-cont.ovk-diag-stacked:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > button,
+    .ovk-diag-cont.ovk-diag-stacked:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > input[type="button"],
+    .ovk-diag-cont.ovk-diag-stacked:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > input[type="submit"] {
+        width: 100%;
+        min-height: 48px;
+        height: 48px;
+        margin: 0;
+        padding: 0 16px !important;
+        justify-content: flex-end;
+    }
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > .button:hover,
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > button:hover,
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > input[type="button"]:hover,
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > input[type="submit"]:hover,
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > .button:active,
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > button:active,
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > input[type="button"]:active,
+    .ovk-diag-cont:not(.ovk-msg-sheet):not(.ovk-msg-fullscreen) .ovk-diag-action > input[type="submit"]:active {
+        background-color: color-mix(in srgb, var(--accent-color) 12%, transparent);
+        color: var(--accent-color);
+    }
+
+    /* bottom-sheet opt-in */
+    .ovk-diag-cont.ovk-msg-sheet {
+        width: 100%!important;
+        max-width: none;
         top: auto;
         bottom: 0;
         left: 0;
         margin-right: 0;
         transform: translateY(0);
         animation: slideUpBottomSheet 0.3s ease-out forwards !important;
-        background-color: transparent !important;
     }
-    .ovk-diag {
-        width: 100% !important;
-        margin: 0;
-        border: none;
-        border-radius: 12px 12px 0 0;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    }
-    .ovk-diag-head {
-        padding: 0 0 0 16px;
-    }
-    .ovk-diag-body {
-        height: auto !important;
-        max-height: 75vh !important;
-        padding: 16px!important;
-    }
-    .ovk-diag-action {
+    /* MD1 modal bottom sheet */
+    .ovk-msg-sheet .ovk-diag {
         display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - var(--header-height) - 8px);
+        border-radius: 0;
+        box-shadow: 0 -8px 10px -5px rgba(0,0,0,0.2),
+                    0 -16px 24px 2px rgba(0,0,0,0.14),
+                    0 -6px 30px 5px rgba(0,0,0,0.12);
+        will-change: transform;
+    }
+    .ovk-msg-sheet .ovk-diag-body {
+        overscroll-behavior-y: contain;
+    }
+    /* portrait: peek stays below the 16:9 keyline until expanded */
+    @media (orientation: portrait) {
+        .ovk-diag-cont.ovk-msg-sheet:not(.ovk-msg-sheet--expanded) .ovk-diag {
+            max-height: calc(100vh - 56.25vw);
+        }
+    }
+    .ovk-diag-cont.ovk-msg-sheet--dragging .ovk-diag {
+        max-height: none !important;
+    }
+    body.dimmed.ovk-sheet-dim > .dimmer {
+        opacity: 0.2;
+    }
+    .ovk-msg-sheet .ovk-diag-head {
+        display: flex;
+        align-items: center;
+        flex: none;
+        height: 56px;
+        line-height: normal;
+        padding: 0 4px;
+        background-color: var(--module-background-color);
+        color: var(--muted-text-color-2);
+        font-size: 16px;
+        font-weight: 400;
+        border-radius: 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .ovk-diag-cont.ovk-diag-no-title.ovk-msg-sheet .ovk-diag-head {
+        display: none;
+    }
+    .ovk-msg-sheet .ovk-diag-head a {
+        color: var(--muted-text-color-2);
+    }
+    .ovk-msg-sheet .ovk-diag-head-close {
+        float: none;
+        order: -1;
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        margin-right: 4px;
+        background: none;
+        color: var(--muted-text-color-2);
+    }
+    .ovk-msg-sheet .ovk-diag-head-close-icon {
+        display: block;
+    }
+    .ovk-msg-sheet .ovk-diag-head-apply {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        width: 48px;
+        height: 48px;
+        margin-left: auto;
+        padding: 0;
+        background: none;
+        border: none;
+        color: var(--accent-color);
+        cursor: pointer;
+    }
+    .ovk-msg-sheet .ovk-diag-body {
+        flex: 1;
+        min-height: 0 !important;
+        height: auto !important;
+        padding: 8px 16px !important;
+        overflow-y: auto;
+        font-size: 16px;
+        line-height: 20px;
+    }
+    /* list-style rows: 48dp, 24dp icons, 72dp text keyline */
+    .ovk-msg-sheet .mobile-info-row {
+        min-height: 48px;
+        align-items: center;
+        gap: 32px;
+        font-size: 16px;
+    }
+    .ovk-msg-sheet .mobile-info-row .mir-icon {
+        width: 24px;
+        height: 24px;
+        margin-top: 0;
+    }
+    .ovk-msg-sheet .mobile-info-row .mir-text {
+        margin-top: 0;
+        font-size: 16px;
+    }
+    .ovk-msg-sheet .ovk-diag-action {
+        display: flex;
+        flex: none;
         gap: 8px;
-        padding: 16px;
+        padding: 8px 16px;
         white-space: nowrap;
     }
-    .ovk-diag-action > .button,
-    .ovk-diag-action > button,
-    .ovk-diag-action > input[type="button"],
-    .ovk-diag-action > input[type="submit"] {
+    /* a lone action is always the dismissive one — the X/scrim cover it */
+    .ovk-msg-sheet .ovk-diag-action:has(> :only-child) {
+        display: none;
+    }
+
+    /* audio/notes attachment sheets: tap row to attach, check circle up front */
+    .ovk-msg-sheet .audio_attachment_header,
+    .ovk-msg-sheet .notesInsert ._content {
+        align-items: center;
+        cursor: pointer;
+    }
+    .ovk-msg-sheet .audio_attachment_header .media_check_btn_wrap,
+    .ovk-msg-sheet .notesInsert .media_check_btn_wrap {
+        display: block;
+        position: static;
+        flex: none;
+        padding: 8px 12px 8px 0;
+    }
+    .ovk-msg-sheet .audio_attachment_header .player_part,
+    .ovk-msg-sheet .notesInsert .notes_titles {
+        flex: 1;
+        width: auto !important;
+        min-width: 0;
+    }
+    .ovk-msg-sheet .audio_attachment_header .attachAudio,
+    .ovk-msg-sheet .notesInsert .attachAudio {
+        display: none;
+    }
+    .ovk-msg-sheet .ovk-diag-action > .button,
+    .ovk-msg-sheet .ovk-diag-action > button,
+    .ovk-msg-sheet .ovk-diag-action > input[type="button"],
+    .ovk-msg-sheet .ovk-diag-action > input[type="submit"] {
         width: 100%;
         margin: 0;
         box-sizing: border-box;
+    }
+
+    /* full-screen dialog opt-in (MD1): app-bar head, X left, tick right */
+    .ovk-diag-cont.ovk-msg-fullscreen {
+        width: 100%!important;
+        height: 100%!important;
+        min-width: 0;
+        max-width: none;
+        top: 0;
+        bottom: auto;
+        left: 0;
+        margin-right: 0;
+        transform: none;
+        animation: fullscreenDialogIn 0.2s ease-out !important;
+    }
+    .ovk-msg-fullscreen .ovk-diag {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .ovk-msg-fullscreen .ovk-diag-head {
+        display: flex;
+        align-items: center;
+        flex: none;
+        height: var(--header-height);
+        line-height: normal;
+        padding: 0 4px;
+        background-color: var(--accent-color);
+        color: var(--accent-text-color);
+        font-size: 20px;
+        font-weight: 500;
+        letter-spacing: 0.0125em;
+        border-radius: 0;
+    }
+    .dark-mode .ovk-msg-fullscreen .ovk-diag-head {
+        --accent-color: var(--module-header-background-color);
+        --accent-text-color: var(--text-color);
+    }
+    .ovk-msg-fullscreen .ovk-diag-head-title,
+    .ovk-msg-sheet .ovk-diag-head-title {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .ovk-msg-fullscreen .ovk-diag-head-close {
+        float: none;
+        order: -1;
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        box-sizing: border-box;
+        padding: 0;
+        margin-right: 4px;
+        background: none;
+        opacity: 1;
+        color: var(--accent-text-color);
+    }
+    .ovk-msg-fullscreen .ovk-diag-head-close-icon {
+        display: block;
+    }
+    .ovk-msg-fullscreen .ovk-diag-head-apply {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        width: 48px;
+        height: 48px;
+        margin-left: auto;
+        padding: 0;
+        background: none;
+        border: none;
+        color: var(--accent-text-color);
+        cursor: pointer;
+    }
+    .ovk-msg-fullscreen .ovk-diag-body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0 !important;
+        height: auto !important;
+        padding-top: 16px !important;
+        overflow-y: auto;
+    }
+    .ovk-msg-fullscreen .ovk-diag-action {
+        display: none;
+    }
+    /* tab strip pinned under the header, content scrolls */
+    .ovk-msg-fullscreen #_feed_settings_container,
+    .ovk-msg-fullscreen #_fast_video_upload,
+    .ovk-msg-sheet #_feed_settings_container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        width: 100%;
+    }
+    .ovk-msg-fullscreen #_feed_settings_container #_tabs,
+    .ovk-msg-fullscreen #_fast_video_upload #_tabs,
+    .ovk-msg-sheet #_feed_settings_container #_tabs {
+        flex: none;
+    }
+    .ovk-msg-fullscreen #_feed_settings_container #__content,
+    .ovk-msg-fullscreen #_fast_video_upload #__content,
+    .ovk-msg-sheet #_feed_settings_container #__content {
+        flex: 1;
+        min-height: 0;
+        height: auto;
+        overflow-y: auto;
+        padding: 16px;
+    }
+    /* the header tick button replaces the in-body Apply button */
+    .ovk-msg-fullscreen #_feed_settings_container #__content input[type='button'].button,
+    .ovk-msg-sheet #_feed_settings_container #__content input[type='button'].button {
+        display: none;
+    }
+
+    /* footer divider only while the body can scroll further down */
+    .ovk-diag-cont .ovk-diag-action {
+        border-top-color: transparent;
+    }
+    .ovk-diag-cont.ovk-diag-can-scroll .ovk-diag-action {
+        border-top-color: var(--border-color);
     }
     .ovk-diag .language_column {
         width: 100%;
@@ -1873,6 +2234,16 @@
     }
     to {
         transform: translateY(0);
+    }
+}
+@keyframes mdDialogIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
     }
 }
 
