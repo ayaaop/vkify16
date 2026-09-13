@@ -426,6 +426,8 @@
         + ', .mobile-scroll-card, .msg-dropdown-menu .msg-dropdown-item'
         + ', .messenger-app--header--back a, .messenger-app--header--name a';
     const RIPPLE_UNBOUNDED_SELECTOR = '.appbar .hamburger, .appbar-extra-btn'
+        + ', .ovk-msg-fullscreen .ovk-diag-head-close, .ovk-msg-fullscreen .ovk-diag-head-apply'
+        + ', .ovk-msg-sheet .ovk-diag-head-close, .ovk-msg-sheet .ovk-diag-head-apply'
         + ', .messenger-app--header--ava, .messenger-app-header--more-actions--trigger';
 
     function rippleEnabled() {

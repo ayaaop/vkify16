@@ -431,7 +431,7 @@
 	<script>
 	function __mobileProfileShowMore() {
 		var el = document.getElementById('mobile_more_info_content');
-		MessageBox(tr('additional_information'), el ? el.innerHTML : '', [tr('close')], [Function.noop]);
+		MessageBox(tr('additional_information'), el ? el.innerHTML : '', [tr('close')], [Function.noop]).addClass('ovk-msg-sheet');
 	}
 	</script>
 	{/if}

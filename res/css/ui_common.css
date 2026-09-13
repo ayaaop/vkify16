@@ -674,7 +674,7 @@ body.dimmed > .dimmer #clickable {
     padding: 14px 23px 14px 25px;
 }
 .ovk-diag-action:empty {
-    display: none;
+    display: none!important;
 }
 
 /* я забыл для чего это нужно было

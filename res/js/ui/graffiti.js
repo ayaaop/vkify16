@@ -341,7 +341,7 @@ vkify.once("graffiti", function () {
     if (msgboxsel) {
       msgboxsel.style.width = isMobile ? "100%" : "800px";
       msgboxsel.style.maxWidth = isMobile ? "100vw" : "";
-      msgboxsel.classList.add("vkify-graffiti-diag");
+      msgboxsel.classList.add("vkify-graffiti-diag", "ovk-msg-sheet");
     }
     const diagBody = msgbox.getNode().find(".ovk-diag-body").nodes[0];
     if (diagBody) {

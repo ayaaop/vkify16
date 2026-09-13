@@ -480,6 +480,7 @@ window.showEditPlaylistModal = async (playlistId, e) => {
             close_on_buttons: false,
             warn_on_exit: true
         });
+        modal.getNode().addClass('ovk-msg-sheet');
 
         setTimeout(() => {
             const node = modal.getNode().nodes[0];
@@ -613,6 +614,7 @@ window.showNewPlaylistModal = async (e, gid = null) => {
             close_on_buttons: false,
             warn_on_exit: true
         });
+        modal.getNode().addClass('ovk-msg-sheet');
 
         setTimeout(() => {
             const node = modal.getNode().nodes[0];
