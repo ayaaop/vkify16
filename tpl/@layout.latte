@@ -12,7 +12,7 @@
             {ifset title}{include title} - {/ifset}{$instance_name}
         </title>
         <meta charset="utf-8" />
-        <link rel="shortcut icon" href="/themepack/vkify16/{$theme->getVersion()}/resource/favicon_vk.ico" />
+        <link rel="shortcut icon" href="/themepack/vkify16/{$theme->getVersion()}/resource/icons/default.ico" />
         <meta name="application-name" content="{$instance_name}" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content" />
         <meta n:ifset="$csrfToken" name="csrf" value="{$csrfToken}" />
@@ -637,6 +637,7 @@
 
         <script>window.vkifylang = {=json_encode(vkifyGetLang(), 15)|noescape}</script>
         <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/core/vkify.js"></script>
+        <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/core/favicon.js"></script>
         <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/core/settings-config.js"></script>
         <script>
         </script>

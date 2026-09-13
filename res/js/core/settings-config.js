@@ -21,10 +21,14 @@
 
         u(body).toggleClass('ovkhat', enabled);
 
-        const favicon = document.querySelector('link[rel="shortcut icon"]');
-        if (favicon) {
-            const icoName = enabled ? 'ovk.ico' : 'default.ico';
-            favicon.href = vkify.resourceUrl('icons') + '/' + icoName;
+        if (window.Favicon && typeof window.Favicon.set === 'function') {
+            window.Favicon.set(enabled ? 'ovk' : 'default');
+        } else {
+            const favicon = document.querySelector('link[rel="shortcut icon"]');
+            if (favicon) {
+                const icoName = enabled ? 'ovk.ico' : 'default.ico';
+                favicon.href = vkify.resourceUrl('icons') + '/' + icoName;
+            }
         }
 
         if (enabled) {
