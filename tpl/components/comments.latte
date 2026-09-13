@@ -1,4 +1,5 @@
-{if sizeof($comments) > 0}
+{var $canComment = isset($thisUser) && $parent->canBeCommentedBy($thisUser)}
+{if sizeof($comments) > 0 || $canComment}
     <div id="replies" class="page_block comments">
         {if isset($sort) && !is_null($sort) && $count > 5}
             <div class="post_replies_header">
@@ -13,20 +14,20 @@
             </a>
             </div>
         {/if}
-        <div class='scroll_container'>
-            {foreach $comments as $comment}
-                {include "comment.latte", comment => $comment, model => $model}
-            {/foreach}
-            {include "paginator.latte", conf => (object) ["page" => $page, "count" => $count, "amount" => sizeof($comments), "perPage" => 10]}
-        </div>
-    </div>
-    {else}
-    <div class="page_block comments">
-        {include "../components/content_error.latte", icon => "first_comment.png", description=> tr("comments_tip")}
-        <div class='scroll_container'></div>
+        {if sizeof($comments) > 0}
+            <div class='scroll_container'>
+                {foreach $comments as $comment}
+                    {include "comment.latte", comment => $comment, model => $model}
+                {/foreach}
+                {include "paginator.latte", conf => (object) ["page" => $page, "count" => $count, "amount" => sizeof($comments), "perPage" => 10]}
+            </div>
+        {else}
+            {include "../components/content_error.latte", icon => "first_comment.png", description=> tr("comments_tip")}
+            <div class='scroll_container'></div>
+        {/if}
     </div>
 {/if}
-<div n:ifset="$thisUser" id="standaloneCommentBox">
+<div n:if="$canComment" id="standaloneCommentBox">
     {var $commentsURL = "/al_comments/create/$model/" . $parent->getId()}
     {var $club = $parent instanceof \openvk\Web\Models\Entities\Post && $parent->getTargetWall() < 0 ? (new openvk\Web\Models\Repositories\Clubs)->get(abs($parent->getTargetWall())) : (isset($club) ? $club : null)}
     {if !isset($readOnly) || !$readOnly}

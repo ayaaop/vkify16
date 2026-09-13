@@ -962,25 +962,24 @@
 						{/if}
 					</div>
 					<div class="counts_module" n:ifcontent>
-						{var $fmtCount = fn($n) => $n >= 1000000 ? round($n / 1000000, 1) . 'M' : ($n >= 1000 ? round($n / 1000, 1) . 'K' : (string)$n)}
 						<a class="page_counter" n:if="$user->getFollowersCount() > 0 && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL)" href="/friends{$user->getId()}?act=incoming">
-							<div class="count">{$fmtCount($user->getFollowersCount())}</div>
+							<div class="count">{=vkifyFormatCount($user->getFollowersCount())}</div>
 							<div class="label">{tr("followers", $user->getFollowersCount())|replaceRE: '/^[^\s]+\s+/', ''}</div>
 						</a>
 						<a class="page_counter" n:if="(new \openvk\Web\Models\Repositories\Photos())->getUserPhotosCount($user) > 0 && $user->getPrivacyPermission('photos.read', $thisUser ?? NULL)" href="/albums{$user->getId()}">
-							<div class="count" id="profile_photos_counter_val">{$fmtCount((new \openvk\Web\Models\Repositories\Photos())->getUserPhotosCount($user))}</div>
+							<div class="count" id="profile_photos_counter_val">{=vkifyFormatCount((new \openvk\Web\Models\Repositories\Photos())->getUserPhotosCount($user))}</div>
 							<div class="label">{tr("mobile_photos")}</div>
 						</a>
 						<a class="page_counter" n:if="\OPENVK_ROOT_CONF['openvk']['preferences']['commerce'] && ($giftCount = $user->getGiftCount()) > 0" href="/gifts{$user->getId()}">
-							<div class="count">{$fmtCount($giftCount)}</div>
+							<div class="count">{=vkifyFormatCount($giftCount)}</div>
 							<div class="label">{tr("gifts", $giftCount)|replaceRE: '/^[^\s]+\s+/', ''}</div>
 						</a>
 						<a class="page_counter" n:if="(new \openvk\Web\Models\Repositories\Videos())->getUserVideosCount($user) > 0 && $user->getPrivacyPermission('videos.read', $thisUser ?? NULL)" href="/videos{$user->getId()}">
-							<div class="count">{$fmtCount((new \openvk\Web\Models\Repositories\Videos())->getUserVideosCount($user))}</div>
+							<div class="count">{=vkifyFormatCount((new \openvk\Web\Models\Repositories\Videos())->getUserVideosCount($user))}</div>
 							<div class="label">{tr("videos", (new \openvk\Web\Models\Repositories\Videos())->getUserVideosCount($user))|replaceRE: '/^[^\s]+\s+/', ''}</div>
 						</a>
 						<a class="page_counter" n:if="$audiosCount > 0 && $user->getPrivacyPermission('audios.read', $thisUser ?? NULL)" href="/audios{$user->getId()}">
-							<div class="count">{$fmtCount($audiosCount)}</div>
+							<div class="count">{=vkifyFormatCount($audiosCount)}</div>
 							<div class="label">{tr("audios_count", $audiosCount)|replaceRE: '/^[^\s]+\s+/', ''}</div>
 						</a>
 					</div>

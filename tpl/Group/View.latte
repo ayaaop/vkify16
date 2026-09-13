@@ -454,7 +454,7 @@
 												<a href="javascript:void(0)" data-event-action="notgoing">{_leave_community}</a>
 											{/if}
 											<div class="separator"></div>
-											<a n:if="!$club->isHideFromGlobalFeedEnabled()" id="__ignoreSomeone" data-val='{!$ignore_status ? 1 : 0}' data-id="{$club->getRealId()}">
+											<a n:if="!$club->isHideFromGlobalFeedEnabled()" id="__ignoreSomeone" onclick="onIgnoreSomeoneClick(event)" data-val='{!$ignore_status ? 1 : 0}' data-id="{$club->getRealId()}">
 												{if !$ignore_status}{_ignore_club}{else}{_unignore_club}{/if}
 											</a>
 										</div>
@@ -499,15 +499,14 @@
 					</div>
 				</div>
 				<div class="page_block" id="group_counters" n:if="$thisUser && $club->isEvent()">
-					{var $fmtCount = fn($n) => $n >= 1000000 ? round($n / 1000000, 1) . 'M' : ($n >= 1000 ? round($n / 1000, 1) . 'K' : (string)$n)}
 					<div class="group_counters_wrap clear_fix">
 						<div class="group_counters full">
 							<a class="page_counter" href="/club{$club->getId()}/followers">
-								<div class="count">{$fmtCount($club->getFollowersCount())}</div>
+								<div class="count">{=vkifyFormatCount($club->getFollowersCount())}</div>
 								<div class="label">{_event_comers}</div>
 							</a>
 							<a class="page_counter" href="/club{$club->getId()}/followers?mightcome=1">
-								<div class="count">{$fmtCount($club->getPotentialFollowersCount())}</div>
+								<div class="count">{=vkifyFormatCount($club->getPotentialFollowersCount())}</div>
 								<div class="label">{_event_potential_comers}</div>
 							</a>
 						</div>

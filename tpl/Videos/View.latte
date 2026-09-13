@@ -40,7 +40,7 @@
                         <a href="/video{$video->getPrettyId()}/like?hash={rawurlencode($csrfToken)}" class="video_like_button button video_like_wrap" data-liked="{(int) $liked}" data-likes="{$likesCount}" data-id="{$video->getPrettyId()}" data-type='video'>
                             <i class="action_icon" id="{if $liked}liked{/if}"></i>
                             <span class="action_label">{tr('mobile_like')}</span>
-                            <span class="action_count">{if $likesCount > 0}{$likesCount}{/if}</span>
+                            <span class="action_count">{if $likesCount > 0}{=vkifyFormatCount($likesCount)}{/if}</span>
                         </a>
                         <a onclick="javascript:repost({$video->getPrettyId()}, 'video')" class="video_share_button button button_light">
                             <i class="action_icon"></i>

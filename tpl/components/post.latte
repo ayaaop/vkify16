@@ -85,11 +85,11 @@
                 <div class="post_actions_icon"></div>
                 <div n:ifcontent id="post_actions_menu_{$post->getId()}" class="ui_actions_menu">
                     {if $post->canBeEditedBy($thisUser) && !($forceNoEditLink ?? false)}
-                        <a class="edit" id="editPost">{_edit}</a>
+                        <a class="edit" id="editPost" onclick="onPostEditButtonClick(event)">{_edit}</a>
                     {/if}
                     <a n:if="$canBeDeleted && !($forceNoDeleteLink ?? false)" class="delete" n:attr="id => $postPage ? '_ajaxDelete' : '_wallDelete', data => $postPage ? null : $post->getPrettyId()" href="/wall{$post->getPrettyId()}/delete">{_delete}</a>
                     {if $canBeArchived && !($forceNoDeleteLink ?? false)}
-                    <a n:attr="data-post-page => $postPage ? '1' : null" class="archive_post" href="/wall{$post->getPrettyId()}/archive?hash={rawurlencode($csrfToken)}">
+                    <a n:attr="data-post-page => $postPage ? '1' : null" class="archive_post" onclick="onArchivePostButtonClick(event)" href="/wall{$post->getPrettyId()}/archive?hash={rawurlencode($csrfToken)}">
                         {if $post->isArchived()}
                             {_unarchive_action}
                         {else}
@@ -105,7 +105,7 @@
                         {/if}
                     {/if}
                     {if $feedIgnoreButton}
-                        <a id="__ignoreSomeoneFeed"  data-val='1' data-id="{$wallOwner->getRealId()}">{if $wallOwner instanceof \openvk\Web\Models\Entities\Club}{_ignore_club}{else}{_ignore_user}{/if}</a>
+                        <a id="__ignoreSomeoneFeed" onclick="onIgnoreSomeoneClick(event, true)" data-val='1' data-id="{$wallOwner->getRealId()}">{if $wallOwner instanceof \openvk\Web\Models\Entities\Club}{_ignore_club}{else}{_ignore_user}{/if}</a>
                     {/if}
                     <a n:if="!($post->isPostedOnBehalfOfGroup() && $wallOwner->canBeModifiedBy($thisUser)) && $author->getId() != $thisUser->getId()"  class="report" href="javascript:reportPost({$post->getId()})">{_report}</a>
                     {if $thisUser->getChandlerUser()->can('access')->model('admin')->whichBelongsTo(NULL) AND $post->getEditTime()}
@@ -182,21 +182,20 @@
                 <a href="/wall{$post->getPrettyId()}/like?hash={rawurlencode($csrfToken)}" class="action_button post_like {if $liked}my_like{/if}" data-liked="{(int) $liked}" data-likes="{$likesCount}" data-id="{$post->getPrettyId()}" data-type='post'>
                     <i class="action_icon" id="{if $liked}liked{/if}"></i>
                     <span class="action_label">{tr('mobile_like')}</span>
-                    <span class="action_count">{if $likesCount > 0}{$likesCount}{/if}</span>
+                    <span class="action_count">{if $likesCount > 0}{=vkifyFormatCount($likesCount)}{/if}</span>
                 </a>
             {/if}
-            <a n:if="!($forceNoCommentsLink ?? false) && $commentSection == true && $is2018" id="comments{$post->getPrettyId()}" class="post_reply action_button" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">
+            <a n:if="!($forceNoCommentsLink ?? false) && $commentSection == true" id="comments{$post->getPrettyId()}" class="post_reply action_button" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">
                 <i class="action_icon"></i>
                 <span class="action_label">{tr('reply')}</span>
-                <span class="action_count" id="commentsCount{$post->getPrettyId()}">{if $commentsCount > 0}{$commentsCount}{/if}</span>
+                <span class="action_count" id="commentsCount{$post->getPrettyId()}">{if $commentsCount > 0}{=vkifyFormatCount($commentsCount)}{/if}</span>
             </a>
             <a n:if="!($forceNoShareLink ?? false)" id="reposts{$post->getPrettyId()}" class="post_share action_button" href="javascript:repost('{$post->getPrettyId()}', 'post')">
                 <i class="action_icon"></i>
                 <span class="action_label">{tr('share')}</span>
-                <span class="action_count" id="repostsCount{$post->getPrettyId()}">{if $repostsCount > 0}{$repostsCount}{/if}</span>
+                <span class="action_count" id="repostsCount{$post->getPrettyId()}" data-count="{$repostsCount}">{if $repostsCount > 0}{=vkifyFormatCount($repostsCount)}{/if}</span>
             </a>
         </div>
-        <a n:if="!$is2018 && !($forceNoCommentsLink ?? false) && $commentsCount == 0" class="reply_link_wrap" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">{_comment}</a>
         <div n:if="$suggestion && $canBePinned" class="suggestionControls buttons_row">
             <button class="button" id="publish_post" data-id="{$post->getId()}">{_publish_suggested}</button>
             <button class="button button_gray" id="decline_post" data-id="{$post->getId()}">{_decline_suggested}</button>

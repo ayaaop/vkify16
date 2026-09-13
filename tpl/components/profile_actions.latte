@@ -111,7 +111,7 @@
 
 			{if !$user->isHideFromGlobalFeedEnabled()}
 				{var $isIgnored = $user->isIgnoredBy($thisUser)}
-				<a  id="__ignoreSomeone" data-val="{if $isIgnored}0{else}1{/if}" data-id="{$user->getId()}">
+				<a  id="__ignoreSomeone" onclick="onIgnoreSomeoneClick(event)" data-val="{if $isIgnored}0{else}1{/if}" data-id="{$user->getId()}">
 					{if $isIgnored}{_unignore_user}{else}{_ignore_user}{/if}
 				</a>
 			{/if}

@@ -590,7 +590,7 @@
     .settings_padding,.settings_block_msg,.audio_pl_edit_box .ape_header {
         padding-block: 16px;
     }
-    .form_group,.post_full_like_wrap {
+    .form_group {
         margin-inline: 16px;
     }
     .page_padding .form_group {
@@ -611,6 +611,61 @@
     }
     .post_view_page .comments {
         border-top: 1px solid var(--border-color)!important;
+    }
+
+    .post_header_info {
+        margin-left: 58px;
+        padding-top: 8px;
+    }
+
+    .post-avatar {
+        height: 46px;
+        width: 46px;
+    }
+
+    .post_full_like_wrap {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+    .post_full_like {
+        width: 100%;
+    }
+    body:not(.mode-2018) .post_full_like {
+        display: flex;
+        align-items: center;
+    }
+    .post_full_like_wrap .post_like:first-child, .post_full_like_wrap .post_share:first-child {
+        margin: 0;
+    }
+    body:not(.mode-2018) .post .action_button {
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 6px;
+        border-radius: 0;
+        line-height: 1;
+        margin: 0;
+    }
+    body:not(.mode-2018) .action_icon {
+        width: 18px;
+        height: 16px;
+        background-size: cover;
+    }
+    body:not(.mode-2018) .action_count {
+        margin-left: 8px;
+    }
+    body.mode-2018 .post .action_button {
+        padding: 12px 16px;
+        height: unset;
+        margin: 0;
+    }
+
+    body:not(.mode-2018) .post .post_reply {
+        order: unset;
+    }
+    body:not(.mode-2018) .post .post_reply .action_icon {
+        display: block;
     }
 
     .composer.model_content_textarea textarea {
@@ -2086,6 +2141,10 @@
     }
     .ovk-diag-body .mobile-info-row {
         margin: 0 -16px;
+    }
+
+    .page_block .action_label {
+        display: none;
     }
 
     /* photo viewer (fullscreen modal) */

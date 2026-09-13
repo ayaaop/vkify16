@@ -30,6 +30,36 @@ const errorTpl = Hb.compile(
     `<div class='like_tooltip_wrapper'><div style='padding: 10px;'>{{message}}</div></div>`
 );
 
+window.formatCompactCount = window.formatCompactCount || function (n) {
+    n = Number(n) || 0;
+    if (n >= 1e6) return (Math.round(n / 1e5) / 10) + 'M';
+    if (n >= 1e3) return (Math.round(n / 100) / 10) + 'K';
+    return String(n);
+};
+
+// Make .html() on .action_count elements with a data-count attribute
+// read/write the raw numeric value while formatting the visible text.
+// This lets upstream code (e.g., al_wall.js' repost()) update repost
+// counters without us editing OpenVK files.
+(function wrapActionCountHtml() {
+    if (u.prototype.__vkifyHtmlWrapped) return;
+    u.prototype.__vkifyHtmlWrapped = true;
+    const _origHtml = u.prototype.html;
+    u.prototype.html = function (value) {
+        const node = this.first();
+        if (!node || !node.classList.contains('action_count') || !node.hasAttribute('data-count')) {
+            return arguments.length === 0 ? _origHtml.call(this) : _origHtml.call(this, value);
+        }
+        if (arguments.length === 0) {
+            return node.getAttribute('data-count') || '';
+        }
+        const raw = Number(value);
+        if (Number.isNaN(raw)) return _origHtml.call(this, value);
+        if (raw > 0) node.setAttribute('data-count', raw);
+        return _origHtml.call(this, raw ? window.formatCompactCount(raw) : '');
+    };
+})();
+
 const _likesCache = new Map();
 const _likesCacheLimit = 100;
 const _likesCacheSet = (key, value) => {
@@ -67,7 +97,7 @@ vkify.bindOnce('likeHandlers', () => {
         heart.attr('id', isLiked ? '' : 'liked');
         btn.attr('data-liked', isLiked ? '0' : '1');
         btn.attr('data-likes', nextLikes);
-        counter.text(nextLikes || '');
+        counter.text(nextLikes ? window.formatCompactCount(nextLikes) : '');
         if (isPost) btn.toggleClass('my_like', !isLiked);
 
         const tip = hasLikesTooltip && btn.first()?._tippy;
@@ -92,7 +122,7 @@ vkify.bindOnce('likeHandlers', () => {
             heart.attr('id', isLiked ? 'liked' : '');
             btn.attr('data-liked', isLiked ? '1' : '0');
             btn.attr('data-likes', currentLikes);
-            counter.text(currentLikes || '');
+            counter.text(currentLikes ? window.formatCompactCount(currentLikes) : '');
             if (isPost) btn.toggleClass('my_like', isLiked);
         }
 
