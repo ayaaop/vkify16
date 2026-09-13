@@ -372,6 +372,7 @@ class AttachmentPicker extends AttachmentPickerBase {
             buttons: this.adapter.buttons || [],
             callbacks: this.adapter.callbacks?.(this) || []
         });
+        this.msgbox.getNode().addClass('ovk-msg-sheet');
 
         this._installCloseGuard();
 
@@ -938,6 +939,7 @@ class PhotoPicker extends AttachmentPickerBase {
             buttons,
             callbacks
         });
+        this.msgbox.getNode().addClass('ovk-msg-sheet');
         this._installCloseGuard();
         const node = this.msgbox.getNode();
         node.nodes[0].style.width = '640px';
@@ -1148,6 +1150,17 @@ const AudioAdapter = {
             picker.page = 0;
             picker.load();
         });
+
+        // mobile: tap the row itself to mark it instead of the text button;
+        // stopPropagation keeps stock's document-level .status handler from playing the track
+        node.on('click', '.audio_attachment_header', (e) => {
+            if (!matchMedia('(max-width: 768px)').matches) return;
+            if (u(e.target).closest('.picker-item-select, .attachAudio, .playerButton, .mini_timer, .subTracks, a').length) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const row = u(e.target).closest('.audio_attachment_header');
+            picker.handleItemSelect(row, row.attr('data-picker-id'));
+        });
     },
 
     // biome-ignore lint/correctness/noUnusedFunctionParameters: interface
@@ -1184,6 +1197,7 @@ const AudioAdapter = {
         const selected = picker.ensureSelected(id);
 
         return `<div class='audio_attachment_header ${selected ? 'selected' : ''}' style="display:flex;width:100%;" data-picker-id="${id}">
+            <div class="media_check_btn_wrap picker-item-select"><div class="media_check_btn"></div></div>
             <div class='player_part'>${audioEl.outerHTML}</div>
             <div class="attachAudio picker-item-attach"><span>${selected ? tr("detach") : tr("attach")}</span></div>
         </div>`;
@@ -1312,6 +1326,14 @@ const NoteAdapter = {
             picker.close();
             window.router.route('/notes/create');
         });
+
+        // mobile: tap the row itself to mark it instead of the text button
+        node.on('click', '.notesInsert [data-picker-id]', (e) => {
+            if (!matchMedia('(max-width: 768px)').matches) return;
+            if (u(e.target).closest('.picker-item-select, .attachAudio, a').length) return;
+            const row = u(e.target).closest('[data-picker-id]');
+            picker.handleItemSelect(row, row.attr('data-picker-id'));
+        });
     },
 
     // biome-ignore lint/correctness/noUnusedFunctionParameters: interface
@@ -1335,6 +1357,7 @@ const NoteAdapter = {
         const selected = picker.ensureSelected(id);
 
         return `<div class='display_flex_row _content ${selected ? 'selected' : ''}' data-picker-id="${id}" data-name='${escapeHtml(note.title)}'>
+            <div class="media_check_btn_wrap picker-item-select"><div class="media_check_btn"></div></div>
             <div class="notes_titles" style='width: 73%;'>
                 <div class="written">
                     <a href="${note.view_url}">${escapeHtml(note.title)}</a>
@@ -1442,11 +1465,13 @@ vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
         body: `
         <div id='_fast_video_upload'>
             <div id='_tabs'>
-                <ul class="ui_tabs clear_fix">
-                    <li><a class="ui_tab ui_tab_sel" data-name="file">${tr('video_file_upload')}</a></li>
-                    <li><a class="ui_tab" data-name="youtube">${tr('video_youtube_upload')}</a></li>
-                    <div class="ui_tabs_slider"></div>
-                </ul>
+                <h2 class="page_block_h2 tabs_header">
+                    <ul class="ui_tabs clear_fix">
+                        <li><a class="ui_tab ui_tab_sel" data-name="file">${tr('video_file_upload')}</a></li>
+                        <li><a class="ui_tab" data-name="youtube">${tr('video_youtube_upload')}</a></li>
+                        <div class="ui_tabs_slider"></div>
+                    </ul>
+                </h2>
             </div>
             <div id='__content' class='page_padding'></div>
         </div>
@@ -1548,6 +1573,7 @@ vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
         }, () => msg.close()]
     });
 
+    msg.getNode().addClass('ovk-msg-fullscreen');
     msg.getNode().find('.ovk-diag-body').attr('style', 'padding:0!important');
 
     function switchTab(name) {
