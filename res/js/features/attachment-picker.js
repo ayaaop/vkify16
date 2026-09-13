@@ -1611,7 +1611,7 @@ window.attachmentAdapters = adapters;
 window.openAttachmentPicker = openPicker;
 
 vkify.bindOnce('pickerButtons', () => {
-    const resolveForm = (el) => (el ? u(el).closest('#write') : u());
+    const resolveForm = (el) => (el ? u(el).closest('form') : u());
 
     document.addEventListener('click', async (e) => {
         const photo = e.target.closest('#__photoAttachment');
