@@ -3,52 +3,36 @@
 
 vkify.musicPopup = vkify.musicPopup || {};
 
-const __vkifyFavicon = vkify.resourceBase ? {
-    get default() {
-        const ico = vkify.getSetting('ovkHat') ? 'ovk.ico' : 'default.ico';
-        return vkify.resourceUrl('icons/' + ico);
-    },
-    play: vkify.resourceUrl('icons/play.ico'),
-    pause: vkify.resourceUrl('icons/pause.ico')
-} : null;
-
-function setFaviconUrl(url) {
-    if (!url) return;
-    const icon = document.querySelector('link[rel="icon"], link[rel="shortcut icon"]');
-    if (!icon) return;
-    icon.setAttribute('href', url);
-}
-
 function updateFaviconFromPlayerState() {
-    if (!__vkifyFavicon) return;
+    if (!window.Favicon) return;
 
     const hasTrack = Boolean(window.player && window.player.currentTrack);
     if (!hasTrack) {
-        setFaviconUrl(__vkifyFavicon.default);
+        window.Favicon.clear();
         return;
     }
 
     if (window.player?.audioPlayer?.paused === false) {
-        setFaviconUrl(__vkifyFavicon.play);
+        window.Favicon.setMusic('play');
     } else {
-        setFaviconUrl(__vkifyFavicon.pause);
+        window.Favicon.setMusic('pause');
     }
 }
 
 function patchPlayerFaviconOnce() {
-    if (!__vkifyFavicon) return;
     if (!window.player) return;
     if (window.player.__vkifyPatchedFavicon) return;
 
     window.player.__vkifyPatchedFavicon = true;
 
     window.player.__setFavicon = function (state = 'playing') {
+        if (!window.Favicon) return;
         if (state === 'playing') {
-            setFaviconUrl(__vkifyFavicon.play);
+            window.Favicon.setMusic('play');
         } else if (state === 'paused') {
-            setFaviconUrl(__vkifyFavicon.pause);
+            window.Favicon.setMusic('pause');
         } else {
-            setFaviconUrl(__vkifyFavicon.default);
+            window.Favicon.clear();
         }
     };
 
