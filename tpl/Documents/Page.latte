@@ -30,40 +30,42 @@
                     {include "../components/content_error.latte", description => vkifyTr('document_preview_unavailable')}
                 {/if}
             </div>
-            <div class='media-page-wrapper-description'>
-                <p n:if='sizeof($tags) > 0'>
-                    {foreach $tags as $tag}
-                        <a href="/search?section=docs&tags={urlencode($tag)}">
-                            {$tag}{if $tag != $tags[sizeof($tags) - 1]},{/if}
-                        </a>
-                    {/foreach}
-                </p>
-                <div class='upload_time'>
-                    {_info_upload_date}: {$doc->getPublicationTime()}
-                </div>
-            </div>
-            <div n:if="isset($thisUser)" class="page_block_footer document_actions" data-context="page" data-id="{$doc->getPrettiestId()}">
-                <div class="post_full_like_wrap">
-                    <div class="post_full_like docMainItem" data-context="page" data-id="{$doc->getPrettiestId()}">
-                        <a n:if="!$copied" class="action_button post_add" id="vkifyAdd">
-                            <i class="action_icon"></i>
-                            <span class="action_label">{_add}</span>
-                        </a>
-                        <a n:if="$copied && $doc->isCopy()" class="action_button post_remove" id="vkifyRemove">
-                            <i class="action_icon"></i>
-                            <span class="action_label">{_remove}</span>
-                        </a>
-                        <a class="action_button post_download" href="{$doc->getURL()}" download="{downloadable_name($doc->getName())}">
-                            <i class="action_icon"></i>
-                            <span class="action_label">{_download_file}</span>
-                        </a>
-                        <a n:if="$modifiable" class="action_button post_edit" id="edit_icon">
-                            <i class="action_icon"></i>
-                            <span class="action_label">{_edit}</span>
-                        </a>
+            <div class="ovk-photo-details">
+                <div class='media-page-wrapper-description'>
+                    <p n:if='sizeof($tags) > 0'>
+                        {foreach $tags as $tag}
+                            <a href="/search?section=docs&tags={urlencode($tag)}">
+                                {$tag}{if $tag != $tags[sizeof($tags) - 1]},{/if}
+                            </a>
+                        {/foreach}
+                    </p>
+                    <div class='upload_time'>
+                        {_info_upload_date}: {$doc->getPublicationTime()}
                     </div>
-                    <div class="docMainItem" data-context="page" data-id="{$doc->getPrettiestId()}">
-                        <a n:if="!$modifiable" class="reply_link_wrap" id="report_icon">{_report}</a>
+                </div>
+                <div n:if="isset($thisUser)" class="page_block_footer document_actions" data-context="page" data-id="{$doc->getPrettiestId()}">
+                    <div class="post_full_like_wrap">
+                        <div class="post_full_like docMainItem" data-context="page" data-id="{$doc->getPrettiestId()}">
+                            <a n:if="!$copied" class="action_button post_add" id="vkifyAdd">
+                                <i class="action_icon"></i>
+                                <span class="action_label">{_add}</span>
+                            </a>
+                            <a n:if="$copied && $doc->isCopy()" class="action_button post_remove" id="vkifyRemove">
+                                <i class="action_icon"></i>
+                                <span class="action_label">{_remove}</span>
+                            </a>
+                            <a class="action_button post_download" href="{$doc->getURL()}" download="{downloadable_name($doc->getName())}">
+                                <i class="action_icon"></i>
+                                <span class="action_label">{_download_file}</span>
+                            </a>
+                            <a n:if="$modifiable" class="action_button post_edit" id="edit_icon">
+                                <i class="action_icon"></i>
+                                <span class="action_label">{_edit}</span>
+                            </a>
+                        </div>
+                        <div class="docMainItem" data-context="page" data-id="{$doc->getPrettiestId()}">
+                            <a n:if="!$modifiable" class="reply_link_wrap" id="report_icon">{_report}</a>
+                        </div>
                     </div>
                 </div>
             </div>

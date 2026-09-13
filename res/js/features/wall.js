@@ -972,6 +972,10 @@ function bindPostEditOnce() {
             return;
         }
 
+        document.querySelectorAll('#write').forEach(el => {
+            el.classList.remove('expanded-textarea', 'shown');
+        });
+
         const edit_place_l = post.hasClass('reply') ? post.find('.reply_content > .post_edit') : post.children('.post_edit');
         const edit_place = u(edit_place_l.first());
         const rawId = post.attr('data-id') || '';
@@ -981,9 +985,11 @@ function bindPostEditOnce() {
         if (edit_place.html() === '') {
             u(editBtn).addClass('lagged');
             try {
-                const params = type === 'post' ? { posts: rawId } : { owner_id: 1, comment_id: id[1] };
+                const params = type === 'post' ? { posts: rawId } : { owner_id: parseInt(id[0], 10) || 1, comment_id: id[1] };
                 const api_req = await window.OVKAPI.call(`wall.${type === 'post' ? 'getById' : 'getComment'}`, params);
-                const api_post = api_req.items[0];
+                const _items = api_req.items || api_req.response?.items || api_req;
+                const api_post = Array.isArray(_items) ? _items[0] : _items;
+                if (!api_post) throw new Error('Post not found');
 
                 edit_place.html(vkify.editMenuLayout(api_post, type, rawId));
 
@@ -1049,7 +1055,14 @@ function bindPostEditOnce() {
                         return;
                     }
 
-                    const new_post_html = await ContentFetcher.request(`/iapi/getPostTemplate/${id[0]}_${id[1]}?type=${type}`, {
+                    let is_at_post_page = false;
+                    try {
+                        if (location.pathname.indexOf('wall') !== -1 && location.pathname.split('_').length === 2) {
+                            is_at_post_page = true;
+                        }
+                    } catch (e) {}
+
+                    const new_post_html = await ContentFetcher.request(`/iapi/getPostTemplate/${id[0]}_${id[1]}?type=${type}&from_page=${is_at_post_page ? 'post' : 'another'}`, {
                         method: 'POST',
                         responseType: 'text',
                         ajaxQuery: false

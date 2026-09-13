@@ -39,10 +39,10 @@
 
                     <div n:ifcontent class="attachments attachments_m">
                         <div class="attachment" n:foreach="$attachmentsLayout->extras as $attachment" n:if="!($attachment instanceof \openvk\Web\Models\Entities\Audio)">
-                            {include "attachment.latte", attachment => $attachment, post => $comment}
+                            {include "attachment.latte", attachment => $attachment, parent => $comment, parentType => "comment"}
                         </div>
                         <div class="attachment" n:foreach="$attachmentsLayout->extras as $attachment" n:if="$attachment instanceof \openvk\Web\Models\Entities\Audio">
-                            {include "attachment.latte", attachment => $attachment, post => $comment}
+                            {include "attachment.latte", attachment => $attachment, parent => $comment, parentType => "comment"}
                         </div>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                     {var $isLiked = $comment->hasLikeFrom($thisUser)}
                     <a class="post_like like_wrap {if $isLiked}my_like{/if}" href="/comment{$comment->getId()}/like?hash={rawurlencode($csrfToken)}" data-likes='{$likesCount}' data-id="1_{$comment->getPrettyId()}" data-type='comment'>
                         <i class="action_icon" id="{if $isLiked}liked{/if}"></i>
-                        <span class="action_count">{if $likesCount > 0}{$likesCount}{/if}</span>
+                        <span class="action_count">{if $likesCount > 0}{=vkifyFormatCount($likesCount)}{/if}</span>
                     </a>
                 {/if}
                 <div class="reply_date">

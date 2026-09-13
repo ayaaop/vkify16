@@ -485,15 +485,14 @@
 					</div>
 				</div>
 				<div class="page_block" id="group_counters" n:if="$thisUser && $club->isEvent()">
-					{var $fmtCount = fn($n) => $n >= 1000000 ? round($n / 1000000, 1) . 'M' : ($n >= 1000 ? round($n / 1000, 1) . 'K' : (string)$n)}
 					<div class="group_counters_wrap clear_fix">
 						<div class="group_counters full">
 							<a class="page_counter" href="/club{$club->getId()}/followers">
-								<div class="count">{$fmtCount($club->getFollowersCount())}</div>
+								<div class="count">{=vkifyFormatCount($club->getFollowersCount())}</div>
 								<div class="label">{_event_comers}</div>
 							</a>
 							<a class="page_counter" href="/club{$club->getId()}/followers?mightcome=1">
-								<div class="count">{$fmtCount($club->getPotentialFollowersCount())}</div>
+								<div class="count">{=vkifyFormatCount($club->getPotentialFollowersCount())}</div>
 								<div class="label">{_event_potential_comers}</div>
 							</a>
 						</div>

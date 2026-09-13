@@ -51,18 +51,22 @@
     <div class="wide_column_left">
         <div class="narrow_column_wrap">
             <div class="narrow_column">
-                {include "../components/ui_rmenu.latte", items => $menuItems}
+                {include "../components/ui_rmenu.latte", items => $menuItems, additionalCssClass => 'show_as_menu_on_mobile'}
             </div>
         </div>
         <div class="wide_column_wrap">
             <div class="wide_column post_view_page {if $cCount > 0}with_comments{/if}">
-                {include "../components/post.latte", post => $post, forceNoCommentsLink => TRUE, scrollNode => false, postPage => true}
-                {include "../components/comments.latte",
-                comments => $comments,
-                count => $cCount,
-                page => $cPage,
-                model => "posts",
-                parent => $post }
+                <div id="post_page_main">
+                    {include "../components/post.latte", post => $post, forceNoCommentsLink => TRUE, scrollNode => false, postPage => true, commentSection => false}
+                </div>
+                <div id="post_page_meta">
+                    {include "../components/comments.latte",
+                    comments => $comments,
+                    count => $cCount,
+                    page => $cPage,
+                    model => "posts",
+                    parent => $post }
+                </div>
             </div>
         </div>
     </div>

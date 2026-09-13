@@ -52,7 +52,7 @@
                 </div>
             </div>
         </div>
-        <div class="pv_right">
+        <div class="pv_right ovk-photo-details">
             <div class="pv_author_block clear_fix">
                 <div class="pv_author_img fl_l">
                     <a href="{$owner->getURL()}">
@@ -75,19 +75,18 @@
                     <a href="/photo{$photo->getPrettyId()}/like?hash={rawurlencode($csrfToken)}" class="action_button post_like {if $liked}my_like{/if}" data-liked="{(int) $liked}" data-likes="{$likesCount}" data-id="{$photo->getPrettyId()}" data-type='photo'>
                         <i class="action_icon" id="{if $liked}liked{/if}"></i>
                         <span class="action_label">{tr('mobile_like')}</span>
-                        <span class="action_count">{if $likesCount > 0}{$likesCount}{/if}</span>
+                        <span class="action_count">{if $likesCount > 0}{=vkifyFormatCount($likesCount)}{/if}</span>
                     </a>
-                    <a n:if="$is2018" id="comments{$photo->getPrettyId()}" class="post_reply action_button mobileonly" href="/photo{$photo->getPrettyId()}">
+                    <a id="comments{$photo->getPrettyId()}" class="post_reply action_button mobileonly" href="/photo{$photo->getPrettyId()}">
                         <i class="action_icon"></i>
                         <span class="action_label">{tr('reply')}</span>
-                        <span class="action_count" id="commentsCount{$photo->getPrettyId()}">{if $cCount > 0}{$cCount}{/if}</span>
+                        <span class="action_count" id="commentsCount{$photo->getPrettyId()}">{if $cCount > 0}{=vkifyFormatCount($cCount)}{/if}</span>
                     </a>
                     <a id="reposts{$photo->getPrettyId()}" class="post_share action_button" href="javascript:repost('{$photo->getPrettyId()}', 'photo')">
                         <i class="action_icon"></i>
                         <span class="action_label">{tr('share')}</span>
                     </a>
                 </div>
-                <a n:if="!$is2018 && $cCount == 0" class="reply_link_wrap mobileonly" href="/photo{$photo->getPrettyId()}">{_comment}</a>
             </div>
             {if (isset($thisUser) && $thisUser->getId() === $photo->getOwner()->getId()) || !empty($photo->getDescription())}
             {var $descPlain = $photo->getDescription($html = false) ?? ''}

@@ -587,7 +587,7 @@
     .settings_padding,.settings_block_msg,.audio_pl_edit_box .ape_header {
         padding-block: 16px;
     }
-    .form_group,.post_full_like_wrap {
+    .form_group {
         margin-inline: 16px;
     }
     .page_padding .form_group {
@@ -599,6 +599,9 @@
     .post .post_header {
         padding: 16px 16px 0;
     }
+    .post_author {
+        font-weight: 500;
+    }
     .post-nsfw .post-content::after, .deleted_content .content_page_error {
         margin: 0 16px;
         width: calc(100% - 32px);
@@ -607,30 +610,113 @@
         border-top: 1px solid var(--border-color)!important;
     }
 
-    .model_content_textarea textarea {
+    .post_header_info {
+        margin-left: 58px;
+        padding-top: 8px;
+    }
+
+    .post-avatar {
+        height: 46px;
+        width: 46px;
+    }
+
+    .post_full_like_wrap {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+    .post_full_like {
+        width: 100%;
+    }
+    body:not(.mode-2018) .post_full_like {
+        display: flex;
+        align-items: center;
+    }
+    .post_full_like_wrap .post_like:first-child, .post_full_like_wrap .post_share:first-child {
+        margin: 0;
+    }
+    body:not(.mode-2018) .post .action_button {
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 6px;
+        border-radius: 0;
+        line-height: 1;
+        margin: 0;
+    }
+    body:not(.mode-2018) .action_icon {
+        width: 18px;
+        height: 16px;
+        background-size: cover;
+    }
+    body:not(.mode-2018) .action_count {
+        margin-left: 8px;
+    }
+    body.mode-2018 .post .action_button {
+        padding: 12px 16px;
+        height: unset;
+        margin: 0;
+    }
+
+    body:not(.mode-2018) .post .post_reply {
+        order: unset;
+    }
+    body:not(.mode-2018) .post .post_reply .action_icon {
+        display: block;
+    }
+
+    .composer.model_content_textarea textarea {
         margin-left: 44px;
         width: calc(100% - 44px);
     }
     .post_field_user_link {
         left: 16px;
     }
-    .model_content_textarea:not(.shown) #wallAttachmentMenu {
+    .composer.model_content_textarea:not(.shown) #wallAttachmentMenu {
         padding: 15px 16px;
     }
-    .model_content_textarea.shown .post-bottom-acts {
+    .composer.model_content_textarea.shown .post-bottom-acts {
         padding: 16px;
     }
 
-    /* buttons */
+    /* buttons — Material Design 1 style */
     .button, input[class="button"], .profile_link {
-        padding: 7px 16px 9px;
-        min-height: 32px;
+        min-width: 88px;
+        height: 36px;
+        min-height: 36px;
+        padding: 0 16px;
+        border-radius: 2px;
+        font-size: 14px;
+        line-height: 20px;
         font-weight: 500;
-        font-size: 13px;
+        letter-spacing: normal;
+        text-transform: none;
+        box-shadow: none;
+        transition: background-color 0.15s ease-out, color 0.15s ease-out, box-shadow 0.15s ease-out;
+    }
+    .button:not(.button_light):not(.profile_link):not(:disabled):not([disabled]):active,
+    input[class="button"]:not(:disabled):not([disabled]):active {
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
     }
     .button:not(.profile_more_btn):active, input[class="button"]:active {
-        padding-top: 8px;
-        padding-bottom: 8px;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .button.profile_more_btn {
+        min-width: 0;
+    }
+    .button.button_light, .profile_link {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    .button.button_wide {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    .button:disabled, .button[disabled],
+    input[class="button"]:disabled, input[class="button"][disabled] {
+        box-shadow: none;
+        opacity: 0.64;
     }
     .action_links .button {
         padding: 7px 16px 8px
@@ -662,6 +748,69 @@
     }
     #login_form, .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"]), .form_field:not(.settings_privacy_row) select, .form_field textarea {
         width: 100%;
+    }
+
+    /* form fields — MD1 underline text fields */
+    .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"], [type="file"], [type="image"]),
+    #login_form input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"]),
+    .form_field select,
+    .form_field textarea, textarea:not(.expanded-textarea) {
+        height: 44px;
+        padding: 11px 0 8px;
+        font-size: 16px;
+        line-height: 24px;
+        color: var(--text-color);
+        background-color: transparent;
+        border: none;
+        border-bottom: 1px solid color-mix(in srgb, var(--text-color) 38%, transparent);
+        border-radius: 0;
+        box-sizing: border-box;
+        outline: none;
+    }
+    .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"], [type="file"], [type="image"])::placeholder,
+    .form_field textarea::placeholder, textarea::placeholder {
+        color: var(--muted-text-color);
+        opacity: 1;
+    }
+    .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"], [type="file"], [type="image"]):focus,
+    .form_field select:focus,
+    .form_field textarea:focus, textarea:not(.expanded-textarea):focus {
+        border-bottom-color: var(--accent-color);
+        box-shadow: 0 1px 0 0 var(--accent-color);
+    }
+    .form_field input:disabled,
+    .form_field select:disabled,
+    .form_field textarea:disabled, textarea:disabled {
+        border-bottom-style: dotted;
+        opacity: 0.48;
+    }
+    .form_field textarea, textarea {
+        height: auto;
+        min-height: 88px;
+        padding: 8px 0;
+        resize: none;
+    }
+    .form_field select[size],
+    .form_field select[multiple] {
+        height: auto;
+        border: 1px solid color-mix(in srgb, var(--text-color) 38%, transparent);
+    }
+
+    /* selects — trailing chevron over the underline field */
+    .form_field select {
+        appearance: none;
+        -webkit-appearance: none;
+        padding-right: 32px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Cpath d='M12 13.698 6.64 9.232a1 1 0 0 0-1.28 1.536l6 5a1 1 0 0 0 1.28 0l6-5a1 1 0 1 0-1.28-1.536L12 13.698Z' fill='%23818c99'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 4px center;
+        background-size: 20px 20px;
+    }
+    body.dark-mode .form_field select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Cpath d='M12 13.698 6.64 9.232a1 1 0 0 0-1.28 1.536l6 5a1 1 0 0 0 1.28 0l6-5a1 1 0 1 0-1.28-1.536L12 13.698Z' fill='%2399a2ad'/%3E%3C/svg%3E");
     }
     .label_end .form_label {
         text-align: start;
@@ -1989,6 +2138,10 @@
     }
     .ovk-diag-body .mobile-info-row {
         margin: 0 -16px;
+    }
+
+    .page_block .action_label {
+        display: none;
     }
 
     /* photo viewer (fullscreen modal) */

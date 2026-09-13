@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    var processedDeletions = new Set();
+    const processedDeletions = new WeakSet();
     var placeholderTimer = null;
 
     function showPlaceholder() {
@@ -47,7 +47,9 @@
         decrementCounts(false);
     });
 
-    // Delete — al_wall.js replaces post innerHTML with a .post-deleted div.
+    // Delete — al_wall.js replaces the post with .post-deleted (old markup keeps data-*
+    // on the parent; new markup uses an entirely new .post.post-divider). We use a WeakSet
+    // keyed by the .post-deleted node so each physical deletion only decrements once.
     vkify.bindOnce('postDeleteObserver', function () {
         var observer = new MutationObserver(function (mutations) {
             for (var i = 0; i < mutations.length; i++) {
@@ -56,13 +58,10 @@
                     var node = added[j];
                     if (node.nodeType !== 1) continue;
                     if (!node.classList.contains('post-deleted')) continue;
+                    if (processedDeletions.has(node)) continue;
 
-                    var post = node.parentElement;
-                    var id = (post && (post.getAttribute('data-uniqueid') || post.getAttribute('data-id')));
-                    if (id && !processedDeletions.has(id)) {
-                        processedDeletions.add(id);
-                        decrementCounts(true);
-                    }
+                    processedDeletions.add(node);
+                    decrementCounts(true);
                 }
             }
         });
