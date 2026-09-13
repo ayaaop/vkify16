@@ -1,6 +1,7 @@
 (function() {
     vkify.musicPopup = vkify.musicPopup || {};
     let profileAppbarScrollHandler = null;
+    let appbarElevationScrollHandler = null;
 
     window.vkify.ready(() => {
         const body = document.body;
@@ -118,15 +119,46 @@
         window.addEventListener('scroll', profileAppbarScrollHandler, {'passive': true});
     }
 
+    function setupAppbarElevation() {
+        if (!isMobileViewport()) return;
+
+        const appbar = document.getElementById('appbar');
+        if (!appbar || appbar.classList.contains('appbar--transparent')) return;
+
+        const applyAppbarElevation = function() {
+            appbar.classList.toggle('appbar--elevated',
+                (window.scrollY || window.pageYOffset) > 0);
+        };
+
+        let rafPending = false;
+        if (appbarElevationScrollHandler) {
+            window.removeEventListener('scroll', appbarElevationScrollHandler);
+        }
+        appbarElevationScrollHandler = function() {
+            if (rafPending) return;
+            rafPending = true;
+            requestAnimationFrame(() => {
+                rafPending = false;
+                applyAppbarElevation();
+            });
+        };
+        applyAppbarElevation();
+        window.addEventListener('scroll', appbarElevationScrollHandler, {'passive': true});
+    }
+
     function resetTransparentAppbar() {
         if (profileAppbarScrollHandler) {
             window.removeEventListener('scroll', profileAppbarScrollHandler);
             profileAppbarScrollHandler = null;
         }
+        if (appbarElevationScrollHandler) {
+            window.removeEventListener('scroll', appbarElevationScrollHandler);
+            appbarElevationScrollHandler = null;
+        }
         document.body.classList.remove('has-transparent-appbar');
         const appbar = document.getElementById('appbar');
         if (appbar) {
-            appbar.classList.remove('appbar--transparent', 'appbar--scrolled');
+            appbar.classList.remove('appbar--transparent', 'appbar--scrolled', 'appbar--elevated');
             appbar.style.removeProperty('--appbar-bg-alpha');
         }
     }
@@ -134,7 +166,10 @@
     vkify.onPageLifecycle('beforePageLeave', () => {
         resetTransparentAppbar();
     });
-    vkify.onPageLifecycle('afterPageReady', setupTransparentAppbar);
+    vkify.onPageLifecycle('afterPageReady', () => {
+        setupTransparentAppbar();
+        setupAppbarElevation();
+    });
 
     let tabsMenuState = null;
 
@@ -421,7 +456,7 @@
     // so static layout is never affected.
     const RIPPLE_BOUNDED_SELECTOR = '.button, .profile_link'
         + ', .ui_actions_menu a, .ui_actions_menu button, .ui_actions_menu input'
-        + ', .ui_actions_menu .ui_actions_menu_item'
+        + ', .ui_actions_menu label, .ui_actions_menu .ui_actions_menu_item'
         + ', .ui_tab, .ui_tab_plain, .sidebar_inner .link, .mobile-info-row'
         + ', .mobile-scroll-card, .msg-dropdown-menu .msg-dropdown-item'
         + ', .messenger-app--header--back a, .messenger-app--header--name a';
@@ -579,7 +614,11 @@
         ink.style.opacity = '0.12';
         ink.style.transform = 'translate(' + driftX + 'px, ' + driftY + 'px) scale(1)';
 
-        const release = () => releaseRipple(ink, host);
+        const release = (ev) => {
+            // Long-press on a ripple host must not summon the context menu.
+            if (ev && ev.type === 'contextmenu') ev.preventDefault();
+            releaseRipple(ink, host);
+        };
         if (host.__rippleRelease) host.removeEventListener('contextmenu', host.__rippleRelease);
         host.__rippleRelease = release;
         window.addEventListener('pointerup', release, { once: true });

@@ -45,6 +45,7 @@ const modules = [
     'features/attachment-picker.js',
     'features/post-count.js',
     'features/wall.js',
+    'features/makima-attachments.js',
     'features/player.js',
 
     'features/status-editor.js',

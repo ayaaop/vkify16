@@ -79,7 +79,7 @@
                 </div>
             {else}
                 <div class="ui_rmenu_item_wrap {$itemClass ?? ''}">
-                    <a class="ui_rmenu_item {($item['active'] ?? false) ? 'ui_rmenu_item_sel' : ''} {$itemIsRich ? 'ui_ownblock' : ''}" href="{$item['url']}" n:attr="id => $itemId, onclick => $item['onclick'] ?? null">
+                    <a class="ui_rmenu_item {($item['active'] ?? false) ? 'ui_rmenu_item_sel' : ''} {$itemIsRich ? 'ui_ownblock' : ''}" href="{$item['url']}" n:attr="id => $itemId, onclick => $item['onclick'] ?? null, data-pagescount => $item['data-pagescount'] ?? null">
                         {if $itemIsRich}
                             <img class="ui_ownblock_img" src="{$item['avatar']}" />
                             <div class="ui_ownblock_info">
@@ -159,7 +159,7 @@
                         <li class="ui_tabs_sep"></li>
                     {elseif !($item['isHeader'] ?? false)}
                         <li>
-                            <a class="ui_tab {($item['active'] ?? false) ? 'ui_tab_sel' : ''} {$item['class'] ?? ''}" href="{$item['url']}" n:attr="id => $item['id'] ?? null, onclick => $item['onclick'] ?? null">
+                            <a class="ui_tab {($item['active'] ?? false) ? 'ui_tab_sel' : ''} {$item['class'] ?? ''}" href="{$item['url']}" n:attr="id => $item['id'] ?? null, onclick => $item['onclick'] ?? null, data-pagescount => $item['data-pagescount'] ?? null">
                                 {if $item['isRich'] ?? false}
                                     <img src="{$item['avatar']}" class="ui_tab_icon ui_tab_icon--avatar">
                                 {/if}

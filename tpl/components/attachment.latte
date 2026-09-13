@@ -11,7 +11,7 @@
         {elseif $photoContext instanceof \openvk\Web\Models\Entities\Post}
             {var $photoContextId = $photoContext->getPrettyId()}
         {/if}
-        <a class="media-href" style="line-height: 0; --post-image: url({$attachment->getURLBySizeId('normal')|noescape})" href="{$link}" {if $photoContextType === 'post' && $photoContextId}onclick="OpenMiniature(event, '{$attachment->getURLBySizeId('larger')|noescape}', '{$photoContextId|noescape}', '{$photoViewerId|noescape}', 'post')"{else}onclick="PhotoViewer.openById('{$photoViewerId|noescape}', event)"{/if}>
+        <a class="media-href" style="line-height: 0; --post-image: url({$attachment->getURLBySizeId('normal')|noescape})" href="{$link}" data-makima-w="{$photoDims[0]}" data-makima-h="{$photoDims[1]}" {if $photoContextType === 'post' && $photoContextId}onclick="OpenMiniature(event, '{$attachment->getURLBySizeId('larger')|noescape}', '{$photoContextId|noescape}', '{$photoViewerId|noescape}', 'post')"{else}onclick="PhotoViewer.openById('{$photoViewerId|noescape}', event)"{/if}>
             <img n:class="media, $tilesCount > 1 ? media_makima" src="{$attachment->getURLBySizeId('normal')}" alt="{$attachment->getDescription()}" width="{$photoDims[0]}" height="{$photoDims[1]}" loading=lazy />
         </a>
     {else}
@@ -41,7 +41,8 @@
             </a>
         </div>
     {else}
-        <a class="video_item media-href compact_video" style="--post-image: url({$attachment->getThumbnailURL()|noescape})" id='videoOpen' data-id='{$attachment->getPrettyId()}' href="/video{$attachment->getPrettyId()}">
+        {var $videoDims = $attachment->getDimensions()}
+        <a class="video_item media-href compact_video" n:attr="data-makima-w => $videoDims[0] ?? null, data-makima-h => $videoDims[1] ?? null" style="--post-image: url({$attachment->getThumbnailURL()|noescape})" id='videoOpen' data-id='{$attachment->getPrettyId()}' href="/video{$attachment->getPrettyId()}">
             <div class='video_thumb_play'>
             </div>
             <div class='video_thumb_label' n:if="$attachment->getLength() != NULL">

@@ -3,7 +3,7 @@
 
 {block appbar_extra}
 <div class="mobileonly" id="feed_appbar_extra">
-    <button class="appbar-extra-btn" id="__feed_settings_link" aria-label="{_feed_settings}">
+    <button class="appbar-extra-btn" id="__feed_settings_link" aria-label="{_feed_settings}" data-pagescount='{ceil($paginatorConf->count / $paginatorConf->perPage)}'>
         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><use href="#settings-24"></use></svg>
     </button>
 </div>
@@ -27,7 +27,8 @@
             'class' => 'nomobile',
             'url' => '#',
             'title' => 'feed_settings',
-            'active' => false
+            'active' => false,
+            'data-pagescount' => ceil($paginatorConf->count / $paginatorConf->perPage)
         ]
     ]}
 
