@@ -2561,18 +2561,19 @@
         background-color: rgba(122,122,122,.2);
     }
 
-    /* action menu — VKUI ActionSheet: modal surface, 12dp shape,
-       elevation3, 8dp vertical padding, 48dp items with 16dp padding
-       and 16sp/20dp primary text (negative red for destructive) */
+    /* action menu */
     .ui_actions_menu,
     .msg-dropdown-menu {
+        --ui-actions-menu-distance: 12px;
         min-width: 112px;
         max-width: 280px;
-        padding: 8px 0;
-        border: 0;
-        border-radius: 12px;
+        padding: 1px 0;
+        border: 1px solid var(--border-color-2);
+        border-radius: 2px;
         z-index: 10;
-        box-shadow: 0 0 6px 0 rgba(0,16,61,.06), 0 6px 12px 0 rgba(0,16,61,.06), 0 6px 20px 0 rgba(0,16,61,.06), 0 10px 36px 0 rgba(0,16,61,.08);
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.09),
+            0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12), 0 5px 5px -3px rgba(0,0,0,.2);
     }
 
     .ui_actions_menu:before,
@@ -2583,33 +2584,25 @@
     .ui_actions_menu a,
     .ui_actions_menu .ui_actions_menu_item,
     .ui_actions_menu form button,
+    .ui_actions_menu label,
     .msg-dropdown-item {
+        display: flex;
+        align-items: center;
         padding: 0 16px;
         font-size: 16px;
-        line-height: 48px;
-        height: 48px;
+        line-height: 44px;
+        height: 44px;
+        transition: none;
+        box-sizing: border-box;
     }
 
     .ui_actions_menu a:hover,
     .ui_actions_menu .ui_actions_menu_item:hover,
     .ui_actions_menu form button:hover,
+    .ui_actions_menu label:hover,
     .msg-dropdown-item:hover {
         background-color: color-mix(in srgb, currentColor 4%, transparent);
     }
-
-    /* commenting out because MD 2 ripple is now implemented
-    .ui_actions_menu a:focus-visible,
-    .ui_actions_menu .ui_actions_menu_item:focus-visible,
-    .ui_actions_menu form button:focus-visible {
-        background-color: color-mix(in srgb, currentColor 12%, transparent);
-        outline: none;
-    }
-    .ui_actions_menu a:active,
-    .ui_actions_menu .ui_actions_menu_item:active,
-    .ui_actions_menu form button:active {
-        background-color: color-mix(in srgb, currentColor 12%, transparent);
-    }
-    */
 
     .ui_actions_menu:not(.dark) a {
         color: var(--text-color);

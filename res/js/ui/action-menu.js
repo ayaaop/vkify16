@@ -51,10 +51,6 @@ vkify.once('uiActionsMenu', function () {
     return el ? el.getBoundingClientRect() : { top: 0, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
   }
 
-  function prefersReducedMotion() {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  }
-
   // ——— positioning helpers ———
   function computeBounds(el) {
     // Dialog case – constrain to the dialog body
@@ -130,13 +126,6 @@ vkify.once('uiActionsMenu', function () {
     return menu;
   }
 
-  function getMenuItems(menu) {
-    if (!menu) return [];
-    return Array.from(menu.querySelectorAll(
-      'a[href], button:not([disabled]), input[type="button"], input[type="submit"], [role="menuitem"], .ui_actions_menu_item'
-    )).filter(el => el.offsetParent !== null); // visible only
-  }
-
   function getPageBlock(el) {
     return el?.closest?.('.page_block') || null;
   }
@@ -151,73 +140,6 @@ vkify.once('uiActionsMenu', function () {
       if (!stillOpen) {
         pageBlock.style.zIndex = '';
       }
-    }
-  }
-
-  // ——— ARIA & focus ———
-  function setAria(el, shown) {
-    const trigger = firstNonMenuChild(el) || el;
-    const menu = geByClass1('ui_actions_menu', el);
-
-    if (trigger) {
-      trigger.setAttribute('aria-haspopup', 'menu');
-      trigger.setAttribute('aria-expanded', shown ? 'true' : 'false');
-    }
-    if (menu) {
-      menu.setAttribute('role', 'menu');
-      menu.setAttribute('aria-hidden', shown ? 'false' : 'true');
-      if (shown) {
-        // make items focusable
-        getMenuItems(menu).forEach(item => {
-          if (!item.hasAttribute('tabindex')) item.tabIndex = -1;
-        });
-      }
-    }
-  }
-
-  function focusFirstItem(menu) {
-    const items = getMenuItems(menu);
-    if (items.length) items[0].focus({ preventScroll: true });
-  }
-
-  function handleMenuKeydown(ev, wrap) {
-    const menu = geByClass1('ui_actions_menu', wrap);
-    if (!menu || !hasClass(wrap, 'shown')) return;
-
-    const items = getMenuItems(menu);
-    if (!items.length) return;
-
-    const current = document.activeElement;
-    let idx = items.indexOf(current);
-
-    switch (ev.key) {
-      case 'Escape':
-        ev.preventDefault();
-        uiActionsMenu.toggle(wrap, false, { immediate: true });
-        (firstNonMenuChild(wrap) || wrap).focus();
-        break;
-      case 'ArrowDown':
-        ev.preventDefault();
-        idx = idx < items.length - 1 ? idx + 1 : 0;
-        items[idx].focus();
-        break;
-      case 'ArrowUp':
-        ev.preventDefault();
-        idx = idx > 0 ? idx - 1 : items.length - 1;
-        items[idx].focus();
-        break;
-      case 'Home':
-        ev.preventDefault();
-        items[0].focus();
-        break;
-      case 'End':
-        ev.preventDefault();
-        items[items.length - 1].focus();
-        break;
-      case 'Tab':
-        // allow natural tab, but close menu
-        uiActionsMenu.toggle(wrap, false, { immediate: true });
-        break;
     }
   }
 
@@ -420,6 +342,7 @@ vkify.once('uiActionsMenu', function () {
 
     toggle(el, s, options = {}) {
       const dummyMenu = data(el, 'dummyMenu');
+      const origEl = el;
       if (dummyMenu) el = dummyMenu;
 
       // clicking inside an open menu should close it
@@ -431,7 +354,7 @@ vkify.once('uiActionsMenu', function () {
       const isShown = hasClass(el, 'shown');
       const willShow = (s === undefined || s === null) ? !isShown : !!s;
       let menu = geByClass1('ui_actions_menu', el);
-      const noAnimate = !!(options.noAnimate || prefersReducedMotion());
+      const noAnimate = !!options.noAnimate;
       const immediate = !!options.immediate;
 
       // clear pending hide
@@ -477,16 +400,15 @@ vkify.once('uiActionsMenu', function () {
 
         positionArrow(el, options);
         addClass(el, 'shown');
-        setAria(el, true);
-
-        if (menu && !options.noFocus) {
-          requestAnimationFrame(() => focusFirstItem(menu));
-        }
+        // mirror onto the originating wrap so trigger-side `shown` checks
+        // keep working when the menu lives in a portal dummy.
+        if (origEl !== el) addClass(origEl, 'shown');
       } else {
         if (!isShown) return;
 
         const doHide = () => {
           removeClass(el, 'shown');
+          if (origEl !== el) removeClass(origEl, 'shown');
           if (menu) {
             removeClass(menu, 'ui_actions_menu_hiding');
             menu.style.display = 'none';
@@ -525,6 +447,13 @@ vkify.once('uiActionsMenu', function () {
         clearTimeout(ht);
         data(el, 'hidetimer', 0);
       }
+      // ...and one parked on an already-portaled dummy: hovering back from
+      // the menu to the trigger must not let it fire and close under us.
+      const existingDummy = data(el, 'dummyMenu');
+      if (existingDummy && (ht = data(existingDummy, 'hidetimer'))) {
+        clearTimeout(ht);
+        data(existingDummy, 'hidetimer', 0);
+      }
       const orig = data(el, 'origMenu');
       if (orig && (ht = data(orig, 'hidetimer'))) {
         clearTimeout(ht);
@@ -552,7 +481,10 @@ vkify.once('uiActionsMenu', function () {
       // dummy menu (portal-like)
       if (options.appendParentCls) {
         let menu = geByClass1('ui_actions_menu', el);
-        if (menu) {
+        if (menu && hasClass(el, 'ui_actions_menu_dummy_wrap')) {
+          // already portaled (e.g. hover re-entry on the dummy itself):
+          // keep el so it only gets repositioned below.
+        } else if (menu) {
           const appendEl = domClosest(options.appendParentCls, menu);
           const menuWrap = domClosest('ui_actions_menu_wrap', el);
           const newWrap = se(
@@ -649,11 +581,6 @@ vkify.once('uiActionsMenu', function () {
       }
     });
   }, { passive: true });
-
-  document.addEventListener('keydown', ev => {
-    const open = document.querySelector('.ui_actions_menu_wrap.shown');
-    if (open) handleMenuKeydown(ev, open);
-  });
 
   document.addEventListener('click', ev => {
     const wrap = ev.target.closest('.ui_actions_menu_wrap');

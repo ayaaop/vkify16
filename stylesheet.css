@@ -2122,7 +2122,7 @@ table,
     cursor: pointer;
 }
 .post-attach-menu:not(.post-attach-menu--inline) .post-attach-menu__trigger:hover,
-.post-attach-menu:not(.post-attach-menu--inline) .post-attach-menu__trigger.shown {
+.post-attach-menu:not(.post-attach-menu--inline) .shown .post-attach-menu__trigger {
     opacity: 1;
 }
 
