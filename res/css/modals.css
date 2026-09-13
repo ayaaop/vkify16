@@ -776,6 +776,10 @@
 .ovk-diag-body .media_check_btn_wrap {
   display: block;
 }
+.audio_attachment_header .media_check_btn_wrap,
+.notesInsert .media_check_btn_wrap {
+  display: none;
+}
 .photos_container_albums .page_album_row {
   display: inline-block;
   vertical-align: top;
