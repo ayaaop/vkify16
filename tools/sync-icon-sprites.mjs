@@ -228,10 +228,13 @@ function compareIconIds(a, b) {
 
 function collectExistingSymbolData(layoutContent) {
   const symbols = new Map();
+  let minified = 0;
   for (const match of layoutContent.matchAll(SYMBOL_RE)) {
-    symbols.set(match[1], normalizeSymbolMarkup(match[0]));
+    const cleaned = minifySymbolMarkup(match[0].trim());
+    if (cleaned !== match[0].trim()) minified++;
+    symbols.set(match[1], normalizeSymbolMarkup(cleaned));
   }
-  return symbols;
+  return { symbols, minified };
 }
 
 function formatSpriteSymbols(symbolMap) {
@@ -278,15 +281,34 @@ function parseSvgDimensions(attrs, iconId) {
 }
 
 function cleanSvgInner(inner) {
-  return inner
+  let out = inner
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/<\?xml[^?]*\?>/gi, '')
     .replace(/<title>[\s\S]*?<\/title>/gi, '')
     .replace(/<desc>[\s\S]*?<\/desc>/gi, '')
+    .replace(/<metadata>[\s\S]*?<\/metadata>/gi, '')
     .replace(/<defs>\s*<\/defs>/gi, '')
     .replace(/<polygon\b[^>]*points="(?:\d+\s*){4,}"[^>]*>\s*<\/polygon>/gi, '')
+    .replace(/\s+id="[^"]*"/gi, '')
     .replace(/\s+/g, ' ')
     .trim();
+
+  // Unwrap attribute-less <g> layers (what remains after layer-name ids are
+  // stripped); repeat until no bare groups are left.
+  let prev;
+  do {
+    prev = out;
+    out = out.replace(/<g\s*>([\s\S]*?)<\/g>/g, '$1');
+  } while (out !== prev);
+
+  return out.replace(/\s+/g, ' ').replace(/> </g, '><').trim();
+}
+
+function minifySymbolMarkup(symbolHtml) {
+  return symbolHtml.replace(
+    /^(<symbol\b[^>]*>)([\s\S]*?)(<\/symbol>)$/,
+    (m, open, inner, close) => open + cleanSvgInner(inner) + close,
+  );
 }
 
 function svgFileToSymbol(iconId, svgPath) {
@@ -419,7 +441,9 @@ function main() {
   const scanFiles = SCAN_DIRS.flatMap((dir) => walkFiles(dir));
   const usedIconIds = collectUsedIconIds(scanFiles);
   let layoutContent = fs.readFileSync(LAYOUT, 'utf8');
-  const symbolMap = collectExistingSymbolData(layoutContent);
+  const symbolData = collectExistingSymbolData(layoutContent);
+  const symbolMap = symbolData.symbols;
+  const minifiedCount = symbolData.minified;
   const existingIconIds = new Set(symbolMap.keys());
   const index = buildIconIndex(ICONS_ROOT);
 
@@ -495,6 +519,7 @@ function main() {
   console.log(`Referenced icons: ${usedIconIds.size}`);
   console.log(`Existing sprites: ${existingIconIds.size}`);
   console.log(`Canonical icons required: ${requiredCanonical.size}`);
+  console.log(`Sprites minified: ${minifiedCount}`);
   if (prune) {
     console.log(`Unused sprites: ${unusedIconIds.size}`);
   } else {
@@ -535,7 +560,10 @@ function main() {
   }
 
   const shouldReorderSprites =
-    symbolsToAdd.length > 0 || reorder || (prune && unusedIconIds.size > 0);
+    symbolsToAdd.length > 0 ||
+    reorder ||
+    (prune && unusedIconIds.size > 0) ||
+    minifiedCount > 0;
 
   const viewBoxSync = syncSvgViewBoxes(scanFiles, viewBoxMap, false);
 
@@ -543,6 +571,7 @@ function main() {
     renameMap.size === 0 &&
     symbolsToAdd.length === 0 &&
     unresolved.length === 0 &&
+    minifiedCount === 0 &&
     !shouldReorderSprites &&
     viewBoxSync.syncedIcons.length === 0
   ) {
