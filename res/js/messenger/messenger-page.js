@@ -1,4 +1,4 @@
-import { imImport, fallbackReplySnippet, fallbackEmojiHex, fallbackRecentSmiles, fallbackRecentSmileClick, fallbackPeerAvatar, ensureVideoPreviews } from './shared.js';
+import { imImport, fallbackReplySnippet, fallbackEmojiHex, fallbackRecentSmiles, fallbackRecentSmileClick, fallbackPeerAvatar, ensureVideoPreviews, syncBodyNoScroll, isCompactMode } from './shared.js';
 import { isMobileViewport } from './mobile-mode.js';
 import { createPeerInfoView } from './components/peer-info-view.js';
 import { createPinnedMessageBar } from './components/pinned-message-bar.js';
@@ -7,7 +7,6 @@ import { createInputArea } from './components/input-area.js';
 import { createStockInputArea } from './components/input-area-stock.js';
 import { installClassicTabBar } from './components/classic-tab-bar.js';
 import { installConversationsRenderer } from './components/conversations-page.js';
-import { installCompactPlaceholder } from './components/compact-placeholder.js';
 
 let installed = false;
 
@@ -46,7 +45,7 @@ export async function installMessengerRenderer() {
 
     const { MessengerPage } = messengerPagesMod || {};
     const { MessageListView } = messageMod || {};
-    const { ActionsBar, ErrorConversation } = commonMod || {};
+    const { ActionsBar, ErrorConversation, MentionAutocomplete } = commonMod || {};
     const {
         PeerAvatar: UpstreamPeerAvatar,
         getReplySnippet: upstreamReplySnippet,
@@ -76,8 +75,8 @@ export async function installMessengerRenderer() {
     const tr = (typeof window.tr === 'function' ? window.tr : (key) => key);
 
     const AttachmentMenu = createAttachmentMenu({ html, tr });
-    const VkInputArea = createInputArea({ html, tr, AttachmentMenu, getReplySnippet, getEmojiHex });
-    const StockInputArea = createStockInputArea({ html, tr, getDisplayRecentSmiles, onRecentSmileClick, getEmojiHex, getReplySnippet, PeerAvatar });
+    const VkInputArea = createInputArea({ html, tr, AttachmentMenu, getReplySnippet, getEmojiHex, MentionAutocomplete });
+    const StockInputArea = createStockInputArea({ html, tr, getDisplayRecentSmiles, onRecentSmileClick, getEmojiHex, getReplySnippet, PeerAvatar, MentionAutocomplete });
     const PeerInfoView = createPeerInfoView({ html, tr });
     const PinnedMessageBar = createPinnedMessageBar({ html, tr });
 
@@ -86,11 +85,6 @@ export async function installMessengerRenderer() {
 
     await installClassicTabBar({ html, render, commonMod });
     await installConversationsRenderer({ html, render, h, Fragment, commonMod });
-    try {
-        installCompactPlaceholder({ html, render, commonMod });
-    } catch (e) {
-        console.error('vkify16 | compact placeholder banner upgrade failed:', e);
-    }
 
     MessengerPage.prototype.render = async function vkifyMessengerPageRender(container, options = {}, messenger = null) {
         if (!container) {
@@ -129,13 +123,26 @@ export async function installMessengerRenderer() {
         }
     };
 
+    function peerTabsSignature(messenger) {
+        try {
+            const tabs = Array.isArray(messenger && messenger.opened_tabs) ? messenger.opened_tabs : [];
+            const ids = tabs.map((t) => {
+                const id = (t && t.peer && t.peer.id != null) ? t.peer.id : ((t && t.id != null) ? t.id : '');
+                return String(id);
+            });
+            return ids.join(',') + '|' + String(messenger && messenger.currentChatId != null ? messenger.currentChatId : '');
+        } catch (e) {
+            return '';
+        }
+    }
+
     async function vkifyRenderMessenger(container, options, orig_messenger, deps) {
         const { html, render, h, Fragment, ErrorConversation, MessageListView, ActionsBar, PeerInfoView, PinnedMessageBar, InputAreaComponent } = deps;
         try {
-            const inputEl = this.getNode().find('#write .content-editable, #write .small-textarea').last().get(0);
-            orig_messenger.currentDraft = inputEl && typeof inputEl.value !== 'undefined' ? inputEl.value : '';
+            orig_messenger.currentDraft = this.getCurrentText() || '';
         } catch (e) {
         }
+        syncBodyNoScroll();
 
         this.getNode().addClass('page-other');
 
@@ -154,71 +161,128 @@ export async function installMessengerRenderer() {
         ensureVideoPreviews(messages);
 
         const isSavedMessages = peer && peer.id == window.im?.state?.getId();
-        const initialDate = (messages && messages.length > 0)
+        // Upstream keeps the visible date across re-renders (this.currentVisibleDate);
+        // fall back to the last chunk date like upstream render does.
+        const initialDate = this.currentVisibleDate || ((messages && messages.length > 0)
             ? (messages[messages.length - 1].readable_date || messages[messages.length - 1].date || '')
-            : '';
+            : '');
 
         const pinned = (currentConv.hasPinned && currentConv.hasPinned())
             ? html`<${PinnedMessageBar} convo=${currentConv} />`
             : null;
         const headerWrapClass = 'messenger-app--header-wrap' + (pinned ? ' has-pinned' : '');
 
-        const header = html`
-            <div class=${headerWrapClass}>
-                <${PeerInfoView}
-                    convo=${currentConv}
-                    page=${this}
-                    togglePeerInfo=${() => { this.togglePeerInfo(); }}
-                />
-                ${pinned}
-            </div>
-        `;
-
         const chatPage = html`
-            <div id="chat-page" class="chat-window ${isSavedMessages ? 'saved-msgs' : ''}">
-                <${ActionsBar}
-                    selectedMessages=${orig_messenger.selected_messages_objs}
-                    count=${orig_messenger.selected_messages_count}
-                    onDelete=${() => this.callDeletion()}
-                    onUnselect=${() => orig_messenger.unselectAll()}
-                    onReply=${() => this.onReplyButtonClick()}
-                    onForwardClick=${() => this.onForwardClick()}
-                    onViewers=${(msg) => this.onViewersButtonClick(null, msg || orig_messenger.selected_messages_objs[0])}
-                />
-                ${initialDate ? html`
-                    <div class="im_floating_date_wrap" onClick=${(e) => this.onFloatingDateClick(e)}>
-                        <b id="im_floating_date_text">${initialDate}</b>
+            <div id="chat-page">
+                <div class="chat-window ${isSavedMessages ? 'saved-msgs' : ''}">
+                    <div class=${headerWrapClass}>
+                        <${PeerInfoView}
+                            convo=${currentConv}
+                            page=${this}
+                            togglePeerInfo=${() => { this.togglePeerInfo(); }}
+                        />
+                        ${pinned}
                     </div>
-                ` : ''}
-                <div class="messenger-app messenger-layer">
-                    <${MessageListView}
-                        convo=${currentConv}
-                        dayDividedChunks=${messages}
-                        page=${this} />
-                    ${!options.removeInput ? html`<${InputAreaComponent}
-                        convo=${currentConv}
-                        editMsg=${orig_messenger.editMsg}
-                        replyTo=${orig_messenger.replyTo}
-                        onRemoveReply=${() => orig_messenger.removeReply()}
-                        onSend=${() => orig_messenger.onSendMessage()}
-                        onKeyPress=${(e) => this.onTextareaKeyPress(e)}
-                        currentDraft=${orig_messenger.currentDraft}
-                        onInput=${(e) => { this.currentDraft = e.target.value; }}
-                        togglePeerInfo=${(e) => { this.togglePeerInfo(); }}
-                        clickOnReply=${(msg, e) => { this.clickOnReply(msg, e); }}
-                        forwarded_msg=${orig_messenger.forwarded_msg}
-                        onRemoveForward=${() => orig_messenger.removeForward()}
-                    />` : ''}
+                    <${ActionsBar}
+                        selectedMessages=${orig_messenger.selected_messages_objs}
+                        count=${orig_messenger.selected_messages_count}
+                        onDelete=${() => this.callDeletion()}
+                        onUnselect=${() => orig_messenger.unselectAll()}
+                        onReply=${() => this.onReplyButtonClick()}
+                        onForwardClick=${() => this.onForwardClick()}
+                        onViewers=${(msg) => this.onViewersButtonClick(null, msg || orig_messenger.selected_messages_objs[0])}
+                    />
+                    <div class="messenger-app messenger-layer">
+                        ${initialDate ? html`
+                            <div class="im_floating_date_wrap" onClick=${(e) => this.onFloatingDateClick(e)}>
+                                <b id="im_floating_date_text">${initialDate}</b>
+                            </div>
+                        ` : ''}
+                        <${MessageListView}
+                            convo=${currentConv}
+                            dayDividedChunks=${messages}
+                            page=${this} />
+                        ${!options.removeInput ? html`<${InputAreaComponent}
+                            convo=${currentConv}
+                            editMsg=${orig_messenger.editMsg}
+                            replyTo=${orig_messenger.replyTo}
+                            onRemoveReply=${() => orig_messenger.removeReply()}
+                            onSend=${() => orig_messenger.onSendMessage()}
+                            onKeyPress=${(e) => this.onTextareaKeyPress(e)}
+                            currentDraft=${orig_messenger.currentDraft}
+                            onInput=${(e) => {
+                                const val = (e && e.target && (e.target.value !== undefined
+                                    ? e.target.value
+                                    : (e.target._contentEditable ? e.target._contentEditable.getText() : e.target.innerText))) || '';
+                                this.currentDraft = val;
+                                orig_messenger.currentDraft = val;
+                                try {
+                                    this.checkMentionTrigger(e.target);
+                                } catch (err) {
+                                    console.error('vkify16 | checkMentionTrigger failed:', err);
+                                }
+                            }}
+                            togglePeerInfo=${(e) => { this.togglePeerInfo(); }}
+                            clickOnReply=${(msg, e) => { this.clickOnReply(msg, e); }}
+                            forwarded_msg=${orig_messenger.forwarded_msg}
+                            onRemoveForward=${() => orig_messenger.removeForward()}
+                            mentionActive=${orig_messenger.mentionActive}
+                            mentionMatches=${orig_messenger.mentionMatches}
+                            mentionSelectedIndex=${orig_messenger.mentionSelectedIndex}
+                            onApplyMention=${(item) => { this.applyMention(item); }}
+                        />` : ''}
+                    </div>
                 </div>
             </div>
         `;
 
-        render(h(Fragment, null, header, chatPage), container);
+        render(chatPage, container);
 
+        // New upstream scroll model (4c462220): the pill/observer/underflow
+        // helpers live on the page instance. Mirror showHook/render side
+        // effects so the mountain pill, read receipts and underflow fill keep
+        // working; every call is guarded for older upstream.
+        try {
+            if (typeof this.updateMountainButton === 'function') this.updateMountainButton();
+        } catch (e) {
+            console.error('vkify16 | updateMountainButton failed:', e);
+        }
+        try {
+            if (typeof this._setupReadObserver === 'function') this._setupReadObserver();
+        } catch (e) {
+            console.error('vkify16 | _setupReadObserver failed:', e);
+        }
+        try {
+            if (typeof this._setupResizeListener === 'function') this._setupResizeListener();
+        } catch (e) {
+            console.error('vkify16 | _setupResizeListener failed:', e);
+        }
+        try {
+            if (typeof this._checkAndFillUnderflow === 'function') this._checkAndFillUnderflow();
+        } catch (e) {
+            console.error('vkify16 | _checkAndFillUnderflow failed:', e);
+        }
         try {
             this._updPadding();
         } catch (e) {
             console.error('vkify16 | _updPadding failed:', e);
+        }
+
+        // Classic rail: refresh peer tabs when they actually change. The
+        // messenger re-renders on every keystroke/LongPoll tick, so compare a
+        // signature of opened_tabs+currentChatId and only re-render the bar
+        // on a real change. updateTabs only re-renders the tab bar — no
+        // recursion into here.
+        try {
+            if (currentConv && !isCompactMode(window.im) && typeof window.im?.updateTabs === 'function') {
+                const sig = peerTabsSignature(orig_messenger);
+                if (sig !== this._vkifyLastPeerTabsSig) {
+                    this._vkifyLastPeerTabsSig = sig;
+                    window.im.updateTabs();
+                }
+            }
+        } catch (e) {
+            console.error('vkify16 | tab bar refresh failed:', e);
         }
     }
 
@@ -235,6 +299,49 @@ export async function installMessengerRenderer() {
         const h = this.container ? this.container.querySelector('.post-horizontal') : null;
         const v = this.container ? this.container.querySelector('.post-vertical') : null;
         return [h ? h.innerHTML : '', v ? v.innerHTML : ''];
+    };
+
+    const origTogglePeerInfo = MessengerPage.prototype.togglePeerInfo;
+
+    // Upstream 5796d6fa moved the toggle logic inside `if (false)`, leaving
+    // the method a no-op: header/author clicks and the contact page's own
+    // "back" button no longer open/close the peer tab. Restore the toggle
+    // here, keeping upstream's new close() of the contact tab on the way
+    // back (IMTab.close() now also drops the container and re-renders tabs).
+    MessengerPage.prototype.togglePeerInfo = async function vkifyTogglePeerInfo(sender = null) {
+        const messenger = window.im?.messenger;
+        if (!messenger || messenger.is_switching === true) {
+            return;
+        }
+        messenger.is_switching = true;
+        try {
+            if (window.im.getSelectedTabId?.() == "contact") {
+                const contactTab = window.im.getTab?.("contact");
+                if (contactTab) {
+                    contactTab.close();
+                }
+                window.im.openTabByName('messenger');
+            } else {
+                const _c = window.im.state?.getCurrentConvo?.();
+                if (_c?.peer && !(typeof _c.peer.isILeft === 'function' && _c.peer.isILeft())) {
+                    await _c.peer.checkMembers?.();
+                }
+                window.im.openTabByName?.('contact', false, {
+                    peer: { "peer": sender }
+                });
+            }
+        } catch (e) {
+            console.error('vkify16 | togglePeerInfo failed, deferring to upstream:', e);
+            if (typeof origTogglePeerInfo === 'function') {
+                try {
+                    return await origTogglePeerInfo.call(this, sender);
+                } catch (e2) {
+                    console.error('vkify16 | upstream togglePeerInfo also failed:', e2);
+                }
+            }
+        } finally {
+            messenger.is_switching = false;
+        }
     };
 
 }

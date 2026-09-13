@@ -266,6 +266,9 @@
         margin: 0 !important;
         z-index: 201;
     }
+    body:has(#im_container.at_page) .sidebar {
+        z-index: 201;
+    }
     .sidebar_inner {
         width: 100%;
     }
@@ -1909,14 +1912,217 @@
         position: relative;
         padding: 16px 8px 13px;
     }
-    .messenger-app--messages---message .time {
-        width: fit-content;
-        position: absolute;
-        right: 8px;
-        top: 16px;
-    }
     .messenger-app--messages---message ._content > a {
         width: calc(100% - 80px)
+    }
+
+    /* Chat header takes over the appbar while a conversation is open: it is
+       fixed over the (static, in-flow) appbar and reuses its chrome. */
+    body.body_im .messenger-app--header.messages--peers-header-peer-name {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: auto;
+        min-height: 0;
+        height: var(--header-height);
+        display: flex;
+        align-items: center;
+        padding: 0 4px;
+        box-sizing: border-box;
+        background-color: var(--accent-color);
+        color: var(--accent-text-color);
+        border-bottom: 0;
+        z-index: 1;
+    }
+    body.dark-mode .messenger-app--header.messages--peers-header-peer-name {
+        --accent-color: var(--module-header-background-color);
+        --accent-text-color: var(--text-color);
+    }
+    body.body_im .messenger-app--header--back,
+    body.body_im .messenger-app-header--actions {
+        position: static;
+        width: auto;
+        height: 48px;
+    }
+    body.body_im .messenger-app--header--back {
+        flex: 0 0 auto;
+    }
+    body.body_im .messenger-app--header--back:hover {
+        background: none;
+    }
+    body.body_im .messenger-app--header--back a {
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        font-size: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-text-color);
+    }
+    .messenger-app--header--ava {
+        position: absolute;
+        left: 52px;
+    }
+    .messenger-app--header--ava img {
+        height: 38px;
+        width: 38px;
+    }
+    body.body_im .messenger-app--header--info {
+        width: auto;
+        flex: 1;
+        min-width: 0;
+        margin: 0 0 0 38px;
+        padding: 0 12px;
+        text-align: left;
+    }
+    body.body_im .messenger-app--header--name {
+        font-size: 16px;
+    }
+    body.body_im .messenger-app--header--name a {
+        color: var(--accent-text-color);
+    }
+    body.body_im .messenger-app--header--info .messenger-app--header--online {
+        color: var(--accent-text-color);
+        font-size: 13px;
+        opacity: 0.75;
+        margin-top: 3px;
+    }
+    body.body_im .messenger-app-header--actions {
+        margin-left: auto;
+        padding-right: 0;
+    }
+    body.body_im .messenger-app-header--more-actions--trigger {
+        filter: brightness(0) invert(1);
+    }
+    body.body_im .messenger-app--header--ava .messenger-app--header--online {
+        border-color: var(--accent-color);
+    }
+    /* Selection bar overlays the (now fixed) header, same as upstream. */
+    body.body_im .messages--actions {
+        position: fixed;
+        top: 0;
+        height: var(--header-height);
+    }
+
+    /* Input bar styled after the VKUI WriteBar: flat bar with an upward
+       elevation shadow, 44x52 icon slots at the edges, borderless field. */
+    body.body_im .messenger-app-end {
+        border-radius: 0;
+        box-shadow: none;
+    }
+    body.body_im .messenger-app .im-chat-input {
+        padding: 0;
+        border-top: 0;
+        box-shadow: 0 -1px 4px rgba(0,0,0,.08);
+    }
+    body.body_im .messenger-app .im-chat-input--textarea {
+        margin: 0 96px 0 48px;
+    }
+    body.body_im .messenger-app .im-chat-input--txt-wrap {
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        margin-bottom: 0;
+    }
+    body.body_im .messenger-app .im-chat-input--text,
+    body.body_im .messenger-app .im-chat-input--textarea textarea,
+    body.body_im #write.expanded-textarea .messenger-app--input---messagebox .content-editable,
+    body.body_im #write.expanded-textarea .messenger-app--input---messagebox .content-editable[contenteditable="true"] {
+        min-height: 52px !important;
+        max-height: 120px;
+        padding: 16px 12px;
+        font-size: 16px;
+        line-height: 20px;
+        border-radius: 0;
+    }
+    body.body_im .messenger-app .im-chat-input--textarea textarea::placeholder {
+        color: var(--muted-text-color);
+        opacity: 1;
+    }
+    body.body_im .messenger-app .im-chat-input--scroll .im-chat-input--attaches {
+        margin-top: 0;
+    }
+    /* VKUI WriteBar has a single paperclip on the left; the in-field camera
+       is redundant with the attach menu. */
+    body.body_im .messenger-app .im-chat-input--attach {
+        display: none;
+    }
+    body.body_im .messenger-app .im-chat-input--smile-wrap {
+        right: -48px;
+        bottom: 0;
+    }
+    body.body_im .messenger-app .im-chat-input--smile-wrap .emoji_picker_entrypoint {
+        width: 44px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted-text-color);
+    }
+    body.body_im .messenger-app .im-chat-input--smile-wrap .emoji_smile_icon_vector {
+        display: none;
+    }
+    body.body_im .messenger-app .im-chat-input--selector {
+        left: -48px;
+        bottom: 0;
+    }
+    body.body_im .messenger-app .post-attach-menu:not(.post-attach-menu--inline) .post-attach-menu__trigger {
+        width: 44px;
+        height: 52px;
+        padding: 0;
+        background-image: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted-text-color);
+    }
+    body.body_im .messenger-app .im-send-btn {
+        width: 44px;
+        height: 52px;
+        padding: 0;
+        opacity: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-color);
+    }
+    body.body_im .messenger-app .im-chat-input--send {
+        right: -92px;
+        bottom: 0;
+        margin-top: 0;
+    }
+    body.body_im .messenger-app .im-send-btn:after {
+        display: none;
+    }
+    /* VKUI done mode: check_circle_outline in place of send while editing. */
+    body.body_im .messenger-app .im-send-btn .wb-done {
+        display: none !important;
+    }
+    body.body_im .messenger-app .im-chat-input.is_msg_editing .im-send-btn {
+        background: none;
+    }
+    body.body_im .messenger-app .im-chat-input.is_msg_editing .im-send-btn .wb-send {
+        display: none !important;
+    }
+    body.body_im .messenger-app .im-chat-input.is_msg_editing .im-send-btn .wb-done {
+        display: block !important;
+    }
+
+    /* upstream 4c462220 mobile parity: fastchats hidden, sticker shop/modal fit */
+    #fastchats_container {
+        display: none !important;
+    }
+    .stickers_packs_grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    .stickers_pack_card {
+        max-width: 100%;
+    }
+    .ovk-diag-cont:has(.stickers_pack_modal), .stickers_pack_modal_cont {
+        max-width: 100% !important;
     }
 
     /* notes */
@@ -1997,7 +2203,8 @@
     /* action menu — VKUI ActionSheet: modal surface, 12dp shape,
        elevation3, 8dp vertical padding, 48dp items with 16dp padding
        and 16sp/20dp primary text (negative red for destructive) */
-    .ui_actions_menu {
+    .ui_actions_menu,
+    .msg-dropdown-menu {
         min-width: 112px;
         max-width: 280px;
         padding: 8px 0;
@@ -2014,7 +2221,8 @@
 
     .ui_actions_menu a,
     .ui_actions_menu .ui_actions_menu_item,
-    .ui_actions_menu form button {
+    .ui_actions_menu form button,
+    .msg-dropdown-item {
         padding: 0 16px;
         font-size: 16px;
         line-height: 48px;
@@ -2023,7 +2231,8 @@
 
     .ui_actions_menu a:hover,
     .ui_actions_menu .ui_actions_menu_item:hover,
-    .ui_actions_menu form button:hover {
+    .ui_actions_menu form button:hover,
+    .msg-dropdown-item:hover {
         background-color: color-mix(in srgb, currentColor 4%, transparent);
     }
 
@@ -2064,6 +2273,15 @@
     }
 
     /* Material Design 2 touch ripples (surface set up from mobile.js) */
+    .msg-dropdown-menu *,
+    .messenger-app--header--back a, .messenger-app--header--back a *,
+    .messenger-app--header--name a, .messenger-app--header--name a *,
+    .messenger-app--header--ava, .messenger-app--header--ava *,
+    .messenger-app-header--more-actions--trigger, .messenger-app-header--more-actions--trigger * {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
     .md-ripple {
         position: relative;
         overflow: hidden;

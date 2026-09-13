@@ -1,4 +1,4 @@
-import { imImport, isCompactMode, shouldShowBanner, dismissBanner } from '../shared.js';
+import { imImport, isCompactMode, shouldShowBanner, dismissBanner, syncBodyNoScroll } from '../shared.js';
 
 let installed = false;
 
@@ -72,6 +72,12 @@ export async function installConversationsRenderer({ html, render, h, Fragment, 
             convs = orig_convs;
         }
 
+        // Upstream 93fc992a: on a re-render with an empty list, kick off the
+        // next page load (initial load is covered by upstream beforeRender).
+        if (convs.length === 0 && window.im?.conversations && !window.im.conversations.isLoadingMore && !window.im.conversations._hasNoMore) {
+            window.im.conversations.loadNext().then(() => this.update()).catch(console.error);
+        }
+
         const showBanner = shouldShowBanner(this) && !isCompactMode();
         const handleDismissBanner = (e) => {
             if (e && e.preventDefault) {
@@ -85,6 +91,7 @@ export async function installConversationsRenderer({ html, render, h, Fragment, 
             html`<${ConversationListView}
                 conversations=${convs}
                 hasMore=${window.im.conversations.has_more_items}
+                isLoadingMore=${window.im.conversations.isLoadingMore}
                 onLoadMore=${(e) => this.loadNext(e)}
                 onCreateChat=${() => this._chatCreationModal()}
                 onSearch=${(e) => this._onMessagesSearch(e)}
@@ -93,5 +100,6 @@ export async function installConversationsRenderer({ html, render, h, Fragment, 
                 unreadMode=${window.im.conversations.isShowingUnread}
             />`
         ), container);
+        syncBodyNoScroll();
     }
 }

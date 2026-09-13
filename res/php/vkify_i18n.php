@@ -87,7 +87,9 @@ if (!function_exists('vkifyGetStrings')) {
                     'users_posts' => 'Posts from user',
                     'vkify_settings' => 'VKify16 settings',
                     'other_results' => 'Other results...',
-                    'document_preview_unavailable' => 'The preview for this document is not available.'
+                    'document_preview_unavailable' => 'The preview for this document is not available.',
+                    'loading_messenger' => 'Loading messenger...',
+                    'loading_messenger_part2' => 'This load time is abnormal. PLease try switching back to the default theme — if the messenger loads fine there, send a bugreport to <a href="https://github.com/ayaaop/vkify16" target="_blank">GitHub</a>.'
                 ],
                 'ru' => [
                     'add_tracks' => 'Добавить аудиозаписи',
@@ -168,7 +170,9 @@ if (!function_exists('vkifyGetStrings')) {
                     'users_posts' => 'Записи от пользователя',
                     'vkify_settings' => 'Настройки VKify16',
                     'other_results' => 'Другие результаты...',
-                    'document_preview_unavailable' => 'Предпросмотр этого документа недоступен.'
+                    'document_preview_unavailable' => 'Предпросмотр этого документа недоступен.',
+                    'loading_messenger' => 'Загрузка мессенджера...',
+                    'loading_messenger_part2' => 'Мессенджер загружается слишком долго. Попробуйте переключиться обратно на стандартную тему — если там все нормально, отправьте багрепорт на <a href="https://github.com/ayaaop/vkify16" target="_blank">GitHub</a>.'
                 ],
                 'uk' => [
                     'add_tracks' => 'Додати аудіозаписи',
@@ -247,7 +251,9 @@ if (!function_exists('vkifyGetStrings')) {
                     'themepack_warn' => 'Будь ласка, оберіть тему «VKify16» в <a href="/settings?act=interface">налаштуваннях оформлення</a> заново або <a href="#" onclick="location.reload(); return false;">оновіть сторінку</a>, якщо ви щойно переключилися на неї.',
                     'users_posts' => 'Дописи користувача',
                     'vkify_settings' => 'Налаштування VKify16',
-                    'other_results' => 'Інші результати...'
+                    'other_results' => 'Інші результати...',
+                    'loading_messenger' => 'Завантаження месенджера...',
+                    'loading_messenger_part2' => 'Месенджер завантажується занадто довго. Спробуйте переключитися назад на стандартну тему — якщо там все нормально, надішліть багрепорт на <a href="https://github.com/ayaaop/vkify16" target="_blank">GitHub</a>.'
                 ],
                 'kk' => [
                     'add_tracks' => 'Әндерді қосу',
@@ -327,7 +333,9 @@ if (!function_exists('vkifyGetStrings')) {
                     'themepack_warn' => '<a href="/settings?act=interface">Баптау бетінде</a> «VKify16» стилін қайта таңдаңыз, немесе, стильді енді ғана ауыстырған болсаңыз, <a href="#" onclick="location.reload(); return false;">бетті қайта жүктеңіз</a>.',
                     'users_posts' => 'Пайдаланушы жазбалары',
                     'vkify_settings' => 'VKify16 баптаулары',
-                    'other_results' => 'Басқа нәтижелер...'
+                    'other_results' => 'Басқа нәтижелер...',
+                    'loading_messenger' => 'Мессенджер жүктелуде...',
+                    'loading_messenger_part2' => 'Мессенджер тым ұзақ жүктелуде. Стандартты стильге оралып көріңіз — ол жерде бәрі жақсы істеп тұрса, <a href="https://github.com/ayaaop/vkify16" target="_blank">GitHub-та</a> қате туралы есеп жіберіңіз.'
                 ],
             ];
         }

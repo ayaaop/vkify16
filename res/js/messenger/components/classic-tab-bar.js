@@ -1,4 +1,4 @@
-import { imImport, isCompactMode } from '../shared.js';
+import { isCompactMode, syncBodyNoScroll } from '../shared.js';
 
 let installed = false;
 
@@ -14,14 +14,23 @@ export async function installClassicTabBar({ html, render, commonMod }) {
         return;
     }
 
-    let ImClass = window.im_class;
-    if (!ImClass) {
-        try {
-            await imImport('./im.js');
-            ImClass = window.im_class;
-        } catch (e) {
-            console.error('vkify16 | Failed to load im.js for tab bar:', e);
-        }
+    // Never import im.js ourselves: upstream loads that entry with ?mod=
+    // while its internal imports are query-less, so a query-less import
+    // would evaluate a SECOND copy (double window.im_class assignment and
+    // double auto-init) and our prototype patch could land on the dead one.
+    // Take the class from the live instance / published reference instead.
+    let ImClass = (window.im && window.im.constructor) || window.im_class;
+    if (!ImClass || !ImClass.prototype || typeof ImClass.prototype._renderTabBar !== 'function') {
+        ImClass = await new Promise((resolve) => {
+            let tries = 0;
+            const timer = setInterval(() => {
+                const found = (window.im && window.im.constructor) || window.im_class;
+                if ((found && found.prototype && typeof found.prototype._renderTabBar === 'function') || ++tries > 100) {
+                    clearInterval(timer);
+                    resolve(found);
+                }
+            }, 100);
+        });
     }
 
     if (!ImClass || !ImClass.prototype) {
@@ -70,50 +79,87 @@ export async function installClassicTabBar({ html, render, commonMod }) {
         });
 
         let peerTabs = null;
-        if (activeTabId === 'messenger' && this.messenger) {
-            const messengerTab = this.getTab('messenger');
-            const openedTabs = this.messenger.opened_tabs || [];
-            const currentChat = this.messenger.currentChatId;
-            if (openedTabs.length > 0) {
-                peerTabs = html`
-                    <div class="messages--peers-header-wrap">
-                        <div class="messages--peers-tabs">
-                            ${openedTabs.map((tab, idx) => html`
-                                <${PeerTab}
-                                    conv=${tab}
-                                    active=${idx === currentChat}
-                                    page=${messengerTab?.render_class || null} />
-                            `)}
+        try {
+            if (activeTabId === 'messenger' && this.messenger) {
+                const messengerTab = this.getTab('messenger');
+                const openedTabs = this.messenger.opened_tabs || [];
+                const currentChat = this.messenger.currentChatId;
+                if (openedTabs.length > 0) {
+                    peerTabs = html`
+                        <div class="messages--peers-header-wrap">
+                            <div class="messages--peers-tabs">
+                                ${openedTabs.map((tab, idx) => html`
+                                    <${PeerTab}
+                                        key=${tab?.peer ? tab.peer.id : (tab?.id || idx)}
+                                        conv=${tab}
+                                        active=${idx === currentChat}
+                                        page=${messengerTab?.render_class || null} />
+                                `)}
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
             }
+        } catch (e) {
+            // Peer tabs are decorative: never let them take down the whole
+            // tab bar (which would fall back to stock entirely).
+            console.error('vkify16 | peer tabs failed, continuing without them:', e);
+            peerTabs = null;
         }
 
         if (mainTabs && mainTabs.props) {
-            let children = mainTabs.props.children;
-            if (!Array.isArray(children)) {
-                children = children ? [children] : [];
-            }
-            children = children.filter((child) => {
-                if (!child) {
-                    return false;
-                }
-                if (MessagesNewInterfaceBanner && child.type === MessagesNewInterfaceBanner) {
-                    return false;
-                }
-                const cls = child.props && (child.props.class || child.props.className);
-                if (typeof cls === 'string' && cls.includes('im-new-interface-banner')) {
-                    return false;
-                }
-                return true;
-            });
+            const kids = dropBannerVNodes(mainTabs.props.children);
             if (peerTabs != null) {
-                children.push(peerTabs);
+                kids.push(peerTabs);
             }
-            mainTabs.props.children = children;
+            mainTabs.props.children = kids;
         }
 
         render(mainTabs, wrap);
+        syncBodyNoScroll();
+    }
+
+    function isBannerVNode(child) {
+        if (!child || typeof child !== 'object') {
+            return false;
+        }
+        const t = child.type;
+        if (!t) {
+            return false;
+        }
+        if (MessagesNewInterfaceBanner && t === MessagesNewInterfaceBanner) {
+            return true;
+        }
+        // Fall back to the component name: survives a dual module instance
+        // (e.g. stale HTTP cache serving different copies of common.js),
+        // where identity comparison fails but the banner must still go.
+        if (typeof t === 'function' && t.name === 'MessagesNewInterfaceBanner') {
+            return true;
+        }
+        if (typeof t === 'string') {
+            const cls = child.props && (child.props.class || child.props.className);
+            if (typeof cls === 'string' && cls.includes('im-new-interface-banner')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function dropBannerVNodes(children) {
+        if (!children) {
+            return [];
+        }
+        const arr = Array.isArray(children) ? children : [children];
+        const out = [];
+        for (const child of arr) {
+            if (!child) {
+                continue;
+            }
+            if (isBannerVNode(child)) {
+                continue;
+            }
+            out.push(child);
+        }
+        return out;
     }
 }

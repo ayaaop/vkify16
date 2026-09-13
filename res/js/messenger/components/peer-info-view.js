@@ -13,7 +13,9 @@ export function createPeerInfoView({ html, tr }) {
         const isSelfSaved = typeof peer.isSavedMessages === 'function' && peer.isSavedMessages();
         const userId = isUser ? peer.data?.id : null;
         const firstName = isUser ? (peer.data?.first_name || name) : '';
-        const isOnline = isUser && !isSelfSaved && peer.data?.last_seen && (Math.floor(Date.now() / 1000) - peer.data.last_seen.time <= 300);
+        const isOnline = isUser && !isSelfSaved && (typeof peer.isOnline === 'function'
+            ? peer.isOnline()
+            : (peer.data?.last_seen && (Math.floor(Date.now() / 1000) - peer.data.last_seen.time <= 300)));
 
         const onBackClick = (e) => {
             e.preventDefault();
@@ -30,6 +32,18 @@ export function createPeerInfoView({ html, tr }) {
             }
         };
 
+        const openMenu = (trigger) => {
+            if (window.isMobile && window.isMobile()) {
+                return;
+            }
+            if (typeof uiActionsMenu === 'undefined' || !uiActionsMenu) {
+                return;
+            }
+            if (!trigger.classList.contains('shown')) {
+                uiActionsMenu.show(trigger, null, { appendParentCls: 'at_page', align: 'right' });
+            }
+        };
+
         const onActionsClick = (e) => {
             if (e.target.closest('a, button')) {
                 return;
@@ -38,15 +52,37 @@ export function createPeerInfoView({ html, tr }) {
             if (window.isMobile && window.isMobile()) {
                 return;
             }
-            if (typeof uiActionsMenu !== 'undefined' && uiActionsMenu.toggle) {
-                uiActionsMenu.toggle(e.currentTarget);
+            if (typeof uiActionsMenu === 'undefined' || !uiActionsMenu) {
+                return;
             }
+            const wrap = e.currentTarget;
+            if (wrap.classList.contains('shown')) {
+                uiActionsMenu.toggle(wrap, false);
+            } else {
+                openMenu(wrap);
+            }
+        };
+
+        const onActionsMouseEnter = (e) => {
+            openMenu(e.currentTarget);
+        };
+
+        const onActionsMouseLeave = (e) => {
+            if (window.isMobile && window.isMobile()) {
+                return;
+            }
+            if (typeof uiActionsMenu === 'undefined' || !uiActionsMenu) {
+                return;
+            }
+            // Delayed hide: moving onto the portaled menu cancels it via the
+            // dummy's own hover handlers; moving away lets it fire.
+            uiActionsMenu.hide(e.currentTarget);
         };
 
         return html`
             <div class="messenger-app--header messages--peers-header-peer-name">
                 <div class="messenger-app--header--back">
-                    <a href="/im" onClick=${onBackClick}>${backLabel}</a>
+                    <a href="/im" onClick=${onBackClick}><svg class="mobileonly" width="28" height="28" viewBox="0 0 28 28"><use href="#arrow-left-outline-28" /></svg>${backLabel}</a>
                 </div>
                 <div class="messenger-app--header--info">
                     <div class="messenger-app--header--name">
@@ -56,7 +92,7 @@ export function createPeerInfoView({ html, tr }) {
                 </div>
                 <div class="messenger-app-header--actions">
                     ${isUser && !isSelfSaved ? html`
-                    <div class="messenger-app-header--more-actions ui_actions_menu_wrap ui_actions_menu_left_align" onClick=${onActionsClick}>
+                    <div class="messenger-app-header--more-actions ui_actions_menu_wrap ui_actions_menu_left_align" onClick=${onActionsClick} onMouseEnter=${onActionsMouseEnter} onMouseLeave=${onActionsMouseLeave}>
                         <div id="profile_more_btn" class="messenger-app-header--more-actions--trigger"></div>
                         <div id="profile_actions_tooltip" class="ui_actions_menu">
                             <a id="_bl_toggler" data-name=${firstName} data-val="1" data-id=${userId}>

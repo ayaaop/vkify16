@@ -4,6 +4,7 @@
 {var $mode2018Enabled = ($_COOKIE['vkify16_2018mode'] ?? '0') === '1'}
 {var $ovkHatEnabled = ($_COOKIE['ovkhat'] ?? '0') === '1'}
 {var $hideSidebar = $_SERVER['REQUEST_URI'] === '/' || $_SERVER['REQUEST_URI'] === '/reg' || $_SERVER['REQUEST_URI'] === '/login' || (isset($thisUser) && $thisUser->isBanned())}
+{var $isMessenger = preg_match('~^/im([/?]|$)~', $_SERVER['REQUEST_URI'] ?? '')}
 {if !isset($parentModule) || substr($parentModule, 0, 21) === 'libchandler:absolute.'}
 <!DOCTYPE html>
 <html>
@@ -38,6 +39,7 @@
         {css "js/node_modules/leaflet/dist/leaflet.css"}
         {css "js/node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css"}
         {script "js/node_modules/handlebars/dist/handlebars.min.js"}
+        {script "js/node_modules/lottie-web/build/player/lottie.min.js"}
         {script_module "js/messages/im.js"}
         {if $isTimezoned == NULL}
             {script "js/timezone.js"}
@@ -58,7 +60,7 @@
             {include headIncludes}
         {/ifset}
     </head>
-    <body {if isset($thisUser)}data-themepack="{$thisUser->getStyle()}"{/if} n:class="$hideSidebar ? no-sidebar, isset($thisUser) && $thisUser->isBanned() ? banned, $darkModeEnabled ? dark-mode, $ovkHatEnabled ? ovkhat">
+    <body {if isset($thisUser)}data-themepack="{$thisUser->getStyle()}"{/if} n:class="$hideSidebar ? no-sidebar, isset($thisUser) && $thisUser->isBanned() ? banned, $darkModeEnabled ? dark-mode, $ovkHatEnabled ? ovkhat, $isMessenger ? body_im">
         {include "_mobileIcons.latte"}
         <div n:if="\OPENVK_ROOT_CONF['openvk']['preferences']['bellsAndWhistles']['testLabel']" id="test-label">FOR TESTING PURPOSES ONLY</div>
 

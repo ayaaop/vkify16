@@ -57,10 +57,10 @@ export function createAttachmentMenu({ html, tr }) {
     return function AttachmentMenu() {
         return html`
         <div id="wallAttachmentMenu" class="page_add_media post-attach-menu">
-            <div class="ui_actions_menu_wrap ui_actions_menu_top ui_actions_menu_left_align"
-                 onMouseOver=${handleMenuShow(null, {autopos: true})}
+            <div class="ui_actions_menu_wrap ui_actions_menu_top"
+                 onMouseOver=${handleMenuShow(null, {align: 'left'})}
                  onMouseOut=${handleMenuHide}>
-                <span class="post-attach-menu__trigger" id="moreAttachTriggerIm" tabindex="0" role="button"></span>
+                <span class="post-attach-menu__trigger" id="moreAttachTriggerIm" tabindex="0" role="button"><svg class="mobileonly" width="28" height="28" viewBox="0 0 28 28"><use href="#attach-outline-28" /></svg></span>
                 <div class="ui_actions_menu" id="moreAttachTooltipIm">
                     ${toMenuEntries(html, tr, keys)}
                 </div>
@@ -81,8 +81,8 @@ export function createStockAttachmentMenu({ html, tr }) {
         <div id="wallAttachmentMenu" class="page_add_media post-attach-menu post-attach-menu--inline">
             ${inlineEntry(html, tr, 'photo')}
             ${inlineKeys.map((key) => inlineEntry(html, tr, key))}
-            <div class="ui_actions_menu_wrap ui_actions_menu_center_align"
-                 onMouseOver=${handleMenuShow()}
+            <div class="ui_actions_menu_wrap ui_actions_menu_top"
+                 onMouseOver=${handleMenuShow(null, {align: 'left'})}
                  onMouseOut=${handleMenuHide}>
                 <a class="post-attach-menu__trigger" id="moreAttachTriggerIm" aria-haspopup="menu" aria-expanded="false">
                     <vkifyloc name="more" />

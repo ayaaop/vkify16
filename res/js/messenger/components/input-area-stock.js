@@ -1,11 +1,11 @@
 import { createStockAttachmentMenu } from './attachment-menu.js';
 import { createInputChrome } from './input-chrome.js';
 
-export function createStockInputArea({ html, tr, getDisplayRecentSmiles, onRecentSmileClick, getEmojiHex, getReplySnippet, PeerAvatar }) {
+export function createStockInputArea({ html, tr, getDisplayRecentSmiles, onRecentSmileClick, getEmojiHex, getReplySnippet, PeerAvatar, MentionAutocomplete }) {
     const StockAttachmentMenu = createStockAttachmentMenu({ html, tr });
     const { ReplyBar, EditBar, ForwardBar, MountainPill, inputEndClass } = createInputChrome({ html, tr, getReplySnippet });
 
-    return function StockInputArea({ editMsg, replyTo, onRemoveReply, onSend, onKeyPress, currentDraft, onInput, togglePeerInfo, clickOnReply, convo, forwarded_msg, onRemoveForward }) {
+    return function StockInputArea({ editMsg, replyTo, onRemoveReply, onSend, onKeyPress, currentDraft, onInput, togglePeerInfo, clickOnReply, convo, forwarded_msg, onRemoveForward, mentionActive, mentionMatches, mentionSelectedIndex, onApplyMention }) {
         const is_editing = editMsg != null;
         const current_user = window.im.state.getOperator();
         const corresponder = window.im.state.getCurrentConvo();
@@ -22,6 +22,13 @@ export function createStockInputArea({ html, tr, getDisplayRecentSmiles, onRecen
                 <div class="model_content_textarea messenger-app--input has_emoji_picker expanded-textarea" id="write">
                     <img class="ava" src=${current_user.getAvatar("mid", false)} alt=${current_user.getName()} />
                     <div class="messenger-app--input---messagebox">
+                        ${MentionAutocomplete && mentionActive && mentionMatches && mentionMatches.length > 0 ? html`
+                            <${MentionAutocomplete}
+                                items=${mentionMatches}
+                                selectedIndex=${mentionSelectedIndex}
+                                onSelect=${onApplyMention}
+                            />
+                        ` : ''}
                         <div class="textareas has_emoji_picker">
                             ${(typeof window !== 'undefined' && window.ContentEditable && typeof window.ContentEditable.isSupported === 'function' && window.ContentEditable.isSupported()) ? html`
                                 <div
@@ -35,11 +42,17 @@ export function createStockInputArea({ html, tr, getDisplayRecentSmiles, onRecen
                                     ref=${(el) => {
                                         if (el && !el._contentEditable && window.ContentEditable) {
                                             new window.ContentEditable(el, { submitOnEnter: true, placeholder: tr('enter_message') });
+                                            el._lastConvoId = convo?.id;
                                             if (currentDraft && el.getText() !== currentDraft) {
                                                 el.setText(currentDraft);
                                             }
                                         } else if (el && el._contentEditable && currentDraft != null && el.getText() !== currentDraft) {
-                                            el.setText(currentDraft);
+                                            // Only push the draft on conversation switch; re-renders
+                                            // happen on every keystroke and would clobber typing.
+                                            if (convo && convo.id !== el._lastConvoId) {
+                                                el._lastConvoId = convo.id;
+                                                el.setText(currentDraft);
+                                            }
                                         }
                                     }}
                                 ></div>
@@ -65,6 +78,7 @@ export function createStockInputArea({ html, tr, getDisplayRecentSmiles, onRecen
                                             class="im-recent-smile-btn"
                                             title="${s}"
                                             data-emoji="${s}"
+                                            onMouseDown=${(e) => { e.preventDefault(); }}
                                             onClick=${(e) => onRecentSmileClick(s, e)}
                                         >
                                             <span class="emoji emoji_${getEmojiHex(s)}">${s}</span>

@@ -1,8 +1,8 @@
 import { createInputChrome } from './input-chrome.js';
 
-export function createInputArea({ html, tr, AttachmentMenu, getReplySnippet, getEmojiHex }) {
+export function createInputArea({ html, tr, AttachmentMenu, getReplySnippet, getEmojiHex, MentionAutocomplete }) {
     const { ReplyBar, EditBar, ForwardBar, MountainPill, inputEndClass } = createInputChrome({ html, tr, getReplySnippet });
-    return function InputArea({ editMsg, replyTo, onRemoveReply, onSend, onKeyPress, currentDraft, onInput, togglePeerInfo, clickOnReply, convo, forwarded_msg, onRemoveForward }) {
+    return function InputArea({ editMsg, replyTo, onRemoveReply, onSend, onKeyPress, currentDraft, onInput, togglePeerInfo, clickOnReply, convo, forwarded_msg, onRemoveForward, mentionActive, mentionMatches, mentionSelectedIndex, onApplyMention }) {
         const is_editing = editMsg != null;
         const cls = inputEndClass({ editMsg, replyTo, forwarded_msg, convo });
 
@@ -15,11 +15,17 @@ export function createInputArea({ html, tr, AttachmentMenu, getReplySnippet, get
             if (!el) return;
             if (hasContentEditable && !el._contentEditable && window.ContentEditable) {
                 new window.ContentEditable(el, { hiddenInput: hiddenTextarea, submitOnEnter: true, placeholder: tr('enter_message') });
+                el._lastConvoId = convo?.id;
                 if (currentDraft != null && typeof el.setText === 'function' && el.getText() !== currentDraft) {
                     el.setText(currentDraft);
                 }
             } else if (hasContentEditable && el._contentEditable && currentDraft != null && el.getText() !== currentDraft) {
-                el.setText(currentDraft);
+                // Only push the draft on conversation switch; re-renders happen
+                // on every keystroke and would clobber in-progress typing.
+                if (convo && convo.id !== el._lastConvoId) {
+                    el._lastConvoId = convo.id;
+                    el.setText(currentDraft);
+                }
             }
         };
 
@@ -61,6 +67,13 @@ export function createInputArea({ html, tr, AttachmentMenu, getReplySnippet, get
             <${MountainPill} convo=${convo} />
             <div class="im-chat-input clear_fix im-chat-input_classic ${is_editing ? 'is_msg_editing' : ''}" id="write">
                 <div class="im-chat-input--textarea messenger-app--input---messagebox">
+                    ${MentionAutocomplete && mentionActive && mentionMatches && mentionMatches.length > 0 ? html`
+                        <${MentionAutocomplete}
+                            items=${mentionMatches}
+                            selectedIndex=${mentionSelectedIndex}
+                            onSelect=${onApplyMention}
+                        />
+                    ` : ''}
                     <div class="im-chat-input--txt-wrap textareas has_emoji_picker">
                         <div class="im-chat-input--attach">
                             <a class="im-chat-input--attach-label im-attach-photo" tabindex="0" role="button"
@@ -69,6 +82,7 @@ export function createInputArea({ html, tr, AttachmentMenu, getReplySnippet, get
                         <div class="emoji_smile_wrap im-chat-input--smile-wrap">
                             <div class="emoji_picker_entrypoint emoji_smile">
                                 <div class="emoji_smile_icon_vector emoji_smile_icon"></div>
+                                <svg class="mobileonly" width="28" height="28" viewBox="0 0 28 28"><use href="#smile-outline-28" /></svg>
                             </div>
                         </div>
                         <div class="im-chat-input--selector">
@@ -77,7 +91,10 @@ export function createInputArea({ html, tr, AttachmentMenu, getReplySnippet, get
                         ${inputEl}
                         <button type="button" class="im-send-btn im-chat-input--send"
                                 onClick=${onSend}
-                                aria-label=${!is_editing ? tr('send') : tr('edit_action_lr')}></button>
+                                aria-label=${!is_editing ? tr('send') : tr('edit_action_lr')}>
+                            <svg class="mobileonly wb-send" width="28" height="28" viewBox="0 0 28 28"><use href="#send-28" /></svg>
+                            <svg class="mobileonly wb-done" width="28" height="28" viewBox="0 0 28 28"><use href="#check-circle-outline-28" /></svg>
+                        </button>
                     </div>
                     <div class="im-chat-input--scroll post-buttons">
                         <div class="im-chat-input--attaches">

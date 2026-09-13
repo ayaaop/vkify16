@@ -19,12 +19,18 @@ const contracts = [
     'emoji_picker_entrypoint',
     'post-buttons',
     'messenger-app-end',
-    'm-mountain',
+    // NOTE: 'm-mountain' is intentionally NOT here. Upstream 4c462220 owns
+    // that class via updateMountainButton() (covered below); the bundle must
+    // not emit it statically or the pill pins visible. Covered instead:
+    'messenger-mountain',
     'im-to-end',
     'messenger-app--header-wrap',
     'messages--peers-header-wrap',
     'im-new-interface-banner',
-    'im-compact-placeholder',
+    // upstream 4c462220 parity smoke signals (JS method/prop names must be
+    // present in the bundle, not DOM selectors)
+    'updateMountainButton',
+    'isLoadingMore',
 ];
 
 let src;

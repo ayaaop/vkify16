@@ -304,6 +304,22 @@ window.router = new class Router {
         const context = { container: document, pageBody };
         await window.vkify?.runPageLifecycle?.('afterPageSwap', context);
         window.vkify?.onPageReady?.();
+        // Leaving the messenger (no #im_container after the swap) must drop
+        // the chat-page body lock; entering it is picked up by the IM renders.
+        if (!document.querySelector('#im_container')) {
+            document.body.classList.remove('no-scroll');
+        }
+
+        const isImPage = /^\/im(?:\/|$)/.test(window.location.pathname);
+        document.body.classList.toggle('body_im', isImPage);
+        document.body.classList.toggle('body_im_modern', isImPage && localStorage.getItem('tw.im.modern_mode') === '1');
+        // Upstream stickers (4c462220) hydrate static Lottie thumbs after
+        // every render; re-run after AJAX swaps so chat/sticker markup animates.
+        try {
+            window.initStaticLottieStickers?.();
+        } catch (e) {
+            console.error('vkify16 | initStaticLottieStickers failed:', e);
+        }
         await window.vkify?.runPageLifecycle?.('afterPageReady', context);
     }
 

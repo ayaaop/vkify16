@@ -423,8 +423,10 @@
         + ', .ui_actions_menu a, .ui_actions_menu button, .ui_actions_menu input'
         + ', .ui_actions_menu .ui_actions_menu_item'
         + ', .ui_tab, .ui_tab_plain, .sidebar_inner .link, .mobile-info-row'
-        + ', .mobile-scroll-card';
-    const RIPPLE_UNBOUNDED_SELECTOR = '.appbar .hamburger, .appbar-extra-btn';
+        + ', .mobile-scroll-card, .msg-dropdown-menu .msg-dropdown-item'
+        + ', .messenger-app--header--back a, .messenger-app--header--name a';
+    const RIPPLE_UNBOUNDED_SELECTOR = '.appbar .hamburger, .appbar-extra-btn'
+        + ', .messenger-app--header--ava, .messenger-app-header--more-actions--trigger';
 
     function rippleEnabled() {
         return window.matchMedia('(max-width: 768px)').matches

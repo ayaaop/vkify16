@@ -1,9 +1,12 @@
-
 <div id="load_skeleton" class="im_page_loader">
-    <div class="pr">
+    <div class="pr pr_medium">
         <div class="pr_bt"></div>
         <div class="pr_bt"></div>
         <div class="pr_bt"></div>
+    </div>
+    <div class="loader_text">
+        <p id="loader_text_part1">{=vkifyTr("loading_messenger")}</p>
+        <p class="hidden" id="loader_text_part2">{=vkifyTr("loading_messenger_part2")|noescape}</p>
     </div>
 </div>
 <script>
@@ -20,7 +23,9 @@
             }, 1000);
         }
 
-        window.im_class.insertIn(document.querySelector('.page_content .page_block'), n_url.searchParams.get("as"));
+        if (!document.querySelector('.page_content #im_container')) {
+            window.im_class.insertIn(document.querySelector('.page_content'), n_url.searchParams.get("as"));
+        }
         
         document.querySelector('.page_block_h2').style.display = 'none';
         document.querySelector('.page_block').classList.remove('page_block');
@@ -28,6 +33,15 @@
 
     document.addEventListener("DOMContentLoaded", (e) => {
         loadPage();
+        
+        setTimeout(() => {
+            const loaderTextPart1 = document.getElementById('loader_text_part1');
+            const loaderTextPart2 = document.getElementById('loader_text_part2');
+            if (loaderTextPart1 && loaderTextPart2 && document.getElementById('load_skeleton')) {
+                loaderTextPart1.classList.add('hidden');
+                loaderTextPart2.classList.remove('hidden');
+            }
+        }, 3000);
     });
 
     if (window.im_class != null) {

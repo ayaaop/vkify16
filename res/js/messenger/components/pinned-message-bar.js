@@ -27,10 +27,10 @@ export function createPinnedMessageBar({ html, tr }) {
 
         let textPreview = '';
         try {
-            if (pinMsg.data && pinMsg.data.text) {
-                textPreview = pinMsg.data.text;
-            } else if (typeof pinMsg.getText === 'function') {
-                textPreview = pinMsg.getText(true);
+            if (typeof pinMsg.getText === 'function') {
+                textPreview = pinMsg.getText(true, true);
+            } else if (pinMsg.data && pinMsg.data.text) {
+                textPreview = pinMsg.data.text.replace(/\[([a-zA-Z0-9_]+)(?:\|([^\]]*))?\]/g, (m, target, title) => (title && title.trim()) ? title.trim() : target);
             }
         } catch (e) {
             textPreview = '';
