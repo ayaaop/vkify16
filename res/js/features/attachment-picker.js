@@ -1560,7 +1560,7 @@ vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
         }, () => msg.close()]
     });
 
-    msg.getNode().addClass('ovk-msg-fullscreen');
+    msg.getNode().addClass('ovk-msg-sheet');
     msg.getNode().find('.ovk-diag-body').attr('style', 'padding:0!important');
 
     function switchTab(name) {

@@ -31,6 +31,15 @@
 
 {block title}{$pageTitle}{/block}
 
+
+{block appbar_extra}
+<div n:if="$owner->getId() === $thisUser->getId()" class="mobileonly" id="group_appbar_extra">
+    <a class="appbar-extra-btn" href="/audios/upload" onclick="showAudioUploadPopup(); return false;" aria-label="{_upload}">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><use href="#add-outline-24"></use></svg>
+    </a>
+</div>
+{/block}
+
 {block content}
     {var $isMyClub = $isMyClub ?? false}
     {var $club = $club ?? null}

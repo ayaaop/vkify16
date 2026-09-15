@@ -986,10 +986,10 @@
         height: 36px;
         margin: 0 0 0 8px;
         padding: 0 8px !important;
-        background: none;
-        border: none;
-        box-shadow: none;
-        color: var(--accent-color);
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        color: var(--accent-color) !important;
         font-size: 14px;
         text-transform: uppercase;
         font-weight: 500;
@@ -1011,8 +1011,8 @@
     }
     .ovk-msg-dialog .ovk-diag-action > .ovk-msg-btn:hover,
     .ovk-msg-dialog .ovk-diag-action > .ovk-msg-btn:active {
-        background-color: color-mix(in srgb, var(--accent-color) 12%, transparent);
-        color: var(--accent-color);
+        background-color: color-mix(in srgb, var(--accent-color) 12%, transparent) !important;
+        color: var(--accent-color) !important;
     }
 
     /* bottom sheet */
@@ -1142,10 +1142,12 @@
     .ovk-msg-sheet .notesInsert .attachAudio {
         display: none;
     }
-    .ovk-msg-sheet .ovk-diag-action > .ovk-msg-btn {
+    .ovk-msg-sheet .ovk-diag-action > .ovk-msg-btn,
+    .ovk-msg-sheet .ovk-diag-action > .button {
         width: 100%;
         margin: 0;
         box-sizing: border-box;
+        text-align: center;
     }
 
     /* full-screen dialog */
@@ -1241,7 +1243,7 @@
     }
     /* tabs */
     .ovk-msg-fullscreen #_feed_settings_container,
-    .ovk-msg-fullscreen #_fast_video_upload,
+    .ovk-msg-sheet #_fast_video_upload,
     .ovk-msg-sheet #_feed_settings_container {
         display: flex;
         flex-direction: column;
@@ -1250,12 +1252,12 @@
         width: 100%;
     }
     .ovk-msg-fullscreen #_feed_settings_container #_tabs,
-    .ovk-msg-fullscreen #_fast_video_upload #_tabs,
+    .ovk-msg-sheet #_fast_video_upload #_tabs,
     .ovk-msg-sheet #_feed_settings_container #_tabs {
         flex: none;
     }
     .ovk-msg-fullscreen #_feed_settings_container #__content,
-    .ovk-msg-fullscreen #_fast_video_upload #__content,
+    .ovk-msg-sheet #_fast_video_upload #__content,
     .ovk-msg-sheet #_feed_settings_container #__content {
         flex: 1;
         min-height: 0;

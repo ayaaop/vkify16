@@ -87,7 +87,7 @@ vkify.once("showAudioUploadPopup", () => {
             }),
             buttons: [tr('close')],
             callbacks: [() => audioUploadPopup.close()]
-        });
+        }).addClass('ovk-msg-sheet');
 
         const id3Src = '/assets/packages/static/openvk/js/node_modules/id3js/lib/id3.js';
         let id3 = window.id3;
@@ -379,7 +379,7 @@ vkify.once("showAudioUploadPopup", () => {
 
         const actionEl = audioUploadPopup.getNode().find('.ovk-diag-action').nodes[0];
         if (actionEl) {
-            actionEl.insertAdjacentHTML('afterbegin', `<a href="/search?section=audios" class="button button_light" style="float: left; margin: 0;">${tr('audio_search')}</a>`);
+            actionEl.insertAdjacentHTML('afterbegin', `<a href="/search?section=audios" class="button button_light ovk-msg-btn" style="float: left; margin: 0;">${tr('audio_search')}</a>`);
         }
     };
 });

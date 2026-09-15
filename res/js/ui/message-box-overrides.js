@@ -103,8 +103,8 @@ vkify.bindOnce('messageBoxOverrides', () => {
             };
 
             // themepack dialogs opt in directly via addClass at creation
-            const SHEET_BODY_MARKERS = '.stickers_pack_modal, .audiosInsert, [id^="poll_editor"], #osm-map';
-            const FULLSCREEN_BODY_MARKERS = '#_fullyDeleteAudio, #_fast_video_upload';
+            const SHEET_BODY_MARKERS = '.stickers_pack_modal, .audiosInsert, [id^="poll_editor"], #osm-map, #upload_container, #repostMsgInput, #_fast_video_upload';
+            const FULLSCREEN_BODY_MARKERS = '#_fullyDeleteAudio';
             const classifyDialog = (el) => {
                 el.querySelectorAll('.ovk-diag-action > .button, .ovk-diag-action > button, .ovk-diag-action > input[type="button"], .ovk-diag-action > input[type="submit"]')
                     .forEach(btn => btn.classList.add('ovk-msg-btn'));

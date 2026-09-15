@@ -1134,7 +1134,7 @@ vkify.once('shareAudioPlaylist', () => {
             `,
             buttons: [],
             callbacks: []
-        });
+        }).addClass('ovk-msg-sheet');
 
         const node = msg.getNode();
         u('.ovk-diag-body').attr('style', 'padding: 20px 25px;');
@@ -1304,6 +1304,7 @@ vkify.once('repostModalLayout', () => {
         if (!dialogBody.length) return;
 
         const dialog = dialogBody.closest('.ovk-diag-cont');
+        dialog.addClass('ovk-msg-sheet');
         const footer = dialog.find('.ovk-diag-action');
         const originalSendBtn = footer.find('button').first();
 
