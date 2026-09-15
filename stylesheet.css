@@ -4269,7 +4269,8 @@ a.poll-retract-vote,
 #ban-reason {
     border-bottom: 1px solid var(--border-color);
 }
-#ban-reason .msg {
+#ban-reason .msg,
+#post_page_main .page_block {
     margin: 0;
 }
 
