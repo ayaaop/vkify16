@@ -1,6 +1,8 @@
 (function () {
 'use strict';
 
+let enableSheetGestures = null;
+
 vkify.bindOnce('messageBoxOverrides', () => {
     const applyOverrides = () => {
         const U = window.u;
@@ -85,8 +87,7 @@ vkify.bindOnce('messageBoxOverrides', () => {
                 }
             };
 
-            // full-screen dialogs get a header tick wired to the first
-            // action button (the hidden bar still fires via .click())
+            // the hidden action bar still fires via .click()
             const installHeadApply = (el) => {
                 const head = el.querySelector('.ovk-diag-head');
                 const confirmBtn = el.querySelector('.ovk-diag-action > .button, .ovk-diag-action > button, .ovk-diag-action > input[type="button"], .ovk-diag-action > input[type="submit"]');
@@ -101,11 +102,12 @@ vkify.bindOnce('messageBoxOverrides', () => {
                 head.appendChild(applyBtn);
             };
 
-            // stock dialogs classified by body marker; themepack dialogs
-            // opt in directly via addClass at creation
+            // themepack dialogs opt in directly via addClass at creation
             const SHEET_BODY_MARKERS = '.stickers_pack_modal, .audiosInsert, [id^="poll_editor"], #osm-map';
             const FULLSCREEN_BODY_MARKERS = '#_fullyDeleteAudio, #_fast_video_upload';
             const classifyDialog = (el) => {
+                el.querySelectorAll('.ovk-diag-action > .button, .ovk-diag-action > button, .ovk-diag-action > input[type="button"], .ovk-diag-action > input[type="submit"]')
+                    .forEach(btn => btn.classList.add('ovk-msg-btn'));
                 if (el.querySelector(SHEET_BODY_MARKERS)) {
                     el.classList.add('ovk-msg-sheet');
                 }
@@ -113,10 +115,11 @@ vkify.bindOnce('messageBoxOverrides', () => {
                     el.classList.add('ovk-msg-fullscreen');
                     installHeadApply(el);
                 }
+                if (!el.classList.contains('ovk-msg-sheet') && !el.classList.contains('ovk-msg-fullscreen')) {
+                    el.classList.add('ovk-msg-dialog');
+                }
             };
 
-            // footer divider only while the body can scroll further down;
-            // also stacks the action buttons when labels overflow the row
             const watchDialogBodyScroll = (el) => {
                 const body = el.querySelector('.ovk-diag-body');
                 if (!body) return;
@@ -143,12 +146,11 @@ vkify.bindOnce('messageBoxOverrides', () => {
                 update();
             };
 
-            // bottom-sheet gestures: drag drives the height between peek and
-            // expanded detents; below peek it translates for dismissal
-            const enableSheetGestures = (el) => {
+            enableSheetGestures = (el) => {
                 const diag = el.querySelector('.ovk-diag');
                 const body = el.querySelector('.ovk-diag-body');
-                if (!diag) return;
+                if (!diag || el.__vkifyGestures) return;
+                el.__vkifyGestures = true;
                 let drag = null;
                 let lastH = null;
                 let sizeAnimating = false;
@@ -228,6 +230,11 @@ vkify.bindOnce('messageBoxOverrides', () => {
                 }, { passive: false });
 
                 const settle = () => {
+                    if (!diag.isConnected) {
+                        document.removeEventListener('touchend', settle);
+                        document.removeEventListener('touchcancel', settle);
+                        return;
+                    }
                     const d = dimmer();
                     if (d) d.style.opacity = '';
                     if (!drag) return;
@@ -291,41 +298,106 @@ vkify.bindOnce('messageBoxOverrides', () => {
                     diag.style.transition = 'height .22s cubic-bezier(.4,0,.2,1), transform .22s cubic-bezier(.4,0,.2,1)';
                     diag.style.height = `${targetH}px`;
                     diag.style.transform = '';
-                    diag.addEventListener('transitionend', () => {
+                    const settleDone = (e) => {
+                        if (e.propertyName !== 'height' && e.propertyName !== 'transform') return;
+                        diag.removeEventListener('transitionend', settleDone);
                         diag.style.transition = '';
                         diag.style.height = '';
                         sizeAnimating = false;
                         lastH = diag.offsetHeight;
-                    }, { once: true });
+                    };
+                    diag.addEventListener('transitionend', settleDone);
                 };
-                diag.addEventListener('touchend', settle);
-                diag.addEventListener('touchcancel', settle);
+                // listen on document: a touch ending outside the sheet must
+                // still settle, otherwise drag stays decided forever
+                document.addEventListener('touchend', settle);
+                document.addEventListener('touchcancel', settle);
 
-                // animate content-driven resizes (tab switches, async loads)
-                const sizeRO = new ResizeObserver(() => {
-                    if (!diag.isConnected) {
-                        sizeRO.disconnect();
+                // pin the height while content mutations settle (incl.
+                // pending loaders) so a burst animates as one glide
+                let endTimer = null;
+                let settleTimer = null;
+                let settleWaits = 0;
+                let pendingResize = false;
+                const releaseHeight = () => {
+                    settleTimer = null;
+                    if (settleWaits < 16 && body?.querySelector('#gif_loader')) {
+                        settleWaits++;
+                        settleTimer = setTimeout(releaseHeight, 120);
                         return;
                     }
+                    settleWaits = 0;
+                    onContentResize();
+                };
+                const onContentResize = () => {
+                    if (!diag.isConnected) {
+                        sizeRO.disconnect();
+                        contentMO.disconnect();
+                        clearTimeout(settleTimer);
+                        return;
+                    }
+                    if (drag?.decided || settleTimer) return;
+                    if (sizeAnimating) {
+                        pendingResize = true;
+                        return;
+                    }
+                    diag.style.transition = 'none';
+                    diag.style.height = '';
                     const newH = diag.offsetHeight;
-                    if (lastH === null || drag?.decided || sizeAnimating || Math.abs(newH - lastH) < 2) {
+                    if (lastH === null || Math.abs(newH - lastH) < 2) {
+                        diag.style.transition = '';
                         lastH = newH;
                         return;
                     }
-                    sizeAnimating = true;
-                    diag.style.transition = 'none';
                     diag.style.height = `${lastH}px`;
                     void diag.offsetHeight;
+                    lastH = newH;
+                    sizeAnimating = true;
+                    if (endTimer) clearTimeout(endTimer);
                     diag.style.transition = 'height .2s ease';
                     diag.style.height = `${newH}px`;
-                    diag.addEventListener('transitionend', () => {
+                    const done = (e) => {
+                        if (e?.propertyName && e.propertyName !== 'height') return;
+                        diag.removeEventListener('transitionend', done);
+                        diag.removeEventListener('transitioncancel', done);
+                        if (endTimer) { clearTimeout(endTimer); endTimer = null; }
+                        if (diag.style.transition !== 'height .2s ease') {
+                            // pin was taken over by the drag path
+                            sizeAnimating = false;
+                            return;
+                        }
                         diag.style.transition = '';
-                        diag.style.height = '';
                         sizeAnimating = false;
+                        if (pendingResize) {
+                            pendingResize = false;
+                            onContentMutate();
+                            return;
+                        }
+                        diag.style.height = '';
                         lastH = diag.offsetHeight;
-                    }, { once: true });
-                });
+                    };
+                    diag.addEventListener('transitionend', done);
+                    diag.addEventListener('transitioncancel', done);
+                    endTimer = setTimeout(() => { if (sizeAnimating) done(); }, 350);
+                };
+                const onContentMutate = () => {
+                    if (!diag.isConnected || drag?.decided) return;
+                    if (sizeAnimating) {
+                        pendingResize = true;
+                        return;
+                    }
+                    // offsetHeight already reflects the new content — pin to
+                    // the last committed height so nothing moves while settling
+                    if (!diag.style.height) {
+                        diag.style.height = `${lastH ?? diag.offsetHeight}px`;
+                    }
+                    clearTimeout(settleTimer);
+                    settleTimer = setTimeout(releaseHeight, 120);
+                };
+                const sizeRO = new ResizeObserver(onContentResize);
                 sizeRO.observe(diag);
+                const contentMO = new MutationObserver(onContentMutate);
+                contentMO.observe(body ?? diag, { childList: true, subtree: true });
             };
 
             vkify.bindOnce('msgboxStackObserver', () => {
@@ -408,11 +480,18 @@ function replaceMbTabs(mbTabs) {
         currentTab = name;
         const active = ul.querySelector(`.ui_tab[data-name='${name}']`);
         ul.querySelectorAll('.ui_tab').forEach(a => a.classList.toggle('ui_tab_sel', a === active));
-        positionSlider(active);
         updateExtrasVisibility();
+        positionSlider(active);
     }
 
+    const repositionSlider = () => positionSlider(ul.querySelector('.ui_tab_sel'));
+
     positionSlider(ul.querySelector('.ui_tab_sel'));
+    // re-measure after first paint / late layout shifts (async content,
+    // webfont swap on min-width:max-content tabs, container resize)
+    requestAnimationFrame(repositionSlider);
+    document.fonts?.ready?.then(repositionSlider);
+    new ResizeObserver(repositionSlider).observe(ul);
 
     u(ul).on('click', '.ui_tab', (e) => {
         e.preventDefault();
@@ -431,6 +510,9 @@ function replaceMbTabs(mbTabs) {
             btn.remove();
             ul.appendChild(a);
         });
+        // appended extras are in-flow flex items — they redistribute tab widths
+        updateExtrasVisibility();
+        repositionSlider();
     }).observe(mbTabs, { childList: true });
 }
 
@@ -472,6 +554,10 @@ vkify.onPage(() => {
             if (diag) {
                 diag.setAttribute('style', 'width:500px');
                 diag.classList.add('ovk-msg-sheet');
+                // the class can land after the stack observer saw the node —
+                // wire gestures directly; the call is idempotent
+                document.body.classList.add('ovk-sheet-dim');
+                enableSheetGestures?.(diag);
 
                 const head = diag.querySelector('.ovk-diag-head');
                 if (head && !head.querySelector('.ovk-diag-head-apply')) {

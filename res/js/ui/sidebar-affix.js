@@ -2,34 +2,68 @@
 'use strict';
 
 vkify.once("updateNarrow", () => {
-    let __narrowBar = { bar: null, barBlock: null, wideCol: null, pl: null };
+    let __narrowBar = {
+        bar: null, barBlock: null, wideCol: null, pl: null, ajloader: null,
+        barMT: 0, dirty: true, isFixed: false, lastSt: 0, lastStyles: {}
+    };
+    let __barObserver = null;
+
+    function observeBar(bar) {
+        if (__barObserver) {
+            __barObserver.disconnect();
+            __barObserver = null;
+        }
+        if (bar) {
+            __barObserver = new MutationObserver(() => { __narrowBar.dirty = true; });
+            __barObserver.observe(bar, { childList: true });
+        }
+    }
 
     function getNarrowRefs() {
-        if (!__narrowBar.bar || !__narrowBar.bar.isConnected || !__narrowBar.barBlock || !__narrowBar.barBlock.isConnected) {
-            let bar, barBlock, wideCol, pl;
-            bar = document.querySelector('.narrow_column');
-            barBlock = bar ? bar.querySelector('.page_block') : null;
-            wideCol = document.querySelector('.wide_column');
-            pl = document.querySelector('.layout');
-            __narrowBar = { bar, barBlock, wideCol, pl };
+        const s = __narrowBar;
+        if (!s.bar || !s.bar.isConnected) {
+            s.bar = document.querySelector('.narrow_column');
+            s.isFixed = s.bar ? s.bar.classList.contains('fixed') : false;
+            s.lastStyles = {};
+            s.dirty = true;
+            observeBar(s.bar);
         }
-        return __narrowBar;
+        if (!s.barBlock || !s.barBlock.isConnected) {
+            s.dirty = true;
+        }
+        if (s.dirty) {
+            s.barBlock = s.bar ? s.bar.querySelector('.page_block') : null;
+            s.barMT = s.barBlock ? (parseFloat(getComputedStyle(s.barBlock).marginTop) || 0) : 0;
+            s.dirty = false;
+        }
+        if (!s.wideCol || !s.wideCol.isConnected) {
+            s.wideCol = document.querySelector('.wide_column');
+        }
+        if (!s.pl || !s.pl.isConnected) {
+            s.pl = document.querySelector('.layout');
+        }
+        if (!s.ajloader || !s.ajloader.isConnected) {
+            s.ajloader = document.getElementById('ajloader');
+        }
+        return s;
     }
 
     window.updateNarrow = function () {
         if (window.isMobile && window.isMobile()) return;
 
-        const { bar, barBlock, wideCol, pl } = getNarrowRefs();
-        if (!bar || !barBlock || !wideCol || !pl) return;
-        if (document.querySelector('#ajloader.shown')) return;
+        const s = getNarrowRefs();
+        const { bar, wideCol, pl } = s;
+        if (!bar || !s.barBlock || !wideCol || !pl) return;
+        if (s.ajloader && s.ajloader.classList.contains('shown')) return;
         if (document.body.classList.contains('dimmed')) return;
+
         const wh = Math.round(window.lastWindowHeight || window.innerHeight || 0);
         const st = Math.round(window.scrollY || 0);
         const headH = 57;
         const delta = 1;
 
-        const isFixed = bar.classList.contains('fixed');
-        const barMT = parseFloat(window.getComputedStyle(barBlock).marginTop) || 0;
+        const isFixed = s.isFixed;
+        const barMT = s.barMT;
         const barH = Math.round(bar.offsetHeight) - (isFixed ? barMT : 0);
         const pageH = Math.round(wideCol.offsetHeight);
         const pagePos = Math.round(wideCol.getBoundingClientRect().top + st);
@@ -41,8 +75,8 @@ vkify.once("updateNarrow", () => {
         const barPT = pagePos - headH;
         const barPos = Math.round(bar.getBoundingClientRect().top + st) + (isFixed ? barMT : 0);
 
-        const lastSt = window._lastSt || 0;
-        const lastStyles = window._lastStyles || {};
+        const lastSt = s.lastSt;
+        const lastStyles = s.lastStyles;
         let styles = {};
         let needFix = false;
 
@@ -95,15 +129,16 @@ vkify.once("updateNarrow", () => {
             for (let i = 0; i < allKeys.length; i++) {
                 bar.style[allKeys[i]] = styles[allKeys[i]] || '';
             }
-            window._lastStyles = styles;
+            s.lastStyles = styles;
         }
 
         if (needFix !== isFixed) {
             bar.classList.toggle('fixed', needFix);
+            bar.style.position = needFix ? 'fixed' : '';
+            s.isFixed = needFix;
         }
-        bar.style.position = needFix ? 'fixed' : '';
 
-        window._lastSt = st;
+        s.lastSt = st;
     };
 });
 
@@ -112,13 +147,17 @@ vkify.once('affixedNavigation', () => {
     const SCROLL_TOLERANCE = 4;
 
     let state = null;
+    const refs = { menu: null, pageBody: null, hasFastLogin: false };
 
-    function getMenu() {
-        return document.querySelector('.sidebar > .sidebar_inner');
-    }
-
-    function getPageBody() {
-        return document.querySelector('.page_body');
+    function getRefs() {
+        if (!refs.menu || !refs.menu.isConnected) {
+            refs.menu = document.querySelector('.sidebar > .sidebar_inner');
+            refs.hasFastLogin = refs.menu ? !!refs.menu.querySelector('#fastLogin') : false;
+        }
+        if (!refs.pageBody || !refs.pageBody.isConnected) {
+            refs.pageBody = document.querySelector('.page_body');
+        }
+        return refs;
     }
 
     function getScrollTop() {
@@ -131,10 +170,25 @@ vkify.once('affixedNavigation', () => {
     }
 
     function setStyles(el, styles) {
-        el.style.position = styles.position || '';
-        el.style.top = styles.top != null ? styles.top + 'px' : '';
-        el.style.width = styles.width != null ? styles.width + 'px' : '';
-        el.style.marginTop = styles.marginTop != null ? styles.marginTop + 'px' : '';
+        const apply = {
+            position: styles.position || '',
+            top: styles.top != null ? styles.top + 'px' : '',
+            width: styles.width != null ? styles.width + 'px' : '',
+            marginTop: styles.marginTop != null ? styles.marginTop + 'px' : ''
+        };
+        const last = state && state.menuStyles;
+        if (last
+            && last.position === apply.position
+            && last.top === apply.top
+            && last.width === apply.width
+            && last.marginTop === apply.marginTop) {
+            return;
+        }
+        el.style.position = apply.position;
+        el.style.top = apply.top;
+        el.style.width = apply.width;
+        el.style.marginTop = apply.marginTop;
+        if (state) state.menuStyles = apply;
     }
 
     function resetMenu(menu) {
@@ -150,14 +204,13 @@ vkify.once('affixedNavigation', () => {
         setStyles(menu, {
             position: 'fixed',
             top: HEAD_H - hiddenOffset,
-            width: state.anchor.offsetWidth,
+            width: state.anchorWidth,
             marginTop: null
         });
     }
 
     function updateLeftMenu() {
-        const menu = getMenu();
-        const pageBody = getPageBody();
+        const { menu, pageBody, hasFastLogin } = getRefs();
         if (!menu || !pageBody || !state) {
             return;
         }
@@ -167,7 +220,7 @@ vkify.once('affixedNavigation', () => {
             return;
         }
 
-        if (menu.querySelector('#fastLogin')) {
+        if (hasFastLogin) {
             resetMenu(menu);
             return;
         }
@@ -202,7 +255,7 @@ vkify.once('affixedNavigation', () => {
     }
 
     function init() {
-        const menu = getMenu();
+        const menu = getRefs().menu;
         const anchor = menu ? menu.parentElement : null;
         if (!menu || !anchor) {
             state = null;
@@ -212,19 +265,19 @@ vkify.once('affixedNavigation', () => {
         const scrollTop = getScrollTop();
         const previousState = state;
         const preserveOffset = previousState && previousState.anchor === anchor;
-        const hiddenOffset = preserveOffset ? previousState.hiddenOffset : 0;
-        const lastScrollTop = preserveOffset ? previousState.lastScrollTop : scrollTop;
+
+        state = {
+            anchor: anchor,
+            anchorWidth: anchor.offsetWidth,
+            initialTop: getDocumentTop(anchor),
+            hiddenOffset: preserveOffset ? previousState.hiddenOffset : 0,
+            lastScrollTop: preserveOffset ? previousState.lastScrollTop : scrollTop,
+            menuStyles: preserveOffset ? previousState.menuStyles : null
+        };
 
         if (!preserveOffset) {
             resetMenu(menu);
         }
-
-        state = {
-            anchor: anchor,
-            initialTop: getDocumentTop(anchor),
-            hiddenOffset: hiddenOffset,
-            lastScrollTop: lastScrollTop
-        };
 
         updateLeftMenu();
     }
@@ -236,23 +289,38 @@ vkify.once('affixedNavigation', () => {
 vkify.once('bodyScroll', () => {
     let __scrLeft = 0;
     let __toTopEl = null;
+    let __layoutEl = null;
     let __lastHidden = null;
     let __lastHasDown = null;
     let __lastScrolled = null;
     let __lastInactive = null;
     let __lastWidth = null;
     let __lastOpacity = null;
+    let __scheduled = false;
+    let __lastY = null;
+    let __lastX = null;
+
+    function getToTop() {
+        if (!__toTopEl || !__toTopEl.isConnected) {
+            __toTopEl = document.querySelector('.toTop');
+            __lastHidden = __lastHasDown = __lastScrolled = __lastInactive = __lastWidth = __lastOpacity = null;
+        }
+        return __toTopEl;
+    }
+
+    function getLayout() {
+        if (!__layoutEl || !__layoutEl.isConnected) {
+            __layoutEl = document.querySelector('.layout');
+        }
+        return __layoutEl;
+    }
 
     window.updSideTopLink = function (resized) {
-        const toTop = document.querySelector('.toTop');
+        const toTop = getToTop();
         if (!toTop) {
-            __toTopEl = null;
             return;
         }
         if (window.isMobile && window.isMobile()) return;
-
-        const toTopChanged = toTop !== __toTopEl;
-        __toTopEl = toTop;
 
         const doc = document.documentElement;
         const body = document.body;
@@ -261,10 +329,10 @@ vkify.once('bodyScroll', () => {
         const mx = 200;
 
         if (resized || scl !== __scrLeft) {
-            const layout = document.querySelector('.layout');
+            const layout = getLayout();
             const width = layout ? Math.max(Math.round(layout.getBoundingClientRect().left), 114) : 114;
             if (width !== __lastWidth) {
-                doc.style.setProperty('--to-top-width', width + 'px');
+                toTop.style.setProperty('--to-top-width', width + 'px');
                 __lastWidth = width;
             }
             __scrLeft = scl;
@@ -274,11 +342,11 @@ vkify.once('bodyScroll', () => {
         const hasDown = st < 100 && !!window.temp_y_scroll;
         const scrolled = st >= 100;
 
-        if (toTopChanged || hidden !== __lastHidden) {
+        if (hidden !== __lastHidden) {
             toTop.classList.toggle('hidden', hidden);
             __lastHidden = hidden;
         }
-        if (toTopChanged || hasDown !== __lastHasDown) {
+        if (hasDown !== __lastHasDown) {
             toTop.classList.toggle('has_down', hasDown);
             __lastHasDown = hasDown;
         }
@@ -290,15 +358,40 @@ vkify.once('bodyScroll', () => {
         const opacity = Math.min(Math.max((st - mx) / mx, 0), 1);
         const opacityStr = opacity.toFixed(3);
         if (opacityStr !== __lastOpacity) {
-            doc.style.setProperty('--to-top-opacity', opacityStr);
+            toTop.style.setProperty('--to-top-opacity', opacityStr);
             __lastOpacity = opacityStr;
         }
 
         const inactive = opacity < 1;
-        if (toTopChanged || inactive !== __lastInactive) {
+        if (inactive !== __lastInactive) {
             toTop.classList.toggle('inactive', inactive);
             __lastInactive = inactive;
         }
+    };
+
+    function runScrollPass() {
+        __scheduled = false;
+        const y = window.scrollY || 0;
+        const x = window.scrollX || 0;
+        if (y === __lastY && x === __lastX) return;
+        __lastY = y;
+        __lastX = x;
+
+        if (typeof window.updateNarrow === 'function') {
+            window.updateNarrow();
+        }
+        if (typeof window.updSideTopLink === 'function') {
+            window.updSideTopLink();
+        }
+        if (typeof window.updateLeftMenu === 'function') {
+            window.updateLeftMenu();
+        }
+    }
+
+    window.onBodyScroll = function () {
+        if (__scheduled) return;
+        __scheduled = true;
+        requestAnimationFrame(runScrollPass);
     };
 
     window.onBodyResize = function () {
@@ -310,27 +403,18 @@ vkify.once('bodyScroll', () => {
         if (typeof window.updateLeftMenuInit === 'function') {
             window.updateLeftMenuInit();
         }
-        if (typeof window.updateLeftMenu === 'function') {
-            window.updateLeftMenu();
-        }
         if (typeof window.updateNarrow === 'function') {
             window.updateNarrow();
         }
         if (typeof window.updSideTopLink === 'function') {
             window.updSideTopLink(true);
         }
-    };
-
-    window.onBodyScroll = function () {
         if (typeof window.updateLeftMenu === 'function') {
             window.updateLeftMenu();
         }
-        if (typeof window.updateNarrow === 'function') {
-            window.updateNarrow();
-        }
-        if (typeof window.updSideTopLink === 'function') {
-            window.updSideTopLink();
-        }
+
+        __lastY = window.scrollY || 0;
+        __lastX = window.scrollX || 0;
     };
 
     document.body.addEventListener('click', (e) => {

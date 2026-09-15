@@ -192,6 +192,9 @@
                 state.wrap.parentNode.insertBefore(state.titleEl, state.wrap);
                 state.wrap.remove();
             }
+            if (state.appbarExtraEl && state.appbarExtraEl.parentNode) {
+                state.appbarExtraEl.remove();
+            }
             if (state.titleEl) {
                 state.titleEl.classList.remove('appbar-title--tabs-menu');
                 state.titleEl.removeAttribute('tabindex');
@@ -224,17 +227,22 @@
             if (li && li.classList.contains('ui_tabs_extra')) return;
             const href = anchor.getAttribute('href');
             if (!href) return;
+            const isSubitem = anchor.classList.contains('ui_tab_subitem') || !!anchor.closest('.ui_tab_subitem_wrap');
             const labelClone = anchor.cloneNode(true);
             labelClone.querySelectorAll('img, .ui_tab_count, .ui_tab_extra_item').forEach((node) => node.remove());
             const label = (labelClone.textContent || '').trim().replace(/\s+/g, ' ');
             if (!label) return;
             const countEl = anchor.querySelector('.ui_tab_count');
+            const extraEl = anchor.querySelector('.ui_tab_extra_item');
             items.push({
                 href: href,
                 label: label,
                 count: countEl ? countEl.textContent.trim() : '',
                 active: anchor.classList.contains('ui_tab_sel'),
                 onclick: anchor.getAttribute('onclick'),
+                isSubitem: isSubitem,
+                extraHtml: extraEl ? extraEl.innerHTML : '',
+                extraClass: extraEl ? extraEl.className : '',
             });
         });
         if (items.length === 0) return;
@@ -251,22 +259,41 @@
         menu.className = 'ui_actions_menu appbar-tabs-menu';
         menu.setAttribute('role', 'menu');
         items.forEach((item) => {
+            const row = document.createElement('div');
+            let itemCls = 'appbar-tabs-menu-item';
+            if (item.active) itemCls += ' appbar-tabs-menu-item--active';
+            if (item.isSubitem) itemCls += ' appbar-tabs-menu-item--subitem';
+            row.className = itemCls;
+
             const link = document.createElement('a');
             link.setAttribute('href', item.href);
             if (item.onclick) link.setAttribute('onclick', item.onclick);
-            link.className = 'appbar-tabs-menu-item' + (item.active ? ' appbar-tabs-menu-item--active' : '');
+            link.className = 'appbar-tabs-menu-link';
             if (item.active) link.setAttribute('aria-current', 'page');
+
             const labelSpan = document.createElement('span');
             labelSpan.className = 'appbar-tabs-menu-label';
             labelSpan.textContent = item.label;
             link.appendChild(labelSpan);
+
             if (item.count) {
                 const badge = document.createElement('span');
                 badge.className = 'appbar-tabs-menu-count';
                 badge.textContent = item.count;
                 link.appendChild(badge);
             }
-            menu.appendChild(link);
+            row.appendChild(link);
+
+            if (item.extraHtml) {
+                const extraSpan = document.createElement('span');
+                extraSpan.className = 'appbar-tabs-menu-extra ' + (item.extraClass || '');
+                extraSpan.innerHTML = item.extraHtml;
+                extraSpan.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+                row.appendChild(extraSpan);
+            }
+            menu.appendChild(row);
         });
 
         titleEl.innerHTML = '';
@@ -293,6 +320,39 @@
         titleEl.parentNode.insertBefore(wrap, titleEl);
         wrap.appendChild(titleEl);
         wrap.appendChild(menu);
+
+        let appbarExtraEl = null;
+        let appbarExtraContainer = appbar.querySelector('.appbar-extra');
+        if (!appbarExtraContainer) {
+            appbarExtraContainer = document.createElement('div');
+            appbarExtraContainer.className = 'appbar-extra';
+            appbar.appendChild(appbarExtraContainer);
+        }
+
+        const existingExtraBtn = appbarExtraContainer.querySelector('.appbar-extra-btn, a, button');
+        if (!existingExtraBtn) {
+            const tabsExtraLi = tabsRoot.querySelector('li.ui_tabs_extra');
+            if (activeItem && activeItem.extraHtml && activeItem.extraHtml.includes('ui_actions_menu_wrap')) {
+                const extraWrap = document.createElement('div');
+                extraWrap.className = 'appbar-extra-btn-wrap';
+                extraWrap.innerHTML = activeItem.extraHtml;
+                const innerTrigger = extraWrap.querySelector('.ui_actions_menu_wrap');
+                if (innerTrigger) {
+                    innerTrigger.classList.add('appbar-extra-btn');
+                }
+                appbarExtraContainer.appendChild(extraWrap);
+                appbarExtraEl = extraWrap;
+            } else if (tabsExtraLi && tabsExtraLi.firstElementChild) {
+                const extraBtnWrap = document.createElement('div');
+                extraBtnWrap.className = 'appbar-extra-btn-wrap';
+                const clonedExtra = tabsExtraLi.firstElementChild.cloneNode(true);
+                clonedExtra.classList.add('appbar-extra-btn');
+                extraBtnWrap.appendChild(clonedExtra);
+                appbarExtraContainer.appendChild(extraBtnWrap);
+                appbarExtraEl = extraBtnWrap;
+            }
+        }
+
         tabsRoot.remove();
 
         tabsMenuState = {
@@ -300,6 +360,7 @@
             titleEl: titleEl,
             originalTitleHTML: originalTitleHTML,
             keydownHandler: keydownHandler,
+            appbarExtraEl: appbarExtraEl,
         };
     }
 
