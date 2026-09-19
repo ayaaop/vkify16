@@ -87,12 +87,12 @@ function renderMusicPopupTracks(container) {
     <audio class="audio"></audio>
     <div id="miniplayer" class="audioEntry">
         <div class="audioEntryWrapper" draggable="true">
-            <div class="playerButton"><div class="playIcon"></div></div>
+            <div class="playerButton"><div class="playIcon"><svg class="playGlyph" viewBox="0 0 24 24"><use href="#play-24"/></svg><svg class="pauseGlyph" viewBox="0 0 24 24"><use href="#pause-24"/></svg></div></div>
             <div class="status">
                 <div class="mediaInfo noOverflow">
                     <div class="info">
                         <strong class="performer"><a draggable="false" href="/search?section=audios&amp;order=listens&amp;only_performers=on&amp;q=${encodeURIComponent(track.performer || '')}">${performer}</a></strong>
-                        — <span draggable="false" class="title">${title}</span>
+                        <span class="tire">—</span> <span draggable="false" class="title">${title}</span>
                     </div>
                 </div>
             </div>
@@ -1013,10 +1013,8 @@ vkify.bindOnce('statusBroadcastToggle', () => {
         const isPressed = btn.classList.contains('pressed');
         const newBroadcastState = !isPressed;
 
-        // Toggle visual state immediately
         btn.classList.toggle('pressed', newBroadcastState);
 
-        // Sync other statusButtons and checkboxes on the page
         document.querySelectorAll('.bigPlayer .additionalButtons .statusButton').forEach(otherBtn => {
             if (otherBtn !== btn) {
                 otherBtn.classList.toggle('pressed', newBroadcastState);
@@ -1058,7 +1056,6 @@ vkify.bindOnce('statusBroadcastToggle', () => {
             }
         } catch (err) {
             console.error(err);
-            // Revert visual state if failed
             btn.classList.toggle('pressed', isPressed);
             document.querySelectorAll('.bigPlayer .additionalButtons .statusButton').forEach(otherBtn => {
                 if (otherBtn !== btn) {

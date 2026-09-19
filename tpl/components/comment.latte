@@ -6,7 +6,8 @@
 {var $target = $comment->getTarget()}
 {var $postId = $target ? $target->getId() : NULL}
 {var $correctLink = $correctLink ?? true}
-<div data-id="1_{$comment->getId()}" class="post reply scroll_node" data-uniqueid="reply_{$comment->getId()}" id="_comment{$comment->getId()}" data-comment-id="{$comment->getId()}" data-owner-id="{$author->getId()}" data-from-group="{$author instanceof $Club ? 'true' : 'false'}" n:attr="data-post-id => $postId, data-mention-name => ($author instanceof $Club ? $author->getName() : $author->getFirstName())">
+{var $isScrollNode = !($compact ?? false)}
+<div data-id="1_{$comment->getId()}" n:class="post, reply, $isScrollNode ? scroll_node" id="_comment{$comment->getId()}" data-comment-id="{$comment->getId()}" data-owner-id="{$author->getId()}" data-from-group="{$author instanceof $Club ? 'true' : 'false'}" n:attr="data-uniqueid => $isScrollNode ? ('reply_' . $comment->getId()) : null, data-post-id => $postId, data-mention-name => ($author instanceof $Club ? $author->getName() : $author->getFirstName())">
     <div class="reply_wrap">
         <a class="reply_image{if !$author instanceof $Club && $author->isOnline()} online{/if}" href="{$author->getURL()}">
             {include 'avatar.latte', author => $author, size => 'miniscule', width => 30, class => 'reply_img'}

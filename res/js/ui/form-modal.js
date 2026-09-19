@@ -3,9 +3,7 @@
 const SimpleFormModal = vkify.once('SimpleFormModal', () => {
     const Hb = window.Handlebars;
 
-    // Per-type templates. Handlebars auto-escapes `{{ }}` so manual escapeHtml
-    // calls disappear; `{{{ }}}` preserves raw HTML where the caller intends it
-    // (e.g. f.label, f.after, f.html).
+    // Handlebars auto-escapes {{ }}; {{{ }}} renders raw HTML (f.label, f.after, f.html)
     const fieldInputTpl = {
         hidden: Hb.compile(
             '<input type="hidden" name="{{name}}" id="{{id}}" value="{{value}}" />'
@@ -166,10 +164,8 @@ const SimpleFormModal = vkify.once('SimpleFormModal', () => {
 
 window.showSimpleFormModal = SimpleFormModal.show;
 
-// Generic form modal: fetches a server-rendered page (edit/create), extracts
-// its `.form_group` element and injects the original HTML directly into the
-// modal. POSTs the form on submit using its own action attribute (or the
-// fetched URL). Preserves the template's exact layout and behaviour.
+// Fetches a server-rendered form page, injects its .form_group into a modal
+// and POSTs to the form's own action on submit.
 window.showFormModal = vkify.once('showFormModal', () => async (url, opts = {}) => {
     const {
         title: titleOverride,
@@ -228,7 +224,6 @@ window.showFormModal = vkify.once('showFormModal', () => async (url, opts = {}) 
         }
     }
 
-    // Capture inline scripts for optional execution after mount
     const scripts = runScripts
         ? Array.from(doc.querySelectorAll('script:not([src])')).map(s => s.textContent)
         : [];
@@ -320,7 +315,6 @@ window.showFormModal = vkify.once('showFormModal', () => async (url, opts = {}) 
         const firstInput = form.querySelector('input[type=text], input:not([type]), textarea');
         firstInput?.focus();
 
-        // Submit on Enter in single-line text inputs
         node.addEventListener('keydown', (e) => {
             if (e.keyCode === 13 && !e.shiftKey && e.target.tagName === 'INPUT'
                 && (e.target.type === 'text' || !e.target.type)) {
@@ -338,7 +332,6 @@ window.showFormModal = vkify.once('showFormModal', () => async (url, opts = {}) 
 // Backwards-compatible alias
 window.showEditFormModal = window.showFormModal;
 
-// === Per-type wrappers ===
 window.showEditPhotoModal = (photoId) => window.showFormModal(`/photo${photoId}/edit`, {
     fallbackUrl: `/photo${photoId}`,
     errorMsg: 'Failed to update photo'
@@ -425,17 +418,12 @@ window.showCreateTopicModal = (e, clubId) => {
         requiredError: tr('error_segmentation'),
         submitText: tr('create_topic'),
         errorMsg: 'Failed to create topic',
-        // The server redirects on both success (to /topic{clubId}_{topicId})
-        // and failure (flashFail to HTTP_REFERER), so don't treat the
-        // redirect itself as an access error.
+        // server redirects on success and failure — don't treat it as an access error
         skipRedirectError: true,
         validateResponse: (res) => res.ok && /\/topic-?\d+_\d+/.test(res.url || ''),
         // biome-ignore lint/correctness/noUnusedFunctionParameters: event handler
         onReady: (modal, form) => {
-            // The original /board{id}/create page wires file inputs via
-            // setupWallPostInputHandlers / handleUpload, which live in
-            // OpenVK's wall bundle and aren't loaded outside that page.
-            // Wire just the attachment name display here instead.
+            // stock page wires file inputs via OpenVK's wall bundle, which isn't loaded here
             const picInput = form.querySelector('input[name="_pic_attachment"]');
             const vidInput = form.querySelector('input[name="_vid_attachment"]');
             const statusSpan = form.querySelector('.post-upload span');
@@ -467,7 +455,6 @@ window.showEditPlaylistModal = async (playlistId, e) => {
         const editBox = doc.querySelector('.audio_pl_edit_box');
         if (!editBox) throw new Error('Edit box not found');
 
-        // Dynamically load the edit_playlist.css styles
         vkify.loadStyle(null, 'vkify_style_edit_playlist', vkify.resourceUrl('/css/edit_playlist.css'));
 
         const modalTitle = tr('edit_playlist') || 'Edit playlist';
@@ -490,7 +477,6 @@ window.showEditPlaylistModal = async (playlistId, e) => {
             modal.getNode().attr('style', 'width: 560px;');
             modal.getNode().find('.ovk-diag-body').attr('style', 'padding: 0 !important;');
 
-            // Sync play/pause state for audios inside the modal
             const updateModalPlayerStates = () => {
                 if (!window.player) return;
                 const isPlaying = !window.player.audioPlayer.paused;
@@ -509,14 +495,12 @@ window.showEditPlaylistModal = async (playlistId, e) => {
                 });
             };
 
-            // Listen to player's audio element events
             if (window.player?.audioPlayer) {
                 window.player.audioPlayer.addEventListener('play', updateModalPlayerStates);
                 window.player.audioPlayer.addEventListener('pause', updateModalPlayerStates);
                 window.player.audioPlayer.addEventListener('timeupdate', updateModalPlayerStates);
             }
 
-            // Also run initially
             updateModalPlayerStates();
 
             const saveBtn = node.querySelector('#playlist_edit');
@@ -559,7 +543,6 @@ window.showEditPlaylistModal = async (playlistId, e) => {
                 }, true); // capturing phase to preempt general bubbling click listener
             }
 
-            // Hook close behavior to unload styles when closed
             const originalClose = modal.close;
             modal.close = function(...args) {
                 if (window.player?.audioPlayer) {
@@ -571,7 +554,6 @@ window.showEditPlaylistModal = async (playlistId, e) => {
                 originalClose.apply(this, args);
             };
 
-            // Focus the title input
             const firstInput = node.querySelector('#ape_pl_name');
             firstInput?.focus();
         }, 50);
@@ -601,7 +583,6 @@ window.showNewPlaylistModal = async (e, gid = null) => {
         const editBox = doc.querySelector('.audio_pl_edit_box');
         if (!editBox) throw new Error('Edit box not found');
 
-        // Dynamically load the edit_playlist.css styles
         vkify.loadStyle(null, 'vkify_style_edit_playlist', vkify.resourceUrl('/css/edit_playlist.css'));
 
         const modalTitle = tr('new_playlist') || 'New playlist';
@@ -621,11 +602,9 @@ window.showNewPlaylistModal = async (e, gid = null) => {
             const form = node.querySelector('.PE_playlistEditPage');
             if (!form) return;
 
-            // Set size of the messagebox
             modal.getNode().attr('style', 'width: 560px;');
             modal.getNode().find('.ovk-diag-body').attr('style', 'padding: 0 !important;');
 
-            // Intercept create button click to perform AJAX POST
             const createBtn = node.querySelector('#playlist_create');
             if (createBtn) {
                 createBtn.addEventListener('click', async (event) => {
@@ -666,14 +645,12 @@ window.showNewPlaylistModal = async (e, gid = null) => {
                 }, true);
             }
 
-            // Hook close behavior to unload styles when closed
             const originalClose = modal.close;
             modal.close = function(...args) {
                 vkify.unloadStyle('vkify_style_edit_playlist');
                 originalClose.apply(this, args);
             };
 
-            // Focus the title input
             const firstInput = node.querySelector('#ape_pl_name');
             firstInput?.focus();
         }, 50);

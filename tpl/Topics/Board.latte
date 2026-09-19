@@ -19,11 +19,11 @@
             id => 'topics_search_header',
         }
 
-        <div class="list_view">
+        <div class="list_view scroll_container">
             {var $data = is_array($topics) ? $topics : iterator_to_array($topics)}
 
             {if sizeof($data) > 0}
-                <div class="search_row" n:foreach="$data as $x">
+                <div class="search_row scroll_node" data-uniqueid="topic-{$x->getPrettyId()}" n:foreach="$data as $x">
                     <div class="info fl_l">
                         <div class="labeled name">
                             <a href="/topic{$x->getPrettyId()}">

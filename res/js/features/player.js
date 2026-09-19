@@ -353,7 +353,6 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
             if (repeatButton._tippy) repeatButton._tippy.setContent(tipText);
         };
 
-        // Clean up conflicting original listeners
         delete listeners[".bsdn_terebilkaLowerWrap"];
         delete listeners[".bsdn_soundControlSubWrap"];
 
@@ -513,7 +512,6 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
             }
         ];
 
-        // Loading state management
         listeners[".bsdn_video > video"].waiting = [function() {
             el.querySelector(".bsdn-player").classList.add("bsdn_loading");
         }];
@@ -537,7 +535,6 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
             el.querySelector(".bsdn-player").classList.remove("bsdn_loading");
         }];
 
-        // Teaser overlay click → play
         listeners[".bsdn_teaser"] = {
             click: [function() {
                 if (v.paused) v.play();
@@ -546,7 +543,6 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
             }]
         };
 
-        // Cross-browser fullscreen toggle
         listeners[".bsdn_fullScreenButton"] = {
             click: [function() {
                 if (getFullscreenElement()) {

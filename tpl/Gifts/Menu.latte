@@ -14,7 +14,7 @@
 
         {if sizeof($data) > 0}
             <div class="scroll_container">
-                <div class="gifts_section_row clear_fix scroll_node" n:foreach="$data as $x">
+                <div class="gifts_section_row clear_fix scroll_node" data-uniqueid="giftcat-{$x->getId()}" n:foreach="$data as $x">
                     <a href="/gifts?act=menu&user={$user->getId()}&pack={$x->getId()}" class="gifts_section_show_all fl_r">{_show_more}</a>
                     <h4 class="gifts_section_header">
                         {$x->getName(tr("__lang"))}

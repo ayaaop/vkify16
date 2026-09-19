@@ -889,6 +889,8 @@ var Graffiti = {
     this.resDif = 0;
     this.resW = 586;
     this.resH = 350;
+    this.resCont = null;
+    this.resBody = null;
 
     this.resizer = ge("graffiti_resizer");
     this.histHelpCanv = ge("graffiti_hist_helper");
@@ -963,6 +965,12 @@ var Graffiti = {
       Graffiti.handleResize(e);
       return cancelEvent(e);
     },
+    // bound on the parent document while resizing so the drag survives
+    // the cursor leaving the iframe
+    parentResize: function (e) {
+      Graffiti.handleResize(e, true);
+      return cancelEvent(e);
+    },
   },
 
   attachEvents: function () {
@@ -998,31 +1006,71 @@ var Graffiti = {
     if (window.parent && window.parent !== window) {
       try {
         removeEvent(window.parent.document, "keydown keyup", evs.keyboard);
+        removeEvent(
+          window.parent.document,
+          "mousemove mouseup",
+          evs.parentResize,
+        );
       } catch (e) {
         // Cross-origin iframe, can't access parent
       }
     }
   },
 
-  handleResize: function (e) {
+  // vertical mouse position in iframe coordinates; events from the parent
+  // document carry parent coordinates and need translating
+  resizeMouseY: function (e, fromParent) {
+    var touch =
+      (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
+    if (touch) return touch.pageY;
+    if (fromParent && window.frameElement) {
+      return e.clientY - window.frameElement.getBoundingClientRect().top;
+    }
+    return e.pageY;
+  },
+
+  handleResize: function (e, fromParent) {
     if (e.button == 2) {
       return;
     }
     switch (e.type) {
       case "mousedown":
         document.body.style.cursor = "s-resize";
-        var mouse = Graffiti.getMouseXY(e, window);
-        Graffiti.resDif = mouse.y;
+        Graffiti.resDif = Graffiti.resizeMouseY(e);
         Graffiti.resizing = true;
         Graffiti.mainCtx.clearRect(0, 0, Graffiti.W, Graffiti.H);
+        try {
+          if (window.parent && window.parent !== window) {
+            addEvent(
+              window.parent.document,
+              "mousemove mouseup",
+              Graffiti.events.parentResize,
+            );
+          }
+        } catch (e) {}
+        try {
+          Graffiti.resCont =
+            window.frameElement && window.frameElement.closest
+              ? window.frameElement.closest(".ovk-msg-all")
+              : null;
+          Graffiti.resBody = Graffiti.resCont
+            ? Graffiti.resCont.querySelector(".ovk-diag-body")
+            : null;
+          if (Graffiti.resCont) {
+            Graffiti.resCont.classList.add("ovk-msg-sheet--resizing");
+          }
+        } catch (ex) {
+          Graffiti.resCont = null;
+          Graffiti.resBody = null;
+        }
         break;
 
       case "mousemove":
         if (Graffiti.resizing) {
-          var mouse = Graffiti.getMouseXY(e, window);
+          var mouseY = Graffiti.resizeMouseY(e, fromParent);
           var height = parseInt(Graffiti.canvWrapper.style.height);
           var width = parseInt(Graffiti.canvWrapper.style.width);
-          var newHeight = height + mouse.y - Graffiti.resDif;
+          var newHeight = height + mouseY - Graffiti.resDif;
           if (newHeight > 586) newHeight = 586;
           if (newHeight < 350) newHeight = 350;
           var newWidth = (newHeight / Graffiti.H) * Graffiti.W;
@@ -1032,22 +1080,15 @@ var Graffiti = {
           Graffiti.canvWrapper.style.height = newHeight + "px";
 
           // Adjust parent dialog dimensions
-          if (window.parent && window.parent !== window) {
+          if (Graffiti.resCont) {
             try {
-              var dialogBody =
-                window.parent.document.querySelector(".ovk-diag-body");
-              var dialogCont = window.parent.document.querySelector(
-                ".ovk-diag-cont.ovk-msg-all",
-              );
-              if (dialogBody) {
+              if (Graffiti.resBody) {
                 var newDialogHeight = 141 + newHeight; // 141px base + canvas height
-                dialogBody.style.height = newDialogHeight + "px";
+                Graffiti.resBody.style.height = newDialogHeight + "px";
               }
-              if (dialogCont) {
-                // Scale dialog width proportionally with canvas (base 800px at 350px height)
-                var newDialogWidth = 800 + (newWidth - 586); // 800px base + width difference
-                dialogCont.style.width = newDialogWidth + "px";
-              }
+              // Scale dialog width proportionally with canvas (base 800px at 350px height)
+              var newDialogWidth = 800 + (newWidth - 586); // 800px base + width difference
+              Graffiti.resCont.style.width = newDialogWidth + "px";
             } catch (e) {
               // Cross-origin or parent not accessible
             }
@@ -1056,7 +1097,7 @@ var Graffiti = {
           if (Graffiti.onResize) {
             Graffiti.onResize(newWidth, newHeight);
           }
-          Graffiti.resDif = mouse.y;
+          Graffiti.resDif = mouseY;
         }
         break;
 
@@ -1065,6 +1106,20 @@ var Graffiti = {
           Graffiti.resizing = false;
           Graffiti.resDif = 0;
           document.body.style.cursor = "default";
+          try {
+            if (window.parent && window.parent !== window) {
+              removeEvent(
+                window.parent.document,
+                "mousemove mouseup",
+                Graffiti.events.parentResize,
+              );
+            }
+          } catch (e) {}
+          try {
+            if (Graffiti.resCont) {
+              Graffiti.resCont.classList.remove("ovk-msg-sheet--resizing");
+            }
+          } catch (e) {}
           Graffiti.factor = Graffiti.resH / 350;
           Graffiti.W = Graffiti.resW;
           Graffiti.H = Graffiti.resH;

@@ -27,11 +27,8 @@ const ajloader = {
 };
 
 vkify.bindOnce('composerAttachmentHandlers', () => {
-    // Video attachments set id="videoOpen" on the outer <a>, and both al_wall.js and
-    // media-modals.js delegate '#videoOpen' clicks on document. A bubble-phase handler
-    // on '.upload-delete' fires at the same document level, so stopPropagation there is
-    // too late to suppress the sibling #videoOpen handlers. Use capture phase to block
-    // them before bubble dispatch.
+    // al_wall.js and media-modals.js delegate '#videoOpen' clicks on document;
+    // only a capture-phase handler can suppress them
     document.addEventListener('click', (e) => {
         const del = e.target.closest('.upload-delete');
         if (del && e.target.closest('#videoOpen')) {
@@ -1145,8 +1142,26 @@ const AudioAdapter = {
         picker._searchType = 'by_name';
 
         node.on('click', '.picker-upload-btn', () => {
+            const form = picker.form;
+            const playlistMode = picker.playlistMode;
             picker.close();
-            window.showAudioUploadPopup?.({ ownerId: picker.getOwnerId() });
+            window.showAudioUploadPopup?.({
+                ownerId: picker.getOwnerId(),
+                targetForm: form,
+                playlistMode,
+                onUploaded: (newAudioEmbeds) => {
+                    form?.closest?.('.model_content_textarea')?.addClass('shown');
+                    newAudioEmbeds.forEach(audioEl => {
+                        const id = audioEl.getAttribute('data-prettyid') || audioEl.getAttribute('data-realid') || audioEl.getAttribute('data-id');
+                        appendVertical(form, {
+                            type: 'audio',
+                            id,
+                            html: audioEl.outerHTML,
+                            alignment: 'vertical'
+                        }, playlistMode);
+                    });
+                }
+            });
         });
 
         node.on('change', '.picker-search-type', (e) => {
@@ -1155,8 +1170,7 @@ const AudioAdapter = {
             picker.load();
         });
 
-        // mobile: tap the row itself to mark it instead of the text button;
-        // stopPropagation keeps stock's document-level .status handler from playing the track
+        // mobile: tap the row to mark it; stopPropagation blocks stock's .status play handler
         node.on('click', '.audio_attachment_header', (e) => {
             if (!matchMedia('(max-width: 768px)').matches) return;
             if (u(e.target).closest('.picker-item-select, .attachAudio, .playerButton, .mini_timer, .subTracks, a').length) return;

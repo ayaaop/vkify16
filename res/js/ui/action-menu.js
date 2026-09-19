@@ -4,7 +4,6 @@ vkify.once('uiActionsMenu', function () {
   const DEFAULT_HIDE_DELAY = 200;
   const DEFAULT_AUTOPOS_GAP = 10;
 
-  // ——— helpers ———
   function data(el, key, value) {
     if (!el) return undefined;
     if (!dataStore.has(el)) dataStore.set(el, {});
@@ -51,9 +50,7 @@ vkify.once('uiActionsMenu', function () {
     return el ? el.getBoundingClientRect() : { top: 0, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
   }
 
-  // ——— positioning helpers ———
   function computeBounds(el) {
-    // Dialog case – constrain to the dialog body
     const diag = el.closest?.('.ovk-diag');
     if (diag) {
       const body = diag.querySelector('.ovk-diag-body') || diag;
@@ -66,7 +63,6 @@ vkify.once('uiActionsMenu', function () {
       };
     }
 
-    // Everything else – full screen space
     const header = document.getElementById('page_header_wrap');
     return {
       top: header ? rectOf(header).height : 0,
@@ -135,7 +131,6 @@ vkify.once('uiActionsMenu', function () {
     if (elevate) {
       pageBlock.style.zIndex = 'calc(var(--action-menu-z-index, 5) + 1)';
     } else {
-      // only remove if no other open menus remain inside this page_block
       const stillOpen = pageBlock.querySelector('.ui_actions_menu_wrap.shown');
       if (!stillOpen) {
         pageBlock.style.zIndex = '';
@@ -143,7 +138,6 @@ vkify.once('uiActionsMenu', function () {
     }
   }
 
-  // ——— positioning ———
   function positionArrow(el, options) {
     const menu = geByClass1('ui_actions_menu', el);
     if (!menu) return;
@@ -158,10 +152,7 @@ vkify.once('uiActionsMenu', function () {
 
     const verticalOffset = Math.max(triggerRect.bottom - wrapRect.top, wrapRect.height);
     menu.style.setProperty('--ui-actions-menu-vertical-offset', verticalOffset + 'px');
-    // Offset for upward-opening menus: anchor the menu's bottom edge to the
-    // trigger's top edge rather than the wrap, so the menu hugs the trigger
-    // even when the wrap itself is zero-sized (e.g. absolutely-positioned
-    // triggers like .post_actions_icon inside a 0x0 .post_actions wrap).
+    // upward-opening menus anchor to the trigger's top edge, not the (possibly 0x0) wrap
     menu.style.setProperty('--ui-actions-menu-up-offset', (wrapRect.bottom - triggerRect.top) + 'px');
 
     if (hasClass(el, 'ui_actions_menu_no_chevron')) return;
@@ -246,15 +237,12 @@ vkify.once('uiActionsMenu', function () {
     const gap = options.dy ?? DEFAULT_AUTOPOS_GAP;
     const bounds = computeBounds(el);
 
-    // Restore visibility
     menu.style.visibility = '';
 
-    // Vertical decision – use the TRIGGER rect
     if (shouldFlipAbove(triggerRect, menuHeight, bounds, gap)) {
       addClass(el, 'ui_actions_menu_top');
     }
 
-    // vertical flip
     if (shouldFlipAbove(elRect, menuHeight, bounds, gap)) {
       addClass(el, 'ui_actions_menu_top');
     }
@@ -268,10 +256,8 @@ vkify.once('uiActionsMenu', function () {
     const preferred = options.align;
     const triggerCenter = triggerRect.left + triggerRect.width / 2;
 
-    // Ideal centered position (relative to the viewport)
     let desiredLeft = triggerCenter - menuWidth / 2;
 
-    // Does a true center fit inside the bounds?
     const centerFits =
       desiredLeft >= bounds.left &&
       desiredLeft + menuWidth <= bounds.right;
@@ -279,13 +265,11 @@ vkify.once('uiActionsMenu', function () {
     let finalLeft;
 
     if (centerFits && preferred !== 'left' && preferred !== 'right') {
-      // Prefer center
       finalLeft = desiredLeft;
       addClass(el, 'ui_actions_menu_center_align');
     } else {
-      // Fall back to left / right preference
-      const leftAvailable = bounds.right - triggerRect.left;   // space to the right of trigger
-      const rightAvailable = triggerRect.right - bounds.left;   // space to the left of trigger
+      const leftAvailable = bounds.right - triggerRect.left;
+      const rightAvailable = triggerRect.right - bounds.left;
 
       const leftFits = menuWidth <= leftAvailable;
       const rightFits = menuWidth <= rightAvailable;
@@ -296,7 +280,6 @@ vkify.once('uiActionsMenu', function () {
       } else if (preferred === 'right' && rightFits) {
         alignLeft = false;
       } else if (leftFits && rightFits) {
-        // pick the side that has more room
         alignLeft = leftAvailable > rightAvailable;
       } else if (leftFits) {
         alignLeft = true;
@@ -307,24 +290,19 @@ vkify.once('uiActionsMenu', function () {
       }
 
       if (alignLeft) {
-        // left edge of menu = left edge of trigger
         finalLeft = triggerRect.left;
         addClass(el, 'ui_actions_menu_left_align');
       } else {
-        // right edge of menu = right edge of trigger
         finalLeft = triggerRect.right - menuWidth;
       }
     }
 
-    // Final clamp so we never overflow the bounds
     finalLeft = Math.max(bounds.left, Math.min(finalLeft, bounds.right - menuWidth));
 
-    // Apply the position relative to the wrap
     menu.style.left = (finalLeft - elRect.left) + 'px';
     menu.style.right = 'auto';
     menu.style.transform = 'none';
 
-    // If the menu is still too wide, constrain it
     if (menuWidth > bounds.right - bounds.left) {
       menu.style.maxWidth = (bounds.right - bounds.left) + 'px';
     }
@@ -332,7 +310,6 @@ vkify.once('uiActionsMenu', function () {
     requestAnimationFrame(() => removeClass(el, 'no_transition'));
   }
 
-  // ——— public API ———
   window.uiActionsMenu = {
     keyToggle(el, ev) {
       if (!checkKeyboardEvent(ev)) return false;
@@ -357,7 +334,6 @@ vkify.once('uiActionsMenu', function () {
       const noAnimate = !!options.noAnimate;
       const immediate = !!options.immediate;
 
-      // clear pending hide
       const hideTimer = data(el, 'hideTimer');
       if (hideTimer) {
         clearTimeout(hideTimer);
@@ -400,8 +376,7 @@ vkify.once('uiActionsMenu', function () {
 
         positionArrow(el, options);
         addClass(el, 'shown');
-        // mirror onto the originating wrap so trigger-side `shown` checks
-        // keep working when the menu lives in a portal dummy.
+        // keep trigger-side `shown` checks working when the menu lives in a portal dummy
         if (origEl !== el) addClass(origEl, 'shown');
       } else {
         if (!isShown) return;
@@ -441,14 +416,12 @@ vkify.once('uiActionsMenu', function () {
     show(el, ev, options = {}) {
       if (window.isMobile && window.isMobile()) return;
 
-      // cancel any pending hide
       let ht = data(el, 'hidetimer');
       if (ht) {
         clearTimeout(ht);
         data(el, 'hidetimer', 0);
       }
-      // ...and one parked on an already-portaled dummy: hovering back from
-      // the menu to the trigger must not let it fire and close under us.
+      // also cancel a hide timer parked on the portaled dummy
       const existingDummy = data(el, 'dummyMenu');
       if (existingDummy && (ht = data(existingDummy, 'hidetimer'))) {
         clearTimeout(ht);
@@ -460,7 +433,6 @@ vkify.once('uiActionsMenu', function () {
         data(el, 'hidetimer', 0);
       }
 
-      // delayed show
       if (options.delay) {
         if (window.__uiActionsMenuShowTimeout) clearTimeout(window.__uiActionsMenuShowTimeout);
         const delay = options.delay;
@@ -482,8 +454,7 @@ vkify.once('uiActionsMenu', function () {
       if (options.appendParentCls) {
         let menu = geByClass1('ui_actions_menu', el);
         if (menu && hasClass(el, 'ui_actions_menu_dummy_wrap')) {
-          // already portaled (e.g. hover re-entry on the dummy itself):
-          // keep el so it only gets repositioned below.
+          // already portaled — only reposition below
         } else if (menu) {
           const appendEl = domClosest(options.appendParentCls, menu);
           const menuWrap = domClosest('ui_actions_menu_wrap', el);
@@ -541,7 +512,7 @@ vkify.once('uiActionsMenu', function () {
       if (delay) data(el, 'hidedelay', false);
       else delay = DEFAULT_HIDE_DELAY;
 
-      if (data(el, 'hidetimer')) return; // already scheduled
+      if (data(el, 'hidetimer')) return;
 
       data(el, 'hidetimer', setTimeout(() => {
         this.toggle(el, false, options);
@@ -553,7 +524,6 @@ vkify.once('uiActionsMenu', function () {
       data(el, 'hidedelay', delay);
     },
 
-    // new helper for dynamic menus
     destroy(el) {
       const dummy = data(el, 'dummyMenu');
       if (dummy) {
@@ -565,7 +535,6 @@ vkify.once('uiActionsMenu', function () {
     }
   };
 
-  // ——— global listeners ———
   window.addEventListener('resize', () => {
     document.querySelectorAll('.ui_actions_menu_wrap.shown').forEach(wrap => {
       const dummy = data(wrap, 'dummyMenu');
@@ -586,7 +555,6 @@ vkify.once('uiActionsMenu', function () {
     const wrap = ev.target.closest('.ui_actions_menu_wrap');
     const menu = ev.target.closest('.ui_actions_menu');
 
-    // mobile toggle
     if (window.isMobile && window.isMobile()) {
       if (wrap && !wrap.getAttribute('onclick') && !menu) {
         let opts = {};
@@ -604,7 +572,6 @@ vkify.once('uiActionsMenu', function () {
       }
     }
 
-    // click on actionable item → close immediately
     if (wrap && menu) {
       const item = ev.target.closest('a, button, input[type="button"], input[type="submit"], .ui_actions_menu_item');
       if (item && !item.classList.contains('ui_actions_menu')) {
@@ -614,7 +581,6 @@ vkify.once('uiActionsMenu', function () {
       }
     }
 
-    // outside click
     document.querySelectorAll('.ui_actions_menu_wrap.shown').forEach(openWrap => {
       if (!openWrap.contains(ev.target)) {
         const dummy = data(openWrap, 'dummyMenu');

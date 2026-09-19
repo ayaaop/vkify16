@@ -37,10 +37,8 @@ window.formatCompactCount = window.formatCompactCount || function (n) {
     return String(n);
 };
 
-// Make .html() on .action_count elements with a data-count attribute
-// read/write the raw numeric value while formatting the visible text.
-// This lets upstream code (e.g., al_wall.js' repost()) update repost
-// counters without us editing OpenVK files.
+// Makes .html() on .action_count[data-count] read/write the raw count while
+// formatting visible text, so upstream code (al_wall.js) updates counters unmodified.
 (function wrapActionCountHtml() {
     if (u.prototype.__vkifyHtmlWrapped) return;
     u.prototype.__vkifyHtmlWrapped = true;

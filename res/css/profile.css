@@ -1050,7 +1050,8 @@ a.page_module_upload:hover .page_upload_label,
   background-position: 0px -32px;
 }
 
-#group_tab_pinned_content .post .pinned_mark {
+#group_tab_pinned_content .post .pinned_mark,
+.ui_actions_menu ._add_image::before {
   display: none
 }
 

@@ -216,8 +216,8 @@
                                     {/if}
                                 </div>
                             </a>
-                            <a href="{if $userTainted}/setSID/unset?hash={rawurlencode($csrfToken)}{else}/logout?hash={urlencode($csrfToken)}{/if}" class="mobile-profile-logout" aria-label="{_menu_logout}" title="{_menu_logout}">
-                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><use href="#door-arrow-right-outline-24"></use></svg>
+                            <a href="/search" class="mobile-profile-search" aria-label="{tr('header_search')}" title="{tr('header_search')}">
+                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><use href="#search-outline-24"></use></svg>
                             </a>
                         </div>
                         {if !$thisUser->isBanned() XOR !$thisUser->isActivated() XOR $thisUser->isDeactivated()}
@@ -397,6 +397,7 @@
                                                 {/if}
                                             {/foreach}
                                         </a>
+                                        <a class="mobileonly" href="{if $userTainted}/setSID/unset?hash={rawurlencode($csrfToken)}{else}/logout?hash={urlencode($csrfToken)}{/if}">{_menu_logout}</a>
                                     </div>
                                 </div>
                             </div>

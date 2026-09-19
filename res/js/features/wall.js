@@ -25,16 +25,16 @@ function renderEditMenuLayout(apiPost, type, postId) {
     const editFormId = `write-edit-form-${postId}`;
 
     const nsfwOpt = type === 'post'
-        ? `<label class="checkbox"><input type="checkbox" name="nsfw" form="${editFormId}" ${apiPost.is_explicit ? 'checked' : ''} /><span>${tr('contains_nsfw')}</span></label>`
+        ? `<label class="checkbox"><input type="checkbox" name="nsfw" ${apiPost.is_explicit ? 'checked' : ''} /><span>${tr('contains_nsfw')}</span></label>`
         : '';
 
-    const asGroupOpt = type === 'post' && apiPost.owner_id < 0 && apiPost.can_pin
-        ? `<label class="checkbox"><input type="checkbox" name="as_group" form="${editFormId}" ${apiPost.from_id < 0 ? 'checked' : ''} /><span>${tr('post_as_group')}</span></label>`
+    const asGroupOpt = type === 'post' && apiPost.owner_id < 0
+        ? `<label class="checkbox"><input type="checkbox" name="as_group" ${apiPost.from_id < 0 ? 'checked' : ''} /><span>${tr('post_as_group')}</span></label>`
         : '';
 
     const postOptsItems = `${nsfwOpt}${asGroupOpt}`;
     const postOptsTrigger = type === 'post' && postOptsItems
-        ? `<div class="post-opts-trigger ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+        ? `<div class="post-opts-trigger ui_actions_menu_wrap" onclick="if (event.target.closest('.ui_actions_menu')) return; uiActionsMenu.toggle(this, null, {autopos: true});" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
             <div class="post_settings" id="postOptsTrigger${postId}" role="button">
                 <div class="common_icon"></div>
             </div>
@@ -981,109 +981,147 @@ function bindPostEditOnce() {
         const rawId = post.attr('data-id') || '';
         const id = rawId.split('_');
         const type = post.hasClass('reply') ? 'comment' : 'post';
+        const isMobile = typeof window.isMobile === 'function' ? window.isMobile() : window.matchMedia('(max-width: 768px)').matches;
 
-        if (edit_place.html() === '') {
-            u(editBtn).addClass('lagged');
-            try {
-                const params = type === 'post' ? { posts: rawId } : { owner_id: parseInt(id[0], 10) || 1, comment_id: id[1] };
-                const api_req = await window.OVKAPI.call(`wall.${type === 'post' ? 'getById' : 'getComment'}`, params);
-                const _items = api_req.items || api_req.response?.items || api_req;
-                const api_post = Array.isArray(_items) ? _items[0] : _items;
-                if (!api_post) throw new Error('Post not found');
+        u(editBtn).addClass('lagged');
+        try {
+            const params = type === 'post' ? { posts: rawId } : { owner_id: parseInt(id[0], 10) || 1, comment_id: id[1] };
+            const api_req = await window.OVKAPI.call(`wall.${type === 'post' ? 'getById' : 'getComment'}`, params);
+            const _items = api_req.items || api_req.response?.items || api_req;
+            const api_post = Array.isArray(_items) ? _items[0] : _items;
+            if (!api_post) throw new Error('Post not found');
 
-                edit_place.html(vkify.editMenuLayout(api_post, type, rawId));
-
+            const populateEditForm = (container) => {
                 if (api_post.copyright) {
-                    edit_place.find('.post-source').html(`
+                    container.find('.post-source').html(`
                         <span>${tr('source')}: <a>${escapeHtml(api_post.copyright.link)}</a></span>
                         <div id='remove_source_button'></div>
                     `);
-                    edit_place.find('.post-source #remove_source_button').on('click', () => {
-                        edit_place.find('.post-source').html('');
-                        edit_place.find(`input[name='source']`).attr('value', 'remove');
+                    container.find('.post-source #remove_source_button').on('click', () => {
+                        container.find('.post-source').html('');
+                        container.find(`input[name='source']`).attr('value', 'remove');
                     });
                 }
 
                 if (api_post.copy_history?.length > 0) {
-                    edit_place.find('.post-repost').html(`<span>${tr('has_repost')}.</span>`);
+                    container.find('.post-repost').html(`<span>${tr('has_repost')}.</span>`);
                 }
 
-                api_post.attachments.forEach(att => {
+                api_post.attachments?.forEach(att => {
                     const attType = att.type;
                     let aid = `${att[attType].owner_id}_${att[attType].id}`;
                     if (att[attType]?.access_key) aid += `_${att[attType].access_key}`;
 
                     if (attType === 'video' || attType === 'photo') {
                         const preview = attType === 'photo' ? att[attType].sizes[1].url : att[attType].image[0].url;
-                        window.__appendToTextarea({ type: attType, preview, id: aid }, edit_place);
+                        window.__appendToTextarea({ type: attType, preview, id: aid }, container);
                     } else if (attType === 'poll') {
-                        window.__appendToTextarea({ type: attType, alignment: 'vertical', html: tr('poll'), id: att[attType].id, undeletable: true }, edit_place);
+                        window.__appendToTextarea({ type: attType, alignment: 'vertical', html: tr('poll'), id: att[attType].id, undeletable: true }, container);
                     } else {
                         const found_block = post.find(`div[data-att_type='${attType}'][data-att_id='${aid}']`);
-                        window.__appendToTextarea({ type: attType, alignment: 'vertical', html: found_block.html(), id: aid }, edit_place);
+                        window.__appendToTextarea({ type: attType, alignment: 'vertical', html: found_block.html(), id: aid }, container);
                     }
                 });
+            };
 
-                edit_place.find('.edit_menu #__edit_save').on('click', async (ev) => {
-                    const p = {
-                        owner_id: id[0],
-                        post_id: id[1],
-                        message: edit_place.find('.edit_menu textarea').nodes[0].value
-                    };
-                    const editForm = edit_place.find('.edit_menu form').nodes[0];
-                    const nsfw_mark = editForm?.elements.namedItem('nsfw') || null;
-                    const as_group = editForm?.elements.namedItem('as_group') || null;
-                    const copyright = edit_place.find(`.edit_menu input[name='source']`);
-                    const collected_attachments = collect_attachments(edit_place.find('.post-buttons')).join(',');
+            const performSave = async (container, triggerBtn) => {
+                const p = {
+                    owner_id: id[0],
+                    post_id: id[1],
+                    message: container.find('.edit_menu textarea').nodes[0]?.value || ''
+                };
+                const editForm = container.find('.edit_menu form').nodes[0];
+                const nsfw_mark = container.find("input[name='nsfw']").nodes[0] || editForm?.elements.namedItem('nsfw') || null;
+                const as_group = container.find("input[name='as_group']").nodes[0] || editForm?.elements.namedItem('as_group') || null;
+                const copyright = container.find(`.edit_menu input[name='source']`);
+                const collected_attachments = collect_attachments(container.find('.post-buttons')).join(',');
 
-                    if (nsfw_mark) p.explicit = Number(nsfw_mark.checked);
-                    p.attachments = collected_attachments.length < 1 ? 'remove' : collected_attachments;
-                    if (as_group?.checked) p.from_group = 1;
-                    if (copyright.length && copyright.nodes[0].value !== 'none') p.copyright = copyright.nodes[0].value;
+                if (nsfw_mark) p.explicit = nsfw_mark.checked ? 1 : 0;
+                p.attachments = collected_attachments.length < 1 ? 'remove' : collected_attachments;
+                if (as_group) p.from_group = as_group.checked ? 1 : 0;
+                if (copyright.length && copyright.nodes[0].value !== 'none') p.copyright = copyright.nodes[0].value;
 
-                    u(ev.target).addClass('lagged');
-                    try {
-                        if (type === 'post') {
-                            await window.OVKAPI.call('wall.edit', p);
-                        } else {
-                            p.comment_id = id[1];
-                            await window.OVKAPI.call('wall.editComment', p);
-                        }
-                    } catch (err) {
-                        fastError(err.message);
-                        u(ev.target).removeClass('lagged');
-                        return;
+                if (triggerBtn) u(triggerBtn).addClass('lagged');
+                try {
+                    if (type === 'post') {
+                        await window.OVKAPI.call('wall.edit', p);
+                    } else {
+                        p.comment_id = id[1];
+                        await window.OVKAPI.call('wall.editComment', p);
                     }
+                } catch (err) {
+                    fastError(err.message);
+                    if (triggerBtn) u(triggerBtn).removeClass('lagged');
+                    return false;
+                }
 
-                    let is_at_post_page = false;
-                    try {
-                        if (location.pathname.indexOf('wall') !== -1 && location.pathname.split('_').length === 2) {
-                            is_at_post_page = true;
+                let is_at_post_page = false;
+                try {
+                    if (location.pathname.indexOf('wall') !== -1 && location.pathname.split('_').length === 2) {
+                        is_at_post_page = true;
+                    }
+                } catch (e) {}
+
+                const new_post_html = await ContentFetcher.request(`/iapi/getPostTemplate/${id[0]}_${id[1]}?type=${type}&from_page=${is_at_post_page ? 'post' : 'another'}`, {
+                    method: 'POST',
+                    responseType: 'text',
+                    ajaxQuery: false
+                });
+                if (triggerBtn) u(triggerBtn).removeClass('lagged');
+                post.removeClass('editing');
+                post.nodes[0].outerHTML = u(new_post_html).last().outerHTML;
+                bsdnHydrate();
+                return true;
+            };
+
+            if (isMobile) {
+                const editModal = new CMessageBox({
+                    title: tr('edit'),
+                    close_on_buttons: false,
+                    unique_name: 'post_editor_modal',
+                    body: `<div id="_edit_post_modal">${vkify.editMenuLayout(api_post, type, rawId)}</div>`,
+                    buttons: [tr('save'), tr('cancel')],
+                    callbacks: [
+                        async () => {
+                            const modalNode = editModal.getNode();
+                            const applyBtn = modalNode.find('.ovk-diag-head-apply').nodes[0] || modalNode.find('.ovk-diag-action button').nodes[0];
+                            const success = await performSave(modalNode, applyBtn);
+                            if (success) {
+                                editModal.close();
+                            }
+                        },
+                        () => {
+                            editModal.close();
                         }
-                    } catch (e) {}
-
-                    const new_post_html = await ContentFetcher.request(`/iapi/getPostTemplate/${id[0]}_${id[1]}?type=${type}&from_page=${is_at_post_page ? 'post' : 'another'}`, {
-                        method: 'POST',
-                        responseType: 'text',
-                        ajaxQuery: false
+                    ]
+                });
+                editModal.getNode().addClass('ovk-msg-fullscreen');
+                const modalNode = editModal.getNode();
+                populateEditForm(modalNode);
+                modalNode.find('.edit_menu #__edit_cancel').on('click', () => editModal.close());
+                modalNode.find('.edit_menu #__edit_save').on('click', () => {
+                    modalNode.find('.ovk-diag-action button').first()?.click();
+                });
+                const ta = modalNode.find('textarea').first();
+                if (ta) window.vkifyTextareaAutosize?.apply?.(ta);
+            } else {
+                if (edit_place.html() === '') {
+                    edit_place.html(vkify.editMenuLayout(api_post, type, rawId));
+                    populateEditForm(edit_place);
+                    edit_place.find('.edit_menu #__edit_save').on('click', async (ev) => {
+                        await performSave(edit_place, ev.target);
                     });
-                    u(ev.target).removeClass('lagged');
-                    post.removeClass('editing');
-                    post.nodes[0].outerHTML = u(new_post_html).last().outerHTML;
-                    bsdnHydrate();
-                });
-
-                edit_place.find('.edit_menu #__edit_cancel').on('click', () => post.removeClass('editing'));
-            } catch (err) {
-                console.error('Failed to load post for editing:', err);
-                NewNotification(tr('error'), tr('error_loading_post'), null, () => {}, 4000, false);
+                    edit_place.find('.edit_menu #__edit_cancel').on('click', () => post.removeClass('editing'));
+                }
+                post.addClass('editing');
+                const ta = edit_place.find('textarea').first();
+                if (ta) window.vkifyTextareaAutosize?.apply?.(ta);
             }
-            u(editBtn).removeClass('lagged');
+        } catch (err) {
+            console.error('Failed to load post for editing:', err);
+            NewNotification(tr('error'), tr('error_loading_post'), null, () => {}, 4000, false);
         }
-
-        post.addClass('editing');
-        const ta = edit_place.find('textarea').first();
-        if (ta) window.vkifyTextareaAutosize?.apply?.(ta);
+        u(editBtn).removeClass('lagged');
     }, true);
 }
 
@@ -1150,7 +1188,6 @@ vkify.once('shareAudioPlaylist', () => {
             node.find('#wallAttachmentMenu a').attr('data-club', clubId);
         };
 
-        // Bind repost type changes
         u('.ovk-diag-body').on('change', "input[name='repost_type']", (e) => {
             const value = e.target.value;
             const hasClubs = window.openvk.writeableClubs && window.openvk.writeableClubs.items.length > 0;
@@ -1173,12 +1210,10 @@ vkify.once('shareAudioPlaylist', () => {
             updateAttachClub();
         });
 
-        // Bind option changes inside the tooltip
         node.find('#__vkifyRepostOptsTooltip input[name="asGroup"]').on('change', (e) => {
             node.find('#__vkifyRepostSignedOpt').attr('style', e.target.checked ? '' : 'display:none');
         });
 
-        // Bind send button click
         node.find('#__vkifyRepostSend').on('click', async () => {
             const message = node.find('#repostMsgInput').nodes[0].value;
             const type = node.find("input[name='repost_type']:checked").nodes[0].value;
@@ -1220,7 +1255,6 @@ vkify.once('shareAudioPlaylist', () => {
             }
         });
 
-        // Initialize clubs list
         if(!window.openvk.writeableClubs) {
             window.openvk.writeableClubs = await window.OVKAPI.call('groups.get', {'filter': 'admin', 'count': 100});
         }
@@ -1406,15 +1440,9 @@ function vkifyTplPost(post) {
 
 vkify.hook(window, 'tplPost', vkifyTplPost, 'replace');
 
-// Stock #__ignoreSomeoneFeed handler assumes .scroll_node wraps .post as
-// separate elements. In our template both classes sit on the same <div>, so
-// find('.post') inside scroll_node returns nothing on unignore. We intercept
-// in the capture phase (runs before stock's bubbling handler), take over, and
-// animate the transition the same way post deletion does.
+// Stock #__ignoreSomeoneFeed handler expects .scroll_node and .post as separate
+// elements; ours share one <div>. Intercept in capture phase and morph in-place.
 vkify.bindOnce('ignoreFeedFix', () => {
-    // Replace the post's contents in-place with new HTML, mirroring the
-    // post-delete animation: fade-out current content, swap innerHTML,
-    // fade-in new content, animate height to its new natural size.
     async function morphPostContents(post, newInnerHTML, finalClasses) {
         post.style.position = 'relative';
 
@@ -1471,9 +1499,7 @@ vkify.bindOnce('ignoreFeedFix', () => {
         ]);
 
         const newHeight = newChild.offsetHeight;
-        // Transition height itself so the box animates in either direction
-        // (grow for undo, shrink for ignore). max-height alone can't grow
-        // past style.height, and clearing height breaks shrink animations.
+        // animate height itself — max-height can't grow past style.height
         post.style.transition = 'height 300ms ease';
         post.style.height     = `${newHeight}px`;
 
@@ -1513,11 +1539,7 @@ vkify.bindOnce('ignoreFeedFix', () => {
         const ENTITY    = ENTITY_ID < 0 ? 'club' : 'user';
         const URL       = `/method/newsfeed.${METHOD}?auth_mechanism=roaming&${PARAM}=${Math.abs(ENTITY_ID)}`;
 
-        // The post element is what we morph. On ignore, target is inside
-        // .post. On unignore, target is inside .ignore-message — but in our
-        // setup we morph the post in-place, so unignore's target IS inside
-        // the same .post element (the post was replaced in-place, not
-        // moved to a sibling).
+        // post is morphed in-place, so .post wraps the target on both ignore and unignore
         const post = target.closest('.post');
         if (!post) return;
 

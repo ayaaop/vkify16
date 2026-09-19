@@ -98,7 +98,7 @@
                             </a>
                             <div id="playlist_more_actions_menu" class="ui_actions_menu">
                                 <a href="/playlist{$playlist->getPrettyId()}/edit" onclick="return showEditPlaylistModal({$playlist->getPrettyId()}, event);">{_edit_playlist}</a>
-                                <a href="/player/upload?playlist={$playlist->getId()}">{_upload_audio}</a>
+                                <a href="/player/upload?playlist={$playlist->getId()}" onclick="showAudioUploadPopup({ playlist: {$playlist->getId()}, ownerId: {$owner->getRealId()} }); return false;">{_upload_audio}</a>
                                 <a id="_deletePlaylist" data-id="{$playlist->getId()}">{tr('delete_playlist', 'Delete playlist')}</a>
                             </div>
                         </div>
@@ -114,7 +114,7 @@
                         {if $count < 1}
                             {include "../components/content_error.latte", icon => "no_music.svg", description => tr("empty_playlist")}
                         {else}  
-                            <div class="AudioPlaylistSnippet__audioRow scroll_node" n:foreach="$audios as $audio">
+                            <div class="AudioPlaylistSnippet__audioRow scroll_node" data-uniqueid="audio-{$audio->getId()}" n:foreach="$audios as $audio">
                                 {include "player.latte", audio => $audio}
                             </div>
 

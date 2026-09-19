@@ -1,11 +1,7 @@
 /**
- * Dismissable onboarding popups (Tippy-backed) and shared helpers for the
- * remaining Tippy consumers (tooltips-simple.js, notifications-popup.js,
- * music-popup.js). Declarative interactive action menus used to live here
- * too, but they're now handled by action-menu.js (see that file for why:
- * Tippy's DOM relocation vs. document stacking order trade-off couldn't be
- * solved in a way that didn't either break stock OpenVK's `.closest()`-based
- * JS or turn into an unbounded z-index/isolation bookkeeping exercise).
+ * Dismissable onboarding popups (Tippy-backed) and shared helpers for
+ * tooltips-simple.js, notifications-popup.js, music-popup.js. Action menus
+ * moved to action-menu.js — Tippy's DOM relocation broke stacking/closest().
  */
 
 function getTippyZIndex(triggerElement) {

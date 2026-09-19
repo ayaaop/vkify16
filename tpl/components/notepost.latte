@@ -3,7 +3,7 @@
 {var $commentsCount = $note->getCommentsCount()}
 
 {var $commentTextAreaId = $note === NULL ? rand(1,300) : $note->getId()}
-<div class="scroll_node page_block">
+<div class="scroll_node page_block" data-uniqueid="note-{$note->getPrettyId()}">
     <div data-id="{$note->getPrettyId()}" class="post note_post">
         <div class="post_header">
             <a class="post_image{if $author->isOnline()} online{/if}" href="{$author->getURL()}">

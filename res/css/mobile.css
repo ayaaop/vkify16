@@ -326,14 +326,16 @@
     /* sidebar drawer */
     .sidebar {
         position: fixed;
-        left: -85vw;
+        left: 0;
         top: 0;
         bottom: 0;
         display: block !important;
         padding-top: 0;
-        width: 85vw !important;
+        width: calc(100vw - 3.5rem) !important;
+        max-width: 17.5rem;
         background-color: var(--module-background-color);
-        transition: left 0.3s ease;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
         overflow-y: auto;
         margin: 0 !important;
         z-index: 201;
@@ -342,28 +344,32 @@
         width: 100%;
     }
     .sidebar_inner .link {
-        height: 48px;
-        line-height: 48px;
-        padding: 0 16px 0 8px;
+        height: 3rem;
+        line-height: 3rem;
+        padding: 0 1rem;
         color: var(--text-color);
+        font-weight: 500;
     }
     .sidebar_inner .link * {
         font-size: .875rem;
     }
     .sidebar_inner .link .link_icon {
-        height: 30px;
-        margin-left: -7px;
-        filter: grayscale(1) brightness(0.7);
-        width: 50px;
+        height: 1.75rem;
+        width: 1.75rem;
+        margin-right: 1rem;
+        color: rgba(0,0,0,.54);
+    }
+    body.dark-mode .sidebar .sidebar_inner .link .link_icon {
+        color: rgba(255,255,255,.7);
     }
     .sidebar_inner .link span {
         margin-top: 1px;
-        max-width: calc(100% - 50px);
+        max-width: calc(100% - 3.5rem);
     }
     .sidebar .sidebar_inner .link object[type="internal/link"] {
-        right: 16px;
-        margin-top: 12px;
-        padding: 5px 8px;
+        right: 1rem;
+        margin-top: .75rem;
+        padding: .3125rem .5rem;
         border-radius: var(--module-border-radius);
         height: fit-content;
         line-height: .875rem;
@@ -371,35 +377,38 @@
     }
     .menu_divider {
         background: var(--border-color);
-        margin: 4px 0!important;
+        margin: .5rem 0!important;
     }
     .left_menu_nav_wrap {
-        padding: 7px 16px 16px;
+        padding: .4375rem 1rem 1rem;
     }
     body.menu-expanded .sidebar {
-        left: 0;
-        box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+        transform: translateX(0);
+        box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 16px 24px 2px rgba(0,0,0,.14), 0 6px 30px 5px rgba(0,0,0,.12);
     }
     body.menu-expanded {
         overflow: hidden;
     }
     .home_button {
         width: 100%;
-        padding: 8px 16px;
-        margin-bottom: 8px;
-        height: fit-content;
+        padding: .5rem 1rem;
+        margin-bottom: .5rem;
+        height: var(--header-height);
         box-sizing: border-box;
+        background-color: var(--accent-color);
     }
-    .home_button .home_button_bg {
-        margin: 0;
+
+    .home_button:active {
+        padding-top: calc(.5rem + 1px);
+        height: var(--header-height)
     }
 
     #votesBalance, #news {
         background: none;
         border: 0;
         border-top: 1px solid var(--border-color);
-        margin: 8px 0 0;
-        padding: 16px;
+        margin: .5rem 0 0;
+        padding: 1rem;
         text-align: start;
     }
     #news b {
@@ -412,7 +421,7 @@
     .mobile-profile-bar {
         display: block;
         width: 100%;
-        height: 158px;
+        height: 10.5rem;
         overflow: hidden;
         text-decoration: none;
         box-sizing: border-box;
@@ -433,29 +442,30 @@
     }
     .mobile-profile-avatar-wrap {
         position: absolute;
-        top: 16px;
-        left: 16px;
+        top: 1rem;
+        left: 1rem;
         z-index: 2;
     }
     #mobileProfileAvatar {
-        width: 4.125rem;
-        height: 4.125rem;
+        width: 4.5rem;
+        height: 4.5rem;
         border-radius: 50%;
         object-fit: cover;
         display: block;
     }
     .mobile-profile-info {
         position: absolute;
-        bottom: 16px;
-        left: 16px;
+        bottom: 1rem;
+        left: 1rem;
         z-index: 2;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        max-width: calc(100% - 32px);
+        max-width: calc(100% - 2rem);
     }
     .mobile-profile-name {
-        font-size: 1rem;
+        font-size: 1.125rem;
+        line-height: 1.375rem;
         font-weight: 500;
         color: var(--white);
         white-space: nowrap;
@@ -465,8 +475,9 @@
     }
     .mobile-profile-status {
         font-size: .875rem;
+        line-height: 1.25rem;
         font-weight: 400;
-        color: rgba(255, 255, 255, 0.85);
+        color: var(--white);
         margin-top: .25rem;
         white-space: nowrap;
         overflow: hidden;
@@ -476,24 +487,25 @@
     .mobile-profile-bar-wrap {
         position: relative;
         display: block;
+        margin-bottom: .5rem;
     }
-    .mobile-profile-logout {
+    .mobile-profile-search {
         position: absolute;
-        top: 8px;
-        right: 8px;
+        top: .5rem;
+        right: .5rem;
         z-index: 3;
-        width: 40px;
-        height: 40px;
+        width: 2.5rem;
+        height: 2.5rem;
         display: flex;
         align-items: center;
         justify-content: center;
         color: rgba(255, 255, 255, 0.9);
     }
-    .mobile-profile-logout svg {
-        width: 24px;
-        height: 24px;
+    .mobile-profile-search svg {
+        width: 1.5rem;
+        height: 1.5rem;
     }
-    .mobile-profile-logout:active {
+    .mobile-profile-search:active {
         opacity: 0.7;
     }
 
@@ -506,28 +518,28 @@
         right: 0;
         width: 100%;
         align-items: center;
-        height: 56px;
-        padding: 0 8px;
+        height: 3.5rem;
+        padding: 0 .5rem;
         box-sizing: border-box;
         overflow: hidden;
         background-color: var(--module-background-color);
         border-top: 1px solid var(--border-color);
-        gap: 8px;
+        gap: .5rem;
         z-index: 10;
     }
     .sidebar_audio_player.mobileonly.sidebar_audio_player_active {
         display: flex!important;
     }
     .sidebar_audio_player svg {
-        width: 24px;
-        height: 24px;
+        width: 1.5rem;
+        height: 1.5rem;
         flex-shrink: 0;
         fill: var(--accent-color);
     }
     .sidebar_ap_play_btn {
         flex-shrink: 0;
-        width: 36px;
-        height: 36px;
+        width: 2.25rem;
+        height: 2.25rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -561,7 +573,7 @@
         cursor: pointer;
     }
     .sidebar_ap_track_name {
-        font-size: 13px;
+        font-size: .8125rem;
         font-weight: 600;
         color: var(--text-color);
         white-space: nowrap;
@@ -570,7 +582,7 @@
         transition: opacity 80ms linear;
     }
     .sidebar_ap_track_performer {
-        font-size: 13px;
+        font-size: .8125rem;
         font-weight: 400;
         color: var(--muted-text-color-2);
         white-space: nowrap;
@@ -718,15 +730,10 @@
         line-height: 1;
         margin: 0;
     }
-    body:not(.mode-2018) .action_icon {
-        width: 18px;
-        height: 16px;
-        background-size: cover;
-    }
-    body.mode-2018 .action_count {
+    body.mode-2018 .post .post_full_like .action_count {
         width: 33px;
     }
-    body:not(.mode-2018) .action_count {
+    body:not(.mode-2018) .post .post_full_like .action_count {
         margin-left: 8px;
     }
     body.mode-2018 .post .action_button {
@@ -735,7 +742,7 @@
         margin: 0;
     }
     body.mode-2018 .post .action_count:empty {
-        display: block;
+        display: block!important;
     }
 
     body:not(.mode-2018) .post .post_reply {
@@ -784,6 +791,7 @@
     }
     .button.profile_more_btn {
         min-width: 0;
+        background-position: 11px 17px;
     }
     .button.button_light, .profile_link {
         padding-left: 12px;
@@ -938,7 +946,8 @@
         max-height: calc(100vh - 48px);
     }
     .ovk-msg-dialog .ovk-diag-head {
-        background: none;
+        background: none!important;
+        border: 0!important;
         color: var(--text-color);
         height: auto;
         font-size: 20px;
@@ -1045,7 +1054,8 @@
             max-height: calc(100vh - 56.25vw);
         }
     }
-    .ovk-diag-cont.ovk-msg-sheet--dragging .ovk-diag {
+    .ovk-diag-cont.ovk-msg-sheet--dragging .ovk-diag,
+    .ovk-diag-cont.ovk-msg-sheet--resizing .ovk-diag {
         max-height: none !important;
     }
     body.dimmed.ovk-sheet-dim > .dimmer {
@@ -1269,6 +1279,67 @@
     .ovk-msg-fullscreen #_feed_settings_container #__content input[type='button'].button,
     .ovk-msg-sheet #_feed_settings_container #__content input[type='button'].button {
         display: none;
+    }
+
+    /* fullscreen edit post modal */
+    .ovk-msg-fullscreen:has(#_edit_post_modal) .ovk-diag-body {
+        padding: 0 !important;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        height: 100%;
+        width: 100%;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal .edit_menu {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        height: 100%;
+        padding: 0;
+        background: none;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal form {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        height: 100%;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal textarea {
+        flex: 1;
+        min-height: 140px;
+        width: 100%;
+        box-sizing: border-box;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 16px;
+        line-height: 22px;
+        padding: 16px;
+        resize: none;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal .post-buttons {
+        margin-top: auto;
+        padding: 8px 16px;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal .post-bottom-acts {
+        padding-top: 0;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal .edit_menu_buttons {
+        display: none;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal .post-opts.ui_actions_menu {
+        max-width: calc(100vw - 32px);
+        min-width: 180px;
+        z-index: 1000;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal .post-opts label.checkbox {
+        padding: 6px 12px;
+        cursor: pointer;
     }
 
     .ovk-diag-cont .ovk-diag-action {
@@ -1625,6 +1696,71 @@
     .audiosDiv {
         padding: 8px 6px!important;
     }
+    .audioEntry .audioEntryWrapper {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        padding: 0;
+    }
+    .module_body .audioEntry,
+    .attachments_m .audioEntry {
+        margin: 0;
+        width: 100%;
+    }
+    .audioEntry:hover,
+    .vertical-attachment .audioEntry:hover,
+    .audioEntry:hover, .vertical-attachment .audioEntry:hover, .audioEntry.nowPlaying, .audioEntry.nowPlaying:hover, .vertical-attachment .audioEntry.nowPlaying:hover {
+        background-color: transparent !important;
+    }
+    .audioEntry .playerButton,
+    .audioEntry .playerButton .playIcon {
+        width: 2.25rem;
+        height: 2.25rem;
+    }
+    .audioEntry .playerButton .playIcon svg {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    .audioEntry .status {
+        min-width: 0;
+    }
+    .audioEntry .status .mediaInfo {
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+    }
+    .audioEntry .status .mediaInfo .info {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0;
+        line-height: 1.2;
+    }
+    .audioEntry .info .performer,
+    .audioEntry .info .title {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .audioEntry .info .title {
+        order: -1;
+        font-weight: 600;
+    }
+    .audioEntry .info .title,
+    .audioEntry .info .title a {
+        color: var(--text-color)!important;
+    }
+    .audioEntry .info .performer,
+    .audioEntry .info .performer a {
+        font-weight: 400;
+        color: var(--muted-text-color-2);
+    }
+    .audioEntry .tire {
+        display: none;
+    }
+    .audioEntry .explicitMark {
+        flex-shrink: 0;
+    }
     .bigPlayer:not(.tidy) {
         width: 100% !important;
         margin: 0 !important;
@@ -1667,7 +1803,11 @@
     }
     .bigPlayer .playButtons .playButton.pause .playIcon {
         background-size: 34px auto;
-        background-position: 0px -67px;
+        background-position: 0px -68px;
+    }
+
+    .audiosSideContainer .scroll_node:not(:last-child) .audioEmbed {
+        margin-bottom: 10px;
     }
     .musfooter {
         width: 100% !important;
@@ -2221,7 +2361,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 15px 16px;
+        height: var(--header-height);
+        padding: 0 .25rem;
         background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
         z-index: 10;
         box-sizing: border-box;
@@ -2236,11 +2377,13 @@
     .mobile-photo-header .pv_title_group {
         display: flex;
         flex-direction: column;
+        justify-content: center;
         overflow: hidden;
     }
     .mobile-photo-header .pv_album_name {
         color: #fff;
-        font-size: 17px;
+        font-size: 1rem;
+        line-height: 1.25rem;
         font-weight: 500;
         text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         white-space: nowrap;
@@ -2249,7 +2392,8 @@
     }
     .mobile-photo-header .pv_counter {
         color: #fff;
-        font-size: 13px;
+        font-size: .8125rem;
+        line-height: 1.125rem;
         font-weight: 400;
         text-shadow: 0 1px 2px rgba(0,0,0,0.5);
     }
@@ -2257,7 +2401,8 @@
         display: none;
     }
     .mobile-photo-header .pv_title_group.pv-no-album .pv_counter {
-        font-size: 17px;
+        font-size: 1.25rem;
+        line-height: 2rem;
         font-weight: 500;
         opacity: 1;
     }
@@ -2268,8 +2413,17 @@
     .mobile-photo-header .pv_back_btn {
         display: flex;
         align-items: center;
-        margin-right: 20px;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
         flex-shrink: 0;
+    }
+    .mobile-photo-header .pv_actions_more {
+        width: 3rem;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .mobile-photo-header svg {
         color: #fff;

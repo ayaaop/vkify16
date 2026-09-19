@@ -72,6 +72,8 @@
 .pv_photo img {
   display: block;
   object-fit: contain;
+  width: 100%;
+  height: 100%;
 }
 .pv_bottom_info {
   padding: 17px 23px 14px;

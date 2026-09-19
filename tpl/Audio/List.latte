@@ -33,8 +33,8 @@
 
 
 {block appbar_extra}
-<div n:if="$owner->getId() === $thisUser->getId()" class="mobileonly" id="group_appbar_extra">
-    <a class="appbar-extra-btn" href="/audios/upload" onclick="showAudioUploadPopup(); return false;" aria-label="{_upload}">
+<div n:if="isset($thisUser) && (isset($owner) ? $owner->getId() === $thisUser->getId() : $mode !== 'alone_audio')" class="mobileonly" id="group_appbar_extra">
+    <a class="appbar-extra-btn" href="/player/upload" onclick="showAudioUploadPopup(); return false;" aria-label="{_upload}">
         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><use href="#add-outline-24"></use></svg>
     </a>
 </div>
@@ -111,7 +111,7 @@
                                 {include "../components/content_error.latte", icon => "no_music.svg", description => $ownerId > 0 ? ($ownerId == $thisUser->getId() ? tr("no_audios_thisuser") : tr("no_audios_user")) : tr("no_audios_club")}
                             {/if}
                             <div n:if="($audiosCount ?? 0) > 0" class="scroll_container">
-                                <div class="scroll_node" n:foreach="($audios ?? []) as $audio">
+                                <div class="scroll_node" data-uniqueid="audio-{$audio->getId()}" n:foreach="($audios ?? []) as $audio">
                                     {include "player.latte", audio => $audio, club => $club}
                                 </div>
                             </div>

@@ -511,15 +511,11 @@
         }
     }
 
-    // Material Design 2 touch ripples, mobile layout only. A single delegated
-    // pointerdown listener covers SPA-swapped content with no rescan: the
-    // positioning/clipping classes live only for the duration of the press,
-    // so static layout is never affected.
     const RIPPLE_BOUNDED_SELECTOR = '.button, .profile_link'
         + ', .ui_actions_menu a, .ui_actions_menu button, .ui_actions_menu input'
         + ', .ui_actions_menu label, .ui_actions_menu .ui_actions_menu_item'
         + ', .ui_tab, .ui_tab_plain, .sidebar_inner .link, .mobile-info-row'
-        + ', .mobile-scroll-card';
+        + ', .mobile-scroll-card, .action_button';
     const RIPPLE_UNBOUNDED_SELECTOR = '.appbar .hamburger, .appbar-extra-btn'
         + ', .ovk-msg-fullscreen .ovk-diag-head-close, .ovk-msg-fullscreen .ovk-diag-head-apply'
         + ', .ovk-msg-sheet .ovk-diag-head-close, .ovk-msg-sheet .ovk-diag-head-apply';
@@ -536,9 +532,6 @@
             cleanupRipple(host, ink);
             return;
         }
-        // Fade from the live rendered state: transitions pick up mid-flight,
-        // so an early release never jumps. The end state is plain inline
-        // style, which paints even where animation clocks stall.
         ink.style.transition = 'opacity 150ms linear';
         ink.style.opacity = '0';
         const onEnd = (ev) => {
@@ -547,7 +540,7 @@
             cleanupRipple(host, ink);
         };
         ink.addEventListener('transitionend', onEnd);
-        // Fallback for frozen frames (background tab): guarded by token.
+        // fallback if transitionend never fires (frozen background tab)
         setTimeout(() => cleanupRipple(host, ink), 400);
     }
 
@@ -578,9 +571,7 @@
         if (!rippleEnabled()) return;
         if (e.pointerType === 'mouse' && e.button !== 0) return;
 
-        // When bounded and unbounded hosts nest (e.g. a .ui_actions_menu
-        // rendered inside a button.appbar-extra-btn wrap), the deepest match
-        // wins so the ripple lands on the pressed item, not its container.
+        // deepest match wins when bounded/unbounded hosts nest
         const boundedHost = e.target?.closest?.(RIPPLE_BOUNDED_SELECTOR);
         const unboundedHost = e.target?.closest?.(RIPPLE_UNBOUNDED_SELECTOR);
         let host = boundedHost || unboundedHost;
@@ -600,9 +591,7 @@
         const rect = host.getBoundingClientRect();
         if (rect.width <= 0 || rect.height <= 0) return;
 
-        // Replaced elements (<input>) render no children, so the ripple is
-        // painted in an overlay clip box aligned over the element. The clip
-        // is positioned against the parent, scrolled and stacked with it.
+        // <input>/<img> can't host children — paint the ripple in an overlay clip
         let rippleBox = host;
         clearRippleClip(host);
         if (host.tagName === 'INPUT' || host.tagName === 'IMG') {
@@ -621,9 +610,7 @@
             clip.style.width = rect.width + 'px';
             clip.style.height = rect.height + 'px';
             clip.style.borderRadius = window.getComputedStyle(host).borderRadius;
-            // The ink paints with currentColor: inherit the host's text color
-            // explicitly, since the overlay lives under the form, not the
-            // control (e.g. light label on an accent button).
+            // overlay isn't inside the control — inherit its text color explicitly
             clip.style.color = window.getComputedStyle(host).color;
             clip.__rippleParent = parent;
             clip.__rippleMadeRelative = madeRelative;
@@ -651,8 +638,7 @@
             size = Math.ceil(Math.hypot(rect.width, rect.height));
             originX = (typeof e.clientX === 'number' ? e.clientX - rect.left : rect.width / 2);
             originY = (typeof e.clientY === 'number' ? e.clientY - rect.top : rect.height / 2);
-            // Drift toward the element center while expanding, like MDC Web's
-            // fg-translate. Transform order keeps the drift in host pixels.
+            // drift toward the element center while expanding (MDC fg-translate)
             driftX = rect.width / 2 - originX;
             driftY = rect.height / 2 - originY;
         }
@@ -665,10 +651,7 @@
         rippleBox.appendChild(ink);
         host.__rippleInk = ink;
 
-        // Activation splits like MDC Web's: opacity snaps in fast while the
-        // radius expands slower and drifts toward the center. Forcing style
-        // resolution first makes the end state transition instead of jump,
-        // and the resting state is plain inline style so it always paints.
+        // force reflow so the end state transitions instead of jumping
         void ink.offsetWidth;
         ink.style.opacity = '0.12';
         ink.style.transform = 'translate(' + driftX + 'px, ' + driftY + 'px) scale(1)';

@@ -110,7 +110,6 @@
                         document.querySelector("html").style.overflowY = "scroll";
                         u(".ovk-diag-cont").remove();
 
-                        // 1. Update big avatar (profile main photo)
                         const bigAvatar = document.querySelector("#bigAvatar");
                         if (bigAvatar) {
                             bigAvatar.src = response.url;
@@ -119,7 +118,6 @@
                             }
                         }
 
-                        // 1.5 Update mobile hero avatar and make it open the new photo
                         const mobileHeroImg = document.querySelector(".mobile-hero-img");
                         if (mobileHeroImg) {
                             mobileHeroImg.src = response.url;
@@ -137,13 +135,11 @@
                             mobileHeroEdit.textContent = tr('upload_new_picture');
                         }
 
-                        // 2. Toggle avatar control buttons visibility on profile page
                         const addImageText = document.querySelector(".add_image_text");
                         if (addImageText) addImageText.style.display = "none";
                         const avatarControls = document.querySelector(".avatar_controls");
                         if (avatarControls) avatarControls.style.display = "block";
 
-                        // 3. Update global top menu and sidebar avatars for the current user
                         if (!isGroup) {
                             const sidebarImg = document.querySelector(".ui_ownblock_img");
                             if (sidebarImg) sidebarImg.src = response.url;
@@ -152,7 +148,6 @@
                             if (menuAvatar) menuAvatar.src = response.url;
                         }
 
-                        // 4. Update post/comment/list avatars for this entity, verifying they are actual avatars
                         const entityUrl = isGroup ? `/club${clubId}` : `/id${window.openvk?.current_id}`;
                         const links = document.querySelectorAll(`a[href="${entityUrl}"], a[href="/${entityUrl.substring(1)}"]`);
                         links.forEach(link => {

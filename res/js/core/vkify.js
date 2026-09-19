@@ -242,9 +242,8 @@
         };
     }
 
-    // Shared by any popup/menu/tooltip system that needs to pick a side of the
-    // trigger with enough room in the viewport (tooltips.js, tooltips-simple.js,
-    // action-menu.js).
+    // Shared by tooltip/menu systems picking a trigger side with viewport room
+    // (tooltips.js, tooltips-simple.js, action-menu.js).
     function getOptimalPlacement(element) {
         const rect = element.getBoundingClientRect();
         const viewportWidth = window.innerWidth || document.documentElement.clientWidth;

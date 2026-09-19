@@ -1,5 +1,5 @@
 window.isMobile = function() {
-    return window.matchMedia("(max-width: 770px)").matches;
+    return window.matchMedia("(max-width: 768px)").matches;
 };
 
 window.isMobileAndExpanded = function() {
@@ -158,7 +158,8 @@ window.router = new class Router {
                 };
             } else {
                 newScript.async = false;
-                const wrappedContent = `
+                const isModule = (script.getAttribute('type') || '').toLowerCase() === 'module';
+                const wrappedContent = isModule ? script.textContent : `
                     try {
                         ${script.textContent}
                     } catch (error) {
@@ -271,9 +272,8 @@ window.router = new class Router {
         u('.page_body').html(pageBody.html());
         u('.sidebar').html(sidebar.html());
         u('.appbar').html(appbar.html());
-        // Inner-HTML swaps keep the live element's class list, so propagate
-        // the server-rendered appbar classes (e.g. appbar--transparent).
-        // Dynamic state was already stripped by beforePageLeave handlers.
+        // innerHTML swaps keep the live element's classes — propagate the
+        // server-rendered appbar classes (dynamic state was stripped on leave)
         if (appbar.length > 0) {
             const nextAppbarNode = appbar.nodes[0];
             const currentAppbarNode = document.getElementById('appbar');

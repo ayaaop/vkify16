@@ -22,7 +22,7 @@ vkify.once('mediaModals', function () {
             }
 
             function clearVideoUrl() {
-                CF.clearUrlParam('z');
+                CF.clearMultipleUrlParams(['z', 'p']);
             }
 
             let doc;
@@ -396,7 +396,7 @@ vkify.once('mediaModals', function () {
             }
 
             function clearPhotoUrl() {
-                CF.clearUrlParam('z');
+                CF.clearMultipleUrlParams(['z', 'p']);
             }
 
             ModalUtils.setupCloseButton(msgbox, '#__modal_photo_close');
@@ -979,6 +979,7 @@ vkify.once('mediaModals', function () {
     function clearZParam() {
         const url = new URL(window.location);
         url.searchParams.delete('z');
+        url.searchParams.delete('p');
         history.replaceState(null, '', url);
     }
 
@@ -1074,7 +1075,14 @@ vkify.once('mediaModals', function () {
     vkify.ready(openModalFromUrl);
 
     window.addEventListener('popstate', () => {
-        if (parseZParam()) openModalFromUrl();
+        if (parseZParam()) {
+            openModalFromUrl();
+        } else {
+            const activeModal = ModalUtils.getActiveModal();
+            if (activeModal && (activeModal.__modalType === 'photo' || activeModal.__modalType === 'video')) {
+                activeModal.close();
+            }
+        }
     });
 
     class PostPopupManager {
@@ -1210,6 +1218,11 @@ vkify.once('mediaModals', function () {
                             this._commentsScroller.loadNext();
                         }
                     }
+                });
+
+                modalNode.on('click', '.vkify-paginator-loader', (e) => {
+                    e.preventDefault();
+                    this._commentsScroller?.loadNext();
                 });
 
                 window.processVkifyLocTags();

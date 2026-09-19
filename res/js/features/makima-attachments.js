@@ -1,9 +1,8 @@
 import { computeMakimaGrid } from '../utils/makima-grid.js';
 
-// Re-flows .attachments_b media tiles (photos + compact videos) into a Makima
-// mosaic on mobile, where the server-side getChildrenWithLayout() pixel layout
-// doesn't fit. The PHP mosaic stays authoritative on desktop; without JS the
-// mobile flat-stack fallback in mobile.css (:not(.makima) rules) still applies.
+// Re-flows .attachments_b media tiles into a Makima mosaic on mobile, where the
+// server-side fixed-width layout doesn't fit. Desktop keeps the PHP mosaic;
+// without JS the mobile.css flat-stack fallback applies.
 (function () {
     'use strict';
 

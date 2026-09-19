@@ -1083,7 +1083,7 @@ a.ui_crumb {
     height: 11px;
     background: url(../icons/breadcrumbs.png) -6px
     0 no-repeat;
-    margin: 0 10px 0 7px;
+    margin: 0 10px;
 }
 
 @media (min-resolution: 192dpi) {

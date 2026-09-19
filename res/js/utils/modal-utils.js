@@ -135,6 +135,7 @@ vkify.once('modalUtils', function() {
                 unique_name: uniqueName || null
             });
 
+            modal.__modalType = type;
             this.registerModal(modal, type);
 
             return modal;
