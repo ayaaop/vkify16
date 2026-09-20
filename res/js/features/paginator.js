@@ -73,8 +73,15 @@ const getNextPageNumber = (paginatorEl) => {
 
 const scrollNodeUid = (node) => node?.dataset?.uniqueid || node?.dataset?.id || null;
 
-const scrollNodeExists = (uid) => {
+const scrollNodeExists = (containerEl, uid) => {
     if (!uid) return false;
+    if (containerEl) {
+        try {
+            if (containerEl.querySelector(`[data-uniqueid='${CSS.escape(uid)}'], [data-id='${CSS.escape(uid)}']`)) {
+                return true;
+            }
+        } catch (e) { }
+    }
     return u(`.scroll_node[data-uniqueid='${uid}']`).length > 0
         || u(`.scroll_node[data-id='${uid}']`).length > 0;
 };
@@ -112,100 +119,188 @@ const PAGINATOR_ROOT_MARGIN = 200;
 const isPaginatorNearViewport = (el) => {
     if (!el) return false;
     const rect = el.getBoundingClientRect();
-    return rect.top < window.innerHeight + PAGINATOR_ROOT_MARGIN && rect.bottom > -PAGINATOR_ROOT_MARGIN;
+    const inWindow = rect.top < window.innerHeight + PAGINATOR_ROOT_MARGIN && rect.bottom > -PAGINATOR_ROOT_MARGIN;
+    if (!inWindow) return false;
+
+    const scrollParent = el.closest('.scroll_container');
+    if (scrollParent && scrollParent !== document.body && scrollParent !== document.documentElement) {
+        const pStyle = window.getComputedStyle(scrollParent);
+        if (/(auto|scroll)/.test((pStyle.overflowY || '') + (pStyle.overflow || ''))) {
+            const pRect = scrollParent.getBoundingClientRect();
+            return rect.top < pRect.bottom + PAGINATOR_ROOT_MARGIN && rect.bottom > pRect.top - PAGINATOR_ROOT_MARGIN;
+        }
+    }
+    return true;
 };
 
-const getPaginatorElement = () => document.querySelector('.vkify-paginator:not(.vkify-paginator-at-top)');
+const getPaginatorElement = () => {
+    const modal = document.querySelector('.ovk-msg-all:not(.msgbox-hidden), .ovk-photo-view-dimmer:not(.msgbox-hidden)');
+    if (modal) {
+        // Post popup comments are driven by their own CF.infiniteScroll instance
+        const modalPaginators = [...modal.querySelectorAll('.vkify-paginator:not(.vkify-paginator-at-top)')]
+            .filter(el => !el.closest('.post_popup_modal'));
+        return modalPaginators[0] || null;
+    }
+    return document.querySelector('.vkify-paginator:not(.vkify-paginator-at-top)');
+};
+
+const MODAL_SCOPE_SELECTOR = '.ovk-msg-all, .ovk-photo-view-dimmer, .post_popup_modal';
 
 const getScrollContainer = (paginatorEl) => {
-    if (paginatorEl) {
-        const host = paginatorEl.closest('.scroll_container');
-        if (host) return host;
-        const scope = paginatorEl.closest('.page_padding, .page_block, .wide_column, #content, main');
-        const scoped = scope?.querySelector('.scroll_container');
-        if (scoped) return scoped;
+    if (!paginatorEl) return document.querySelector('.page_body .scroll_container');
+
+    const host = paginatorEl.closest('.scroll_container');
+    if (host) return host;
+
+    const modal = paginatorEl.closest(MODAL_SCOPE_SELECTOR);
+    if (modal) {
+        return modal.querySelector('.scroll_container') || null;
     }
-    return document.querySelector('.page_body .scroll_container');
+
+    const scope = paginatorEl.closest('.page_padding, .page_block, .wide_column, #content, main');
+    const scoped = scope?.querySelectorAll('.scroll_container');
+    if (scoped && scoped.length > 0) {
+        if (scoped.length === 1) return scoped[0];
+
+        const preceding = [...scoped].filter(c =>
+            !!(paginatorEl.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_PRECEDING));
+        return preceding.length > 0 ? preceding[preceding.length - 1] : scoped[0];
+    }
+
+    return document.querySelector('.page_body .scroll_container') || null;
 };
 
 const getPaginatorInsertAnchor = (containerEl, paginatorEl) => {
-    if (!containerEl || !paginatorEl || !containerEl.contains(paginatorEl)) return null;
-    return paginatorEl.closest('.clear_fix') || paginatorEl.parentElement;
+    return paginatorEl?.closest('.clear_fix') || paginatorEl;
 };
 
 const appendScrollNode = (containerEl, paginatorEl, node) => {
     const uid = scrollNodeUid(node);
-    if (uid && scrollNodeExists(uid)) return;
+    if (uid && scrollNodeExists(containerEl, uid)) return;
 
     const imported = document.importNode(node, true);
     const anchor = getPaginatorInsertAnchor(containerEl, paginatorEl);
-    if (anchor) {
+
+    if (anchor && anchor.parentElement === containerEl) {
         containerEl.insertBefore(imported, anchor);
     } else {
         containerEl.appendChild(imported);
     }
 };
 
-const refreshAlbumMasonry = (containerEl) => {
-    const masonryContainer = containerEl?.classList?.contains('album-flex')
-        ? containerEl
-        : containerEl?.querySelector('.album-flex');
-    if (!masonryContainer || !window.Masonry) return;
-
-    if (window.Masonry.get?.(masonryContainer)) {
-        window.Masonry.refresh(masonryContainer);
-    } else {
-        window.Masonry.initAll('.album-flex', {
-            itemSelector: '.masonry-item',
-            columns: 3,
-            gap: 10,
-            breakpoints: { 600: 2, 450: 1 },
-        });
+const getLastLoadedPage = (paginatorEl, containerEl) => {
+    if (containerEl?.dataset?.paginatorLastLoaded) {
+        const p = Number(containerEl.dataset.paginatorLastLoaded);
+        if (!Number.isNaN(p)) return p;
     }
-
-    vkify.paginator.scheduleCheck?.();
+    if (paginatorEl?.dataset?.currentPage) {
+        const p = Number(paginatorEl.dataset.currentPage);
+        if (!Number.isNaN(p)) return p;
+    }
+    return 0;
 };
 
-const isNearDocumentBottom = () => (
-    window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - PAGINATOR_ROOT_MARGIN
-);
-
-const isPaginatorTriggerZone = (paginatorEl) => (
-    isPaginatorNearViewport(paginatorEl)
-);
-
-const getLastLoadedPage = (paginatorEl, containerEl) => {
-    if (containerEl && containerEl.dataset.paginatorLastLoaded) {
-        return Number(containerEl.dataset.paginatorLastLoaded);
+const refreshAlbumMasonry = (containerEl) => {
+    if (!containerEl || !containerEl.classList.contains('album_photos')) return;
+    if (typeof window.applyVkifyAlbumMosaic === 'function') {
+        window.applyVkifyAlbumMosaic();
+        return;
     }
-    return Number(paginatorEl?.dataset?.currentPage || 0);
+    if (typeof window.repositionAlbumCards === 'function') {
+        window.repositionAlbumCards();
+    }
+};
+
+const isPaginatorTriggerZone = (paginatorEl) => {
+    if (!paginatorEl) return false;
+    const triggerBtn = paginatorEl.querySelector('.vkify-paginator-loader');
+    if (!triggerBtn) return false;
+    return isPaginatorNearViewport(paginatorEl);
 };
 
 const canLoadNextPage = (paginatorEl) => {
     if (!paginatorEl) return false;
     const containerEl = getScrollContainer(paginatorEl);
-    if (containerEl && containerEl.dataset.paginatorExhausted) return false;
-    
-    const nextPage = getNextPageNumber(paginatorEl);
-    if (!nextPage || Number.isNaN(nextPage)) return false;
-    return nextPage > getLastLoadedPage(paginatorEl, containerEl);
+    if (!containerEl) return false;
+    if (containerEl.dataset.paginatorLoading) return false;
+    if (containerEl.dataset.paginatorExhausted) return false;
+    const nextNum = getNextPageNumber(paginatorEl);
+    if (!nextNum || Number.isNaN(nextNum)) return false;
+    const lastLoaded = getLastLoadedPage(paginatorEl, containerEl);
+    if (nextNum <= lastLoaded) return false;
+    if (checkExhaustion(paginatorEl, nextNum)) return false;
+    const triggerBtn = paginatorEl.querySelector('.vkify-paginator-loader');
+    if (!triggerBtn) return false;
+    return !triggerBtn.classList.contains('lagged');
 };
 
 const shouldAllowAutoScroll = () => {
-    const autoScrollSetting = localStorage.getItem('ux.auto_scroll');
-    const autoScrollDisabled = autoScrollSetting !== null && Number(autoScrollSetting) === 0;
-    const ajaxRoutingDisabled = Number(localStorage.getItem('ux.disable_ajax_routing') ?? 0) === 1
-        || window.openvk?.current_id === 0
-        || window.openvk?.disable_ajax === 1;
-
-    if (autoScrollDisabled || ajaxRoutingDisabled) return false;
-    if (!document.querySelector('.scroll_container')) return false;
-
-    const currentUrl = new URL(location.href);
-    const pageParam = parseInt(currentUrl.searchParams.get('p'), 10);
-    if (!Number.isNaN(pageParam) && pageParam > 1) return false;
-
+    if (document.body.classList.contains('no-scroll')) return false;
+    if (Number(localStorage.getItem('ux.disable_ajax_routing') ?? 0) === 1) return false;
+    if (window.openvk?.current_id === 0 || window.openvk?.disable_ajax === 1) return false;
+    if (window.isPaginatorDisabled) return false;
     return true;
+};
+
+const resolveFetchUrl = (paginatorEl, containerEl, page) => {
+    let fetchUrlStr = null;
+
+    if (paginatorEl?.dataset?.fetchUrl) {
+        fetchUrlStr = paginatorEl.dataset.fetchUrl;
+    } else if (containerEl?.dataset?.fetchUrl) {
+        fetchUrlStr = containerEl.dataset.fetchUrl;
+    } else {
+        const fetchUrlNode = paginatorEl?.closest('[data-fetch-url]');
+        if (fetchUrlNode?.dataset?.fetchUrl) {
+            fetchUrlStr = fetchUrlNode.dataset.fetchUrl;
+        }
+    }
+
+    if (!fetchUrlStr) {
+        const form = paginatorEl?.querySelector('form[action]');
+        const action = form?.getAttribute('action');
+        if (action && !action.startsWith('javascript:')) {
+            if (action.startsWith('/') || action.startsWith('http')) {
+                fetchUrlStr = action;
+            } else if (action.startsWith('?')) {
+                const isModal = paginatorEl?.closest(MODAL_SCOPE_SELECTOR);
+                if (isModal) {
+                    const zParam = new URLSearchParams(window.location.search).get('z');
+                    const wParam = new URLSearchParams(window.location.search).get('w');
+                    if (zParam) {
+                        fetchUrlStr = '/' + zParam.split('/')[0] + action;
+                    } else if (wParam && wParam.startsWith('wall')) {
+                        fetchUrlStr = '/' + wParam + action;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!fetchUrlStr) {
+        const isModal = paginatorEl && paginatorEl.closest(MODAL_SCOPE_SELECTOR);
+        if (isModal) {
+            const zParam = new URLSearchParams(window.location.search).get('z');
+            const wParam = new URLSearchParams(window.location.search).get('w');
+            if (zParam) {
+                const cleanZ = zParam.split('/')[0];
+                fetchUrlStr = '/' + cleanZ;
+            } else if (wParam && wParam.startsWith('wall')) {
+                fetchUrlStr = '/' + wParam;
+            }
+        }
+    }
+
+    if (!fetchUrlStr) {
+        const cleanLoc = new URL(location.href);
+        cleanLoc.searchParams.delete('z');
+        cleanLoc.searchParams.delete('w');
+        fetchUrlStr = cleanLoc.pathname + cleanLoc.search;
+    }
+
+    const replaceUrl = new URL(fetchUrlStr, location.origin);
+    replaceUrl.searchParams.set('p', page);
+    return replaceUrl;
 };
 
 window.__processPaginatorNextPage = async function (page, targetPaginator = null) {
@@ -221,23 +316,7 @@ window.__processPaginatorNextPage = async function (page, targetPaginator = null
         if (checkExhaustion(paginatorEl, page)) return;
 
         try {
-            let fetchUrlStr = location.href;
-            const fetchUrlNode = paginatorEl?.closest('[data-fetch-url]');
-            if (fetchUrlNode && fetchUrlNode.dataset.fetchUrl) {
-                fetchUrlStr = fetchUrlNode.dataset.fetchUrl;
-            } else {
-                const isModal = paginatorEl && paginatorEl.closest('.ovk-photo-view-window, .ovk-modal-video-window');
-                if (isModal) {
-                    const zParam = new URLSearchParams(window.location.search).get('z');
-                    if (zParam) {
-                        const cleanZ = zParam.split('/')[0];
-                        fetchUrlStr = '/' + cleanZ;
-                    }
-                }
-            }
-
-            const replaceUrl = new URL(fetchUrlStr, location.origin);
-            replaceUrl.searchParams.set('p', page);
+            const replaceUrl = resolveFetchUrl(paginatorEl, containerEl, page);
 
             const res = await ky(replaceUrl.href, { throwHttpErrors: false });
             if (res.redirected || !res.ok) {
@@ -245,10 +324,48 @@ window.__processPaginatorNextPage = async function (page, targetPaginator = null
             }
             const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
 
-            const newNodes = doc.querySelectorAll('.scroll_node');
+            let targetDocContainer = null;
+            if (containerEl.id) {
+                targetDocContainer = doc.getElementById(containerEl.id);
+            }
+            if (!targetDocContainer && containerEl.dataset.fetchUrl) {
+                try {
+                    targetDocContainer = doc.querySelector(`.scroll_container[data-fetch-url="${CSS.escape(containerEl.dataset.fetchUrl)}"]`);
+                } catch (e) { }
+            }
+            if (!targetDocContainer) {
+                const isModal = paginatorEl && paginatorEl.closest(MODAL_SCOPE_SELECTOR);
+                if (isModal) {
+                    targetDocContainer = doc.querySelector('.pv_comments .scroll_container, .video_comments .scroll_container, #replies .scroll_container, .scroll_container');
+                } else {
+                    const liveContainers = [...document.querySelectorAll('.page_body .scroll_container')];
+                    const containerIndex = liveContainers.indexOf(containerEl);
+                    const docContainers = doc.querySelectorAll('.page_body .scroll_container');
+                    if (containerIndex >= 0 && docContainers[containerIndex]) {
+                        targetDocContainer = docContainers[containerIndex];
+                    }
+                }
+                if (!targetDocContainer) {
+                    targetDocContainer = doc.querySelector('.page_body .scroll_container, .wide_column .scroll_container') || doc.querySelector('.scroll_container');
+                }
+            }
+
+            let newNodes = [];
+            if (targetDocContainer) {
+                newNodes = Array.from(targetDocContainer.querySelectorAll('.scroll_node')).filter(node => {
+                    return node.closest('.scroll_container') === targetDocContainer;
+                });
+            } else {
+                newNodes = Array.from(doc.querySelectorAll('.scroll_node')).filter(node => {
+                    const parentContainer = node.closest('.scroll_container');
+                    return !parentContainer || parentContainer.parentElement === doc.body || !node.parentElement.closest('.scroll_node');
+                });
+            }
+
             newNodes.forEach(node => appendScrollNode(containerEl, paginatorEl, node));
 
-            const newPaginator = doc.querySelector('.vkify-paginator:not(.vkify-paginator-at-top)');
+            const newPaginator = targetDocContainer?.querySelector('.vkify-paginator:not(.vkify-paginator-at-top)')
+                || doc.querySelector('.vkify-paginator:not(.vkify-paginator-at-top)');
             const currentPaginator = paginatorEl;
 
             if (newPaginator && currentPaginator) {
@@ -335,8 +452,12 @@ const handlePaginationTrigger = async (paginatorNode, btnNode) => {
         await window.__processPaginatorNextPage(pageNumber, paginatorNode);
         try { bsdnHydrate(); } catch (e) { }
 
-        const updatedEl = u('.vkify-paginator:not(.vkify-paginator-at-top)').nodes[0];
-        checkExhaustion(updatedEl, pageNumber);
+        const updatedEl = paginatorNode && document.body.contains(paginatorNode)
+            ? paginatorNode
+            : (containerEl?.querySelector('.vkify-paginator:not(.vkify-paginator-at-top)') || null);
+        if (updatedEl) {
+            checkExhaustion(updatedEl, pageNumber);
+        }
     } catch (e) {
         console.error(e);
     } finally {
@@ -366,8 +487,17 @@ if (!paginatorAutoScrollInit) {
     const checkPaginatorInView = () => {
         if (!shouldAllowAutoScroll()) return;
 
+        const hasModal = !!document.querySelector('.ovk-msg-all:not(.msgbox-hidden), .ovk-photo-view-dimmer:not(.msgbox-hidden)');
+
         const paginators = document.querySelectorAll('.vkify-paginator:not(.vkify-paginator-at-top)');
         paginators.forEach(paginatorEl => {
+            const inModal = !!paginatorEl.closest(MODAL_SCOPE_SELECTOR);
+            if (hasModal && !inModal) return;
+
+            // Post popup comments are driven by their own CF.infiniteScroll instance
+            if (paginatorEl.closest('.post_popup_modal')) return;
+
+            if (!getScrollContainer(paginatorEl)) return;
             if (!isPaginatorTriggerZone(paginatorEl)) return;
             if (!canLoadNextPage(paginatorEl)) return;
 
@@ -431,9 +561,25 @@ if (!paginatorAutoScrollInit) {
             return;
         }
 
-        e.preventDefault();
         const btn = u(e.currentTarget);
         const paginatorEl = btn.closest('.vkify-paginator').nodes[0];
+
+        // Post popup comments are driven by their own CF.infiniteScroll instance
+        if (paginatorEl && paginatorEl.closest('.post_popup_modal')) return;
+
+        const containerEl = getScrollContainer(paginatorEl);
+        if (!containerEl) {
+            // No AJAX target container: navigate manually because GET forms
+            // drop the action's own query string on submission.
+            const action = paginatorEl?.querySelector('form[action]')?.getAttribute('action');
+            if (action) {
+                e.preventDefault();
+                window.location.assign(action);
+            }
+            return;
+        }
+
+        e.preventDefault();
         await handlePaginationTrigger(paginatorEl, btn.nodes[0]);
     });
 

@@ -69,7 +69,7 @@
                     {/if}
             {/if}
     {/if}
-    <div n:ifcontent n:class="page_block, $isList ? 'list_view tickets_list' : page_padding">
+    <div n:ifcontent n:class="page_block, $isList ? 'list_view tickets_list scroll_container' : page_padding">
     {if $isMain}
         <div n:foreach="$faq as $section" class="faq">
             <div id="faqhead">{$section[0]}</div>
@@ -79,7 +79,7 @@
 
     {if $isList}
         {foreach $tickets as $ticket}
-            <div class="search_row type{$ticket->getType()}">
+            <div class="search_row type{$ticket->getType()} scroll_node" data-uniqueid="ticket-{$ticket->getId()}">
                 <div class="info fl_l">
                     <div class="labeled name">
                         <a href="/support/view/{$ticket->getId()}">

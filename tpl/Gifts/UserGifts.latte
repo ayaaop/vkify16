@@ -11,7 +11,7 @@
         ], extra: '<a href="/gifts?act=pick&user='.$user->getId().'" class="button">'.tr('send_gift').'</a>'}
         {var $data = is_array($iterator) ? $iterator : iterator_to_array($iterator)}
         {if sizeof($data) > 0}
-            <div class="scroll_node" n:foreach="$data as $x">
+            <div class="scroll_node" data-uniqueid="usergift-{$x->id}" n:foreach="$data as $x">
                 <div class="post gift">
                     <div class="post_header">
                         <a class="post_image" href="{!$x->anon ? $x->sender->getURL() : 'javascript:false'}">

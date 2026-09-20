@@ -1141,8 +1141,26 @@ const AudioAdapter = {
         picker._searchType = 'by_name';
 
         node.on('click', '.picker-upload-btn', () => {
+            const form = picker.form;
+            const playlistMode = picker.playlistMode;
             picker.close();
-            window.showAudioUploadPopup?.({ ownerId: picker.getOwnerId() });
+            window.showAudioUploadPopup?.({
+                ownerId: picker.getOwnerId(),
+                targetForm: form,
+                playlistMode,
+                onUploaded: (newAudioEmbeds) => {
+                    form?.closest?.('.model_content_textarea')?.addClass('shown');
+                    newAudioEmbeds.forEach(audioEl => {
+                        const id = audioEl.getAttribute('data-prettyid') || audioEl.getAttribute('data-realid') || audioEl.getAttribute('data-id');
+                        appendVertical(form, {
+                            type: 'audio',
+                            id,
+                            html: audioEl.outerHTML,
+                            alignment: 'vertical'
+                        }, playlistMode);
+                    });
+                }
+            });
         });
 
         node.on('change', '.picker-search-type', (e) => {
@@ -1573,7 +1591,7 @@ vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
         }, () => msg.close()]
     });
 
-    msg.getNode().addClass('ovk-msg-fullscreen');
+    msg.getNode().addClass('ovk-msg-sheet');
     msg.getNode().find('.ovk-diag-body').attr('style', 'padding:0!important');
 
     function switchTab(name) {
@@ -1624,7 +1642,7 @@ window.attachmentAdapters = adapters;
 window.openAttachmentPicker = openPicker;
 
 vkify.bindOnce('pickerButtons', () => {
-    const resolveForm = (el) => (el ? u(el).closest('#write') : u());
+    const resolveForm = (el) => (el ? u(el).closest('form, #write') : u());
 
     document.addEventListener('click', async (e) => {
         const photo = e.target.closest('#__photoAttachment, .im-attach-photo');

@@ -7,7 +7,7 @@
                 {if \OPENVK_ROOT_CONF['openvk']['preferences']['commerce']}
                     {if $user->getPrivacyPermission('messages.write', $thisUser)}
                         <div class="mobile_profile_action_primary">
-                            <a class="button mobile_profile_action_btn" href="/im?sel={$user->getId()}">{_send_message}</a>
+                            <a class="button mobile_profile_action_btn" href="/im?sel={$user->getId()}">{_message}</a>
                         </div>
                     {else}
                         <div class="mobile_profile_action_primary">
@@ -17,7 +17,7 @@
                 {else}
                     {if $user->getPrivacyPermission('messages.write', $thisUser)}
                         <div class="mobile_profile_action_primary">
-                            <a class="button mobile_profile_action_btn" href="/im?sel={$user->getId()}">{_send_message}</a>
+                            <a class="button mobile_profile_action_btn" href="/im?sel={$user->getId()}">{_message}</a>
                         </div>
                     {/if}
                 {/if}

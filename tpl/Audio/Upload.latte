@@ -61,188 +61,201 @@
         </div>
     </div>
 
-    <script type="module" n:syntax='off' data-vkify-route-script="audio-upload">
-        import * as id3 from "/assets/packages/static/openvk/js/node_modules/id3js/lib/id3.js";
-
-        vkify.audioUploadPage = new class {
-            files_list = []
-
-            hideFirstPage() {
-                u('#firstStep').attr('style', 'display:none')
-                u('#lastStep').attr('style', 'display:block')
-            }
-
-            showFirstPage() {
-                u('#firstStep').attr('style', 'display:block')
-                u('#lastStep').attr('style', 'display:none')
-            }
-
-            async detectTags(blob) {
-                const return_params = {
-                    performer: '',
-                    name: '',
-                    genre: '',
-                    lyrics: '',
-                    explicit: 0,
-                    unlisted: 0,
-                }
-
-                function fallback() {
-                    console.info('Tags not found, setting default values.')
-                    return_params.name = remove_file_format(blob.name)
-                    return_params.genre = 'Other'
-                    return_params.performer = tr('track_unknown')
-                }
-
-                let tags = null
+    <script n:syntax='off' data-vkify-route-script="audio-upload">
+        (async () => {
+            const id3Src = "/assets/packages/static/openvk/js/node_modules/id3js/lib/id3.js";
+            let id3 = window.id3;
+            if (!id3) {
                 try {
-                    tags = await id3.fromFile(blob)
-                } catch(e) {
-                    console.error(e)
+                    id3 = await import(id3Src);
+                } catch (e) {
+                    console.error("Failed to load id3js:", e);
+                }
+            }
+
+            window.__audio_upload_page = vkify.audioUploadPage = new class {
+                files_list = []
+
+                hideFirstPage() {
+                    u('#firstStep').attr('style', 'display:none')
+                    u('#lastStep').attr('style', 'display:block')
                 }
 
-                console.log(tags)
-                if(tags != null) {
-                    console.log("ID" + tags.kind + " detected, setting values...")
-                    if(tags.title) {
-                        return_params.name = tags.title
-                    } else {
+                showFirstPage() {
+                    u('#firstStep').attr('style', 'display:block')
+                    u('#lastStep').attr('style', 'display:none')
+                }
+
+                async detectTags(blob) {
+                    const return_params = {
+                        performer: '',
+                        name: '',
+                        genre: '',
+                        lyrics: '',
+                        explicit: 0,
+                        unlisted: 0,
+                    }
+
+                    function fallback() {
+                        console.info('Tags not found, setting default values.')
                         return_params.name = remove_file_format(blob.name)
-                    }
-
-                    if(tags.artist) {
-                        return_params.performer = tags.artist
-                    } else {
-                        return_params.performer = tr('track_unknown')
-                        // todo: split performer and title from filename
-                    }
-
-                    if(tags.genre != null) {
-                        if(tags.genre.split(', ').length > 1) {
-                            const genres = tags.genre.split(', ')
-
-                            genres.forEach(genre => {
-                                if(window.openvk.audio_genres[genre]) {
-                                    return_params.genre = genre;
-                                }
-                            })
-                        } else {
-                            if(window.openvk.audio_genres.indexOf(tags.genre) != -1) {
-                                return_params.genre = tags.genre
-                            } else {
-                                console.warn("Unknown genre: " + tags.genre)
-                                return_params.genre = 'Other'
-                            }
-                        }
-                    } else {
                         return_params.genre = 'Other'
+                        return_params.performer = tr('track_unknown')
                     }
 
-                    if(tags.comments != null)
-                        return_params.lyrics = tags.comments
-                } else {
-                    fallback()
+                    let tags = null
+                    if (id3) {
+                        try {
+                            tags = await (id3.fromFile ? id3.fromFile(blob) : id3.default?.fromFile?.(blob))
+                        } catch(e) {
+                            console.error(e)
+                        }
+                    }
+
+                    console.log(tags)
+                    if(tags != null) {
+                        console.log("ID" + tags.kind + " detected, setting values...")
+                        if(tags.title) {
+                            return_params.name = tags.title
+                        } else {
+                            return_params.name = remove_file_format(blob.name)
+                        }
+
+                        if(tags.artist) {
+                            return_params.performer = tags.artist
+                        } else {
+                            return_params.performer = tr('track_unknown')
+                            // todo: split performer and title from filename
+                        }
+
+                        if(tags.genre != null) {
+                            if(tags.genre.split(', ').length > 1) {
+                                const genres = tags.genre.split(', ')
+
+                                genres.forEach(genre => {
+                                    if(window.openvk?.audio_genres && window.openvk.audio_genres.indexOf(genre) !== -1) {
+                                        return_params.genre = genre;
+                                    }
+                                })
+                            } else {
+                                if(window.openvk?.audio_genres && window.openvk.audio_genres.indexOf(tags.genre) !== -1) {
+                                    return_params.genre = tags.genre
+                                } else {
+                                    console.warn("Unknown genre: " + tags.genre)
+                                    return_params.genre = 'Other'
+                                }
+                            }
+                        } else {
+                            return_params.genre = 'Other'
+                        }
+
+                        if(tags.comments != null)
+                            return_params.lyrics = tags.comments
+                    } else {
+                        fallback()
+                    }
+
+                    return return_params
                 }
 
-                return return_params
-            }
-
-            async appendFile(appender) 
-            {
-                appender.info = await this.detectTags(appender.file)
-                const audio_index = this.files_list.push(appender) - 1
-                this.appendAudioFrame(audio_index)
-            }
-
-            appendAudioFrame(audio_index) {
-                const audio_element = this.files_list[audio_index]
-                if(!audio_element) {
-                    return
-                
+                async appendFile(appender) 
+                {
+                    appender.info = await this.detectTags(appender.file)
+                    const audio_index = this.files_list.push(appender) - 1
+                    this.appendAudioFrame(audio_index)
                 }
-                const template = u(`
-                <div class='upload_container_element' data-index="${audio_index}">
-                    <div class='upload_container_name'>
-                        <span>${ovk_proc_strtr(escapeHtml(audio_element.file.name), 63)}</span>
-                        <div id="small_remove_button"></div>
+
+                appendAudioFrame(audio_index) {
+                    const audio_element = this.files_list[audio_index]
+                    if(!audio_element) {
+                        return
+                    
+                    }
+                    const template = u(`
+                    <div class='upload_container_element' data-index="${audio_index}">
+                        <div class='upload_container_name'>
+                            <span>${ovk_proc_strtr(escapeHtml(audio_element.file.name), 63)}</span>
+                            <div id="small_remove_button"></div>
+                        </div>
+                        <div class="form_group clear_fix">
+                            <div class="form_field">
+                                <div class="form_label">${tr('performer')}:</div>
+                                <div class="form_data">
+                                    <input value='${escapeHtml(audio_element.info.performer)}' name="performer" type="text" autocomplete="off" maxlength="80" />
+                                </div>
+                            </div>
+                            <div class="form_field">
+                                <div class="form_label">${tr('audio_name')}:</div>
+                                <div class="form_data">
+                                    <input type="text" value='${escapeHtml(audio_element.info.name)}' name="name" autocomplete="off" maxlength="80" />
+                                </div>
+                            </div>
+                            <div class="form_field">
+                                <div class="form_label">${tr('genre')}:</div>
+                                <div class="form_data">
+                                    <select name="genre"></select>
+                                </div>
+                            </div>
+                            <div class="form_field">
+                                <div class="form_label">${tr('lyrics')}:</div>
+                                <div class="form_data">
+                                    <textarea name="lyrics" style="resize: vertical;max-height: 300px;">${escapeHtml(audio_element.info.lyrics)}</textarea>
+                                </div>
+                            </div>
+                            <div class="form_field">
+                                <div class="form_label"></div>
+                                <div class="form_data">
+                                    <label class="checkbox"><input type="checkbox" name="explicit"><span>${tr('audios_explicit')}</span></label>
+                                    <label class="checkbox"><input type="checkbox" name="unlisted"><span>${tr('audios_unlisted')}</span></label>
+                                </div>
+                            </div>
+                            <div id="percentage" class="form_field" style="visibility: collapse;">
+                                <div class="progress" style="width: 100%;">
+                                    <div class="progress-bar" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form_group clear_fix">
-                        <div class="form_field">
-                            <div class="form_label">${tr('performer')}:</div>
-                            <div class="form_data">
-                                <input value='${escapeHtml(audio_element.info.performer)}' name="performer" type="text" autocomplete="off" maxlength="80" />
-                            </div>
-                        </div>
-                        <div class="form_field">
-                            <div class="form_label">${tr('audio_name')}:</div>
-                            <div class="form_data">
-                                <input type="text" value='${escapeHtml(audio_element.info.name)}' name="name" autocomplete="off" maxlength="80" />
-                            </div>
-                        </div>
-                        <div class="form_field">
-                            <div class="form_label">${tr('genre')}:</div>
-                            <div class="form_data">
-                                <select name="genre"></select>
-                            </div>
-                        </div>
-                        <div class="form_field">
-                            <div class="form_label">${tr('lyrics')}:</div>
-                            <div class="form_data">
-                                <textarea name="lyrics" style="resize: vertical;max-height: 300px;">${escapeHtml(audio_element.info.lyrics)}</textarea>
-                            </div>
-                        </div>
-                        <div class="form_field">
-                            <div class="form_label"></div>
-                            <div class="form_data">
-                                <label class="checkbox"><input type="checkbox" name="explicit"><span>${tr('audios_explicit')}</span></label>
-                                <label class="checkbox"><input type="checkbox" name="unlisted"><span>${tr('audios_unlisted')}</span></label>
-                            </div>
-                        </div>
-                        <div id="percentage" class="form_field" style="visibility: collapse;">
-                            <div class="progress" style="width: 100%;">
-                                <div class="progress-bar" style="width: 0%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                `)
-                window.openvk.audio_genres.forEach(genre => {
-                    template.find('select').append(`
-                        <option ${genre == audio_element.info.genre ? 'selected': ''} value='${genre}'>${genre}</option>
                     `)
-                })
-                u('#lastStep #lastStepContainers').append(template)
-            }
-        }
-
-        u(`#audio_upload input`).on('change', (e) => {
-            const files = e.target.files
-            if(files.length <= 0) {
-                return
-            }
-
-            Array.from(files).forEach(async file => {
-                let has_duplicates = false
-                const appender = {
-                    'file': file
+                    ;(window.openvk?.audio_genres || []).forEach(genre => {
+                        template.find('select').append(`
+                            <option ${genre == audio_element.info.genre ? 'selected': ''} value='${escapeHtml(genre)}'>${escapeHtml(genre)}</option>
+                        `)
+                    })
+                    u('#lastStep #lastStepContainers').append(template)
                 }
+            }
 
-                if(!file.type.startsWith('audio/')) {
-                    makeError(tr('only_audios_accepted', escapeHtml(file.name)))
+            u(`#audio_upload input`).on('change', (e) => {
+                const files = e.target.files
+                if(files.length <= 0) {
                     return
                 }
 
-                vkify.audioUploadPage.files_list.forEach(el => {
-                    if(el && file.name == el.file.name) {
-                        has_duplicates = true
+                Array.from(files).forEach(async file => {
+                    let has_duplicates = false
+                    const appender = {
+                        'file': file
+                    }
+
+                    const isAudio = (file.type && file.type.startsWith('audio/')) || /\.(mp3|ogg|wav|flac|m4a|aac)$/i.test(file.name)
+                    if(!isAudio) {
+                        makeError(tr('only_audios_accepted', escapeHtml(file.name)))
+                        return
+                    }
+
+                    window.__audio_upload_page.files_list.forEach(el => {
+                        if(el && file.name == el.file.name) {
+                            has_duplicates = true
+                        }
+                    })
+
+                    if(!has_duplicates) {
+                        window.__audio_upload_page.appendFile(appender)
                     }
                 })
-
-                if(!has_duplicates) {
-                    vkify.audioUploadPage.appendFile(appender)
-                }
+                window.__audio_upload_page.hideFirstPage()
             })
-            vkify.audioUploadPage.hideFirstPage()
-        })
+        })()
     </script>
 {/block}

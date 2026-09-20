@@ -53,13 +53,13 @@ const audioModuleTpl = Hb.compile(
                         '<div id="miniplayer" class="audioEntry">' +
                             '<div class="audioEntryWrapper" draggable="true">' +
                                 '<div class="playerButton">' +
-                                    '<div class="playIcon"></div>' +
+                                    '<div class="playIcon"><svg class="playGlyph" viewBox="0 0 24 24"><use href="#play-24"/></svg><svg class="pauseGlyph" viewBox="0 0 24 24"><use href="#pause-24"/></svg></div>' +
                                 '</div>' +
                                 '<div class="status">' +
                                     '<div class="mediaInfo noOverflow">' +
                                         '<div class="info">' +
                                             '<strong class="performer">{{performer}}</strong>' +
-                                            ' — ' +
+                                            '<span class="tire">—</span>' +
                                             '<span class="title">{{title}}</span>' +
                                         '</div>' +
                                     '</div>' +

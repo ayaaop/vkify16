@@ -1,6 +1,8 @@
 (function () {
 'use strict';
 
+let enableSheetGestures = null;
+
 vkify.bindOnce('messageBoxOverrides', () => {
     const applyOverrides = () => {
         const U = window.u;
@@ -29,6 +31,13 @@ vkify.bindOnce('messageBoxOverrides', () => {
                 msg.close();
             }
         };
+
+        if (!proto.addClass) {
+            proto.addClass = function (className) {
+                this.getNode?.()?.addClass(className);
+                return this;
+            };
+        }
 
         if (!proto.__vkifyStackingHooked) {
             proto.__vkifyStackingHooked = true;
@@ -85,8 +94,7 @@ vkify.bindOnce('messageBoxOverrides', () => {
                 }
             };
 
-            // full-screen dialogs get a header tick wired to the first
-            // action button (the hidden bar still fires via .click())
+            // the hidden action bar still fires via .click()
             const installHeadApply = (el) => {
                 const head = el.querySelector('.ovk-diag-head');
                 const confirmBtn = el.querySelector('.ovk-diag-action > .button, .ovk-diag-action > button, .ovk-diag-action > input[type="button"], .ovk-diag-action > input[type="submit"]');
@@ -101,11 +109,12 @@ vkify.bindOnce('messageBoxOverrides', () => {
                 head.appendChild(applyBtn);
             };
 
-            // stock dialogs classified by body marker; themepack dialogs
-            // opt in directly via addClass at creation
-            const SHEET_BODY_MARKERS = '.stickers_pack_modal, .audiosInsert, [id^="poll_editor"], #osm-map';
-            const FULLSCREEN_BODY_MARKERS = '#_fullyDeleteAudio, #_fast_video_upload';
+            // themepack dialogs opt in directly via addClass at creation
+            const SHEET_BODY_MARKERS = '.stickers_pack_modal, .audiosInsert, [id^="poll_editor"], #osm-map, #upload_container, #repostMsgInput, #_fast_video_upload';
+            const FULLSCREEN_BODY_MARKERS = '#_fullyDeleteAudio, #_edit_post_modal';
             const classifyDialog = (el) => {
+                el.querySelectorAll('.ovk-diag-action > .button, .ovk-diag-action > button, .ovk-diag-action > input[type="button"], .ovk-diag-action > input[type="submit"]')
+                    .forEach(btn => btn.classList.add('ovk-msg-btn'));
                 if (el.querySelector(SHEET_BODY_MARKERS)) {
                     el.classList.add('ovk-msg-sheet');
                 }
@@ -113,10 +122,11 @@ vkify.bindOnce('messageBoxOverrides', () => {
                     el.classList.add('ovk-msg-fullscreen');
                     installHeadApply(el);
                 }
+                if (!el.classList.contains('ovk-msg-sheet') && !el.classList.contains('ovk-msg-fullscreen')) {
+                    el.classList.add('ovk-msg-dialog');
+                }
             };
 
-            // footer divider only while the body can scroll further down;
-            // also stacks the action buttons when labels overflow the row
             const watchDialogBodyScroll = (el) => {
                 const body = el.querySelector('.ovk-diag-body');
                 if (!body) return;
@@ -143,23 +153,20 @@ vkify.bindOnce('messageBoxOverrides', () => {
                 update();
             };
 
-            // bottom-sheet gestures: drag drives the height between peek and
-            // expanded detents; below peek it translates for dismissal
-            const enableSheetGestures = (el) => {
+            enableSheetGestures = (el) => {
                 const diag = el.querySelector('.ovk-diag');
                 const body = el.querySelector('.ovk-diag-body');
-                if (!diag) return;
+                if (!diag || el.__vkifyGestures) return;
+                el.__vkifyGestures = true;
                 let drag = null;
                 let lastH = null;
                 let sizeAnimating = false;
 
                 const dimmer = () => document.querySelector('body.dimmed > .dimmer');
-                // read the active cap from CSS so swipe and settle can't diverge
                 const currentCap = () => {
                     const mh = parseFloat(getComputedStyle(diag).maxHeight);
                     return isFinite(mh) ? mh : window.innerHeight;
                 };
-                // natural content height for a detent, inline styles cleared
                 const naturalHeight = (expanded) => {
                     const h0 = diag.offsetHeight;
                     el.classList.toggle('ovk-msg-sheet--expanded', expanded);
@@ -196,7 +203,6 @@ vkify.bindOnce('messageBoxOverrides', () => {
 
                     if (!drag.decided) {
                         if (Math.abs(dy) < 6) return;
-                        // fully expanded + upward pull inside the body → scroll
                         if (drag.inBody && dy < 0
                             && el.classList.contains('ovk-msg-sheet--expanded')
                             && diag.offsetHeight >= currentCap() - 1) {
@@ -228,6 +234,11 @@ vkify.bindOnce('messageBoxOverrides', () => {
                 }, { passive: false });
 
                 const settle = () => {
+                    if (!diag.isConnected) {
+                        document.removeEventListener('touchend', settle);
+                        document.removeEventListener('touchcancel', settle);
+                        return;
+                    }
                     const d = dimmer();
                     if (d) d.style.opacity = '';
                     if (!drag) return;
@@ -240,9 +251,8 @@ vkify.bindOnce('messageBoxOverrides', () => {
 
                     const dy = g.lastY - g.startY;
                     const h = g.startH - dy;
-                    const v = g.vel; // px/ms, positive = moving down
+                    const v = g.vel;
 
-                    // below peek: translate distance or a downward fling dismisses
                     if (h <= g.peekH) {
                         const over = g.peekH - h;
                         if (over > Math.min(120, g.peekH / 3) || v > 0.8) {
@@ -254,7 +264,6 @@ vkify.bindOnce('messageBoxOverrides', () => {
                             setTimeout(async () => {
                                 if (msg) await closeMessageBox(msg);
                                 if (el.isConnected) {
-                                    // warn_on_exit declined — slide back up
                                     diag.style.transition = 'transform .2s';
                                     diag.style.height = '';
                                     diag.style.transform = '';
@@ -264,13 +273,10 @@ vkify.bindOnce('messageBoxOverrides', () => {
                         }
                     }
 
-                    // snap to a detent: fling direction wins over position
                     const expand = v < -0.4 ? true
                         : v > 0.4 ? false
                         : h > (g.peekH + g.capH) / 2;
 
-                    // clamp to the target cap before removing --dragging so
-                    // max-height doesn't snap the dragged height instantly
                     const visH = Math.min(Math.max(h, g.peekH), expand ? g.capH : g.peekCap);
                     diag.style.height = `${visH}px`;
                     el.classList.toggle('ovk-msg-sheet--expanded', expand);
@@ -291,40 +297,83 @@ vkify.bindOnce('messageBoxOverrides', () => {
                     diag.style.transition = 'height .22s cubic-bezier(.4,0,.2,1), transform .22s cubic-bezier(.4,0,.2,1)';
                     diag.style.height = `${targetH}px`;
                     diag.style.transform = '';
-                    diag.addEventListener('transitionend', () => {
+                    const settleDone = (e) => {
+                        if (e.propertyName !== 'height' && e.propertyName !== 'transform') return;
+                        diag.removeEventListener('transitionend', settleDone);
                         diag.style.transition = '';
                         diag.style.height = '';
                         sizeAnimating = false;
                         lastH = diag.offsetHeight;
-                    }, { once: true });
+                    };
+                    diag.addEventListener('transitionend', settleDone);
                 };
-                diag.addEventListener('touchend', settle);
-                diag.addEventListener('touchcancel', settle);
+                document.addEventListener('touchend', settle);
+                document.addEventListener('touchcancel', settle);
 
-                // animate content-driven resizes (tab switches, async loads)
-                const sizeRO = new ResizeObserver(() => {
+                let endTimer = null;
+                let pendingResize = false;
+                const onContentResize = () => {
                     if (!diag.isConnected) {
                         sizeRO.disconnect();
+                        clearTimeout(endTimer);
                         return;
                     }
+                    if (!window.isMobile?.()) {
+                        lastH = null;
+                        return;
+                    }
+                    if (drag?.decided) return;
+                    if (el.classList.contains('ovk-msg-sheet--resizing')) {
+                        if (endTimer) { clearTimeout(endTimer); endTimer = null; }
+                        diag.style.transition = '';
+                        diag.style.height = '';
+                        sizeAnimating = false;
+                        pendingResize = false;
+                        lastH = diag.offsetHeight;
+                        return;
+                    }
+                    if (sizeAnimating) {
+                        pendingResize = true;
+                        return;
+                    }
+                    diag.style.transition = 'none';
+                    diag.style.height = '';
                     const newH = diag.offsetHeight;
-                    if (lastH === null || drag?.decided || sizeAnimating || Math.abs(newH - lastH) < 2) {
+                    if (lastH === null || Math.abs(newH - lastH) < 2) {
+                        diag.style.transition = '';
                         lastH = newH;
                         return;
                     }
-                    sizeAnimating = true;
-                    diag.style.transition = 'none';
                     diag.style.height = `${lastH}px`;
                     void diag.offsetHeight;
+                    lastH = newH;
+                    sizeAnimating = true;
                     diag.style.transition = 'height .2s ease';
                     diag.style.height = `${newH}px`;
-                    diag.addEventListener('transitionend', () => {
+                    const done = (e) => {
+                        if (e?.propertyName && e.propertyName !== 'height') return;
+                        diag.removeEventListener('transitionend', done);
+                        diag.removeEventListener('transitioncancel', done);
+                        if (endTimer) { clearTimeout(endTimer); endTimer = null; }
+                        if (diag.style.transition !== 'height .2s ease') {
+                            sizeAnimating = false;
+                            return;
+                        }
                         diag.style.transition = '';
-                        diag.style.height = '';
                         sizeAnimating = false;
+                        if (pendingResize) {
+                            pendingResize = false;
+                            onContentResize();
+                            return;
+                        }
+                        diag.style.height = '';
                         lastH = diag.offsetHeight;
-                    }, { once: true });
-                });
+                    };
+                    diag.addEventListener('transitionend', done);
+                    diag.addEventListener('transitioncancel', done);
+                    endTimer = setTimeout(() => { if (sizeAnimating) done(); }, 350);
+                };
+                const sizeRO = new ResizeObserver(onContentResize);
                 sizeRO.observe(diag);
             };
 
@@ -408,11 +457,16 @@ function replaceMbTabs(mbTabs) {
         currentTab = name;
         const active = ul.querySelector(`.ui_tab[data-name='${name}']`);
         ul.querySelectorAll('.ui_tab').forEach(a => a.classList.toggle('ui_tab_sel', a === active));
-        positionSlider(active);
         updateExtrasVisibility();
+        positionSlider(active);
     }
 
+    const repositionSlider = () => positionSlider(ul.querySelector('.ui_tab_sel'));
+
     positionSlider(ul.querySelector('.ui_tab_sel'));
+    requestAnimationFrame(repositionSlider);
+    document.fonts?.ready?.then(repositionSlider);
+    new ResizeObserver(repositionSlider).observe(ul);
 
     u(ul).on('click', '.ui_tab', (e) => {
         e.preventDefault();
@@ -421,8 +475,6 @@ function replaceMbTabs(mbTabs) {
         mbTabs.querySelector(`.mb_tab[data-name='${name}'] a`)?.click();
     });
 
-    // mirror buttons injected into .mb_tabs as links in the visible ul,
-    // tagged so they only show on their owning tab
     new MutationObserver(() => {
         mbTabs.querySelectorAll('input[type=button]').forEach((btn) => {
             ul.querySelectorAll(`.ui_tab_extra[data-owner-tab='${currentTab}']`).forEach(el => el.remove());
@@ -431,6 +483,8 @@ function replaceMbTabs(mbTabs) {
             btn.remove();
             ul.appendChild(a);
         });
+        updateExtrasVisibility();
+        repositionSlider();
     }).observe(mbTabs, { childList: true });
 }
 
@@ -472,6 +526,8 @@ vkify.onPage(() => {
             if (diag) {
                 diag.setAttribute('style', 'width:500px');
                 diag.classList.add('ovk-msg-sheet');
+                document.body.classList.add('ovk-sheet-dim');
+                enableSheetGestures?.(diag);
 
                 const head = diag.querySelector('.ovk-diag-head');
                 if (head && !head.querySelector('.ovk-diag-head-apply')) {
@@ -495,7 +551,6 @@ vkify.onPage(() => {
             const content = document.getElementById('__content');
             if (!content) return;
 
-            // the tick shows only once the form diverges from its baseline
             const readSettingsState = () => JSON.stringify({
                 posts: content.querySelector('#pageSelect')?.value ?? '',
                 page: content.querySelector('#pageNumber')?.value ?? '',
@@ -595,8 +650,6 @@ vkify.onPage(() => {
             if (!link) return;
             e.preventDefault();
 
-            // invoke the stock handler with a normalized target so
-            // dataset.pagescount resolves regardless of the clicked child
             if (typeof window.onFeedSettingsClick === 'function') {
                 window.onFeedSettingsClick({ preventDefault() {}, target: link });
             }

@@ -87,12 +87,12 @@ function renderMusicPopupTracks(container) {
     <audio class="audio"></audio>
     <div id="miniplayer" class="audioEntry">
         <div class="audioEntryWrapper" draggable="true">
-            <div class="playerButton"><div class="playIcon"></div></div>
+            <div class="playerButton"><div class="playIcon"><svg class="playGlyph" viewBox="0 0 24 24"><use href="#play-24"/></svg><svg class="pauseGlyph" viewBox="0 0 24 24"><use href="#pause-24"/></svg></div></div>
             <div class="status">
                 <div class="mediaInfo noOverflow">
                     <div class="info">
                         <strong class="performer"><a draggable="false" href="/search?section=audios&amp;order=listens&amp;only_performers=on&amp;q=${encodeURIComponent(track.performer || '')}">${performer}</a></strong>
-                        — <span draggable="false" class="title">${title}</span>
+                        <span class="tire">—</span> <span draggable="false" class="title">${title}</span>
                     </div>
                 </div>
             </div>

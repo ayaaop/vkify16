@@ -47,7 +47,8 @@
                     {include "../components/textArea.latte", route => "/wall" . $thisUser->getId() . "/makePost", graffiti => true, polls => true, notes => true, hasSource => true, geo => true}
                 </div>
                 
-                <div class='scroll_container'>
+                {var $feedFetchUrl = isset($globalFeed) ? '/feed/all' : '/feed'}
+                <div class='scroll_container' data-fetch-url="{$feedFetchUrl}">
                     {if !empty($posts)}
                         {foreach $posts as $post}
                             {include "../components/post.latte", post => $post, commentSection => true}
@@ -59,6 +60,7 @@
 
                 <div class="postFeedBottom">
                     <div class="postFeedPaginator">
+                        {php $paginatorConf->fetchUrl = $feedFetchUrl;}
                         {include "../components/paginator.latte", conf => $paginatorConf}
                     </div>
                 </div>

@@ -39,11 +39,11 @@
         {else}
             {include "../components/page_tabs_header.latte", tabs => $tabs, id => 'apps_top_tabs'}
         {/if}
-        <div class="list_view">
+        <div class="list_view scroll_container">
             {var $data = is_array($iterator) ? $iterator : iterator_to_array($iterator)}
 
             {if sizeof($data) > 0}
-                <div class="search_row" n:foreach="$data as $x">
+                <div class="search_row scroll_node" data-uniqueid="app-{$x->getId()}" n:foreach="$data as $x">
                     <div class="img">
                         <a href="/app{$x->getId()}">
                             <img style="max-width: 80px;" src="{if str_contains($x->getAvatarUrl(), 'camera_200.png')}/themepack/vkify16/{$theme->getVersion()}/resource/camera_200.png{else}{$x->getAvatarUrl()}{/if}" />

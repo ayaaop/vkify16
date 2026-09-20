@@ -1,3 +1,4 @@
+{php if (!function_exists('vkifyTr')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_i18n.php';}
 {php if(!isset($GLOBALS["textAreaCtr"])) $GLOBALS["textAreaCtr"] = 10;}
 {php $textAreaId = ($post ?? NULL) === NULL ? (++$GLOBALS["textAreaCtr"]) : $post->getId()}
 {var $textAreaId = ($custom_id ?? NULL) === NULL ? $textAreaId : $custom_id}

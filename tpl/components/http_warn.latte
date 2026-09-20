@@ -1,3 +1,4 @@
+{php if (!function_exists('vkifyTr')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_i18n.php';}
 {var $httpWarnDismissed = ($_COOKIE['vkify_popup_shown_http_warn'] ?? '0') === '1'}
 
 <div n:if="!$httpWarnDismissed" class="bottom-popup red-popup http-warning-popup" style="display: none;">

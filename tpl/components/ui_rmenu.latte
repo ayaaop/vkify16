@@ -1,3 +1,4 @@
+{php if (!function_exists('vkifyTr')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_i18n.php';}
 {*
   Reusable UI menu component
 
@@ -166,12 +167,34 @@
                                 {if isset($item['translate']) && $item['translate'] === false}{$item['title']}{else}{_$item['title']}{/if}
                                 {if isset($item['extraItem']) && (!isset($item['extraItem']['condition']) || $item['extraItem']['condition'])}
                                     <span class="ui_tab_extra_item {$item['extraItem']['class'] ?? ''}"
-                                          n:attr="onclick => isset($item['extraItem']['onclick']) ? $item['extraItem']['onclick'] : null">
+                                          data-href="{$item['extraItem']['url'] ?? ''}"
+                                          n:attr="onclick => isset($item['extraItem']['onclick']) ? $item['extraItem']['onclick'] : (isset($item['extraItem']['url']) ? 'event.stopPropagation(); window.location.href=this.dataset.href;' : null)">
                                         {$item['extraItem']['content']|noescape}
                                     </span>
                                 {/if}
                             </a>
                         </li>
+                        {if isset($item['subitems']) && is_array($item['subitems'])}
+                            {var $anySubitemActive = ($item['active'] ?? false) || array_filter($item['subitems'], fn($s) => $s['active'] ?? false)}
+                            {if $anySubitemActive}
+                                {foreach $item['subitems'] as $subitem}
+                                    {if !isset($subitem['condition']) || $subitem['condition']}
+                                        <li class="ui_tab_subitem_wrap">
+                                            <a class="ui_tab ui_tab_subitem {($subitem['active'] ?? false) ? 'ui_tab_sel' : ''} {$subitem['class'] ?? ''}" href="{$subitem['url']}" n:attr="id => $subitem['id'] ?? null, onclick => $subitem['onclick'] ?? null">
+                                                {if isset($subitem['translate']) && $subitem['translate'] === false}{$subitem['title']}{else}{_$subitem['title']}{/if}
+                                                {if isset($subitem['extraItem']) && (!isset($subitem['extraItem']['condition']) || $subitem['extraItem']['condition'])}
+                                                    <span class="ui_tab_extra_item {$subitem['extraItem']['class'] ?? ''}"
+                                                          data-href="{$subitem['extraItem']['url'] ?? ''}"
+                                                          n:attr="onclick => isset($subitem['extraItem']['onclick']) ? $subitem['extraItem']['onclick'] : (isset($subitem['extraItem']['url']) ? 'event.stopPropagation(); window.location.href=this.dataset.href;' : null)">
+                                                        {$subitem['extraItem']['content']|noescape}
+                                                    </span>
+                                                {/if}
+                                            </a>
+                                        </li>
+                                    {/if}
+                                {/foreach}
+                            {/if}
+                        {/if}
                     {/if}
                 {/if}
             {/foreach}

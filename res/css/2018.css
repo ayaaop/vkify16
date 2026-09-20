@@ -60,18 +60,21 @@ body {
 .video_info_actions .button:hover .action_icon {
 	opacity: 1 !important;
 }
-.action_count {
+.post:not(.reply) .post .post_full_like .action_count {
 	font-size: 14px;
 	line-height: 16px;
 	height: 16px;
-	width: 33px;
 	font-weight: 500;
 	margin: 0;
+}
+.post:not(.reply) .action_count:empty {
+	display: block;
 }
 #liked ~ .action_count {
 	color: #cc2939;
 }
-.video_info_actions .button:not(:first-child) {
+.video_info_actions .button:not(:first-child),
+.action_count {
 	margin-left: 0;
 }
 
@@ -130,7 +133,7 @@ body {
 	color: #cc2939;
 }
 .reply_footer .action_count {
-	margin: 0 0 0 1px;
+	margin: 2px 0 0;
 }
 .reply_actions {
 	padding-top: 0;

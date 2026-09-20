@@ -1258,13 +1258,27 @@ body.scrolled .toTop:hover #wrap {
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: var(--accent-color-2) url(../resource/icons/audio_playpause.png) no-repeat 8px 7px;
+    background: var(--accent-color-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.audioEntry.nowPlaying .playIcon {
-    background-position-y: -15px !important;
+.audioEntry .playerButton .playIcon svg {
+    width: 18px;
+    height: 18px;
+    fill: var(--white);
+    pointer-events: none;
 }
-.audioEntry .playerButton .playIcon.paused {
-    background-position-y: -15px;
+.audioEntry .playerButton .playIcon .pauseGlyph {
+    display: none;
+}
+.audioEntry .playerButton .playIcon.paused .playGlyph,
+.audioEntry.nowPlaying .playerButton .playIcon .playGlyph {
+    display: none;
+}
+.audioEntry .playerButton .playIcon.paused .pauseGlyph,
+.audioEntry.nowPlaying .playerButton .playIcon .pauseGlyph {
+    display: block;
 }
 
 .audiosDiv {
@@ -1427,6 +1441,7 @@ body.scrolled .toTop:hover #wrap {
     opacity: 0.75;
     display: inline-block;
     background-repeat: no-repeat;
+    color: #7D9CB8;
 }
 
 .left_menu_nav_wrap {
@@ -1627,7 +1642,8 @@ div.container_gray > form > table {
 }
 
 .content_list .cl_element .cl_name .cl_lname,
-.left_small_block br {
+.left_small_block br,
+.scroll_container:empty {
     display: none;
 }
 
@@ -1851,7 +1867,7 @@ table,
     position: relative;
     z-index: 1;
 }
-.composer.model_content_textarea.expanded-textarea:has(.ui_actions_menu_wrap),
+.composer.model_content_textarea.shown:has(.ui_actions_menu_wrap),
 .post.editing {
     z-index: calc(var(--action-menu-z-index, 5) + 1);
 }
@@ -2537,6 +2553,10 @@ table,
     margin: 0;
 }
 
+.ui_actions_menu label.checkbox input[type="checkbox"], .ui_actions_menu label.checkbox input[type="radio"] {
+    margin: 1px 0 0 4px;
+}
+
 .post_view_page.with_comments .post:not(.reply) {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
@@ -2840,16 +2860,16 @@ table,
 
 }
 
-body:not(.mode-2018) .post .post_reply {
+body:not(.mode-2018) .post_full_like .side_button {
 	order: 3;
 	margin: 0 0 0 auto;
     padding-inline: 0;
 }
-body:not(.mode-2018) .post .post_reply .action_icon,
-body:not(.mode-2018) .post .post_reply .action_count {
+body:not(.mode-2018) .post_full_like .side_button .action_icon,
+body:not(.mode-2018) .post_full_like .side_button .action_count {
     display: none;
 }
-body:not(.mode-2018) .post .post_reply:hover {
+body:not(.mode-2018) .post_full_like .side_button:hover {
     text-decoration: underline!important;
     background: none;
 }
@@ -2882,7 +2902,7 @@ body:not(.mode-2018) .post .post_reply:hover {
 .post.copy_quote {
     border-left: 2px solid var(--quote-border-color);
     padding-left: 12px;
-    margin: 5px 0 0;
+    margin: 15px 0 0;
     width: auto;
 }
 .post.copy_quote .post-avatar {
@@ -2903,11 +2923,15 @@ body:not(.mode-2018) .post .post_reply:hover {
 .post.copy_quote .wall_post_text {
     padding-top: 0;
 }
+.post.copy_quote .post-content .attachments.attachments_b:not([style^="width: 3"]) {
+    width: 75%!important;
+    height: 100%!important;
+}
 .post.copy_quote .post-signature,
 .post.copy_quote .sourceDiv,
 .post.copy_quote .post-geo {
     margin: 0;
-    margin-top: 5px;
+    margin-top: 10px;
     padding-bottom: 0;
 }
 
@@ -3851,6 +3875,10 @@ h4.gifts_section_header {
 .media-page-wrapper-description {
 	padding: 0 22px 15px;
 }
+.media-page-wrapper-description .upload_time {
+    color: var(--muted-text-color);
+    font-size: 12px;
+}
 .document_actions .post_full_like_wrap {
     border: 0;
     padding: 0 15px;
@@ -3937,6 +3965,8 @@ h4.gifts_section_header {
     box-shadow:
         0 1px 0 0 var(--shadow-bottom-color),
         0 0 0 1px var(--shadow-outline-color);
+    bottom: 0;
+    top: unset;
 }
 
 .note_post .note_text {
@@ -4272,7 +4302,8 @@ a.poll-retract-vote,
 #ban-reason {
     border-bottom: 1px solid var(--border-color);
 }
-#ban-reason .msg {
+#ban-reason .msg,
+#post_page_main .page_block {
     margin: 0;
 }
 
@@ -4819,4 +4850,12 @@ body.banned {
 
 .stickers_form_btn_save {
     float: none;
+}
+
+
+@media (min-width: 769px) {
+    .appbar,
+    .mobileonly {
+        display: none !important;
+    }
 }

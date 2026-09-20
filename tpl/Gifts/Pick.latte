@@ -23,7 +23,7 @@
             {if sizeof($gifts) > 0}
                 <div class="gift_section_wrap gifts_section_scroll scroll_container clear_fix">
                     {foreach $gifts as $gift}
-                        <a href='/gifts?act=confirm&user={$user->getId()}&pack={$cat->getId()}&elid={$gift->getId()}' n:class="scroll_node, gift_cell, !$gift->canUse($thisUser) ? disabled" data-gift="{$gift->getId()}">
+                        <a href='/gifts?act=confirm&user={$user->getId()}&pack={$cat->getId()}&elid={$gift->getId()}' n:class="scroll_node, gift_cell, !$gift->canUse($thisUser) ? disabled" data-gift="{$gift->getId()}" data-uniqueid="gift-{$gift->getId()}">
                             <img width="107.5" height="107.5" class="gift_img" src="{$gift->getImage(2)}" alt="{_gift}" loading=lazy />
                             <div class="{if $gift->isFree() || $gift->getPrice() <= 2}gift_free{else}gift_price{/if}">
                                 {if $gift->isFree()}

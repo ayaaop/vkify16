@@ -11,7 +11,7 @@
         'id'        => $mode === 'list' && $isMy ? 'mymussel' : null,
         'extraItem' => [
             'url'     => '/player/upload',
-            'class'   => 'addAudioSmall',
+            'class'   => 'addAudioSmall nomobile',
             'content' => '<div class="addIcon"></div>',
             'onclick' => 'showAudioUploadPopup(); return false;'
         ]

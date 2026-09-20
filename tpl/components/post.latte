@@ -1,3 +1,5 @@
+{php if (!function_exists('vkifyTr')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_i18n.php';}
+{php if (!function_exists('vkifyFormatCount')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
 {var $author = $post->getOwner()}
 
 {var $comments = $post->getLastComments(3)}
@@ -123,10 +125,10 @@
             {include "truncated_text.latte", html => $post->getText(), plain => $post->getText(false), limit => $threshold, lineLimit => $lineThreshold, textClass => 'wall_post_text'}
 
             {var $attachmentsCount = iterator_count($post->getChildren())}
-            {var $width = $attachmentsCount > 1 ? 514 : 510}
+            {var $width = $attachmentsCount > 1 ? ($compact ? 372 : 514) : 510}
             {php if(isset($GLOBALS["_nesAttGloCou"])) $width -= 15 * $GLOBALS["_nesAttGloCou"]; }
             {var $attachmentsLayout = $post->getChildrenWithLayout($width)}
-            <div n:ifcontent class="attachments attachments_b" style="height: {$attachmentsLayout->height|noescape}; width: {$attachmentsLayout->width|noescape};">
+            <div n:ifcontent class="attachments attachments_b" style="width: {$attachmentsLayout->width|noescape};">
                 <div class="attachment" n:foreach="$attachmentsLayout->tiles as $attachment" style="float: {$attachment[3]|noescape}; width: {$attachment[0]|noescape}; height: {$attachment[1]|noescape};">
                     {include "attachment.latte", attachment => $attachment[2], parent => $post, parentType => "post", tilesCount => sizeof($attachmentsLayout->tiles)}
                 </div>
@@ -185,7 +187,7 @@
                     <span class="action_count">{if $likesCount > 0}{=vkifyFormatCount($likesCount)}{/if}</span>
                 </a>
             {/if}
-            <a n:if="!($forceNoCommentsLink ?? false) && $commentSection == true" id="comments{$post->getPrettyId()}" class="post_reply action_button" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">
+            <a n:if="!($forceNoCommentsLink ?? false) && $commentSection == true" id="comments{$post->getPrettyId()}" class="post_reply side_button action_button" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">
                 <i class="action_icon"></i>
                 <span class="action_label">{tr('reply')}</span>
                 <span class="action_count" id="commentsCount{$post->getPrettyId()}">{if $commentsCount > 0}{=vkifyFormatCount($commentsCount)}{/if}</span>
@@ -205,7 +207,7 @@
         <a n:if="$commentsCount > 3" href="/wall{$post->getPrettyId()}#replies" class="button button_wide button_gray expand_button post_link">{_view_other_comments}</a>
         <div n:ifcontent class="comments">
             {foreach $comments as $comment}
-                {include "comment.latte", comment => $comment, $compact => true}
+                {include "comment.latte", comment => $comment, compact => true}
             {/foreach}
         </div>
         <div n:ifset="$thisUser" class="commentsTextFieldWrap">

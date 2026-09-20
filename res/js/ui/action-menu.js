@@ -589,7 +589,18 @@ vkify.once('uiActionsMenu', function () {
     // mobile toggle
     if (window.isMobile && window.isMobile()) {
       if (wrap && !wrap.getAttribute('onclick') && !menu) {
-        uiActionsMenu.toggle(wrap, null);
+        let opts = {};
+        const onmouseover = wrap.getAttribute('onmouseover');
+        if (onmouseover) {
+          const menuIdMatch = onmouseover.match(/menuId:\s*['"]([^'"]+)['"]/);
+          const alignMatch = onmouseover.match(/align:\s*['"]([^'"]+)['"]/);
+          const appendMatch = onmouseover.match(/appendParentCls:\s*['"]([^'"]+)['"]/);
+          if (menuIdMatch) opts.menuId = menuIdMatch[1];
+          if (alignMatch) opts.align = alignMatch[1];
+          if (appendMatch) opts.appendParentCls = appendMatch[1];
+        }
+        if (wrap.dataset.menuId) opts.menuId = wrap.dataset.menuId;
+        uiActionsMenu.toggle(wrap, null, opts);
       }
     }
 
@@ -597,13 +608,17 @@ vkify.once('uiActionsMenu', function () {
     if (wrap && menu) {
       const item = ev.target.closest('a, button, input[type="button"], input[type="submit"], .ui_actions_menu_item');
       if (item && !item.classList.contains('ui_actions_menu')) {
-        uiActionsMenu.toggle(wrap, false, { immediate: true });
+        if (!ev.target.closest('.appbar-tabs-menu-extra') && !ev.target.closest('.ui_rmenu_extra_item') && !ev.target.closest('.ui_tab_extra_item') && !ev.target.closest('.ui_actions_menu_wrap:not(.shown)')) {
+          uiActionsMenu.toggle(wrap, false, { immediate: true });
+        }
       }
     }
 
     // outside click
     document.querySelectorAll('.ui_actions_menu_wrap.shown').forEach(openWrap => {
       if (!openWrap.contains(ev.target)) {
+        const dummy = data(openWrap, 'dummyMenu');
+        if (dummy && dummy.contains(ev.target)) return;
         uiActionsMenu.toggle(openWrap, false);
       }
     });

@@ -108,10 +108,9 @@ body.dark-mode {
 	--profile-button-border-color: #cccccc;
 }
 
-body.dark-mode .sidebar_inner .link .link_icon, body.dark-mode .post_settings .common_icon, 
-body.dark-mode .post-attach-menu__icon, body.dark-mode .page_upload_label, 
 body.dark-mode .home_navigation .top_nav_btn_icon,
-body.dark-mode .bigPlayer .additionalButtons .musicIcon,body.dark-mode .audioEntry .buttons .musicIcon {
+body.dark-mode .bigPlayer .musicIcon,
+body.dark-mode .audioEntry .buttons .musicIcon {
 	filter: grayscale(1);
 }
 body.dark-mode .home_navigation .top_nav_btn_icon {

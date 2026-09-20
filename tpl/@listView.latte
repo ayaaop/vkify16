@@ -39,7 +39,7 @@
                     {/ifset}
 
                     {if sizeof($data) > 0}
-                        <div n:class="search_row, scroll_node, isset($row_class) ? $row_class" n:foreach="$data as $dat" n:attr="id => is_null($table_body_id) ? NULL : $table_body_id">
+                        <div n:class="search_row, scroll_node, isset($row_class) ? $row_class" n:foreach="$data as $dat" n:attr="id => is_null($table_body_id) ? NULL : $table_body_id, data-uniqueid => method_exists($dat, 'getId') ? ('row-' . $dat->getId()) : null">
                             <div n:ifset="preview" class="img">
                                 <a href="{include link, x => $dat}">
                                     {include preview, x => $dat}

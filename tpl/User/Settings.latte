@@ -649,8 +649,8 @@
                         {if $blSize < 1}
                             {include "../components/content_error.latte", icon => false, description => tr("bl_count_zero_desc")}
                         {else}
-                            <div class="list_view">
-                                <div n:foreach="$blItems as $item" class="search_row">
+                            <div class="list_view scroll_container">
+                                <div n:foreach="$blItems as $item" class="search_row scroll_node" data-uniqueid="bl-{$item->getId()}">
                                     <a href="{$item->getURL()}" class="img">
                                         <img src='{$item->getAvatarURL()}'>
                                     </a>

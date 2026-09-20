@@ -1,5 +1,5 @@
 window.isMobile = function() {
-    return window.matchMedia("(max-width: 770px)").matches;
+    return window.matchMedia("(max-width: 768px)").matches;
 };
 
 window.isMobileAndExpanded = function() {
@@ -158,7 +158,8 @@ window.router = new class Router {
                 };
             } else {
                 newScript.async = false;
-                const wrappedContent = `
+                const isModule = (script.getAttribute('type') || '').toLowerCase() === 'module';
+                const wrappedContent = isModule ? script.textContent : `
                     try {
                         ${script.textContent}
                     } catch (error) {

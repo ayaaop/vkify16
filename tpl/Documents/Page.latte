@@ -62,9 +62,9 @@
                                 <i class="action_icon"></i>
                                 <span class="action_label">{_edit}</span>
                             </a>
-                        </div>
-                        <div class="docMainItem" data-context="page" data-id="{$doc->getPrettiestId()}">
-                            <a n:if="!$modifiable" class="reply_link_wrap" id="report_icon">{_report}</a>
+                            <a n:if="!$modifiable" class="action_button side_button post_report" id="report_icon">
+                                <span class="action_label">{_report}</span>
+                            </a>
                         </div>
                     </div>
                 </div>

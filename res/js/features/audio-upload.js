@@ -12,14 +12,14 @@ const popupBodyTpl = Hb.compile(
     </ul>
     <div id="audio_upload">
         <input id="audio_input" multiple="" type="file" name="blob" accept="audio/*" style="display:none">
-        <input value="{{upload_button}}" class="button" type="button" onclick="document.querySelector('#audio_input').click()">
+        <input value="{{upload_button}}" class="button" type="button" onclick="this.closest('#upload_container').querySelector('input[type=file]').click()">
     </div>
 </div>
 <div id="lastStep" style="display:none">
     <div id="lastStepContainers"></div>
     <div id="lastStepButtons" style="text-align: center;margin-top: 10px;">
         <input class="button" type="button" id="uploadMusicPopup" value="{{upload_button}}">
-        <input class="button" type="button" id="backToUpload" onclick="document.querySelector('#audio_input').click()" value="{{select_another}}">
+        <input class="button" type="button" id="backToUpload" onclick="this.closest('#upload_container').querySelector('input[type=file]').click()" value="{{select_another}}">
     </div>
 </div>
 </div>`
@@ -86,8 +86,17 @@ vkify.once("showAudioUploadPopup", () => {
                 select_another: tr('select_another_file')
             }),
             buttons: [tr('close')],
-            callbacks: [() => audioUploadPopup.close()]
+            callbacks: [() => {
+                if (window.__audio_upload_page === vkify.audioUploadPage) {
+                    window.__audio_upload_page = null;
+                }
+                vkify.audioUploadPage = null;
+                audioUploadPopup.close();
+            }]
         });
+
+        const modalNode = audioUploadPopup.getNode();
+        modalNode.addClass('ovk-msg-sheet');
 
         const id3Src = '/assets/packages/static/openvk/js/node_modules/id3js/lib/id3.js';
         let id3 = window.id3;
@@ -99,18 +108,18 @@ vkify.once("showAudioUploadPopup", () => {
             }
         }
 
-        vkify.audioUploadPage = new class {
+        window.__audio_upload_page = vkify.audioUploadPage = new class {
             files_list = [];
             ownerId = ownerId;
 
             hideFirstPage() {
-                u('#firstStep').attr('style', 'display:none');
-                u('#lastStep').attr('style', 'display:block');
+                modalNode.find('#firstStep').attr('style', 'display:none');
+                modalNode.find('#lastStep').attr('style', 'display:block');
             }
 
             showFirstPage() {
-                u('#firstStep').attr('style', 'display:block');
-                u('#lastStep').attr('style', 'display:none');
+                modalNode.find('#firstStep').attr('style', 'display:block');
+                modalNode.find('#lastStep').attr('style', 'display:none');
             }
 
             async detectTags(blob) {
@@ -134,14 +143,12 @@ vkify.once("showAudioUploadPopup", () => {
                 if (id3) {
                     try {
                         tags = await (id3.fromFile ? id3.fromFile(blob) : id3.default?.fromFile?.(blob));
-                    } catch (e) {
+                    } catch(e) {
                         console.error(e);
                     }
                 }
 
-                console.log(tags);
                 if (tags != null) {
-                    console.log(`ID${tags.kind} detected, setting values...`);
                     if (tags.title) {
                         return_params.name = tags.title;
                     } else {
@@ -158,12 +165,12 @@ vkify.once("showAudioUploadPopup", () => {
                         if (tags.genre.split(', ').length > 1) {
                             const genres = tags.genre.split(', ');
                             genres.forEach(genre => {
-                                if (window.openvk?.audio_genres?.[genre]) {
+                                if (window.openvk?.audio_genres && window.openvk.audio_genres.indexOf(genre) !== -1) {
                                     return_params.genre = genre;
                                 }
                             });
                         } else {
-                            if (window.openvk?.audio_genres?.indexOf(tags.genre) !== -1) {
+                            if (window.openvk?.audio_genres && window.openvk.audio_genres.indexOf(tags.genre) !== -1) {
                                 return_params.genre = tags.genre;
                             } else {
                                 console.warn(`Unknown genre: ${tags.genre}`);
@@ -214,11 +221,11 @@ vkify.once("showAudioUploadPopup", () => {
                     lbl_unlisted: tr('audios_unlisted')
                 });
 
-                u('#lastStep #lastStepContainers').append(u(html));
+                modalNode.find('#lastStep #lastStepContainers').append(u(html));
             }
         };
 
-        u('#audio_upload input').on('change', (e) => {
+        modalNode.find('#audio_upload input').on('change', (e) => {
             const files = e.target.files;
             if (files.length <= 0) return;
 
@@ -226,7 +233,8 @@ vkify.once("showAudioUploadPopup", () => {
                 let has_duplicates = false;
                 const appender = { 'file': file };
 
-                if (!file.type.startsWith('audio/')) {
+                const isAudio = (file.type && file.type.startsWith('audio/')) || /\.(mp3|ogg|wav|flac|m4a|aac)$/i.test(file.name);
+                if (!isAudio) {
                     makeError(tr('only_audios_accepted', escapeHtml(file.name)));
                     return;
                 }
@@ -244,22 +252,51 @@ vkify.once("showAudioUploadPopup", () => {
             vkify.audioUploadPage.hideFirstPage();
         });
 
-        u('#uploadMusicPopup').on('click', async () => {
-            const uploadPage = ownerId < 0
-                ? `/player/upload?gid=${Math.abs(ownerId)}`
-                : '/player/upload';
+        modalNode.on('click', '.upload_container_element #small_remove_button', (e) => {
+            if (modalNode.find('.uploading').length > 0) return;
+            const element = u(e.target).closest('.upload_container_element');
+            const element_index = Number(element.attr('data-index'));
+            element.remove();
+            if (vkify.audioUploadPage?.files_list) {
+                vkify.audioUploadPage.files_list[element_index] = null;
+            }
+            if (modalNode.find('#lastStep .upload_container_element').length < 1) {
+                vkify.audioUploadPage?.showFirstPage();
+            }
+        });
+
+        modalNode.on("drop", "#upload_container", function (e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            const fileInput = modalNode.find("#audio_input").nodes[0];
+            if (fileInput) {
+                fileInput.files = e.dataTransfer.files;
+                u(fileInput).trigger("change");
+            }
+        });
+        modalNode.on("dragover", "#upload_container", function (e) {
+            e.preventDefault();
+        });
+
+        modalNode.find('#uploadMusicPopup').on('click', async () => {
+            let uploadPage = '/player/upload';
+            if (options.playlist) {
+                uploadPage += `?playlist=${encodeURIComponent(options.playlist)}`;
+            } else if (ownerId < 0) {
+                uploadPage += `?gid=${encodeURIComponent(Math.abs(ownerId))}`;
+            }
             let endRedir = '';
             let uploadedCount = 0;
 
-            u('#lastStepButtons').addClass('lagged');
+            modalNode.find('#lastStepButtons').addClass('lagged');
 
-            for (const elem of u('#lastStepContainers .upload_container_element').nodes) {
+            for (const elem of modalNode.find('#lastStepContainers .upload_container_element').nodes) {
                 if (!elem) continue;
 
                 const elemU = u(elem);
                 const index = elem.dataset.index;
-                const file = vkify.audioUploadPage.files_list[index];
-                if (!file || !index) continue;
+                const file = vkify.audioUploadPage?.files_list[index];
+                if (!file || index === undefined || index === null || index === '') continue;
 
                 elemU.addClass('lagged').find('.upload_container_name').addClass('uploading');
 
@@ -268,14 +305,20 @@ vkify.once("showAudioUploadPopup", () => {
                 fd.append('ajax', 1);
                 fd.append('hash', window.router?.csrf || u('meta[name=csrf]').attr('value'));
 
-                elemU.find("#percentage").nodes[0].style.visibility = "visible";
+                const percentageNode = elemU.find("#percentage").nodes[0];
+                if (percentageNode) {
+                    percentageNode.style.visibility = "visible";
+                }
                 const xhr = new XMLHttpRequest();
 
                 try {
                     const rawResult = await new Promise((resolve) => {
                         xhr.upload.addEventListener("progress", (event) => {
                             if (event.lengthComputable) {
-                                elemU.find(".progress-bar").nodes[0].style.width = (event.loaded / event.total * 100) + "%";
+                                const barNode = elemU.find(".progress-bar").nodes[0];
+                                if (barNode) {
+                                    barNode.style.width = (event.loaded / event.total * 100) + "%";
+                                }
                             }
                         });
                         xhr.addEventListener("loadend", () => {
@@ -298,11 +341,15 @@ vkify.once("showAudioUploadPopup", () => {
                     makeError(tr('error'));
                 }
 
-                await sleep(6000);
+                await sleep(1000);
                 elemU.remove();
             }
 
             audioUploadPopup.close();
+            if (window.__audio_upload_page === vkify.audioUploadPage) {
+                window.__audio_upload_page = null;
+            }
+            vkify.audioUploadPage = null;
 
             if (uploadedCount > 0) {
                 const baseFetchUrl = ownerId < 0 ? `/audios-${Math.abs(ownerId)}` : `/audios${ownerId || window.openvk?.current_id || 0}`;
@@ -312,12 +359,38 @@ vkify.once("showAudioUploadPopup", () => {
                     const doc = await window.ContentFetcher.fetchPageContent(fetchUrl, null, { showLoader: true });
                     const newAudioEmbeds = Array.from(doc.querySelectorAll('.audioEmbed')).slice(0, uploadedCount);
                     
+                    if (typeof options.onUploaded === 'function') {
+                        options.onUploaded(newAudioEmbeds);
+                        return;
+                    }
+
+                    if (options.targetForm) {
+                        const form = u(options.targetForm);
+                        form.closest('.model_content_textarea').addClass('shown');
+                        const target = options.playlistMode ? '.PE_audios' : '.post-vertical';
+                        const dataTypeAttr = options.playlistMode ? '' : " data-type='audio'";
+                        newAudioEmbeds.forEach(audioEl => {
+                            const id = audioEl.getAttribute('data-prettyid') || audioEl.getAttribute('data-realid') || audioEl.getAttribute('data-id');
+                            form.find(target).append(`
+                                <div class="vertical-attachment upload-item" draggable="true"${dataTypeAttr} data-id="${id}">
+                                    <div class='vertical-attachment-content' draggable="false">
+                                        ${audioEl.outerHTML}
+                                    </div>
+                                    <div class="vertical-attachment-remove">
+                                        <div id="small_remove_button"></div>
+                                    </div>
+                                </div>
+                            `);
+                        });
+                        return;
+                    }
+
                     const playlistEditPage = document.querySelector('.PE_playlistEditPage');
                     if (playlistEditPage) {
                         const peAudios = playlistEditPage.querySelector('.PE_audios');
                         if (peAudios) {
                             newAudioEmbeds.reverse().forEach(audioEl => {
-                                const id = audioEl.getAttribute('data-realid') || audioEl.getAttribute('data-id');
+                                const id = audioEl.getAttribute('data-prettyid') || audioEl.getAttribute('data-realid') || audioEl.getAttribute('data-id');
                                 const itemHtml = `
                                     <div class="vertical-attachment upload-item" draggable="true" data-id="${id}">
                                         <div class="vertical-attachment-content" draggable="false">
@@ -368,18 +441,21 @@ vkify.once("showAudioUploadPopup", () => {
                     }
                 } catch (e) {
                     console.error('Failed to post-process uploaded audio:', e);
+                    if (options.onUploaded || options.targetForm) {
+                        return;
+                    }
                     if (endRedir && window.router) {
                         window.router.route(endRedir);
                     }
                 }
-            } else if (endRedir && window.router) {
+            } else if (endRedir && window.router && !options.onUploaded && !options.targetForm) {
                 window.router.route(endRedir);
             }
         });
 
         const actionEl = audioUploadPopup.getNode().find('.ovk-diag-action').nodes[0];
         if (actionEl) {
-            actionEl.insertAdjacentHTML('afterbegin', `<a href="/search?section=audios" class="button button_light" style="float: left; margin: 0;">${tr('audio_search')}</a>`);
+            actionEl.insertAdjacentHTML('afterbegin', `<a href="/search?section=audios" class="button button_light ovk-msg-btn" style="float: left; margin: 0;">${tr('audio_search')}</a>`);
         }
     };
 });
