@@ -1,25 +1,6 @@
 {extends "../@listView.latte"}
 {var $perPage = 6} {* Why 6? Check User::_abstractRelationGenerator *}
 
-{var $act = $_GET["act"] ?? "friends"}
-
-{if $act == "incoming"}
-    {var $iterator = iterator_to_array($user->getRequests($page))}
-    {var $count    = $user->getRequestsCount()}
-{elseif $act == "outcoming"}
-    {var $iterator = iterator_to_array($user->getSubscriptions($page))}
-    {var $count    = $user->getSubscriptionsCount()}
-{elseif $act == "followers"}
-    {var $iterator = iterator_to_array($user->getFollowers($page))}
-    {var $count    = $user->getFollowersCount()}
-{elseif $act == "online"}
-    {var $iterator = iterator_to_array($user->getFriendsOnline($page))}
-    {var $count    = $user->getFriendsOnlineCount()}
-{else}
-    {var $iterator = iterator_to_array($user->getFriends($page))}
-    {var $count    = $user->getFriendsCount()}
-{/if}
-
 {block title}
     {if $act == "incoming"}
         {_incoming_req}
@@ -29,6 +10,10 @@
         {_followers}
     {elseif $act == "online"}
         {_friends_online}
+    {elseif $act == "common"}
+        {_friends_common}
+    {elseif $act == "recommended"}
+        {_friends_recommended}
     {else}
         {_friends}
     {/if}
@@ -62,6 +47,21 @@
             ]
         ],
         [
+            'url' => '?act=recommended',
+            'title' => 'friends_recommended',
+            'active' => $act === 'recommended',
+            'condition' => !is_null($thisUser) && $user->getId() === $thisUser->getId()
+        ],
+        [
+            'url' => '?act=common',
+            'title' => 'friends_common',
+            'active' => $act === 'common',
+            'condition' => !is_null($thisUser) && $user->getId() !== $thisUser->getId(),
+            'extraItem' => [
+                'content' => $act === 'common' ? $count : ''
+            ]
+        ],
+        [
             'isSeparator' => true,
             'condition' => isset($thisUser) && $thisUser->getId() == $user->getId()
         ],
@@ -81,9 +81,11 @@
     {var $title = !is_null($thisUser) && $user->getId() === $thisUser->getId()
         ? ($act == "incoming" || $act == "outcoming" ? "req"
             : ($act == "followers" ? "followers"
-                : ($act == "online" ? "friends_online" : "all_friends")))
-        : "friends"}
-    {include "../components/page_block_header.latte", title => $title, count => $count}
+                : ($act == "online" ? "friends_online"
+                    : ($act == "recommended" ? "friends_recommended" : "all_friends"))))
+        : ($act == "common" ? "friends_common"
+            : ($act == "online" ? "friends_online" : "friends"))}
+    {include "../components/page_block_header.latte", title => $title, count => ($act == "recommended" ? null : $count)}
 {/block}
 
 {block link|strip|stripHtml}

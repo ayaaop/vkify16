@@ -1,9 +1,7 @@
 {extends "../@layout.latte"}
 {php if (!function_exists('vkifyFormatCount')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
 
-{if !$user->isBanned()}
-    {var $backdrops = $user->getBackDropPictureURLs()}
-{/if}
+{var $backdrops = $user->getBackDropPictureURLs()}
 
 {var $transparentAppbar = true}
 
@@ -416,8 +414,6 @@
             {var $hasMoreInfo = true}
         {/if}
     {/if}
-    {if !$user->isBanned()}
-    
     {if !$user->getPrivacyPermission('page.read', $thisUser ?? NULL)}
         <div class="msg msg_err">
             <b>{_forbidden}</b><br/>
@@ -511,6 +507,25 @@
 				</div>
 				<div class="leftDataBlock">
 					<div class="page_block" n:if="$user->getFriendsCount() > 0 && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL)">
+						<div class="module clear people_module" n:if="$thisUser != NULL && $thisUser->getId() != $user->getId() && ($commonFriendsCount = $user->getCommonFriendsCount($thisUser)) > 0">
+							<a href="/friends{$user->getId()}?act=common" class="module_header">
+								<h3 class="header_top clear_fix">
+									<span class="header_label fl_l">
+										{_friends_common}
+									</span>
+									<span class="header_count fl_l">
+										{$commonFriendsCount}
+									</span>
+								</h3>
+							</a>
+							<div class="module_body clear_fix">
+								<div class="search_row" n:foreach="array_chunk(iterator_to_array($user->getCommonFriends($thisUser, 1, 6, 'RAND()')), 3) as $friendRow">
+									{foreach $friendRow as $friend}
+										{include "Thumb.latte", user => $friend}
+									{/foreach}
+								</div>
+							</div>
+						</div>
 						<div class="module clear people_module" n:if="$user->getFriendsCount() > 0 && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL)">
 							<a href="/friends{$user->getId()}" class="module_header">
 								<h3 class="header_top clear_fix">
@@ -524,12 +539,9 @@
 							</a>
 							<div class="module_body clear_fix">
 								<div class="search_row" n:foreach="array_chunk(array_slice(iterator_to_array($user->getFriends(1)), 0, 6), 3) as $friendRow">
-									<div class="people_cell" n:foreach="$friendRow as $friend">
-										<a class="people_cell_ava" href="{$friend->getURL()}">
-											{include '../components/avatar.latte', author => $friend, size => 'miniscule', width => 50, height => 50, alt => $friend->getFirstName(), class => 'people_cell_img'}
-										</a>
-										<div class="people_cell_name"><a href="{$friend->getURL()}">{$friend->getFirstName()}</a></div>
-									</div>
+									{foreach $friendRow as $friend}
+										{include "Thumb.latte", user => $friend}
+									{/foreach}
 								</div>
 							</div>
 						</div>
@@ -546,12 +558,9 @@
 							</a>
 							<div class="module_body clear_fix">
 								<div class="search_row" n:foreach="array_chunk(array_slice(iterator_to_array($user->getFriendsOnline(1)), 0, 6), 3) as $friendRow">
-									<div class="people_cell" n:foreach="$friendRow as $friend">
-										<a class="people_cell_ava" href="{$friend->getURL()}">
-												{include '../components/avatar.latte', author => $friend, size => 'miniscule', width => 50, height => 50, alt => $friend->getFirstName(), class => 'people_cell_img'}
-										</a>
-										<div class="people_cell_name"><a href="{$friend->getURL()}">{$friend->getFirstName()}</a></div>
-									</div>
+									{foreach $friendRow as $friend}
+										{include "Thumb.latte", user => $friend}
+									{/foreach}
 								</div>
 							</div>
 						</div>
@@ -1167,9 +1176,5 @@
 			}
 		{/if}
 	</script>
-    {/if}
-    
-    {else} {* isBanned() *}
-        {include "banned.latte"}
     {/if}
 {/block}

@@ -1,4 +1,38 @@
-    <div class="wide_column_right">
+{extends "../@layout.latte"}
+{var $transparentAppbar = true}
+
+{block title}{$user->getCanonicalName()}{/block}
+
+{block appbar_extra}
+{ifset $thisUser}
+<div class="mobileonly" id="profile_appbar_extra">
+    <button class="appbar-extra-btn ui_actions_menu_wrap ui_actions_menu_no_chevron" id="profileAppbarMoreBtn" aria-label="More actions" onclick='{="uiActionsMenu.toggle(this, null, {menuId: \"profile_actions_tooltip\", noAnimate: true});"|noescape}'>
+        <svg viewBox="0 0 12 24" width="22" height="22" fill="currentColor"><use href="#more-vertical-24"></use></svg>
+    </button>
+</div>
+{/ifset}
+{/block}
+
+{define mobileProfile}
+    {include '../components/mobile_profile_hero.latte', entity => $user, name => $user->getFullName(), status => tr('user_is_blocked'), verified => $user->isVerified(), disablePhotoViewer => true}
+    <div class="page_block mobile-actions-info-block mobileonly" n:ifcontent>
+        {include '../components/mobile_profile_actions.latte'}
+    </div>
+    <div class="page_block page_padding mobile-page-info mobileonly">
+        <div class="profile_deleted_text">
+            {tr("user_banned", htmlentities($user->getFirstName()))|noescape}<br/>
+            {_user_banned_comment} <b>{$user->getBanReason()}</b>.<br/>
+            {_user_is_blocked}
+            <span n:if="$user->getUnbanTime() !== NULL">{_before}: <b>{$user->getUnbanTime()}</b></span>
+            <span n:if="$user->getUnbanTime() === NULL"><b>{_forever}</b></span>
+        </div>
+    </div>
+{/define}
+
+{block content}
+    {include #mobileProfile}
+
+    <div class="wide_column_right nomobile">
         <div class="narrow_column_wrap">
             <div class="narrow_column">
                 <div class="page_block photo_block">
@@ -60,6 +94,28 @@
                 Function.noop
             ]);
         }
+
+        function warnUser() {
+            uBanMsgTxt  = "Вы собираетесь предупредить пользователя " + {$user->getCanonicalName()} + ".";
+            uBanMsgTxt += "<br/>Мы отправим уведомление пользователю в личные сообщения от имени аккаунта администратора.";
+            uBanMsgTxt += "<br/><br/><b>Текст предупреждения</b>: <input type='text' id='uWarnMsgInput' placeholder='придумайте что-нибудь крутое' />";
+
+            MessageBox("Выдать предупреждение " + {$user->getFirstName()}, uBanMsgTxt, ["Подтвердить", "Отмена"], [
+                (function() {
+                    res = document.querySelector("#uWarnMsgInput").value;
+                    xhr = new XMLHttpRequest();
+                    xhr.open("GET", "/admin/warn/" + {$user->getId()} + "?message=" + res + "&hash=" + {rawurlencode($csrfToken)}, true);
+                    xhr.onload = (function() {
+                        if(xhr.responseText.indexOf("message") === -1)
+                            MessageBox("Ошибка", "Не удалось отправить предупреждение...", ["OK"], [Function.noop]);
+                        else
+                            MessageBox("Операция успешна", "Предупреждение отправлено", ["OK"], [Function.noop]);
+                    });
+                    xhr.send(null);
+                }),
+                Function.noop
+            ]);
+        }
     </script>
     <script n:if="$thisUser->getChandlerUser()->can('write')->model('openvk\Web\Models\Entities\TicketReply')->whichBelongsTo(0)">
         {if $user->isBannedInSupport()}
@@ -104,3 +160,4 @@
         {/if}
     </script>
 {/ifset}
+{/block}
