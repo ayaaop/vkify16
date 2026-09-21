@@ -1365,6 +1365,10 @@ body.scrolled .toTop:hover #wrap {
     background: transparent;
 }
 
+.page_header #search_form {
+    padding: 0;
+    display: block;
+}
 .page_header #search_box input[type="search"] {
     border: 0;
     box-sizing: border-box;
@@ -1382,7 +1386,7 @@ body.scrolled .toTop:hover #wrap {
     border-left: 8px solid transparent;
     color: var(--search-text-color);
     margin: 7px 0;
-    padding: 6px 6px 6px 19px;
+    padding: 6px 6px 6px 19px!important;
     font-size: 13px;
     width: 100%;
 }

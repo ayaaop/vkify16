@@ -121,7 +121,7 @@ export function fallbackRecentSmileClick() {
 }
 
 export function fallbackPeerAvatar({ html, className = '', onClick = null }) {
-    return html`<img class="${className}" src="/assets/packages/static/openvk/img/camera_100.png" loading="lazy" onClick=${onClick} />`;
+    return html`<img class="${className}" src="/assets/packages/static/openvk/img/im/chat_default_100.png" loading="lazy" onClick=${onClick} />`;
 }
 
 const VIDEO_PREVIEW_FALLBACK = '/assets/packages/static/openvk/img/camera_200.png';

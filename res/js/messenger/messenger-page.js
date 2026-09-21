@@ -191,6 +191,8 @@ export async function installMessengerRenderer() {
                         onReply=${() => this.onReplyButtonClick()}
                         onForwardClick=${() => this.onForwardClick()}
                         onViewers=${(msg) => this.onViewersButtonClick(null, msg || orig_messenger.selected_messages_objs[0])}
+                        onPin=${(msg) => this.onPinButtonClick(null, msg || orig_messenger.selected_messages_objs[0])}
+                        onReport=${(msg) => this.onReportButtonClick(null, msg || orig_messenger.selected_messages_objs[0])}
                     />
                     <div class="messenger-app messenger-layer">
                         ${initialDate ? html`
@@ -251,6 +253,11 @@ export async function installMessengerRenderer() {
             if (typeof this._setupReadObserver === 'function') this._setupReadObserver();
         } catch (e) {
             console.error('vkify16 | _setupReadObserver failed:', e);
+        }
+        try {
+            if (typeof this._setupVisibilityListener === 'function') this._setupVisibilityListener();
+        } catch (e) {
+            console.error('vkify16 | _setupVisibilityListener failed:', e);
         }
         try {
             if (typeof this._setupResizeListener === 'function') this._setupResizeListener();
