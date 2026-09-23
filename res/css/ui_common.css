@@ -596,6 +596,7 @@ body.dimmed > .dimmer #clickable {
 
 .ovk-diag-body .form_field {
     width: 100%;
+    min-height: unset;
 }
 .ovk-diag-body .form_label {
     width: 100px;
@@ -1940,7 +1941,6 @@ select:focus {
 
 /* items */
 .ui_actions_menu a,
-.ui_actions_menu .ui_actions_menu_item,
 .ui_actions_menu form button {
     display: block;
     height: 30px;
@@ -1967,10 +1967,8 @@ select:focus {
 }
 
 .ui_actions_menu a:hover,
-.ui_actions_menu .ui_actions_menu_item:hover,
 .ui_actions_menu form button:hover,
 .ui_actions_menu a:focus-visible,
-.ui_actions_menu .ui_actions_menu_item:focus-visible,
 .ui_actions_menu form button:focus-visible {
     text-decoration: none;
     background-color: var(--button-background-color);

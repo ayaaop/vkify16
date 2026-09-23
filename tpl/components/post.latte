@@ -84,7 +84,7 @@
                 </div>
             </div>
             <div class="post_actions ui_actions_menu_wrap" n:if="$compact == false && $thisUser" onmouseover="{='uiActionsMenu.show(this, null, {align: "right"});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
-                <div class="post_actions_icon"></div>
+                <svg class="post_actions_icon"><use href="#more-horizontal-16"/></svg>
                 <div n:ifcontent id="post_actions_menu_{$post->getId()}" class="ui_actions_menu">
                     {if $post->canBeEditedBy($thisUser) && !($forceNoEditLink ?? false)}
                         <a class="edit" id="editPost">{_edit}</a>
@@ -175,24 +175,27 @@
             </span>
         </div>
     </div>
+    {if $postPage && !$compact}
+        {include 'like_faces.latte', item => $post, type => 'wall'}
+    {/if}
     <div class='post_edit'></div>
     <div class="post_full_like_wrap" n:if="$thisUser && $compact == false" n:ifcontent>
         <div class="post_full_like" n:ifcontent>
             {if !($forceNoLike ?? false)}
                 {var $liked = $post->hasLikeFrom($thisUser)}
                 <a href="/wall{$post->getPrettyId()}/like?hash={rawurlencode($csrfToken)}" class="action_button post_like {if $liked}my_like{/if}" data-liked="{(int) $liked}" data-likes="{$likesCount}" data-id="{$post->getPrettyId()}" data-type='post'>
-                    <i class="action_icon" id="{if $liked}liked{/if}"></i>
+                    <svg class="action_icon" id="{if $liked}liked{/if}"><use class="i16" href="#like-16"/><use class="i18" href="#like-outline-24"/><use class="i18 iact" href="#like-active-24"/></svg>
                     <span class="action_label">{tr('mobile_like')}</span>
                     <span class="action_count">{if $likesCount > 0}{=vkifyFormatCount($likesCount)}{/if}</span>
                 </a>
             {/if}
             <a n:if="!($forceNoCommentsLink ?? false) && $commentSection == true" id="comments{$post->getPrettyId()}" class="post_reply side_button action_button" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">
-                <i class="action_icon"></i>
+                <svg class="action_icon"><use class="i16" href="#comment-14"/><use class="i18" href="#comment-outline-24"/></svg>
                 <span class="action_label">{tr('reply')}</span>
                 <span class="action_count" id="commentsCount{$post->getPrettyId()}">{if $commentsCount > 0}{=vkifyFormatCount($commentsCount)}{/if}</span>
             </a>
             <a n:if="!($forceNoShareLink ?? false)" id="reposts{$post->getPrettyId()}" class="post_share action_button" href="javascript:repost('{$post->getPrettyId()}', 'post')">
-                <i class="action_icon"></i>
+                <svg class="action_icon"><use class="i16" href="#share-14"/><use class="i18" href="#share-arrow-24"/></svg>
                 <span class="action_label">{tr('share')}</span>
                 <span class="action_count" id="repostsCount{$post->getPrettyId()}" data-count="{$repostsCount}">{if $repostsCount > 0}{=vkifyFormatCount($repostsCount)}{/if}</span>
             </a>

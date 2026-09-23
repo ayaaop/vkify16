@@ -9,13 +9,19 @@ vkify.once('mediaModals', function () {
 
     async function vkifyOpenVideo(video_arr = [], init_player = true, skipUrlUpdate = false, startAtTime = 0) {
         try {
+            const video_owner = video_arr[0];
+            const video_id = video_arr[1];
+            const pretty_id = `${video_owner}_${video_id}`;
+
+            if (window.isMobile && window.isMobile()) {
+                vkify.navigate(`/video${pretty_id}`);
+                return;
+            }
+
             const loader = CF.createLoader();
             if (loader.isShown()) return;
 
             loader.show();
-            const video_owner = video_arr[0];
-            const video_id = video_arr[1];
-            const pretty_id = `${video_owner}_${video_id}`;
 
             function updateVideoUrl(videoId) {
                 CF.updateUrlParam('z', `video${videoId}`, { skip: skipUrlUpdate });
@@ -104,9 +110,11 @@ vkify.once('mediaModals', function () {
             <div class="video_block_layout">
                 ${player_html}
             </div>
-            <div class="video_info">${videoInfoHtml}</div>
-            <div class="clear_fix video_comments" id="video_comments_section" style="${videoCommentsHtml ? '' : 'display: none;'}">
-                ${videoCommentsHtml || '<div class="pr pr_medium"><div class="pr_bt"></div><div class="pr_bt"></div><div class="pr_bt"></div></div>'}
+            <div class="ovk-vid-details">
+                <div class="video_info">${videoInfoHtml}</div>
+                <div class="clear_fix video_comments" id="video_comments_section" style="${videoCommentsHtml ? '' : 'display: none;'}">
+                    ${videoCommentsHtml || '<div class="pr pr_medium"><div class="pr_bt"></div><div class="pr_bt"></div><div class="pr_bt"></div></div>'}
+                </div>
             </div>
         </div>`;
 
@@ -176,8 +184,6 @@ vkify.once('mediaModals', function () {
                             msgbox.getNode().find('#video_comments_section').html(videoComments.html());
                             msgbox.getNode().find('#video_comments_section').attr('style', '');
                             bsdnHydrate();
-
-
                         }
                     }
                 });

@@ -59,7 +59,7 @@
         {/ifset}
     </head>
     <body {if isset($thisUser)}data-themepack="{$thisUser->getStyle()}"{/if} n:class="$hideSidebar ? no-sidebar, isset($thisUser) && $thisUser->isBanned() ? banned, $darkModeEnabled ? dark-mode, $ovkHatEnabled ? ovkhat">
-        {include "_mobileIcons.latte"}
+        {include "_icons.latte"}
         <div n:if="\OPENVK_ROOT_CONF['openvk']['preferences']['bellsAndWhistles']['testLabel']" id="test-label">FOR TESTING PURPOSES ONLY</div>
 
         <div class="notifications_global_wrap"></div>
@@ -450,7 +450,7 @@
             </div>
 
             <div class="page_body">
-                    <script n:ifset="$flashMessage">
+                    <script n:ifset="$flashMessage" data-flash-type="{$flashMessage->type}">
                         (function () {
                             function showFlashMessage() {
                                 if (typeof NewNotification === 'function') {

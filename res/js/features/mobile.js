@@ -513,7 +513,7 @@
 
     const RIPPLE_BOUNDED_SELECTOR = '.button, .profile_link'
         + ', .ui_actions_menu a, .ui_actions_menu button, .ui_actions_menu input'
-        + ', .ui_actions_menu label, .ui_actions_menu .ui_actions_menu_item'
+        + ', .ui_actions_menu label'
         + ', .ui_tab, .ui_tab_plain, .sidebar_inner .link, .mobile-info-row'
         + ', .mobile-scroll-card, .action_button';
     const RIPPLE_UNBOUNDED_SELECTOR = '.appbar .hamburger, .appbar-extra-btn'

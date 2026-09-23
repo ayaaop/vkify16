@@ -73,7 +73,7 @@
 
 {block actions}
     <div class="post_actions ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
-        <div class="post_actions_icon"></div>
+        <svg class="post_actions_icon"><use href="#more-horizontal-16"/></svg>
         <div id="group_actions_menu_{$x->getId()}" class="ui_actions_menu">
             {if $x->canBeModifiedBy($thisUser ?? NULL)}
                 {var $clubPinned = $thisUser->isClubPinned($x)}

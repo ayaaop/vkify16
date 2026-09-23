@@ -68,6 +68,67 @@ const _likesCacheSet = (key, value) => {
     _likesCache.set(key, value);
 };
 
+async function refreshLikeFaces(btn, liked, likesCount) {
+    try {
+        const scope = btn.first()?.closest('.post, .ovk-vid-details, .pv_wrapper');
+        const bar = scope?.querySelector('.post_likes_faces');
+        if (!bar) return;
+
+        if (likesCount <= 0) {
+            bar.hidden = true;
+            return;
+        }
+
+        const type = btn.attr('data-type');
+        const id = btn.attr('data-id');
+        let likers = [];
+        if (type && id) {
+            try {
+                const res = await window.OVKAPI.call('likes.getList', {
+                    extended: 1,
+                    count: 3,
+                    type: type,
+                    owner_id: id.split('_')[0],
+                    item_id: id.split('_')[1]
+                });
+                likers = res?.items || [];
+            } catch (e) { }
+        }
+
+        const viewerId = window.openvk?.current_id || 0;
+        const viewerAvatar = document.querySelector('#mobileProfileAvatar')?.src || '';
+        const faceSrcs = [];
+        if (liked && viewerAvatar) faceSrcs.push(viewerAvatar);
+        for (const liker of likers) {
+            if (faceSrcs.length >= 2) break;
+            if (liked && liker.id == viewerId) continue;
+            if (liker.photo_50) faceSrcs.push(liker.photo_50);
+        }
+
+        let facesToShow = faceSrcs;
+        let moreCount = 0;
+        if (likesCount > faceSrcs.length) {
+            facesToShow = faceSrcs.slice(0, 1);
+            moreCount = likesCount - 1;
+        }
+        const showChip = moreCount > 0 && moreCount < 100;
+
+        const photos = bar.querySelector('.post_likes_faces_photos');
+        photos.classList.toggle('has_counter', showChip);
+        photos.innerHTML = facesToShow.map(src =>
+            `<img src="${escapeHtml(src)}" class="avatar post_likes_face" width="24" height="24" alt="">`).join('')
+            + (showChip ? `<span class="post_likes_faces_counter">+${moreCount}</span>` : '');
+
+        const lang = window.vkifylang || {};
+        bar.querySelector('.post_likes_faces_label').textContent = liked
+            ? (likesCount > 1
+                ? (lang.post_likes_summary_you || 'You and $1 people liked this').replace('$1', likesCount - 1)
+                : (lang.post_likes_summary_only_you || 'You liked this'))
+            : (lang.post_likes_summary || '$1 people liked this').replace('$1', likesCount);
+        bar.hidden = false;
+    } catch (e) { }
+}
+
 vkify.bindOnce('likeHandlers', () => {
     u(document).on('click', '.video_like_button, .post_like', async function (e) {
         e.preventDefault();
@@ -125,6 +186,7 @@ vkify.bindOnce('likeHandlers', () => {
         }
 
         btn.attr('data-vkify-like-pending', '0');
+        refreshLikeFaces(btn, ok ? !isLiked : isLiked, ok ? nextLikes : currentLikes);
         return false;
     });
 });
@@ -156,6 +218,7 @@ vkify.bindOnce('likesTooltip', () => {
             } catch (e) { }
         },
         onShow: function (that) {
+            if (window.isMobile && window.isMobile()) return false;
             const likesNow = that.reference?.getAttribute('data-likes');
             if (!likesNow || likesNow === '0') return false;
             if (that.popper) {

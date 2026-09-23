@@ -573,7 +573,7 @@ vkify.once('uiActionsMenu', function () {
     }
 
     if (wrap && menu) {
-      const item = ev.target.closest('a, button, input[type="button"], input[type="submit"], .ui_actions_menu_item');
+      const item = ev.target.closest('a, button, input[type="button"], input[type="submit"]');
       if (item && !item.classList.contains('ui_actions_menu')) {
         if (!ev.target.closest('.appbar-tabs-menu-extra') && !ev.target.closest('.ui_rmenu_extra_item') && !ev.target.closest('.ui_tab_extra_item') && !ev.target.closest('.ui_actions_menu_wrap:not(.shown)')) {
           uiActionsMenu.toggle(wrap, false, { immediate: true });

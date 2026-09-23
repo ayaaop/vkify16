@@ -1,168 +1,45 @@
 (() => {
 
-const SimpleFormModal = vkify.once('SimpleFormModal', () => {
-    const Hb = window.Handlebars;
+// Parses the flash message OpenVK renders into the returned page (see the
+// script[data-flash-type] block in @layout.latte). OpenVK form endpoints
+// follow post/redirect/get: success redirects to the entity page (sometimes
+// with a "succ" flash), failure redirects back to the referer with an "err"
+// flash — so the flash is the only reliable success/failure signal,
+// especially when the success URL equals the referer.
+const extractFlash = (docOrHtml) => {
+    const doc = typeof docOrHtml === 'string'
+        ? new DOMParser().parseFromString(docOrHtml, 'text/html')
+        : docOrHtml;
+    const script = doc.querySelector?.('.page_body > script[data-flash-type]');
+    if (!script) return null;
 
-    // Handlebars auto-escapes {{ }}; {{{ }}} renders raw HTML (f.label, f.after, f.html)
-    const fieldInputTpl = {
-        hidden: Hb.compile(
-            '<input type="hidden" name="{{name}}" id="{{id}}" value="{{value}}" />'
-        ),
-        text: Hb.compile(
-            '<input type="text" name="{{name}}" id="{{id}}" value="{{value}}" placeholder="{{placeholder}}" style="width:100%" />'
-        ),
-        textarea: Hb.compile(
-            '<textarea name="{{name}}" id="{{id}}" placeholder="{{placeholder}}" style="width:100%;resize:vertical;min-height:80px">{{value}}</textarea>'
-        ),
-        checkbox: Hb.compile(
-            '<label class="checkbox"><input type="checkbox" name="{{name}}" id="{{id}}" {{#if checked}}checked{{/if}} {{#if onChange}}onchange="{{onChange}}"{{/if}} /><span>{{{text}}}</span></label>'
-        ),
-        file: Hb.compile(
-            '<input type="file" name="{{name}}" id="{{id}}" {{#if accept}}accept="{{accept}}"{{/if}} {{#if multiple}}multiple{{/if}} style="{{#if hidden}}display:none{{/if}}" />'
-        )
-    };
+    const text = script.textContent;
+    const match = text.match(/NewNotification\s*\(\s*(["'])(.*?)\1\s*,\s*(["'])(.*?)\3\s*\)/s)
+               || text.match(/MessageBox\s*\(\s*(["'])(.*?)\1\s*,\s*(["'])(.*?)\3\s*,/s);
+    if (!match) return null;
 
-    const fieldWrapperTpl = Hb.compile(
-        '<div class="form_field">' +
-            '{{#unless noLabel}}<div class="form_label">{{{label}}}</div>{{/unless}}' +
-            '<div class="form_data">{{{input}}}{{{after}}}</div>' +
-        '</div>'
-    );
+    return { type: script.dataset.flashType || 'err', title: match[2], message: match[4] };
+};
 
-    const wrapperTpl = Hb.compile(
-        '<div id="{{id}}" class="{{className}}" style="{{style}}">{{{children}}}</div>'
-    );
+const wireFormModal = (modal, onSubmit, onReady) => {
+    setTimeout(() => {
+        const node = modal.getNode().nodes[0];
+        const form = node?.querySelector('form');
+        if (!form) return;
 
-    const bodyTpl = Hb.compile(
-        '<div class="form_group" style="{{style}}">{{{fields}}}</div>'
-    );
+        form.querySelector('input[type=text], input:not([type]), textarea')?.focus();
 
-    const renderField = (f) => {
-        if (f.type === 'html') return f.html || '';
-        if (f.type === 'wrapper') {
-            const children = (f.children || []).map(renderField).join('');
-            return wrapperTpl({ id: f.id || '', className: f.className || '', style: f.style || '', children });
-        }
-
-        const type = f.type || 'text';
-        const inputRenderer = fieldInputTpl[type] || fieldInputTpl.text;
-        const input = inputRenderer({
-            name: f.name || '',
-            id: f.id || '',
-            value: f.value == null ? '' : f.value,
-            placeholder: f.placeholder || '',
-            checked: !!f.checked,
-            onChange: f.onChange || '',
-            text: f.text || '',
-            accept: f.accept || '',
-            multiple: !!f.multiple,
-            hidden: !!f.hidden
-        });
-
-        if (type === 'hidden') return input;
-
-        return fieldWrapperTpl({
-            noLabel: !!f.noLabel,
-            label: f.label || '',
-            after: f.after || '',
-            input
-        });
-    };
-
-    const show = ({ title, fields, submitText = tr('create'), cancelText = tr('cancel'), onSubmit, onReady, focusFieldId, enableEnterHandler = true, width }) => {
-        const style = width ? `width:${width};margin:0` : 'width:100%;margin:0';
-        const body = bodyTpl({ style, fields: fields.map(renderField).join('') });
-        const modal = new CMessageBox({
-            title, body,
-            buttons: [submitText, cancelText],
-            callbacks: [() => onSubmit?.(modal), () => modal.close()],
-            close_on_buttons: false,
-            warn_on_exit: false
-        });
-
-        setTimeout(() => {
-            const firstEl = ge(focusFieldId || fields.find(f => f.id && f.type !== 'hidden' && f.type !== 'html')?.id);
-            if (firstEl) firstEl.focus();
-
-            if (enableEnterHandler && modal.getNode) {
-                const textIds = fields.filter(f => f.id && (f.type === 'text' || !f.type)).map(f => f.id);
-                textIds.forEach((id, i) => {
-                    modal.getNode().on('keydown', `#${id}`, e => {
-                        if (e.keyCode === 13 && !e.shiftKey) {
-                            e.preventDefault();
-                            i === textIds.length - 1 ? onSubmit?.(modal) : ge(textIds[i + 1])?.focus();
-                        }
-                    });
-                });
+        node.addEventListener('keydown', (e) => {
+            if (e.keyCode === 13 && !e.shiftKey && e.target.tagName === 'INPUT'
+                && (e.target.type === 'text' || !e.target.type)) {
+                e.preventDefault();
+                onSubmit();
             }
+        });
 
-            onReady?.(modal);
-        }, 100);
-        return modal;
-    };
-
-    const submitForm = async ({ inputs, requiredId, requiredError, url, formFields, fileInputs, checkboxInputs, fallbackUrl, errorMsg, noNavigate, onSuccess }) => {
-        const els = inputs.map(id => ge(id));
-        if (els.some(el => !el)) return console.error('Form inputs not found');
-
-        const values = els.map(el => el.value.trim());
-        const reqIdx = inputs.indexOf(requiredId);
-        if (reqIdx >= 0 && !values[reqIdx]) {
-            NewNotification(tr('error'), requiredError, null);
-            return els[reqIdx].focus();
-        }
-
-        const csrf = vkify.getCsrf();
-        if (!csrf) {
-            NewNotification(tr('error'), 'CSRF token not found. Please refresh the page and try again.', null);
-            return els[0].focus();
-        }
-
-        const fd = new FormData();
-        formFields.forEach((name, i) => { fd.append(name, values[i]); });
-        fd.append('hash', csrf);
-
-        if (fileInputs) {
-            fileInputs.forEach(({ id, name }) => {
-                const el = ge(id);
-                if (el?.files?.[0]) fd.append(name, el.files[0]);
-            });
-        }
-
-        if (checkboxInputs) {
-            checkboxInputs.forEach(({ id, name }) => {
-                const el = ge(id);
-                if (el?.checked) fd.append(name, 'on');
-            });
-        }
-
-        els.forEach(el => { el.disabled = true; });
-
-        try {
-            const res = await ContentFetcher.request(url, {
-                method: 'POST',
-                body: fd,
-                responseType: 'response',
-                showLoader: true,
-                errorMessage: errorMsg,
-                ajaxQuery: false
-            });
-            window.messagebox_stack?.at(-1)?.close();
-            if (noNavigate) {
-                if (onSuccess) onSuccess();
-            } else {
-                vkify.navigate(res.url || fallbackUrl || location.pathname + location.search);
-            }
-        } catch (err) {
-            els.forEach(el => { el.disabled = false; });
-            els[0].focus();
-        }
-    };
-
-    return { show, submitForm, renderField };
-});
-
-window.showSimpleFormModal = SimpleFormModal.show;
+        onReady?.(modal, form);
+    }, 100);
+};
 
 // Fetches a server-rendered form page, injects its .form_group into a modal
 // and POSTs to the form's own action on submit.
@@ -171,33 +48,43 @@ window.showFormModal = vkify.once('showFormModal', () => async (url, opts = {}) 
         title: titleOverride,
         submitText = tr('save') || tr('create') || 'Save',
         cancelText = tr('cancel') || 'Cancel',
-        formGroupSelector = '.form_group',
         requiredField,
         requiredError = tr('error') || 'Required',
         errorMsg = 'Failed to save',
         fallbackUrl,
         noNavigate,
         onSuccess,
-        runScripts = false,
-        onReady,
-        validateResponse,
-        skipRedirectError = false
+        onReady
     } = opts;
 
-    const onModalSuccess = onSuccess || window._currentMediaModalRefresh;
+    const onModalSuccess = window._currentMediaModalRefresh || onSuccess;
     const noNav = noNavigate != null ? noNavigate : !!window._currentMediaModalRefresh;
 
-    let doc, formGroup;
+    let doc, formGroup, loadError;
     try {
-        doc = await window.ContentFetcher.fetchPageContent(url, null, { showLoader: true });
-        const groups = doc.querySelectorAll(formGroupSelector);
-        for (const g of groups) {
-            if (g.querySelector('form')) { formGroup = g; break; }
+        const res = await window.ContentFetcher.request(url, {
+            responseType: 'response',
+            showLoader: true,
+            skipRedirectError: true
+        });
+        doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+
+        // a redirected GET means the server bounced us (e.g. flashFail to the
+        // referer on missing permissions) — surface its flash instead of a form
+        if (res.redirected) {
+            loadError = extractFlash(doc)?.message || 'Failed to load form';
+        } else {
+            for (const g of doc.querySelectorAll('.form_group')) {
+                if (g.querySelector('form')) { formGroup = g; break; }
+            }
+            if (!formGroup) loadError = 'Failed to load form';
         }
-        if (!formGroup) throw new Error('Form not found on page');
     } catch (e) {
         console.error('Failed to load form', url, e);
-        NewNotification(tr('error'), 'Failed to load form', null);
+        loadError = 'Failed to load form';
+    }
+    if (loadError) {
+        NewNotification(tr('error'), loadError, null);
         return;
     }
 
@@ -224,10 +111,6 @@ window.showFormModal = vkify.once('showFormModal', () => async (url, opts = {}) 
         }
     }
 
-    const scripts = runScripts
-        ? Array.from(doc.querySelectorAll('script:not([src])')).map(s => s.textContent)
-        : [];
-
     const body = formGroup.outerHTML;
 
     let modal;
@@ -253,7 +136,7 @@ window.showFormModal = vkify.once('showFormModal', () => async (url, opts = {}) 
         interactive.forEach(el => { el.disabled = true; });
 
         try {
-            const postUrl = form.getAttribute('action') || url;
+            const postUrl = new URL(form.getAttribute('action') || url, new URL(url, location.href)).href;
             const res = await ContentFetcher.request(postUrl, {
                 method: 'POST',
                 body: fd,
@@ -261,25 +144,24 @@ window.showFormModal = vkify.once('showFormModal', () => async (url, opts = {}) 
                 showLoader: true,
                 errorMessage: errorMsg,
                 ajaxQuery: false,
-                skipRedirectError
+                skipRedirectError: true
             });
 
-            if (typeof validateResponse === 'function' && !validateResponse(res)) {
-                try {
-                    const html = await res.text();
-                    const flash = extractFlashMessage(html);
-                    NewNotification(window.tr('error'), flash?.message || errorMsg, null);
-                } catch (e) {
-                    NewNotification(window.tr('error'), errorMsg, null);
-                }
+            const flash = extractFlash(await res.text());
+            if (flash?.type === 'err') {
+                NewNotification(flash.title || tr('error'), flash.message, null);
                 interactive.forEach(el => { el.disabled = false; });
                 return;
             }
 
-            window.messagebox_stack?.at(-1)?.close();
+            modal.close();
+            if (flash?.message) NewNotification(flash.title, flash.message, null);
 
             if (noNav) {
+                // stay on the current page: run the caller's refresh hook if
+                // any, otherwise reload the page so changes show in place
                 if (onModalSuccess) onModalSuccess();
+                else vkify.navigate(location.pathname + location.search);
             } else {
                 let target = res.url || fallbackUrl || location.pathname + location.search;
                 try {
@@ -302,81 +184,53 @@ window.showFormModal = vkify.once('showFormModal', () => async (url, opts = {}) 
         warn_on_exit: false
     });
 
-    setTimeout(() => {
-        const node = modal.getNode().nodes[0];
-        const form = node.querySelector('form');
-        if (!form) return;
-
-        // Run inline scripts from the fetched page (e.g. file-upload wiring)
-        scripts.forEach(src => {
-            try { (new Function(src))(); } catch (e) { console.warn('Inline script error', e); }
-        });
-
-        const firstInput = form.querySelector('input[type=text], input:not([type]), textarea');
-        firstInput?.focus();
-
-        node.addEventListener('keydown', (e) => {
-            if (e.keyCode === 13 && !e.shiftKey && e.target.tagName === 'INPUT'
-                && (e.target.type === 'text' || !e.target.type)) {
-                e.preventDefault();
-                onSubmit();
-            }
-        });
-
-        onReady?.(modal, form);
-    }, 100);
-
+    wireFormModal(modal, onSubmit, onReady);
     return modal;
 });
 
-// Backwards-compatible alias
-window.showEditFormModal = window.showFormModal;
-
 window.showEditPhotoModal = (photoId) => window.showFormModal(`/photo${photoId}/edit`, {
-    fallbackUrl: `/photo${photoId}`,
-    errorMsg: 'Failed to update photo'
+    errorMsg: 'Failed to update photo',
+    noNavigate: true
 });
 
 window.showEditVideoModal = (videoId) => window.showFormModal(`/video${videoId}/edit`, {
     requiredField: 'name',
     requiredError: tr('error_no_video_name') || tr('error_no_group_name') || 'Name is required',
-    fallbackUrl: `/video${videoId}`,
-    errorMsg: 'Failed to update video'
+    errorMsg: 'Failed to update video',
+    noNavigate: true,
+    // a full page reload would reset the player — swap the info block only,
+    // leaving .video_block_layout (video element/iframe) untouched
+    onSuccess: async () => {
+        try {
+            const doc = await ContentFetcher.fetchPageContent(location.pathname + location.search, null, {});
+            const fresh = doc.querySelector('.ovk-vid-details');
+            const current = document.querySelector('.ovk-vid-details');
+            if (!fresh || !current) throw new Error('Video info block not found');
+            current.innerHTML = fresh.innerHTML;
+
+            // keep the player element's metadata in sync (read by the viewer)
+            const bsdn = doc.querySelector('.bsdn[data-name]');
+            const currentBsdn = document.querySelector('.bsdn[data-name]');
+            if (bsdn && currentBsdn) currentBsdn.dataset.name = bsdn.dataset.name;
+        } catch (e) {
+            vkify.navigate(location.pathname + location.search);
+        }
+    }
 });
 
 window.showEditTopicModal = (topicId) => window.showFormModal(`/topic${topicId}/edit`, {
     requiredField: 'title',
     requiredError: tr('error_segmentation') || 'Title is required',
-    fallbackUrl: `/topic${topicId}`,
     errorMsg: 'Failed to update topic',
-    skipRedirectError: true,
-    validateResponse: (res) => res.ok && /\/topic-?\d+_\d+/.test(res.url || '')
+    noNavigate: true
 });
 
 window.showEditAppModal = (appId) => window.showFormModal(`/editapp?app=${encodeURIComponent(appId)}`, {
     requiredField: 'name',
     requiredError: tr('error_no_app_name') || tr('error_no_group_name') || 'Name is required',
-    fallbackUrl: `/app${appId}`,
-    errorMsg: 'Failed to update app'
+    errorMsg: 'Failed to update app',
+    noNavigate: true
 });
-
-const extractFlashMessage = (html) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const pageBody = doc.querySelector('.page_body');
-    if (!pageBody) return null;
-
-    const scripts = pageBody.querySelectorAll(':scope > script');
-    for (const script of scripts) {
-        const text = script.textContent;
-        const match = text.match(/NewNotification\s*\(\s*(["'])(.*?)\1\s*,\s*(["'])(.*?)\3\s*\)/s)
-                   || text.match(/MessageBox\s*\(\s*(["'])(.*?)\1\s*,\s*(["'])(.*?)\3\s*,/s);
-        if (match) {
-            return { title: match[2], message: match[4] };
-        }
-    }
-    return null;
-};
 
 window.showCreateGroupModal = (e) => {
     e?.preventDefault();
@@ -384,9 +238,7 @@ window.showCreateGroupModal = (e) => {
         requiredField: 'name',
         requiredError: tr('error_no_group_name'),
         submitText: tr('create'),
-        errorMsg: 'Failed to create group',
-        skipRedirectError: true,
-        validateResponse: (res) => /\/club\d+/.test(res.url || '')
+        errorMsg: 'Failed to create group'
     });
     return false;
 };
@@ -397,9 +249,7 @@ window.showCreateEventModal = (e) => {
         requiredField: 'name',
         requiredError: tr('error_no_event_name'),
         submitText: tr('create'),
-        errorMsg: 'Failed to create event',
-        skipRedirectError: true,
-        validateResponse: (res) => /\/event\d+/.test(res.url || '')
+        errorMsg: 'Failed to create event'
     });
     return false;
 };
@@ -418,10 +268,6 @@ window.showCreateTopicModal = (e, clubId) => {
         requiredError: tr('error_segmentation'),
         submitText: tr('create_topic'),
         errorMsg: 'Failed to create topic',
-        // server redirects on success and failure — don't treat it as an access error
-        skipRedirectError: true,
-        validateResponse: (res) => res.ok && /\/topic-?\d+_\d+/.test(res.url || ''),
-        // biome-ignore lint/correctness/noUnusedFunctionParameters: event handler
         onReady: (modal, form) => {
             // stock page wires file inputs via OpenVK's wall bundle, which isn't loaded here
             const picInput = form.querySelector('input[name="_pic_attachment"]');
@@ -442,14 +288,9 @@ window.showCreateTopicModal = (e, clubId) => {
     return false;
 };
 
-window.showEditPlaylistModal = async (playlistId, e) => {
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    const url = `/playlist${playlistId}/edit`;
-
+// Playlist forms use a different contract (ajax=1 -> JSON {success, redirect, flash})
+// and ship their own markup (.audio_pl_edit_box) instead of .form_group.
+const openPlaylistFormModal = async ({ url, title, errorMsg, saveButtonSelector, successUrl, extraSetup }) => {
     try {
         const doc = await window.ContentFetcher.fetchPageContent(url, null, { showLoader: true });
         const editBox = doc.querySelector('.audio_pl_edit_box');
@@ -457,13 +298,10 @@ window.showEditPlaylistModal = async (playlistId, e) => {
 
         vkify.loadStyle(null, 'vkify_style_edit_playlist', vkify.resourceUrl('/css/edit_playlist.css'));
 
-        const modalTitle = tr('edit_playlist') || 'Edit playlist';
-        const body = `<div class="PE_wrapper">${editBox.outerHTML}</div>`;
-
         const modal = new CMessageBox({
-            title: modalTitle,
-            body: body,
-            buttons: [],
+            title,
+            body: `<div class="PE_wrapper">${editBox.outerHTML}</div>`,
+            buttons: [], // the template provides its own controls
             close_on_buttons: false,
             warn_on_exit: true
         });
@@ -477,6 +315,75 @@ window.showEditPlaylistModal = async (playlistId, e) => {
             modal.getNode().attr('style', 'width: 560px;');
             modal.getNode().find('.ovk-diag-body').attr('style', 'padding: 0 !important;');
 
+            const teardown = extraSetup?.(modal, node, form);
+
+            const saveBtn = node.querySelector(saveButtonSelector);
+            saveBtn?.addEventListener('click', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                LoaderUtils.showInButton(saveBtn);
+
+                const ids = [];
+                node.querySelectorAll('.PE_audios .vertical-attachment').forEach(vatch => {
+                    ids.push(vatch.dataset.id);
+                });
+
+                const fd = serializeForm(form);
+                fd.append('hash', vkify.getCsrf());
+                fd.append('ajax', 1);
+                fd.append('audios', ids);
+
+                try {
+                    const req_json = await ContentFetcher.postForm(url, fd, {
+                        responseType: 'json',
+                        csrf: false,
+                        throwOnError: false
+                    });
+                    if (req_json?.success) {
+                        modal.close();
+                        window.router.route(successUrl ?? req_json.redirect);
+                    } else {
+                        makeError(req_json?.flash?.message || errorMsg);
+                    }
+                } catch (err) {
+                    console.error(errorMsg, err);
+                    NewNotification(tr('error'), errorMsg, null);
+                } finally {
+                    LoaderUtils.restoreButton(saveBtn);
+                }
+            }, true); // capturing phase to preempt general bubbling click listener
+
+            const originalClose = modal.close;
+            modal.close = function(...args) {
+                teardown?.();
+                vkify.unloadStyle('vkify_style_edit_playlist');
+                originalClose.apply(this, args);
+            };
+
+            node.querySelector('#ape_pl_name')?.focus();
+        }, 50);
+
+        return modal;
+    } catch (err) {
+        console.error('Failed to load playlist modal:', err);
+        NewNotification(tr('error'), 'Failed to load playlist form', null);
+    }
+
+    return false;
+};
+
+window.showEditPlaylistModal = (playlistId, e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+
+    openPlaylistFormModal({
+        url: `/playlist${playlistId}/edit`,
+        title: tr('edit_playlist') || 'Edit playlist',
+        saveButtonSelector: '#playlist_edit',
+        errorMsg: 'Failed to save playlist',
+        successUrl: location.pathname + location.search,
+        extraSetup: (modal, node) => {
             const updateModalPlayerStates = () => {
                 if (!window.player) return;
                 const isPlaying = !window.player.audioPlayer.paused;
@@ -495,172 +402,35 @@ window.showEditPlaylistModal = async (playlistId, e) => {
                 });
             };
 
-            if (window.player?.audioPlayer) {
-                window.player.audioPlayer.addEventListener('play', updateModalPlayerStates);
-                window.player.audioPlayer.addEventListener('pause', updateModalPlayerStates);
-                window.player.audioPlayer.addEventListener('timeupdate', updateModalPlayerStates);
+            const player = window.player?.audioPlayer;
+            if (player) {
+                player.addEventListener('play', updateModalPlayerStates);
+                player.addEventListener('pause', updateModalPlayerStates);
+                player.addEventListener('timeupdate', updateModalPlayerStates);
             }
 
             updateModalPlayerStates();
 
-            const saveBtn = node.querySelector('#playlist_edit');
-            if (saveBtn) {
-                saveBtn.addEventListener('click', async (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    LoaderUtils.showInButton(saveBtn);
-
-                    const ids = [];
-                    node.querySelectorAll('.PE_audios .vertical-attachment').forEach(vatch => {
-                        ids.push(vatch.dataset.id);
-                    });
-
-                    const fd = serializeForm(form);
-                    fd.append('hash', window.router.csrf);
-                    fd.append('ajax', 1);
-                    fd.append('audios', ids);
-
-                    try {
-                        const req_json = await ContentFetcher.postForm(url, fd, {
-                            responseType: 'json',
-                            csrf: false,
-                            throwOnError: false
-                        });
-                        if (req_json?.success) {
-                            modal.close();
-                            vkify.unloadStyle('vkify_style_edit_playlist');
-                            window.router.route(req_json.redirect);
-                        } else {
-                            makeError(req_json?.flash?.message || 'Failed to save playlist');
-                        }
-                    } catch (err) {
-                        console.error('Failed to save playlist from modal:', err);
-                        NewNotification(tr('error'), 'Failed to save playlist', null);
-                    } finally {
-                        LoaderUtils.restoreButton(saveBtn);
-                    }
-                }, true); // capturing phase to preempt general bubbling click listener
-            }
-
-            const originalClose = modal.close;
-            modal.close = function(...args) {
-                if (window.player?.audioPlayer) {
-                    window.player.audioPlayer.removeEventListener('play', updateModalPlayerStates);
-                    window.player.audioPlayer.removeEventListener('pause', updateModalPlayerStates);
-                    window.player.audioPlayer.removeEventListener('timeupdate', updateModalPlayerStates);
-                }
-                vkify.unloadStyle('vkify_style_edit_playlist');
-                originalClose.apply(this, args);
+            return () => {
+                player?.removeEventListener('play', updateModalPlayerStates);
+                player?.removeEventListener('pause', updateModalPlayerStates);
+                player?.removeEventListener('timeupdate', updateModalPlayerStates);
             };
-
-            const firstInput = node.querySelector('#ape_pl_name');
-            firstInput?.focus();
-        }, 50);
-
-        return modal;
-    } catch (err) {
-        console.error('Failed to load edit playlist modal:', err);
-        NewNotification(tr('error'), 'Failed to load edit playlist form', null);
-    }
-
+        }
+    });
     return false;
 };
 
-window.showNewPlaylistModal = async (e, gid = null) => {
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
+window.showNewPlaylistModal = (e, gid = null) => {
+    e?.preventDefault();
+    e?.stopPropagation();
 
-    let url = '/audios/newPlaylist';
-    if (gid) {
-        url += `?gid=${gid}`;
-    }
-
-    try {
-        const doc = await window.ContentFetcher.fetchPageContent(url, null, { showLoader: true });
-        const editBox = doc.querySelector('.audio_pl_edit_box');
-        if (!editBox) throw new Error('Edit box not found');
-
-        vkify.loadStyle(null, 'vkify_style_edit_playlist', vkify.resourceUrl('/css/edit_playlist.css'));
-
-        const modalTitle = tr('new_playlist') || 'New playlist';
-        const body = `<div class="PE_wrapper">${editBox.outerHTML}</div>`;
-
-        const modal = new CMessageBox({
-            title: modalTitle,
-            body: body,
-            buttons: [], // No standard buttons, the template has its own controls
-            close_on_buttons: false,
-            warn_on_exit: true
-        });
-        modal.getNode().addClass('ovk-msg-sheet');
-
-        setTimeout(() => {
-            const node = modal.getNode().nodes[0];
-            const form = node.querySelector('.PE_playlistEditPage');
-            if (!form) return;
-
-            modal.getNode().attr('style', 'width: 560px;');
-            modal.getNode().find('.ovk-diag-body').attr('style', 'padding: 0 !important;');
-
-            const createBtn = node.querySelector('#playlist_create');
-            if (createBtn) {
-                createBtn.addEventListener('click', async (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    LoaderUtils.showInButton(createBtn);
-
-                    const ids = [];
-                    node.querySelectorAll('.PE_audios .vertical-attachment').forEach(vatch => {
-                        ids.push(vatch.dataset.id);
-                    });
-
-                    const fd = serializeForm(form);
-                    fd.append('hash', window.router.csrf);
-                    fd.append('ajax', 1);
-                    fd.append('audios', ids);
-
-                    try {
-                        const req_json = await ContentFetcher.postForm(url, fd, {
-                            responseType: 'json',
-                            csrf: false,
-                            throwOnError: false
-                        });
-                        if (req_json?.success) {
-                            modal.close();
-                            vkify.unloadStyle('vkify_style_edit_playlist');
-                            window.router.route(req_json.redirect);
-                        } else {
-                            makeError(req_json?.flash?.message || 'Failed to create playlist');
-                        }
-                    } catch (err) {
-                        console.error('Failed to create playlist from modal:', err);
-                        NewNotification(tr('error'), 'Failed to create playlist', null);
-                    } finally {
-                        LoaderUtils.restoreButton(createBtn);
-                    }
-                }, true);
-            }
-
-            const originalClose = modal.close;
-            modal.close = function(...args) {
-                vkify.unloadStyle('vkify_style_edit_playlist');
-                originalClose.apply(this, args);
-            };
-
-            const firstInput = node.querySelector('#ape_pl_name');
-            firstInput?.focus();
-        }, 50);
-
-        return modal;
-    } catch (err) {
-        console.error('Failed to load new playlist modal:', err);
-        NewNotification(tr('error'), 'Failed to load new playlist form', null);
-    }
-
+    openPlaylistFormModal({
+        url: `/audios/newPlaylist${gid ? `?gid=${gid}` : ''}`,
+        title: tr('new_playlist') || 'New playlist',
+        saveButtonSelector: '#playlist_create',
+        errorMsg: 'Failed to create playlist'
+    });
     return false;
 };
 
@@ -687,4 +457,3 @@ vkify.ready(() => {
 });
 
 })();
-
