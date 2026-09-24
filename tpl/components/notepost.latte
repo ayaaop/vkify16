@@ -23,7 +23,7 @@
                     </a>
                 </div>
                 <div class="post_actions ui_actions_menu_wrap" n:if="$thisUser" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
-                    <svg class="post_actions_icon"><use href="#more-horizontal-16"/></svg>
+                    <div class="post_actions_icon"></div>
                     <div id="note_actions_menu_{$note->getId()}" class="ui_actions_menu">
                         <a n:if="$note->canBeModifiedBy($thisUser)" href="/note{$note->getOwner()->getId()}_{$note->getVirtualId()}/edit" rel='nofollow'>{_edit}</a>
                         <a n:if="$note->canBeModifiedBy($thisUser) && !($forceNoDeleteLink ?? false)" id="_noteDelete" class="delete" href="/note{$note->getOwner()->getId()}_{$note->getId()}/delete">{_delete}</a>

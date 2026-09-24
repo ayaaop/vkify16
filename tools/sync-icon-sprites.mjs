@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const LAYOUT = path.join(ROOT, 'tpl', '_mobileIcons.latte');
+const LAYOUT = path.join(ROOT, 'tpl', '_icons.latte');
 const ICONS_ROOT = path.join(
   ROOT,
   'VKUI-repos/icons-master/packages/icons/src/svg',
@@ -26,6 +26,7 @@ const SKIP_DIR_NAMES = new Set([
 const USE_HREF_RE =
   /<use\b[^>]*(?:xlink:)?href="#([a-z0-9][a-z0-9-]*)"[^>]*>/gi;
 const SYMBOL_RE = /<symbol\b[^>]*\bid="([^"]+)"[^>]*>[\s\S]*?<\/symbol>/g;
+const CUSTOM_SYMBOL_RE = /\bdata-custom\b/;
 const SPRITE_BLOCK_RE =
   /(<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" style="display: none;">)([\s\S]*?)(\n\s*<\/svg>)/;
 const ICONS_56_COMMENT =
@@ -259,7 +260,7 @@ function formatSpriteSymbols(symbolMap) {
 
 function rebuildSpriteSheet(layoutContent, symbolMap) {
   if (!SPRITE_BLOCK_RE.test(layoutContent)) {
-    throw new Error('Could not find sprite sheet block in _mobileIcons.latte');
+    throw new Error('Could not find sprite sheet block in _icons.latte');
   }
 
   const block = formatSpriteSymbols(symbolMap);
@@ -492,9 +493,15 @@ function main() {
   }
 
   const unusedIconIds = new Set();
+  const keptCustomIconIds = new Set();
   if (prune) {
     for (const id of existingIconIds) {
       if (!finalUsedIds.has(id)) {
+        // hand-made symbols can't be re-derived from the iconpack — never prune
+        if (CUSTOM_SYMBOL_RE.test(symbolMap.get(id))) {
+          keptCustomIconIds.add(id);
+          continue;
+        }
         unusedIconIds.add(id);
         symbolMap.delete(id);
       }
@@ -522,6 +529,9 @@ function main() {
   console.log(`Sprites minified: ${minifiedCount}`);
   if (prune) {
     console.log(`Unused sprites: ${unusedIconIds.size}`);
+    if (keptCustomIconIds.size > 0) {
+      console.log(`Kept custom sprites: ${keptCustomIconIds.size}`);
+    }
   } else {
     console.log('Pruning disabled (--no-prune)');
   }
@@ -622,13 +632,13 @@ function main() {
     layoutContent = rebuildSpriteSheet(layoutContent, symbolMap);
     fs.writeFileSync(LAYOUT, layoutContent, 'utf8');
     if (symbolsToAdd.length > 0) {
-      console.log(`Added ${symbolsToAdd.length} symbol(s) to tpl/_mobileIcons.latte`);
+      console.log(`Added ${symbolsToAdd.length} symbol(s) to tpl/_icons.latte`);
     }
     if (prune && unusedIconIds.size > 0) {
-      console.log(`Removed ${unusedIconIds.size} unused symbol(s) from tpl/_mobileIcons.latte`);
+      console.log(`Removed ${unusedIconIds.size} unused symbol(s) from tpl/_icons.latte`);
     }
     if (reorder) {
-      console.log('Reordered sprites in tpl/_mobileIcons.latte by size');
+      console.log('Reordered sprites in tpl/_icons.latte by size');
     }
   }
 

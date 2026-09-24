@@ -2990,13 +2990,13 @@ body:not(.mode-2018) .post_full_like .side_button:hover {
 }
 
 .post_actions_icon {
+    background: url(../resource/icons/post_more.png) no-repeat 50%;
     position: absolute;
     width: 22px;
     height: 24px;
     top: 17px;
     right: 16.5px;
     cursor: pointer;
-    color: var(--post-meta-color);
 }
 .post_header .post_actions {
     position: absolute;
