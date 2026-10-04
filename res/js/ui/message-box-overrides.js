@@ -32,23 +32,6 @@ vkify.bindOnce('messageBoxOverrides', () => {
             }
         };
 
-        vkify.closeDialog = () => {
-            const stack = window.messagebox_stack;
-            const msg = Array.isArray(stack) ? stack[stack.length - 1] : null;
-            if (msg) closeMessageBox(msg);
-        };
-
-        vkify.bindOnce("dimmerClose", () => {
-            document.addEventListener('click', (e) => {
-                const t = e.target;
-                if (!t) return;
-                if (document.body?.classList.contains('dimmed') && t.classList?.contains('dimmer')) {
-                    e.stopImmediatePropagation();
-                    vkify.closeDialog?.();
-                }
-            }, true);
-        });
-
         if (!proto.addClass) {
             proto.addClass = function (className) {
                 this.getNode?.()?.addClass(className);
@@ -180,12 +163,10 @@ vkify.bindOnce('messageBoxOverrides', () => {
                 let sizeAnimating = false;
 
                 const dimmer = () => document.querySelector('body.dimmed > .dimmer');
-                // read the active cap from CSS so swipe and settle can't diverge
                 const currentCap = () => {
                     const mh = parseFloat(getComputedStyle(diag).maxHeight);
                     return isFinite(mh) ? mh : window.innerHeight;
                 };
-                // natural content height for a detent, inline styles cleared
                 const naturalHeight = (expanded) => {
                     const h0 = diag.offsetHeight;
                     el.classList.toggle('ovk-msg-sheet--expanded', expanded);
@@ -222,7 +203,6 @@ vkify.bindOnce('messageBoxOverrides', () => {
 
                     if (!drag.decided) {
                         if (Math.abs(dy) < 6) return;
-                        // fully expanded + upward pull inside the body → scroll
                         if (drag.inBody && dy < 0
                             && el.classList.contains('ovk-msg-sheet--expanded')
                             && diag.offsetHeight >= currentCap() - 1) {
@@ -271,9 +251,8 @@ vkify.bindOnce('messageBoxOverrides', () => {
 
                     const dy = g.lastY - g.startY;
                     const h = g.startH - dy;
-                    const v = g.vel; // px/ms, positive = moving down
+                    const v = g.vel;
 
-                    // below peek: translate distance or a downward fling dismisses
                     if (h <= g.peekH) {
                         const over = g.peekH - h;
                         if (over > Math.min(120, g.peekH / 3) || v > 0.8) {
@@ -285,7 +264,6 @@ vkify.bindOnce('messageBoxOverrides', () => {
                             setTimeout(async () => {
                                 if (msg) await closeMessageBox(msg);
                                 if (el.isConnected) {
-                                    // warn_on_exit declined — slide back up
                                     diag.style.transition = 'transform .2s';
                                     diag.style.height = '';
                                     diag.style.transform = '';
@@ -295,12 +273,10 @@ vkify.bindOnce('messageBoxOverrides', () => {
                         }
                     }
 
-                    // snap to a detent: fling direction wins over position
                     const expand = v < -0.4 ? true
                         : v > 0.4 ? false
                         : h > (g.peekH + g.capH) / 2;
 
-                    // clamp to the cap before removing --dragging so max-height doesn't snap
                     const visH = Math.min(Math.max(h, g.peekH), expand ? g.capH : g.peekCap);
                     diag.style.height = `${visH}px`;
                     el.classList.toggle('ovk-msg-sheet--expanded', expand);
@@ -331,15 +307,9 @@ vkify.bindOnce('messageBoxOverrides', () => {
                     };
                     diag.addEventListener('transitionend', settleDone);
                 };
-                // a touch ending outside the sheet must still settle the drag
                 document.addEventListener('touchend', settle);
                 document.addEventListener('touchcancel', settle);
 
-                // Animate content-driven height changes on mobile sheets.
-                // ResizeObserver fires after layout but before paint, so pinning the
-                // old height inside the callback animates resizes without a jump.
-                // Sheet styling only exists under the mobile breakpoint; desktop
-                // dialogs size themselves, so the observer stays inert there.
                 let endTimer = null;
                 let pendingResize = false;
                 const onContentResize = () => {
@@ -354,7 +324,6 @@ vkify.bindOnce('messageBoxOverrides', () => {
                     }
                     if (drag?.decided) return;
                     if (el.classList.contains('ovk-msg-sheet--resizing')) {
-                        // embedded resizers (graffiti) drive the size directly
                         if (endTimer) { clearTimeout(endTimer); endTimer = null; }
                         diag.style.transition = '';
                         diag.style.height = '';
@@ -387,7 +356,6 @@ vkify.bindOnce('messageBoxOverrides', () => {
                         diag.removeEventListener('transitioncancel', done);
                         if (endTimer) { clearTimeout(endTimer); endTimer = null; }
                         if (diag.style.transition !== 'height .2s ease') {
-                            // pin was taken over by the drag path
                             sizeAnimating = false;
                             return;
                         }
@@ -496,7 +464,6 @@ function replaceMbTabs(mbTabs) {
     const repositionSlider = () => positionSlider(ul.querySelector('.ui_tab_sel'));
 
     positionSlider(ul.querySelector('.ui_tab_sel'));
-    // re-measure after first paint, webfont swap and container resize
     requestAnimationFrame(repositionSlider);
     document.fonts?.ready?.then(repositionSlider);
     new ResizeObserver(repositionSlider).observe(ul);
@@ -508,7 +475,6 @@ function replaceMbTabs(mbTabs) {
         mbTabs.querySelector(`.mb_tab[data-name='${name}'] a`)?.click();
     });
 
-    // mirror buttons injected into .mb_tabs as links, tagged to their owning tab
     new MutationObserver(() => {
         mbTabs.querySelectorAll('input[type=button]').forEach((btn) => {
             ul.querySelectorAll(`.ui_tab_extra[data-owner-tab='${currentTab}']`).forEach(el => el.remove());
@@ -517,7 +483,6 @@ function replaceMbTabs(mbTabs) {
             btn.remove();
             ul.appendChild(a);
         });
-        // appended extras are in-flow flex items — they redistribute tab widths
         updateExtrasVisibility();
         repositionSlider();
     }).observe(mbTabs, { childList: true });
@@ -561,7 +526,6 @@ vkify.onPage(() => {
             if (diag) {
                 diag.setAttribute('style', 'width:500px');
                 diag.classList.add('ovk-msg-sheet');
-                // the class can land after the stack observer saw the node — wire directly (idempotent)
                 document.body.classList.add('ovk-sheet-dim');
                 enableSheetGestures?.(diag);
 
@@ -587,7 +551,6 @@ vkify.onPage(() => {
             const content = document.getElementById('__content');
             if (!content) return;
 
-            // the tick shows only once the form diverges from its baseline
             const readSettingsState = () => JSON.stringify({
                 posts: content.querySelector('#pageSelect')?.value ?? '',
                 page: content.querySelector('#pageNumber')?.value ?? '',
@@ -687,7 +650,6 @@ vkify.onPage(() => {
             if (!link) return;
             e.preventDefault();
 
-            // invoke the stock handler with a normalized target so dataset.pagescount resolves
             if (typeof window.onFeedSettingsClick === 'function') {
                 window.onFeedSettingsClick({ preventDefault() {}, target: link });
             }

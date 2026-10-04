@@ -1,3 +1,5 @@
+const _loader_link = '/assets/packages/static/openvk/img/loading_mini.gif';
+
 window.parseAjaxResponse = function (responseString) {
     try {
         const response = JSON.parse(responseString);

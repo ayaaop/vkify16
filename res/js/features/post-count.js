@@ -47,7 +47,9 @@
         decrementCounts(false);
     });
 
-    // al_wall.js swaps the post for .post-deleted; WeakSet dedupes one physical deletion
+    // Delete — al_wall.js replaces the post with .post-deleted (old markup keeps data-*
+    // on the parent; new markup uses an entirely new .post.post-divider). We use a WeakSet
+    // keyed by the .post-deleted node so each physical deletion only decrements once.
     vkify.bindOnce('postDeleteObserver', function () {
         var observer = new MutationObserver(function (mutations) {
             for (var i = 0; i < mutations.length; i++) {

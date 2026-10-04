@@ -221,8 +221,10 @@ window.showEditVideoModal = (videoId) => window.showFormModal(`/video${videoId}/
 window.showEditTopicModal = (topicId) => window.showFormModal(`/topic${topicId}/edit`, {
     requiredField: 'title',
     requiredError: tr('error_segmentation') || 'Title is required',
+    fallbackUrl: `/topic${topicId}`,
     errorMsg: 'Failed to update topic',
-    noNavigate: true
+    skipRedirectError: true,
+    validateResponse: (res) => res.ok && /\/topic-?\d+_\d+/.test(res.url || '')
 });
 
 window.showEditAppModal = (appId) => window.showFormModal(`/editapp?app=${encodeURIComponent(appId)}`, {
@@ -268,6 +270,12 @@ window.showCreateTopicModal = (e, clubId) => {
         requiredError: tr('error_segmentation'),
         submitText: tr('create_topic'),
         errorMsg: 'Failed to create topic',
+        // The server redirects on both success (to /topic{clubId}_{topicId})
+        // and failure (flashFail to HTTP_REFERER), so don't treat the
+        // redirect itself as an access error.
+        skipRedirectError: true,
+        validateResponse: (res) => res.ok && /\/topic-?\d+_\d+/.test(res.url || ''),
+        // biome-ignore lint/correctness/noUnusedFunctionParameters: event handler
         onReady: (modal, form) => {
             // stock page wires file inputs via OpenVK's wall bundle, which isn't loaded here
             const picInput = form.querySelector('input[name="_pic_attachment"]');
@@ -421,9 +429,104 @@ window.showEditPlaylistModal = (playlistId, e) => {
     return false;
 };
 
-window.showNewPlaylistModal = (e, gid = null) => {
-    e?.preventDefault();
-    e?.stopPropagation();
+window.showNewPlaylistModal = async (e, gid = null) => {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    let url = '/audios/newPlaylist';
+    if (gid) {
+        url += `?gid=${gid}`;
+    }
+
+    try {
+        const doc = await window.ContentFetcher.fetchPageContent(url, null, { showLoader: true });
+        const editBox = doc.querySelector('.audio_pl_edit_box');
+        if (!editBox) throw new Error('Edit box not found');
+
+        // Dynamically load the edit_playlist.css styles
+        vkify.loadStyle(null, 'vkify_style_edit_playlist', vkify.resourceUrl('/css/edit_playlist.css'));
+
+        const modalTitle = tr('new_playlist') || 'New playlist';
+        const body = `<div class="PE_wrapper">${editBox.outerHTML}</div>`;
+
+        const modal = new CMessageBox({
+            title: modalTitle,
+            body: body,
+            buttons: [], // No standard buttons, the template has its own controls
+            close_on_buttons: false,
+            warn_on_exit: true
+        });
+        modal.getNode().addClass('ovk-msg-sheet');
+
+        setTimeout(() => {
+            const node = modal.getNode().nodes[0];
+            const form = node.querySelector('.PE_playlistEditPage');
+            if (!form) return;
+
+            // Set size of the messagebox
+            modal.getNode().attr('style', 'width: 560px;');
+            modal.getNode().find('.ovk-diag-body').attr('style', 'padding: 0 !important;');
+
+            // Intercept create button click to perform AJAX POST
+            const createBtn = node.querySelector('#playlist_create');
+            if (createBtn) {
+                createBtn.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    LoaderUtils.showInButton(createBtn);
+
+                    const ids = [];
+                    node.querySelectorAll('.PE_audios .vertical-attachment').forEach(vatch => {
+                        ids.push(vatch.dataset.id);
+                    });
+
+                    const fd = serializeForm(form);
+                    fd.append('hash', window.router.csrf);
+                    fd.append('ajax', 1);
+                    fd.append('audios', ids);
+
+                    try {
+                        const req_json = await ContentFetcher.postForm(url, fd, {
+                            responseType: 'json',
+                            csrf: false,
+                            throwOnError: false
+                        });
+                        if (req_json?.success) {
+                            modal.close();
+                            vkify.unloadStyle('vkify_style_edit_playlist');
+                            window.router.route(req_json.redirect);
+                        } else {
+                            makeError(req_json?.flash?.message || 'Failed to create playlist');
+                        }
+                    } catch (err) {
+                        console.error('Failed to create playlist from modal:', err);
+                        NewNotification(tr('error'), 'Failed to create playlist', null);
+                    } finally {
+                        LoaderUtils.restoreButton(createBtn);
+                    }
+                }, true);
+            }
+
+            // Hook close behavior to unload styles when closed
+            const originalClose = modal.close;
+            modal.close = function(...args) {
+                vkify.unloadStyle('vkify_style_edit_playlist');
+                originalClose.apply(this, args);
+            };
+
+            // Focus the title input
+            const firstInput = node.querySelector('#ape_pl_name');
+            firstInput?.focus();
+        }, 50);
+
+        return modal;
+    } catch (err) {
+        console.error('Failed to load new playlist modal:', err);
+        NewNotification(tr('error'), 'Failed to load new playlist form', null);
+    }
 
     openPlaylistFormModal({
         url: `/audios/newPlaylist${gid ? `?gid=${gid}` : ''}`,

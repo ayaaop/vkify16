@@ -2,21 +2,7 @@
 {var $perPage = 6} {* Why 6? Check User::_abstractRelationGenerator *}
 
 {block title}
-    {if $act == "incoming"}
-        {_incoming_req}
-    {elseif $act == "outcoming"}
-        {_outcoming_req}
-    {elseif $act == "followers"}
-        {_followers}
-    {elseif $act == "online"}
-        {_friends_online}
-    {elseif $act == "common"}
-        {_friends_common}
-    {elseif $act == "recommended"}
-        {_friends_recommended}
-    {else}
-        {_friends}
-    {/if}
+    {include "Friends/Title.latte", act => $act}
 {/block} 
 
 {block narrow}
@@ -50,7 +36,7 @@
             'url' => '?act=recommended',
             'title' => 'friends_recommended',
             'active' => $act === 'recommended',
-            'condition' => !is_null($thisUser) && $user->getId() === $thisUser->getId()
+            'condition' => !is_null($thisUser) && $user->getId() === $thisUser->getId(),
         ],
         [
             'url' => '?act=common',
@@ -83,9 +69,8 @@
             : ($act == "followers" ? "followers"
                 : ($act == "online" ? "friends_online"
                     : ($act == "recommended" ? "friends_recommended" : "all_friends"))))
-        : ($act == "common" ? "friends_common"
-            : ($act == "online" ? "friends_online" : "friends"))}
-    {include "../components/page_block_header.latte", title => $title, count => ($act == "recommended" ? null : $count)}
+        : ($act == "common" ? "friends_common" : "friends")}
+    {include "../components/page_block_header.latte", title => $title, count => ($act === "recommended" ? null : $count)}
 {/block}
 
 {block link|strip|stripHtml}

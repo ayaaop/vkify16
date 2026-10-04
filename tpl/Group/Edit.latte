@@ -118,6 +118,10 @@
                                             <input type="checkbox" name="display_topics_above_wall" value="1" n:attr="checked => $club->isDisplayTopicsAboveWallEnabled()" />
                                             <span>{_display_list_of_topics_above_wall}</span>
                                         </label>
+                                        <label class="checkbox">
+                                            <input type="checkbox" name="is_messages_enabled" value="1" n:attr="checked => $club->isMessagesEnabled()" />
+                                            <span>{_enable_group_messages}</span>
+                                        </label>
                                     </div>
                                 </div>
                                 <div class="form_separator"></div>

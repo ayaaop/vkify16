@@ -143,14 +143,12 @@ vkify.once("showAudioUploadPopup", () => {
                 if (id3) {
                     try {
                         tags = await (id3.fromFile ? id3.fromFile(blob) : id3.default?.fromFile?.(blob));
-                    } catch (e) {
+                    } catch(e) {
                         console.error(e);
                     }
                 }
 
-                console.log(tags);
                 if (tags != null) {
-                    console.log(`ID${tags.kind} detected, setting values...`);
                     if (tags.title) {
                         return_params.name = tags.title;
                     } else {

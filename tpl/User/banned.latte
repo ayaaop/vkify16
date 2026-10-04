@@ -1,6 +1,6 @@
 {extends "../@layout.latte"}
 {var $transparentAppbar = true}
-
+{var $avatarNormal = null}
 {block title}{$user->getCanonicalName()}{/block}
 
 {block appbar_extra}
@@ -14,7 +14,7 @@
 {/block}
 
 {define mobileProfile}
-    {include '../components/mobile_profile_hero.latte', entity => $user, name => $user->getFullName(), status => tr('user_is_blocked'), verified => $user->isVerified(), disablePhotoViewer => true}
+    {include '../components/mobile_profile_hero.latte', entity => $user, name => $user->getFullName(), status => tr('user_is_blocked'), verified => $user->isVerified()}
     <div class="page_block mobile-actions-info-block mobileonly" n:ifcontent>
         {include '../components/mobile_profile_actions.latte'}
     </div>

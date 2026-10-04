@@ -386,6 +386,16 @@
                                             <option value="1" {if $user->getPrivacySetting('messages.write') == 1}selected{/if}>{_privacy_value_friends}</option>
                                             <option value="0" {if $user->getPrivacySetting('messages.write') == 0}selected{/if}>{_privacy_value_nobody}</option>
                                         </select>
+                                        <p class="privacy_setting_tip">{_privacy_setting_write_messages_tip}</p>
+                                    </div>
+                                </div>
+                                <div class="form_field settings_privacy_row">
+                                    <div class="form_label">{_privacy_setting_add_in_chats}</div>
+                                    <div class="form_data">
+                                        <select name="messages.add_to_chats">
+                                            <option value="1" {if $user->getPrivacySetting('messages.add_to_chats') == 1}selected{/if}>{_privacy_value_friends}</option>
+                                            <option value="0" {if $user->getPrivacySetting('messages.add_to_chats') == 0}selected{/if}>{_privacy_value_nobody}</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div n:if="\OPENVK_ROOT_CONF['openvk']['preferences']['wall']['anonymousPosting']['enable']" class="form_field settings_privacy_row">

@@ -56,6 +56,12 @@ vkify.once("updateNarrow", () => {
         if (!bar || !s.barBlock || !wideCol || !pl) return;
         if (s.ajloader && s.ajloader.classList.contains('shown')) return;
         if (document.body.classList.contains('dimmed')) return;
+        if (document.body.classList.contains('no-scroll')) {
+            bar.classList.remove('fixed');
+            bar.style.position = '';
+            s.isFixed = false;
+            return;
+        }
 
         const wh = Math.round(window.lastWindowHeight || window.innerHeight || 0);
         const st = Math.round(window.scrollY || 0);
@@ -220,6 +226,13 @@ vkify.once('affixedNavigation', () => {
             return;
         }
 
+        if (document.body.classList.contains('no-scroll')) {
+            resetMenu(menu);
+            state.lastScrollTop = getScrollTop();
+            state.hiddenOffset = 0;
+            return;
+        }
+
         if (hasFastLogin) {
             resetMenu(menu);
             return;
@@ -338,9 +351,10 @@ vkify.once('bodyScroll', () => {
             __scrLeft = scl;
         }
 
-        const hidden = st < 100 && !window.temp_y_scroll;
-        const hasDown = st < 100 && !!window.temp_y_scroll;
-        const scrolled = st >= 100;
+        const noScroll = body.classList.contains('no-scroll') || doc.classList.contains('no-scroll');
+        const hidden = noScroll || (st < 100 && !window.temp_y_scroll);
+        const hasDown = !noScroll && st < 100 && !!window.temp_y_scroll;
+        const scrolled = !noScroll && st >= 100;
 
         if (hidden !== __lastHidden) {
             toTop.classList.toggle('hidden', hidden);

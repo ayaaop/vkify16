@@ -113,7 +113,12 @@ function renderEditMenuLayout(apiPost, type, postId) {
     return `
         <div class='edit_menu module_body'>
             <form id="${editFormId}">
+                <div class="edit-menu-textarea">
                 <textarea placeholder="${tr('edit')}" name="text" style="width: 100%;resize: none;" class="expanded-textarea small-textarea">${apiPost.text}</textarea>
+                <div class="emoji_picker_entrypoint emoji_smile" role="button">
+                    <div class="emoji_smile_icon_vector emoji_smile_icon"></div>
+                </div>
+            </div>
                 <div class='post-buttons'>
                     <div class="post-horizontal"></div>
                     <div class="post-vertical"></div>
@@ -404,61 +409,57 @@ window.handleWallAnonClick = window.handleWallAnonClick || ((el) => {
         syncWallCheckboxHiddenInputs(form);
     });
 
-function bindComposerSubmitOnce() {
-    if (!vkify.bindOnce('composerSubmit', bindComposerSubmitOnce)) return;
+function bumpSelectedTabCountOnNewPost(form) {
+    const countEl = document.querySelector('.ui_tab_sel .ui_tab_count');
+    if (!countEl) return;
 
-    const bumpSelectedTabCountOnNewPost = () => {
-        const countEl = document.querySelector('.ui_tab_sel .ui_tab_count');
-        if (!countEl) return;
+    const initial = parseInt((countEl.textContent || '').trim(), 10);
+    if (Number.isNaN(initial)) return;
 
-        const initial = parseInt((countEl.textContent || '').trim(), 10);
-        if (Number.isNaN(initial)) return;
+    const existingIds = new Set(
+        Array.from(document.querySelectorAll('.post:not(.reply)[data-id]'))
+            .map(n => n.getAttribute('data-id'))
+            .filter(Boolean)
+    );
 
-        const existingIds = new Set(
-            Array.from(document.querySelectorAll('.post:not(.reply)[data-id]'))
-                .map(n => n.getAttribute('data-id'))
-                .filter(Boolean)
-        );
-
-        let done = false;
-        const finalize = () => {
-            if (done) return;
-            done = true;
-            try { observer.disconnect(); } catch (_e) { }
-            try { clearTimeout(timer); } catch (_e) { }
-        };
-
-        const tryIncrement = () => {
-            if (done) return;
-            const nodes = document.querySelectorAll('.post:not(.reply)[data-id]');
-            for (const n of nodes) {
-                const id = n.getAttribute('data-id');
-                if (id && !existingIds.has(id)) {
-                    const current = parseInt((countEl.textContent || '').trim(), 10);
-                    if (!Number.isNaN(current)) {
-                        countEl.textContent = String(current + 1);
-                    }
-                    finalize();
-                    return;
-                }
-            }
-        };
-
-        const observer = new MutationObserver(() => {
-            tryIncrement();
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-
-        const timer = setTimeout(() => {
-            finalize();
-        }, 5000);
+    let done = false;
+    const finalize = () => {
+        if (done) return;
+        done = true;
+        try { observer.disconnect(); } catch (_e) { }
+        try { clearTimeout(timer); } catch (_e) { }
     };
 
-    u(document).on('submit', '#write form', (e) => {
-        syncWallCheckboxHiddenInputs(e.target);
-        bumpSelectedTabCountOnNewPost();
+    const tryIncrement = () => {
+        if (done) return;
+        const nodes = document.querySelectorAll('.post:not(.reply)[data-id]');
+        for (const n of nodes) {
+            const id = n.getAttribute('data-id');
+            if (id && !existingIds.has(id)) {
+                const current = parseInt((countEl.textContent || '').trim(), 10);
+                if (!Number.isNaN(current)) {
+                    countEl.textContent = String(current + 1);
+                }
+                if (form && typeof window.resetVkifyComposer === 'function') {
+                    window.resetVkifyComposer(form);
+                }
+                finalize();
+                return;
+            }
+        }
+    };
+
+    const observer = new MutationObserver(() => {
+        tryIncrement();
     });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    const timer = setTimeout(() => {
+        finalize();
+    }, 5000);
 }
+
+window.bumpSelectedTabCountOnNewPost = bumpSelectedTabCountOnNewPost;
 
 function bindCommentCancelOnce() {
     if (!vkify.bindOnce('commentCancel', bindCommentCancelOnce)) return;
@@ -521,10 +522,33 @@ function bindSourceButtonOrderFix() {
     });
 }
 
+function bindWallAjaxActions() {
+    if (!vkify.bindOnce('wallAjaxActions', bindWallAjaxActions)) return;
+
+    document.addEventListener('click', (e) => {
+        const deleteTarget = e.target.closest('#_wallDelete, #_ajaxDelete, .delete');
+        if (deleteTarget && typeof window.ajax_delete === 'function') {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            window.ajax_delete(e);
+            return;
+        }
+
+        const pinTarget = e.target.closest('.pin');
+        if (pinTarget && typeof window.ajax_pin === 'function') {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            window.ajax_pin(e);
+        }
+    }, true);
+}
+
 setupWallCheckboxListeners();
-bindComposerSubmitOnce();
 bindCommentCancelOnce();
 bindSourceButtonOrderFix();
+bindWallAjaxActions();
 
 let _groupInfoTabsInitialized = false;
 function initGroupInfoTabs() {
@@ -1122,6 +1146,10 @@ function bindPostEditOnce() {
             NewNotification(tr('error'), tr('error_loading_post'), null, () => {}, 4000, false);
         }
         u(editBtn).removeClass('lagged');
+
+        post.addClass('editing');
+        const ta = edit_place.find('textarea').first();
+        if (ta) window.vkifyTextareaAutosize?.apply?.(ta);
     }, true);
 }
 

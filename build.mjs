@@ -13,7 +13,6 @@ import * as esbuild from 'esbuild';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import fs from 'node:fs';
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const jsRoot = path.join(__dirname, 'res', 'js');
 const outFile = path.join(jsRoot, 'dist', 'vkify16.bundle.js');
@@ -39,11 +38,9 @@ const modules = [
 
     'ui/search.js',
     'ui/music-popup.js',
-    'utils/modal-utils.js',
     'ui/media-modals.js',
     'ui/graffiti.js',
     'ui/action-menu.js',
-    'utils/openvk-cls.js',
 
     'features/attachment-picker.js',
     'features/post-count.js',
@@ -61,6 +58,7 @@ const modules = [
     'features/avatar-upload.js',
     "features/video-audio-coord.js",
     'features/video-delete.js',
+    'features/messenger.js',
 ];
 
 for (const rel of modules) {
@@ -70,6 +68,7 @@ for (const rel of modules) {
         process.exit(1);
     }
 }
+
 
 const entryContents = modules.map(rel => `import './${rel}';`).join('\n') + '\n';
 

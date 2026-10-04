@@ -596,7 +596,6 @@ body.dimmed > .dimmer #clickable {
 
 .ovk-diag-body .form_field {
     width: 100%;
-    min-height: unset;
 }
 .ovk-diag-body .form_label {
     width: 100px;
@@ -1453,8 +1452,7 @@ select:focus {
     background-color: var(--button-background-color);
 }
 
-.tippy-box[data-theme="special vk"],
-.messenger-app--input---messagebox .tippy-box {
+.tippy-box[data-theme="special vk"] {
     background: none !important;
     border-radius: 4px !important;
     box-shadow: none !important;
@@ -1967,8 +1965,10 @@ select:focus {
 }
 
 .ui_actions_menu a:hover,
+.ui_actions_menu .ui_actions_menu_item:hover,
 .ui_actions_menu form button:hover,
 .ui_actions_menu a:focus-visible,
+.ui_actions_menu .ui_actions_menu_item:focus-visible,
 .ui_actions_menu form button:focus-visible {
     text-decoration: none;
     background-color: var(--button-background-color);

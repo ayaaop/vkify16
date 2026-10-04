@@ -23,7 +23,7 @@
 {var $showGroupPostOpts = $isPostComposer && $canModifyClub && ($owner ?? 0) < 0}
 {var $showCommentAsGroup = !$isPostComposer && $canModifyClub}
 
-<div id="write" class="composer model_content_textarea">
+<div id="write" class="composer has_emoji_picker model_content_textarea">
     <form id="write-form-{$textAreaId}" action="{$route}" method="post" enctype="multipart/form-data" style="margin:0;">
         {if $thisUser ?? NULL}
             <a class="post_field_user_link" href="{$thisUser->getURL()}">
@@ -69,6 +69,9 @@
             style="resize: none;"
             placeholder="{ifset $placeholder}{$placeholder}{else}{_write}{/ifset}"
         ></textarea>
+        <div class="emoji_picker_entrypoint emoji_smile" role="button">
+            <div class="emoji_smile_icon_vector emoji_smile_icon"></div>
+        </div>
 
         <div id="post-buttons{$textAreaId}" class="post-buttons">
             <div class="post-horizontal"></div>

@@ -1,3 +1,4 @@
+{php if (!function_exists('vkifyFormatCount')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
 {extends "../@layout.latte"}
 {php if (!function_exists('vkifyFormatCount')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
 {var $transparentAppbar = true}
@@ -25,6 +26,11 @@
                         {var $subStatus = $club->getSubscriptionStatus($thisUser)}
                         {var $isMaybe = $thisUser ? $club->getFollowersQuery()->where(['follower' => $thisUser->getId(), 'flags' => 1])->fetch() : null}
                         {var $eventFlag = $subStatus ? ($isMaybe ? 1 : 0) : -1}
+                        {if !$canEdit && $club->canWriteMessage($thisUser)}
+                            <div class="mobile_profile_action_primary">
+                                <a class="button mobile_profile_action_btn" href="/im?sel={$club->getRealId()}">{_send_message}</a>
+                            </div>
+                        {/if}
                         {if !$subStatus}
                             <form action="/setSub/club" method="post" class="mobile_profile_action_primary">
                                 <input type="hidden" name="act" value="add" />
@@ -395,8 +401,9 @@
 							{/if}
 							{var $avatarSizes = $avatarPhoto ? $avatarPhoto->getSizes() : null}
 							{var $avatarNormal = $avatarSizes['normal'] ?? null}
+							{var $avatarPhotoId = $avatarPhoto ? $avatarPhoto->getPrettyId() . ($avatarPhoto->getAccessKey() ? '_' . $avatarPhoto->getAccessKey() : '') : null}
 							<a href="{$avatarLink|nocheck}" style="display: block; line-height: 0;">
-								{include '../components/avatar.latte', author => $club, size => 'normal', id => 'bigAvatar', width => ($avatarNormal ? $avatarNormal->width : 200), height => ($avatarNormal ? $avatarNormal->height : 200), style => 'width: 100%; image-rendering: -webkit-optimize-contrast;', onclick => ($avatarPhoto ? "event.preventDefault(); OpenMiniature(event, '{$club->getAvatarUrl('normal')}', null, '{$avatarPhoto->getPrettyId()}', null);" : null)}
+								{include '../components/avatar.latte', author => $club, size => 'normal', id => 'bigAvatar', width => ($avatarNormal ? $avatarNormal->width : 200), height => ($avatarNormal ? $avatarNormal->height : 200), style => 'width: 100%; image-rendering: -webkit-optimize-contrast;', onclick => ($avatarPhotoId ? "PhotoViewer.openById('{$avatarPhotoId}', event);" : null)}
 							</a>
 						</div>
 					</div>
@@ -405,6 +412,11 @@
 							{var $subStatus = $club->getSubscriptionStatus($thisUser)}
 							{var $isMaybe = $thisUser ? $club->getFollowersQuery()->where(['follower' => $thisUser->getId(), 'flags' => 1])->fetch() : null}
 							{var $eventFlag = $subStatus ? ($isMaybe ? 1 : 0) : -1}
+							{if !$canEdit && $club->canWriteMessage($thisUser)}
+								<a class="button button_blue button_wide profile_action_btn" onclick="showUserDialog(event, {$club->getRealId()})" href="/im?sel={$club->getRealId()}">
+									{_send_message}
+								</a>
+							{/if}
 							<div class="profile_actions_split">
 								{if !$subStatus}
 									<form action="/setSub/club" method="post" class="profile_link_form fl_l">
@@ -444,7 +456,7 @@
 												<a href="javascript:void(0)" data-event-action="notgoing">{_leave_community}</a>
 											{/if}
 											<div class="separator"></div>
-											<a n:if="!$club->isHideFromGlobalFeedEnabled()" id="__ignoreSomeone" data-val='{!$ignore_status ? 1 : 0}' data-id="{$club->getRealId()}">
+											<a n:if="!$club->isHideFromGlobalFeedEnabled()" id="__ignoreSomeone" onclick="onIgnoreSomeoneClick(event)" data-val='{!$ignore_status ? 1 : 0}' data-id="{$club->getRealId()}">
 												{if !$ignore_status}{_ignore_club}{else}{_unignore_club}{/if}
 											</a>
 										</div>
@@ -459,6 +471,9 @@
 											{if $canEdit}
 												<a href="/club{$club->getId()}/edit">{_edit_group}</a>
 												<a href="/club{$club->getId()}/stats" rel="nofollow">{_statistics}</a>
+												{if $club->isMessagesEnabled()}
+													<a href="/im?as={$club->getRealId()}">{_view_group_messages}</a>
+												{/if}
 												{var $clubPinned = $thisUser->isClubPinned($club)}
 												<a href="/groups_pin?club={$club->getId()}&hash={rawurlencode($csrfToken)}" n:if="$clubPinned || $thisUser->getPinnedClubCount() <= 10" id="_pinGroup" data-group-name="{$club->getName()}" data-group-url="{$club->getUrl()}">
 													{if $clubPinned}

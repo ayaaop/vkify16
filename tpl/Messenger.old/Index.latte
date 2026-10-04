@@ -1,0 +1,69 @@
+{extends "../@layout.latte"}
+{block title}{_my_messages}{/block}/block}
+
+{block content}
+	{var $sendMessageButton = '<a href="/friends' . $thisUser->getId() . '" class="button">' . tr('send_message') . '</a>'}
+	<div class="page_block">
+		{include "../components/page_block_header.latte", title => "my_messages", count => sizeof($corresps), extra => $sendMessageButton}
+
+        <div class="scroll_container" style="min-height: 430px;">
+		    {if sizeof($corresps) > 0}
+                <ul class="im-page--dcontent">
+				{foreach $corresps as $coresp}
+					{var $lastMsg   = $coresp->getPreviewMessage()}
+                    <li
+                        n:class="'nim-dialog nim-dialog_classic scroll_node', $lastMsg->getUnreadState() ? 'nim-dialog--unread'"
+                        data-uniqueid="conversation-{$coresp->getId()}"
+                        onmousedown="window.open({$coresp->getURL()}, '_blank').focus();">
+                        {var $recipient = $coresp->getCorrespondents()[1]}
+                        <div class="nim-dialog--photo">
+                            <div n:class="nim-peer, $recipient->isOnline() ? online">
+                                <div class="nim-peer--photo-w">
+                                    <div class="nim-peer--photo _im_dialog_photo">
+                                        <a href="{$recipient->getURL()}" target="_blank">
+                                            <div class="im_grid">
+                                                {include '../components/avatar.latte', author => $recipient, size => 'miniscule', width => 50, height => 50, alt => tr('photo')}
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="nim-dialog--content"> 
+                            <div class="nim-dialog--cw">
+                                <div class="nim-dialog--date_wrapper">
+                                    <div class="nim-dialog--date _im_dialog_date">{$lastMsg->getSendTimeHumanized()}</div>
+                                </div>
+
+                                <div class="_im_dialog_title" title="{$recipient->getCanonicalName()}">
+                                    <div class="nim-dialog--name">
+                                        <span class="nim-dialog--name-w _im_dialog_name_w">
+                                            <a href="{$recipient->getURL()}">{$recipient->getCanonicalName()}</a>
+                                        </span>
+                                    </div>
+                                    <div class="nim-dialog--text-preview">
+                                        <span class="nim-dialog--preview _dialog_body" tabindex="0">
+                                            <span class="nim-dialog--who">
+                                                <div class="im-prebody">
+                                                    {include '../components/avatar.latte', author => $lastMsg->getSender(), size => 'miniscule', alt => ''}
+                                                </div>
+                                            </span>
+                                            <span class="nim-dialog--inner-text">{$lastMsg->getText()|truncate: 150}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+				{/foreach}
+                </ul>
+			{else}
+				{include "../components/content_error.latte", description => tr(no_messages)}
+			{/if}
+        </div>
+        <div style="margin-top: 3px;">
+            {include "../components/paginator.latte", conf => $paginatorConf}
+        </div>
+	</div>
+{/block}

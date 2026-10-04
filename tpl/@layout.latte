@@ -5,6 +5,7 @@
 {var $mode2018Enabled = ($_COOKIE['vkify16_2018mode'] ?? '0') === '1'}
 {var $ovkHatEnabled = ($_COOKIE['ovkhat'] ?? '0') === '1'}
 {var $hideSidebar = $_SERVER['REQUEST_URI'] === '/' || $_SERVER['REQUEST_URI'] === '/reg' || $_SERVER['REQUEST_URI'] === '/login' || (isset($thisUser) && $thisUser->isBanned())}
+{var $isMessenger = preg_match('~^/im([/?]|$)~', $_SERVER['REQUEST_URI'] ?? '')}
 {if !isset($parentModule) || substr($parentModule, 0, 21) === 'libchandler:absolute.'}
 <!DOCTYPE html>
 <html>
@@ -39,6 +40,8 @@
         {css "js/node_modules/leaflet/dist/leaflet.css"}
         {css "js/node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css"}
         {script "js/node_modules/handlebars/dist/handlebars.min.js"}
+        {script "js/node_modules/lottie-web/build/player/lottie.min.js"}
+        {script_module "js/messages/im.js"}
         {if $isTimezoned == NULL}
             {script "js/timezone.js"}
         {/if}
@@ -58,7 +61,7 @@
             {include headIncludes}
         {/ifset}
     </head>
-    <body {if isset($thisUser)}data-themepack="{$thisUser->getStyle()}"{/if} n:class="$hideSidebar ? no-sidebar, isset($thisUser) && $thisUser->isBanned() ? banned, $darkModeEnabled ? dark-mode, $ovkHatEnabled ? ovkhat">
+    <body {if isset($thisUser)}data-themepack="{$thisUser->getStyle()}"{/if} n:class="$hideSidebar ? no-sidebar, isset($thisUser) && $thisUser->isBanned() ? banned, $darkModeEnabled ? dark-mode, $ovkHatEnabled ? ovkhat, $isMessenger ? body_im">
         {include "_icons.latte"}
         <div n:if="\OPENVK_ROOT_CONF['openvk']['preferences']['bellsAndWhistles']['testLabel']" id="test-label">FOR TESTING PURPOSES ONLY</div>
 
@@ -122,7 +125,7 @@
                             <div id="search_box_fr">
                                 <form id="search_form" action="/search" method="get">
                                     <div id="search_and_one_more_wrapper">
-                                        <input n:attr="value => $_REQUEST['q'] ?? NULL" autocomplete="off" type="search" maxlength="79" name="q" placeholder="{tr("header_search")}" title="{tr("header_search")} [Alt+Shift+F]" accesskey="f">
+                                        <input n:attr="value => $_REQUEST['q'] ?? NULL" onkeydown="onSearchTipKeydown(event)" oninput="onSearchBoxInput(event)" autocomplete="off" type="search" maxlength="79" name="q" placeholder="{tr("header_search")}" title="{tr("header_search")} [Alt+Shift+F]" accesskey="f">
                                     </div>
                                     <button class="search_box_button">
                                         <span>{tr("header_search")}</span>
@@ -551,6 +554,7 @@
         {script "js/node_modules/msgpack-lite/dist/msgpack.min.js"}
         {script "js/node_modules/soundjs/lib/soundjs.min.js"}
         {script "js/node_modules/ky/umd.js"}
+        <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/utils/openvk-cls.js"></script>
         {script "js/messagebox.js"}
         {script "js/notifications.js"}
         {script "js/player.js"}
@@ -622,6 +626,8 @@
         <script id='_js_ep_script'>
             window.openvk = {
                 "current_language": {getLanguage()},
+                "lang": {php echo json_encode(getLanguage())},
+                "locale": {php echo json_encode(str_replace('_', '-', preg_replace('/[.@].*$/', '', explode(';', tr('__locale'))[0] ?? 'ru_RU.UTF-8')))},
                 "audio_genres": {\openvk\Web\Models\Entities\Audio::genres},
                 "at_search": {$atSearch ?? false},
                 "max_attachments": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["wall"]["postSizes"]["maxAttachments"] ?? 10},
@@ -633,6 +639,9 @@
                 "max_add_fields": {ovkGetQuirk("users.max-fields")},
                 "docs_max": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["docs"]["maxSize"]},
                 "docs_allowed": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["docs"]["allowedFormats"]},
+                "dev_id": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["support"]["devAccount"] ?? 1381},
+                "admin_id": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["support"]["adminAccount"] ?? 1},
+                "support_id": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["support"]["supportAccount"] ?? 1},
             }
         </script>
 
@@ -643,6 +652,10 @@
         <script>
         </script>
         {script "js/al_wall.js"}
+        {script "js/options.js"}
+        {script "js/content-editable.js"}
+        {script "js/stickers.js"}
+        {script "js/messages/related.js"}
 
         <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/ui/page.js"></script>
         <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/ui/tooltips.js"></script>

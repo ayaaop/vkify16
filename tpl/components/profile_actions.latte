@@ -9,7 +9,7 @@
 					{if $user->getPrivacyPermission('messages.write', $thisUser)}
 						<div class="profile_msg_split">
 							<div class="cut_left">
-								<a class="button button_blue profile_btn_cut_left profile_action_btn button_wide" href="/im?sel={$user->getId()}">
+								<a class="button button_blue profile_btn_cut_left profile_action_btn button_wide" onclick="showUserDialog(event, {$user->getRealId()})" href="/im?sel={$user->getId()}">
 									{_send_message}
 								</a>
 							</div>
@@ -112,7 +112,7 @@
 
 			{if !$user->isHideFromGlobalFeedEnabled()}
 				{var $isIgnored = $user->isIgnoredBy($thisUser)}
-				<a  id="__ignoreSomeone" data-val="{if $isIgnored}0{else}1{/if}" data-id="{$user->getId()}">
+				<a  id="__ignoreSomeone" onclick="onIgnoreSomeoneClick(event)" data-val="{if $isIgnored}0{else}1{/if}" data-id="{$user->getId()}">
 					{if $isIgnored}{_unignore_user}{else}{_ignore_user}{/if}
 				</a>
 			{/if}

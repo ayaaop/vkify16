@@ -1,3 +1,4 @@
+{php if (!function_exists('vkifyFormatCount')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
 {extends "../@layout.latte"}
 {php if (!function_exists('vkifyFormatCount')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
 
@@ -54,7 +55,7 @@
 			<div class="mobile-info-rows">
 				{if $audioStatus}
 					{if !$thatIsThisUser}
-						<a class="mobile-info-row" href="/audio0_{$audioStatus->getId()}">
+						<a class="mobile-info-row" href="/audio{$audioStatus->getPrettyIdA()}">
 					{else}
 						<div class="mobile-info-row">
 					{/if}
@@ -87,6 +88,12 @@
 					<a class="mobile-info-row" href="/friends{$user->getId()}?act=incoming">
 						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#user-add-outline-24"></use></svg>
 						<div class="mir-text">{tr("followers", $user->getFollowersCount())}</div>
+					</a>
+				{/if}
+				{if $thisUser != NULL && $thisUser->getId() != $user->getId() && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL) && ($commonFriendsCount = $user->getCommonFriendsCount($thisUser)) > 0}
+					<a class="mobile-info-row" href="/friends{$user->getId()}?act=common">
+						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#users-24"></use></svg>
+						<div class="mir-text">{tr("friends_common", $commonFriendsCount)}</div>
 					</a>
 				{/if}
 				{if !is_null($user->getHometown())}
@@ -414,6 +421,7 @@
             {var $hasMoreInfo = true}
         {/if}
     {/if}
+
     {if !$user->getPrivacyPermission('page.read', $thisUser ?? NULL)}
         <div class="msg msg_err">
             <b>{_forbidden}</b><br/>
@@ -452,8 +460,9 @@
 							{var $avatarPhoto = $user->getAvatarPhoto()}
 							{var $avatarSizes = $avatarPhoto ? $avatarPhoto->getSizes() : null}
 							{var $avatarNormal = $avatarSizes['normal'] ?? null}
-														<a href="{$user->getAvatarLink()|nocheck}" style="display: block; line-height: 0;">
-								{include '../components/avatar.latte', author => $user, size => 'normal', id => 'bigAvatar', width => ($avatarNormal ? $avatarNormal->width : 200), height => ($avatarNormal ? $avatarNormal->height : 200), alt => $user->getCanonicalName(), style => 'width: 100%; image-rendering: -webkit-optimize-contrast;', onclick => ($avatarPhoto ? "event.preventDefault(); OpenMiniature(event, '{$user->getAvatarUrl('normal')}', null, '{$avatarPhoto->getPrettyId()}', null);" : null), class => ''}
+							{var $avatarPhotoId = $avatarPhoto ? $avatarPhoto->getPrettyId() . ($avatarPhoto->getAccessKey() ? '_' . $avatarPhoto->getAccessKey() : '') : null}
+							<a href="{$user->getAvatarLink()|nocheck}" style="display: block; line-height: 0;">
+								{include '../components/avatar.latte', author => $user, size => 'normal', id => 'bigAvatar', width => ($avatarNormal ? $avatarNormal->width : 200), height => ($avatarNormal ? $avatarNormal->height : 200), alt => $user->getCanonicalName(), style => 'width: 100%; image-rendering: -webkit-optimize-contrast;', onclick => ($avatarPhotoId ? "PhotoViewer.openById('{$avatarPhotoId}', event);" : null), class => ''}
 							</a>
 						</div>
 					</div>
@@ -506,8 +515,8 @@
 					{/if}
 				</div>
 				<div class="leftDataBlock">
-					<div class="page_block" n:if="$user->getFriendsCount() > 0 && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL)">
-						<div class="module clear people_module" n:if="$thisUser != NULL && $thisUser->getId() != $user->getId() && ($commonFriendsCount = $user->getCommonFriendsCount($thisUser)) > 0">
+					<div class="page_block" n:if="$thisUser != NULL && $thisUser->getId() != $user->getId() && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL) && ($commonFriendsCount = $user->getCommonFriendsCount($thisUser)) > 0">
+						<div class="module clear people_module">
 							<a href="/friends{$user->getId()}?act=common" class="module_header">
 								<h3 class="header_top clear_fix">
 									<span class="header_label fl_l">
@@ -519,14 +528,16 @@
 								</h3>
 							</a>
 							<div class="module_body clear_fix">
-								<div class="search_row" n:foreach="array_chunk(iterator_to_array($user->getCommonFriends($thisUser, 1, 6, 'RAND()')), 3) as $friendRow">
+								<div class="search_row" n:foreach="array_chunk(array_slice(iterator_to_array($user->getCommonFriends($thisUser, 1, 6, 'RAND()')), 0, 6), 3) as $friendRow">
 									{foreach $friendRow as $friend}
 										{include "Thumb.latte", user => $friend}
 									{/foreach}
 								</div>
 							</div>
 						</div>
-						<div class="module clear people_module" n:if="$user->getFriendsCount() > 0 && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL)">
+					</div>
+					<div class="page_block" n:if="$user->getFriendsCount() > 0 && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL)">
+						<div class="module clear people_module">
 							<a href="/friends{$user->getId()}" class="module_header">
 								<h3 class="header_top clear_fix">
 									<span class="header_label fl_l">
@@ -813,7 +824,7 @@
 								{else}
 									<div class="page_status" style="display: flex;">
 										<div n:class="audioStatus, $thatIsThisUser ? page_status_edit_button" id="page_status_text">
-											<a {if !$thatIsThisUser}href="/audio0_{$audioStatus->getId()}"{/if}>{$audioStatus->getName()}</a>
+											<a {if !$thatIsThisUser}href="/audio{$audioStatus->getPrettyIdA()}"{/if}>{$audioStatus->getName()}</a>
 										</div>
 									</div>
 								{/if}
@@ -1003,7 +1014,7 @@
 					</a>
 					{if $photoCount > 0 }
 						<div class="page_photos_module clear_fix" id="page_photos_grid">
-							<a class="page_square_photo" n:foreach="($photos = iterator_to_array((new \openvk\Web\Models\Repositories\Photos())->getEveryUserPhoto($user, 0, 4))) as $photo" href="{$photo->getPageURL()}" onclick="OpenMiniature(event, {$photo->getURLBySizeId('large')}, null, {$photo->getPrettyId()}, null)" style="background-image: url({$photo->getURLBySizeId('normal')})"></a>
+							<a class="page_square_photo" n:foreach="($photos = iterator_to_array((new \openvk\Web\Models\Repositories\Photos())->getEveryUserPhoto($user, 0, 4))) as $photo" href="{$photo->getPageURL()}" onclick="PhotoViewer.openById('{= $photo->getPrettyId() . ($photo->getAccessKey() ? '_' . $photo->getAccessKey() : '') |noescape}', event)" style="background-image: url({$photo->getURLBySizeId('normal')})"></a>
 						</div>
 					{else}
 						{if isset($thisUser) && $user->getId() == $thisUser->getId()}
@@ -1067,7 +1078,7 @@
 								var a = document.createElement('a');
 								a.className = 'page_square_photo';
 								a.href = '/photo' + photo.pretty_id;
-								a.setAttribute('onclick', 'OpenMiniature(event, \'' + photo.link + '\', null, \'' + photo.pretty_id + '\', null)');
+								a.setAttribute('onclick', 'PhotoViewer.openById(\'' + photo.pretty_id + '\', event)');
 								a.style.backgroundImage = 'url(' + photo.url + ')';
 								grid.insertBefore(a, grid.firstChild);
 								while (grid.children.length > 4) grid.removeChild(grid.lastChild);

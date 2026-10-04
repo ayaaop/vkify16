@@ -171,8 +171,7 @@ const getScrollContainer = (paginatorEl) => {
 };
 
 const getPaginatorInsertAnchor = (containerEl, paginatorEl) => {
-    if (!containerEl || !paginatorEl || !containerEl.contains(paginatorEl)) return null;
-    return paginatorEl.closest('.clear_fix') || paginatorEl.parentElement;
+    return paginatorEl?.closest('.clear_fix') || paginatorEl;
 };
 
 const appendScrollNode = (containerEl, paginatorEl, node) => {
@@ -181,72 +180,65 @@ const appendScrollNode = (containerEl, paginatorEl, node) => {
 
     const imported = document.importNode(node, true);
     const anchor = getPaginatorInsertAnchor(containerEl, paginatorEl);
-    if (anchor) {
+
+    if (anchor && anchor.parentElement === containerEl) {
         containerEl.insertBefore(imported, anchor);
     } else {
         containerEl.appendChild(imported);
     }
 };
 
-const refreshAlbumMasonry = (containerEl) => {
-    const masonryContainer = containerEl?.classList?.contains('album-flex')
-        ? containerEl
-        : containerEl?.querySelector('.album-flex');
-    if (!masonryContainer || !window.Masonry) return;
-
-    if (window.Masonry.get?.(masonryContainer)) {
-        window.Masonry.refresh(masonryContainer);
-    } else {
-        window.Masonry.initAll('.album-flex', {
-            itemSelector: '.masonry-item',
-            columns: 3,
-            gap: 10,
-            breakpoints: { 600: 2, 450: 1 },
-        });
+const getLastLoadedPage = (paginatorEl, containerEl) => {
+    if (containerEl?.dataset?.paginatorLastLoaded) {
+        const p = Number(containerEl.dataset.paginatorLastLoaded);
+        if (!Number.isNaN(p)) return p;
     }
-
-    vkify.paginator.scheduleCheck?.();
+    if (paginatorEl?.dataset?.currentPage) {
+        const p = Number(paginatorEl.dataset.currentPage);
+        if (!Number.isNaN(p)) return p;
+    }
+    return 0;
 };
 
-const isNearDocumentBottom = () => (
-    window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - PAGINATOR_ROOT_MARGIN
-);
-
-const isPaginatorTriggerZone = (paginatorEl) => (
-    isPaginatorNearViewport(paginatorEl)
-);
-
-const getLastLoadedPage = (paginatorEl, containerEl) => {
-    if (containerEl && containerEl.dataset.paginatorLastLoaded) {
-        return Number(containerEl.dataset.paginatorLastLoaded);
+const refreshAlbumMasonry = (containerEl) => {
+    if (!containerEl || !containerEl.classList.contains('album_photos')) return;
+    if (typeof window.applyVkifyAlbumMosaic === 'function') {
+        window.applyVkifyAlbumMosaic();
+        return;
     }
-    return Number(paginatorEl?.dataset?.currentPage || 0);
+    if (typeof window.repositionAlbumCards === 'function') {
+        window.repositionAlbumCards();
+    }
+};
+
+const isPaginatorTriggerZone = (paginatorEl) => {
+    if (!paginatorEl) return false;
+    const triggerBtn = paginatorEl.querySelector('.vkify-paginator-loader');
+    if (!triggerBtn) return false;
+    return isPaginatorNearViewport(paginatorEl);
 };
 
 const canLoadNextPage = (paginatorEl) => {
     if (!paginatorEl) return false;
     const containerEl = getScrollContainer(paginatorEl);
-    if (containerEl && containerEl.dataset.paginatorExhausted) return false;
-    
-    const nextPage = getNextPageNumber(paginatorEl);
-    if (!nextPage || Number.isNaN(nextPage)) return false;
-    return nextPage > getLastLoadedPage(paginatorEl, containerEl);
+    if (!containerEl) return false;
+    if (containerEl.dataset.paginatorLoading) return false;
+    if (containerEl.dataset.paginatorExhausted) return false;
+    const nextNum = getNextPageNumber(paginatorEl);
+    if (!nextNum || Number.isNaN(nextNum)) return false;
+    const lastLoaded = getLastLoadedPage(paginatorEl, containerEl);
+    if (nextNum <= lastLoaded) return false;
+    if (checkExhaustion(paginatorEl, nextNum)) return false;
+    const triggerBtn = paginatorEl.querySelector('.vkify-paginator-loader');
+    if (!triggerBtn) return false;
+    return !triggerBtn.classList.contains('lagged');
 };
 
 const shouldAllowAutoScroll = () => {
-    const autoScrollSetting = localStorage.getItem('ux.auto_scroll');
-    const autoScrollDisabled = autoScrollSetting !== null && Number(autoScrollSetting) === 0;
-    const ajaxRoutingDisabled = Number(localStorage.getItem('ux.disable_ajax_routing') ?? 0) === 1
-        || window.openvk?.current_id === 0
-        || window.openvk?.disable_ajax === 1;
-
-    if (autoScrollDisabled || ajaxRoutingDisabled) return false;
-    if (!document.querySelector('.scroll_container')) return false;
-
-    const currentUrl = new URL(location.href);
-    const pageParam = parseInt(currentUrl.searchParams.get('p'), 10);
-    if (!Number.isNaN(pageParam) && pageParam > 1) return false;
-
+    if (document.body.classList.contains('no-scroll')) return false;
+    if (Number(localStorage.getItem('ux.disable_ajax_routing') ?? 0) === 1) return false;
+    if (window.openvk?.current_id === 0 || window.openvk?.disable_ajax === 1) return false;
+    if (window.isPaginatorDisabled) return false;
     return true;
 };
 

@@ -965,8 +965,6 @@ var Graffiti = {
       Graffiti.handleResize(e);
       return cancelEvent(e);
     },
-    // bound on the parent document while resizing so the drag survives
-    // the cursor leaving the iframe
     parentResize: function (e) {
       Graffiti.handleResize(e, true);
       return cancelEvent(e);
@@ -1017,8 +1015,6 @@ var Graffiti = {
     }
   },
 
-  // vertical mouse position in iframe coordinates; events from the parent
-  // document carry parent coordinates and need translating
   resizeMouseY: function (e, fromParent) {
     var touch =
       (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);

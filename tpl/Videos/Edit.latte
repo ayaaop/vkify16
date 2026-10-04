@@ -2,10 +2,6 @@
 
 {block title}{_change_video}{/block}
 
-{block bodyScripts}
-    <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/features/autosave.js"></script>
-{/block}
-
 {block content}
 <div class="page_block">
     {include "../components/page_crumb_header.latte", crumbs: [
@@ -15,7 +11,7 @@
         ['title' => tr("change_video")]
     ]}
     <div class="form_group page_padding">
-        <form method="post" enctype="multipart/form-data" data-autosave="true">
+        <form method="post" enctype="multipart/form-data">
             <div class="form_field">
                 <div class="form_label">{_name}</div>
                 <div class="form_data">
@@ -28,7 +24,13 @@
                     <textarea name="desc">{$video->getDescription()}</textarea>
                 </div>
             </div>
-            <input type="hidden" name="hash" value="{$csrfToken}" />
+            <div class="form_field">
+                <div class="form_label"></div>
+                <div class="form_data">
+                    <input type="submit" value="{_save}" class="button" />
+                    <input type="hidden" name="hash" value="{$csrfToken}" />
+                </div>
+            </div>
         </form>
     </div>
 </div>

@@ -1,5 +1,8 @@
-// Ported from Web/static/js/messages/components/makima_grid.js (layout math only).
-// Used by features/makima-attachments.js for mobile mosaics.
+// Copy of the layout math from /opt/openvk/Web/static/js/messages/components/makima_grid.js.
+// Only the pure computation part is ported (the htm MediaTile/MessageMakimaGrid
+// components are messenger-bound and not needed here). Used by
+// features/makima-attachments.js to re-flow wall/comment media attachments
+// into a mosaic on mobile, where the server-side fixed-width layout doesn't fit.
 
 /**
  * Extracts width, height and aspect ratio from a photo or video attachment.
@@ -81,6 +84,7 @@ export function computeMakimaGrid(visualItems, options = {}) {
         dims: getMediaDimensions(item)
     }));
 
+    // ── 1 Item ──────────────────────────────────────────────
     if (count === 1) {
         const { width, height, ratio } = items[0].dims;
         const clampedRatio = Math.max(0.45, Math.min(2.4, ratio));
@@ -114,10 +118,12 @@ export function computeMakimaGrid(visualItems, options = {}) {
         };
     }
 
+    // ── 2 Items ─────────────────────────────────────────────
     if (count === 2) {
         const r0 = items[0].dims.ratio;
         const r1 = items[1].dims.ratio;
 
+        // If both are very wide panoramas, stack them vertically
         if (r0 >= 1.6 && r1 >= 1.6) {
             const h0 = Math.round(Math.min(maxH * 0.48, maxW / r0));
             const h1 = Math.round(Math.min(maxH * 0.48, maxW / r1));
@@ -132,6 +138,7 @@ export function computeMakimaGrid(visualItems, options = {}) {
             };
         }
 
+        // Default: side by side
         const avgR = (r0 + r1) / 2;
         let rowH = Math.round((maxW / 2) / avgR);
         rowH = Math.max(isFastchat ? 70 : 110, Math.min(maxH * 0.75, rowH));
@@ -153,11 +160,13 @@ export function computeMakimaGrid(visualItems, options = {}) {
         };
     }
 
+    // ── 3 Items ─────────────────────────────────────────────
     if (count === 3) {
         const r0 = items[0].dims.ratio;
         const r1 = items[1].dims.ratio;
         const r2 = items[2].dims.ratio;
 
+        // If all 3 are wide photos: 1 on top (100%), 2 below (50% each)
         if (r0 >= 1.2 && r1 >= 1.2 && r2 >= 1.2) {
             const hTop = Math.round(Math.min(maxH * 0.52, maxW / r0));
             const hBottom = Math.round(Math.min(maxH - hTop - 2, (maxW / 2) / ((r1 + r2) / 2)));
@@ -197,7 +206,9 @@ export function computeMakimaGrid(visualItems, options = {}) {
         };
     }
 
+    // ── 4 Items ─────────────────────────────────────────────
     if (count === 4) {
+        // 2x2 grid
         const rowH = Math.round(Math.min(maxH * 0.48, Math.max(isFastchat ? 65 : 95, (maxW / 2) * 0.72)));
         return {
             type: 'standard',
@@ -224,13 +235,14 @@ export function computeMakimaGrid(visualItems, options = {}) {
         };
     }
 
+    // ── 5 to 10 Items ────────────────────────────────────────
     let rowCounts = [];
     if (count === 5) rowCounts = [2, 3];
     else if (count === 6) rowCounts = [3, 3];
     else if (count === 7) rowCounts = [3, 2, 2];
     else if (count === 8) rowCounts = [2, 3, 3];
     else if (count === 9) rowCounts = [3, 3, 3];
-    else rowCounts = [3, 3, 4];
+    else rowCounts = [3, 3, 4]; // 10
 
     const numRows = rowCounts.length;
     const targetRowH = Math.round(Math.min(maxH * 0.45, Math.max(isFastchat ? 55 : 85, (maxH - (numRows - 1) * 2) / numRows)));

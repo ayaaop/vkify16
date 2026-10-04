@@ -58,7 +58,7 @@
     .page_body {
         margin-top: var(--header-height);
     }
-    .page_body, center span:only-child, .post-content .text, .post-content, .edit_link, table, .video-wowzer,.video_item_info {
+    .page_body, center span:only-child, .post-content .text, .post-content, .edit_link, table, .video-wowzer {
         font-size: 14px;
     }
     svg {
@@ -340,6 +340,9 @@
         margin: 0 !important;
         z-index: 201;
     }
+    body:has(#im_container.at_page) .sidebar {
+        z-index: 201;
+    }
     .sidebar_inner {
         width: 100%;
     }
@@ -360,7 +363,7 @@
         color: rgba(0,0,0,.54);
     }
     body.dark-mode .sidebar .sidebar_inner .link .link_icon {
-        color: #71aaeb;
+        color: rgba(255,255,255,.7);
     }
     .sidebar_inner .link span {
         margin-top: 1px;
@@ -837,13 +840,30 @@
         box-shadow: none;
         transition: background-color 0.15s ease-out, color 0.15s ease-out, box-shadow 0.15s ease-out;
     }
-    .button:not(.button_light):not(.profile_link,:disabled, [disabled], [data-type="video"]):active,
-    input[class="button"]:not(:disabled, [disabled]):active {
+    .button:not(.button_light):not(.profile_link):not(:disabled):not([disabled]):active,
+    input[class="button"]:not(:disabled):not([disabled]):active {
         box-shadow: 0 1px 2px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
     }
     .button:not(.profile_more_btn):active, input[class="button"]:active {
-        padding-top: 7px;
-        padding-bottom: 8px;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .button.profile_more_btn {
+        min-width: 0;
+        background-position: 11px 17px;
+    }
+    .button.button_light, .profile_link {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    .button.button_wide {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    .button:disabled, .button[disabled],
+    input[class="button"]:disabled, input[class="button"][disabled] {
+        box-shadow: none;
+        opacity: 0.64;
     }
     .button.profile_more_btn {
         min-width: 0;
@@ -1185,23 +1205,11 @@
         white-space: nowrap;
     }
 
-    .composer.model_content_textarea :is(.post-horizontal:not(:empty), .post-vertical:not(:empty), .post-has-geo:not(:empty), .post-source:not(:empty), .post-has-poll:not(:empty), .post-has-geo.appended-geo) {
-        padding: 0 16px 0;
-    }
-
     /* attachment sheets */
     .ovk-msg-sheet .audio_attachment_header,
     .ovk-msg-sheet .notesInsert ._content {
         align-items: center;
         cursor: pointer;
-    }
-    .ovk-msg-sheet .audio_attachment_header:not(:last-child),
-    .ovk-msg-sheet .notesInsert ._content:not(:last-child) {
-        margin-bottom: 15px;
-    }
-    .ovk-diag-body .audiosInsert,.ovk-diag-body .notesInsert {
-        margin: 0;
-        padding: 8px;
     }
     .ovk-msg-sheet .audio_attachment_header .media_check_btn_wrap,
     .ovk-msg-sheet .notesInsert .media_check_btn_wrap {
@@ -1872,6 +1880,71 @@
     .audioEntry .explicitMark {
         flex-shrink: 0;
     }
+    .audioEntry .audioEntryWrapper {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        padding: 0;
+    }
+    .module_body .audioEntry,
+    .attachments_m .audioEntry {
+        margin: 0;
+        width: 100%;
+    }
+    .audioEntry:hover,
+    .vertical-attachment .audioEntry:hover,
+    .audioEntry:hover, .vertical-attachment .audioEntry:hover, .audioEntry.nowPlaying, .audioEntry.nowPlaying:hover, .vertical-attachment .audioEntry.nowPlaying:hover {
+        background-color: transparent !important;
+    }
+    .audioEntry .playerButton,
+    .audioEntry .playerButton .playIcon {
+        width: 2.25rem;
+        height: 2.25rem;
+    }
+    .audioEntry .playerButton .playIcon svg {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    .audioEntry .status {
+        min-width: 0;
+    }
+    .audioEntry .status .mediaInfo {
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+    }
+    .audioEntry .status .mediaInfo .info {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0;
+        line-height: 1.2;
+    }
+    .audioEntry .info .performer,
+    .audioEntry .info .title {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .audioEntry .info .title {
+        order: -1;
+        font-weight: 600;
+    }
+    .audioEntry .info .title,
+    .audioEntry .info .title a {
+        color: var(--text-color)!important;
+    }
+    .audioEntry .info .performer,
+    .audioEntry .info .performer a {
+        font-weight: 400;
+        color: var(--muted-text-color-2);
+    }
+    .audioEntry .tire {
+        display: none;
+    }
+    .audioEntry .explicitMark {
+        flex-shrink: 0;
+    }
     .bigPlayer:not(.tidy) {
         width: 100% !important;
         margin: 0 !important;
@@ -1918,7 +1991,7 @@
     }
 
     .audiosSideContainer .scroll_node:not(:last-child) .audioEmbed {
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
     .musfooter {
         width: 100% !important;
@@ -2696,6 +2769,11 @@
     .video_info {
         margin: 0 16px;
     }
+    .video_info .post_likes_faces {
+        padding: 0 0 12px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 20px;
+    }
 
     /* messages */
     .messenger-app--messages---message {
@@ -2710,6 +2788,215 @@
     }
     .messenger-app--messages---message ._content > a {
         width: calc(100% - 80px)
+    }
+
+    /* Chat header takes over the appbar while a conversation is open: it is
+       fixed over the (static, in-flow) appbar and reuses its chrome. */
+    body.body_im .messenger-app--header.messages--peers-header-peer-name {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: auto;
+        min-height: 0;
+        height: var(--header-height);
+        display: flex;
+        align-items: center;
+        padding: 0 4px;
+        box-sizing: border-box;
+        background-color: var(--accent-color);
+        color: var(--accent-text-color);
+        border-bottom: 0;
+        z-index: 1;
+    }
+    body.dark-mode .messenger-app--header.messages--peers-header-peer-name {
+        --accent-color: var(--module-header-background-color);
+        --accent-text-color: var(--text-color);
+    }
+    body.body_im .messenger-app--header--back,
+    body.body_im .messenger-app-header--actions {
+        position: static;
+        width: auto;
+        height: 48px;
+    }
+    body.body_im .messenger-app--header--back {
+        flex: 0 0 auto;
+    }
+    body.body_im .messenger-app--header--back:hover {
+        background: none;
+    }
+    body.body_im .messenger-app--header--back a {
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        font-size: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-text-color);
+    }
+    .messenger-app--header--ava {
+        position: absolute;
+        left: 52px;
+    }
+    .messenger-app--header--ava img {
+        height: 38px;
+        width: 38px;
+    }
+    body.body_im .messenger-app--header--info {
+        width: auto;
+        flex: 1;
+        min-width: 0;
+        margin: 0 0 0 38px;
+        padding: 0 12px;
+        text-align: left;
+    }
+    body.body_im .messenger-app--header--name {
+        font-size: 16px;
+    }
+    body.body_im .messenger-app--header--name a {
+        color: var(--accent-text-color);
+    }
+    body.body_im .messenger-app--header--info .messenger-app--header--online {
+        color: var(--accent-text-color);
+        font-size: 13px;
+        opacity: 0.75;
+        margin-top: 3px;
+    }
+    body.body_im .messenger-app-header--actions {
+        margin-left: auto;
+        padding-right: 0;
+    }
+    body.body_im .messenger-app-header--more-actions--trigger {
+        filter: brightness(0) invert(1);
+    }
+    body.body_im .messenger-app--header--ava .messenger-app--header--online {
+        border-color: var(--accent-color);
+    }
+    /* Selection bar overlays the (now fixed) header, same as upstream. */
+    body.body_im .messages--actions {
+        position: fixed;
+        top: 0;
+        height: var(--header-height);
+    }
+
+    /* Input bar styled after the VKUI WriteBar: flat bar with an upward
+       elevation shadow, 44x52 icon slots at the edges, borderless field. */
+    body.body_im .messenger-app-end {
+        border-radius: 0;
+        box-shadow: none;
+    }
+    body.body_im .messenger-app .im-chat-input {
+        padding: 0;
+        border-top: 0;
+        box-shadow: 0 -1px 4px rgba(0,0,0,.08);
+    }
+    body.body_im .messenger-app .im-chat-input--textarea {
+        margin: 0 96px 0 48px;
+    }
+    body.body_im .messenger-app .im-chat-input--txt-wrap {
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        margin-bottom: 0;
+    }
+    body.body_im .messenger-app .im-chat-input--text,
+    body.body_im .messenger-app .im-chat-input--textarea textarea,
+    body.body_im #write.expanded-textarea .messenger-app--input---messagebox .content-editable,
+    body.body_im #write.expanded-textarea .messenger-app--input---messagebox .content-editable[contenteditable="true"] {
+        min-height: 52px !important;
+        max-height: 120px;
+        padding: 16px 12px;
+        font-size: 16px;
+        line-height: 20px;
+        border-radius: 0;
+    }
+    body.body_im .messenger-app .im-chat-input--textarea textarea::placeholder {
+        color: var(--muted-text-color);
+        opacity: 1;
+    }
+    body.body_im .messenger-app .im-chat-input--scroll .im-chat-input--attaches {
+        margin-top: 0;
+    }
+    /* VKUI WriteBar has a single paperclip on the left; the in-field camera
+       is redundant with the attach menu. */
+    body.body_im .messenger-app .im-chat-input--attach {
+        display: none;
+    }
+    body.body_im .messenger-app .im-chat-input--smile-wrap {
+        right: -48px;
+        bottom: 0;
+    }
+    body.body_im .messenger-app .im-chat-input--smile-wrap .emoji_picker_entrypoint {
+        width: 44px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted-text-color);
+    }
+    body.body_im .messenger-app .im-chat-input--smile-wrap .emoji_smile_icon_vector {
+        display: none;
+    }
+    body.body_im .messenger-app .im-chat-input--selector {
+        left: -48px;
+        bottom: 0;
+    }
+    body.body_im .messenger-app .post-attach-menu:not(.post-attach-menu--inline) .post-attach-menu__trigger {
+        width: 44px;
+        height: 52px;
+        padding: 0;
+        background-image: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted-text-color);
+    }
+    body.body_im .messenger-app .im-send-btn {
+        width: 44px;
+        height: 52px;
+        padding: 0;
+        opacity: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-color);
+    }
+    body.body_im .messenger-app .im-chat-input--send {
+        right: -92px;
+        bottom: 0;
+        margin-top: 0;
+    }
+    body.body_im .messenger-app .im-send-btn:after {
+        display: none;
+    }
+    /* VKUI done mode: check_circle_outline in place of send while editing. */
+    body.body_im .messenger-app .im-send-btn .wb-done {
+        display: none !important;
+    }
+    body.body_im .messenger-app .im-chat-input.is_msg_editing .im-send-btn {
+        background: none;
+    }
+    body.body_im .messenger-app .im-chat-input.is_msg_editing .im-send-btn .wb-send {
+        display: none !important;
+    }
+    body.body_im .messenger-app .im-chat-input.is_msg_editing .im-send-btn .wb-done {
+        display: block !important;
+    }
+
+    /* upstream 4c462220 mobile parity: fastchats hidden, sticker shop/modal fit */
+    #fastchats_container {
+        display: none !important;
+    }
+    .stickers_packs_grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    .stickers_pack_card {
+        max-width: 100%;
+    }
+    .ovk-diag-cont:has(.stickers_pack_modal), .stickers_pack_modal_cont {
+        max-width: 100% !important;
     }
 
     /* notes */
@@ -2787,7 +3074,8 @@
     }
 
     /* action menu */
-    .ui_actions_menu {
+    .ui_actions_menu,
+    .msg-dropdown-menu {
         --ui-actions-menu-distance: 12px;
         min-width: 112px;
         max-width: 280px;
@@ -2806,8 +3094,10 @@
     }
 
     .ui_actions_menu a,
+    .ui_actions_menu .ui_actions_menu_item,
     .ui_actions_menu form button,
-    .ui_actions_menu label {
+    .ui_actions_menu label,
+    .msg-dropdown-item {
         display: flex;
         align-items: center;
         padding: 0 16px;
@@ -2819,8 +3109,10 @@
     }
 
     .ui_actions_menu a:hover,
+    .ui_actions_menu .ui_actions_menu_item:hover,
     .ui_actions_menu form button:hover,
-    .ui_actions_menu label:hover {
+    .ui_actions_menu label:hover,
+    .msg-dropdown-item:hover {
         background-color: color-mix(in srgb, currentColor 4%, transparent);
     }
 
@@ -2830,11 +3122,13 @@
 
     .ui_actions_menu a.delete,
     .ui_actions_menu button.delete,
+    .ui_actions_menu .ui_actions_menu_item.delete,
     .ui_actions_menu form button.delete {
         color: #ED330A;
     }
     body.dark-mode .ui_actions_menu a.delete,
     body.dark-mode .ui_actions_menu button.delete,
+    body.dark-mode .ui_actions_menu .ui_actions_menu_item.delete,
     body.dark-mode .ui_actions_menu form button.delete {
         color: #ff5c5c;
     }
@@ -2849,11 +3143,15 @@
 
     .button, .button *, .profile_link, .profile_link *,
     .ui_actions_menu a, .ui_actions_menu button, .ui_actions_menu input,
-    .ui_actions_menu label, .ui_actions_menu *,
+    .ui_actions_menu label, .ui_actions_menu .ui_actions_menu_item, .ui_actions_menu *,
     .ui_tab, .ui_tab *, .ui_tab_plain, .ui_tab_plain *,
     .sidebar_inner .link, .sidebar_inner .link *,
     .mobile-info-row, .mobile-info-row *, .mobile-scroll-card, .mobile-scroll-card *,
-    .appbar .hamburger, .appbar .hamburger *, .appbar-extra-btn, .appbar-extra-btn *,
+    .appbar .hamburger, .appbar .hamburger *, .appbar-extra-btn, .appbar-extra-btn *, .msg-dropdown-menu *,
+    .messenger-app--header--back a, .messenger-app--header--back a *,
+    .messenger-app--header--name a, .messenger-app--header--name a *,
+    .messenger-app--header--ava, .messenger-app--header--ava *,
+    .messenger-app-header--more-actions--trigger, .messenger-app-header--more-actions--trigger *,
     .ovk-msg-fullscreen .ovk-diag-head-close, .ovk-msg-fullscreen .ovk-diag-head-close *,
     .ovk-msg-fullscreen .ovk-diag-head-apply, .ovk-msg-fullscreen .ovk-diag-head-apply *,
     .ovk-msg-sheet .ovk-diag-head-close, .ovk-msg-sheet .ovk-diag-head-close *,

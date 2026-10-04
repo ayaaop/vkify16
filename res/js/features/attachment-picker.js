@@ -27,8 +27,6 @@ const ajloader = {
 };
 
 vkify.bindOnce('composerAttachmentHandlers', () => {
-    // al_wall.js and media-modals.js delegate '#videoOpen' clicks on document;
-    // only a capture-phase handler can suppress them
     document.addEventListener('click', (e) => {
         const del = e.target.closest('.upload-delete');
         if (del && e.target.closest('#videoOpen')) {
@@ -72,13 +70,14 @@ const canAttach = (form, count = 1, playlistMode = false) => {
     return true;
 };
 
-const appendHorizontal = (form, { type, id, preview, page_url, key, fullsize_url }) => {
+const appendHorizontal = (form, { type, id, viewerId, preview, page_url, key, fullsize_url }) => {
     if (!form?.length || !type || !id) return;
     const isVideo = type === 'video';
+    const openId = viewerId || id;
     const href = page_url || id;
     const dataKey = key ? ` data-key="${key}"` : '';
     form.find('.post-horizontal').append(`
-        <a ${isVideo ? 'id="videoOpen"' : ''} ${type === 'photo' ? `onclick="if(!event.target.closest('.upload-delete'))OpenMiniature(event,'${fullsize_url}',null,'${id}',null)"` : ''} 
+        <a ${isVideo ? 'id="videoOpen"' : ''} ${type === 'photo' ? `onclick="if(!event.target.closest('.upload-delete'))PhotoViewer.openById('${openId}', event)"` : ''} 
            draggable="true" href="/${type}${href}" class="upload-item" data-type='${type}' data-id="${id}"${dataKey}>
             <span class="upload-delete">×</span>
             ${isVideo ? `<div class='play-button'><div class='play-button-ico'></div></div>` : ''}
@@ -1170,7 +1169,8 @@ const AudioAdapter = {
             picker.load();
         });
 
-        // mobile: tap the row to mark it; stopPropagation blocks stock's .status play handler
+        // mobile: tap the row itself to mark it instead of the text button;
+        // stopPropagation keeps stock's document-level .status handler from playing the track
         node.on('click', '.audio_attachment_header', (e) => {
             if (!matchMedia('(max-width: 768px)').matches) return;
             if (u(e.target).closest('.picker-item-select, .attachAudio, .playerButton, .mini_timer, .subTracks, a').length) return;
@@ -1474,6 +1474,7 @@ function setupVideoTitleAutofill(container, fileSelector, linkSelector, nameSele
 
 vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
     let current_tab = 'file';
+    const is_from_messenger = formNode && formNode.closest('.messenger-layer').length > 0;
     const msg = new CMessageBox({
         title: tr('upload_video'),
         close_on_buttons: false,
@@ -1523,6 +1524,14 @@ vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
                     form_data.append('unlisted', formNode ? 1 : 0);
                     form_data.append('hash', vkify.getCsrf());
 
+                    if (is_from_messenger) {
+                        form_data.append('is_from_messenger', '1');
+                        const im = window.im_variants?.getCompromise?.() || window.im;
+                        if (im?.state?.getOperator?.()?.supposed_type === 'club') {
+                            form_data.append('club', Math.abs(im.state.getOperator().id));
+                        }
+                    }
+
                     uploadBtn?.classList.add('lagged');
                     const ytRes = await fetch('/videos/upload', { method: 'POST', body: form_data });
                     append_result = await ytRes.json();
@@ -1539,6 +1548,14 @@ vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
                     form_data.append('blob', video_file.files[0]);
                     form_data.append('unlisted', formNode ? 1 : 0);
                     form_data.append('hash', vkify.getCsrf());
+
+                    if (is_from_messenger) {
+                        form_data.append('is_from_messenger', '1');
+                        const im = window.im_variants?.getCompromise?.() || window.im;
+                        if (im?.state?.getOperator?.()?.supposed_type === 'club') {
+                            form_data.append('club', Math.abs(im.state.getOperator().id));
+                        }
+                    }
 
                     uploadBtn?.classList.add('lagged');
                     const res = await fetch('/videos/upload', { method: 'POST', body: form_data });
@@ -1625,10 +1642,10 @@ window.attachmentAdapters = adapters;
 window.openAttachmentPicker = openPicker;
 
 vkify.bindOnce('pickerButtons', () => {
-    const resolveForm = (el) => (el ? u(el).closest('form') : u());
+    const resolveForm = (el) => (el ? u(el).closest('form, #write') : u());
 
     document.addEventListener('click', async (e) => {
-        const photo = e.target.closest('#__photoAttachment');
+        const photo = e.target.closest('#__photoAttachment, .im-attach-photo');
         if (photo) {
             e.preventDefault();
             e.stopImmediatePropagation();

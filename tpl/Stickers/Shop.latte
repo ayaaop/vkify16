@@ -1,0 +1,155 @@
+{extends "../@layout.latte"}
+
+{block title}
+    {_stickers}
+{/block}
+
+{block content}
+    {if $act === 'shop'}
+        {var $menuItems = [
+            ['url' => '/stickers?act=shop&section=popular', 'title' => 'stickers_tab_popular', 'active' => $section === 'popular'],
+            ['url' => '/stickers?act=shop&section=free', 'title' => 'stickers_tab_free', 'active' => $section === 'free'],
+            ['url' => '/stickers?act=shop&section=all', 'title' => 'stickers_tab_all', 'active' => $section === 'all']
+        ]}
+    {/if}
+
+    <div class="wide_column_left">
+        <div class="narrow_column_wrap">
+            <div class="narrow_column">
+                {include "Tabs.latte", act => $act}
+            </div>
+        </div>
+
+        <div class="wide_column_wrap">
+            <div class="wide_column">
+                <div class="page_block stickers_shop_page">
+                    {if $act === 'shop'}
+                        {include "../components/page_tabs_header.latte", tabs => $menuItems}
+                        <div class="stickers_search_bar">
+                            {include "../components/search_bar.latte",
+                                id => 'stickers_search',
+                                action => '/stickers',
+                                placeholder => tr('stickers_search_placeholder'),
+                                input_name => 'q',
+                                input_value => $q,
+                                hidden_fields => ['act' => 'shop', 'section' => $section]
+                            }
+                        </div>
+
+                        {var $banner = \OPENVK_ROOT_CONF['openvk']['preferences']['stickersBanner'] ?? null}
+                        {if $banner && !empty($banner['enable']) && !empty($banner['src'])}
+                            <div class="stickers_shop_banner">
+                                <a href="{$banner['link'] ?: '/stickers'}" class="stickers_shop_banner_link">
+                                    <img src="{$banner['src']}" alt="{$banner['caption'] ?? ''}" class="stickers_shop_banner_img" />
+                                </a>
+                            </div>
+                        {/if}
+                    {/if}
+
+                    {if sizeof($packs) > 0}
+                        <div class="stickers_packs_grid">
+                            {foreach $packs as $pack}
+                                {var $isInstalled = in_array($pack->getId(), $installedPackIds ?? ($purchasedPackIds ?? []), true)}
+                                {var $isBought = in_array($pack->getId(), $boughtPackIds ?? [], true)}
+                                {var $cardUrl = $act === 'author' ? ('/stickers/edit/' . $pack->getId()) : ('/stickers/' . $pack->getSlug())}
+                                <div class="stickers_pack_card">
+                                    <a href="{$cardUrl}" class="stickers_pack_thumb" {if $act !== 'author'}onclick="openStickerPackModal({$pack->getSlug()}, event);"{/if}>
+                                        <img n:if="$pack->getMainSticker()" src="{$pack->getMainSticker()->getImageUrl(512)}" alt="{$pack->getName()}" />
+                                        <div n:if="!$pack->getMainSticker()" class="stickers_modal_cover_placeholder"></div>
+                                    </a>
+
+                                    <div class="stickers_pack_name">
+                                        <a href="{$cardUrl}" title="{$pack->getName()}" {if $act !== 'author'}onclick="openStickerPackModal({$pack->getSlug()}, event);"{/if}>{$pack->getName()}</a>
+                                    </div>
+
+                                    <div class="stickers_pack_author" n:if="$pack->getAuthor() || $pack->getAuthorUrl()">
+                                        {if $pack->getAuthorUrl()}
+                                            <a href="{$pack->getAuthorUrl()}" target="_blank" rel="noopener noreferrer" title="{$pack->getAuthor() ?: $pack->getAuthorUrl()}">{$pack->getAuthor() ?: $pack->getAuthorUrl()}</a>
+                                        {else}
+                                            {$pack->getAuthor()}
+                                        {/if}
+                                    </div>
+
+                                    <div class="stickers_pack_desc" n:if="$pack->getDescription()">
+                                        {$pack->getDescription()|truncate:70}
+                                    </div>
+                                    <div n:if="!$pack->getDescription()" class="stickers_pack_desc_empty"></div>
+
+                                    <div class="stickers_pack_footer">
+                                        {if $act === 'author'}
+                                            <div>
+                                                <a href="{$cardUrl}" class="stickers_pack_price_paid">
+                                                    {_edit}
+                                                </a>
+                                            </div>
+                                            <div class="stickers_pack_author_balance">
+                                                {_stickers_pack_balance}: <b class="stickers_pack_balance_val">{tr('coins', (int) round($pack->getBalance()))}</b>
+                                                {if $pack->getBalance() > 0}
+                                                    (<a href="javascript:withdrawStickers({$pack->getId()}, {$pack->getBalance()})">{_stickers_withdrawal_q}</a>)
+                                                {/if}
+                                            </div>
+                                        {else}
+                                            {if $isInstalled}
+                                                <a href="/stickers/{$pack->getSlug()}" class="stickers_pack_status_purchased" onclick="openStickerPackModal({$pack->getSlug()}, event);">
+                                                    {_stickers_purchased_label}
+                                                </a>
+                                            {elseif $isBought}
+                                                <a href="/stickers/{$pack->getSlug()}" class="stickers_pack_price_free" onclick="openStickerPackModal({$pack->getSlug()}, event);">
+                                                    {_add}
+                                                </a>
+                                            {elseif $pack->getPrice() > 0}
+                                                <a href="/stickers/{$pack->getSlug()}" class="stickers_pack_price_paid" onclick="openStickerPackModal({$pack->getSlug()}, event);">
+                                                    {tr('coins', $pack->getPrice())}
+                                                </a>
+                                            {else}
+                                                <a href="/stickers/{$pack->getSlug()}" class="stickers_pack_price_free" onclick="openStickerPackModal({$pack->getSlug()}, event);">
+                                                    {_stickers_free}
+                                                </a>
+                                            {/if}
+                                        {/if}
+
+                                        {if $act === 'settings'}
+                                            <div class="stickers_pack_uninstall_wrap">
+                                                <form method="POST" action="/stickers?act=settings" style="margin: 0;">
+                                                    <input type="hidden" name="hash" value="{$csrfToken}" />
+                                                    <input type="hidden" name="pack_id" value="{$pack->getId()}" />
+                                                    <input type="hidden" name="action" value="uninstall" />
+                                                    <button type="button" class="button stickers_pack_uninstall_btn" onclick="confirmUninstallPack(this.form);">
+                                                        {_stickers_uninstall_pack}
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        {/if}
+                                    </div>
+                                </div>
+                            {/foreach}
+                        </div>
+                    {else}
+                        {include "../components/nothing.latte"}
+                    {/if}
+
+                    <script>
+                        window.stickersWithdrawTax = {floatval($withdrawTax ?? 0)};
+                    </script>
+                    {if !empty($autoOpenPack)}
+                        <script>
+                            (function() {
+                                const packToOpen = {$autoOpenPack};
+                                const doOpen = () => {
+                                    if (typeof openStickerPackModal === 'function') {
+                                        openStickerPackModal(packToOpen);
+                                    }
+                                };
+                                if (document.readyState === 'loading') {
+                                    document.addEventListener('DOMContentLoaded', doOpen);
+                                } else {
+                                    doOpen();
+                                }
+                            })();
+                        </script>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
