@@ -6,9 +6,29 @@ vkify.once('mediaModals', function () {
 
     const tr = window.tr;
     const _loader_link = '/assets/packages/static/openvk/img/loading_mini.gif';
-    const LoaderUtils = window.LoaderUtils;
     const showLoader = (node) => { if (node && window.LoaderUtils) window.LoaderUtils.show(node); };
     const hideLoader = (node) => { if (node && window.LoaderUtils) window.LoaderUtils.hide(node); };
+
+    // Upstream _updFrame pre-loads the stock loader gif into #ovk-photo-img
+    // before assigning the real url. The gif decodes instantly (always cached)
+    // and stays as the img's displayed frame while the photo downloads, which
+    // our .pv_photo img rules stretch to full size. Swallow those assignments
+    // so the gif never reaches the element; LoaderUtils covers the wait.
+    function guardPhotoImgSrc(img) {
+        if (!img || img.dataset.vkifySrcGuard) return;
+        const desc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+        if (!desc || !desc.set) return;
+        img.dataset.vkifySrcGuard = '1';
+        Object.defineProperty(img, 'src', {
+            configurable: true,
+            enumerable: true,
+            get() { return desc.get.call(this); },
+            set(value) {
+                if (typeof value === 'string' && value.endsWith(_loader_link)) return;
+                desc.set.call(this, value);
+            },
+        });
+    }
 
     document.addEventListener('click', async (e) => {
         const videoLink = e.target.closest('#videoOpen');
@@ -430,10 +450,14 @@ vkify.once('mediaModals', function () {
 
         showLoader(this.modal.getNode().find('.pv_photo').nodes[0]);
         showLoader(this.modal.getNode().find('.pv_right').nodes[0]);
+        guardPhotoImgSrc(this.modal.getNode().find('#ovk-photo-img').nodes[0]);
     };
 
     const _photoUpdFrame = PhotoViewer.prototype._updFrame;
     PhotoViewer.prototype._updFrame = function (item) {
+        if (this.modal) {
+            guardPhotoImgSrc(this.modal.getNode().find('#ovk-photo-img').nodes[0]);
+        }
         if (this._mobileGestures && typeof this._mobileGestures.reset === 'function') {
             try {
                 this._mobileGestures.reset();
@@ -971,6 +995,15 @@ vkify.once('mediaModals', function () {
 
         setClickableHeightForEls(this.modal.getNode(), this.modal.getNode().find('.ovk-photo-view-overlay').nodes, '.photo_viewer_wrapper', -50);
     };
+
+    if (typeof Viewer !== 'undefined' && Viewer.prototype && typeof Viewer.prototype._removeDetails === 'function') {
+        Viewer.prototype._removeDetails = function () {
+            const node = this.modal && this.modal.getNode().find('.ovk-modal-details').last();
+            if (!node) return;
+            node.innerHTML = '';
+            showLoader(node);
+        };
+    }
 
     const _origResetMsgboxDetails = typeof window.reset_msgbox_details === 'function' ? window.reset_msgbox_details : null;
     window.reset_msgbox_details = function vkifyResetMsgboxDetails(boxTarget) {

@@ -1890,6 +1890,12 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     opacity: 1;
 }
 
+/* System messages get .unread for the read observer but must not get unread styling. */
+.messenger-app--messages .messenger-special-message.unread,
+.messenger-special-message.unread {
+    background-color: transparent !important;
+}
+
 /* Search results & deleted messages */
 /* modals.css applies .show_more { display:flex; margin-top:15px } globally;
    the IM search pager is a plain block link. */

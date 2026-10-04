@@ -1,0 +1,6 @@
+<div class="people_cell">
+    <a class="people_cell_ava" href="{$user->getURL()}">
+        {include '../components/avatar.latte', author => $user, size => 'miniscule', width => 50, height => 50, alt => $user->getFirstName(), class => 'people_cell_img'}
+    </a>
+    <div class="people_cell_name"><a href="{$user->getURL()}">{$user->getFirstName()}</a></div>
+</div>

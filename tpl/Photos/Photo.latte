@@ -89,6 +89,7 @@
                     </a>
                 </div>
             </div>
+            {include "../components/like_faces.latte", item => $photo, type => 'photo'}
             {if (isset($thisUser) && $thisUser->getId() === $photo->getOwner()->getId()) || !empty($photo->getDescription())}
             {var $descPlain = $photo->getDescription($html = false) ?? ''}
             {var $descFull = $photo->getDescription() ?? ''}

@@ -1,0 +1,27 @@
+{php if (!function_exists('vkifyTr')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_i18n.php';}
+{php if (!function_exists('vkifyGetPostLikeFaces')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
+{var $likesCount = $item->getLikesCount()}
+{if isset($thisUser)}
+    {var $likesSummary = vkifyGetPostLikeFaces($item, $thisUser)}
+    <a class="post_likes_faces mobileonly" href="/{$type}/{$item->getPrettyId()}/likes" {if $likesCount <= 0}hidden{/if}>
+        {var $facesToShow = $likesCount > sizeof($likesSummary['faces']) ? array_slice($likesSummary['faces'], 0, 1) : $likesSummary['faces']}
+        {var $moreCount = $likesCount - sizeof($facesToShow)}
+        <span n:class="post_likes_faces_photos, $moreCount > 0 && $moreCount < 100 ? has_counter">
+            {foreach $facesToShow as $face}
+                {include 'avatar.latte', author => $face, size => 'miniscule', width => 24, height => 24, class => 'post_likes_face'}
+            {/foreach}
+            <span n:if="$moreCount > 0 && $moreCount < 100" class="post_likes_faces_counter">+{$moreCount}</span>
+        </span>
+        <span class="post_likes_faces_label">
+            {if $likesSummary['liked']}
+                {if $likesCount > 1}
+                    {=vkifyTr('post_likes_summary_you', $likesCount - 1)}
+                {else}
+                    {=vkifyTr('post_likes_summary_only_you')}
+                {/if}
+            {else}
+                {=vkifyTr('post_likes_summary', $likesCount)}
+            {/if}
+        </span>
+    </a>
+{/if}

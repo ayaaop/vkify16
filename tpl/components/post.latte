@@ -164,7 +164,7 @@
             </a>
         </div>
         <div n:if="$post->hasSource()" class="sourceDiv">
-            <span>{_source}: {$post->getSource(true)|noescape}</span>
+            <a onclick="openSource(event)" title="{$post->getSource()}" href="{$post->getSource()}">{_source}</a>
         </div>
         <div n:if="$post->isSigned()" class="post-signature">
             {var $actualAuthor = $post->getOwner(false)}
@@ -176,6 +176,9 @@
             </span>
         </div>
     </div>
+    {if $postPage && !$compact}
+        {include 'like_faces.latte', item => $post, type => 'wall'}
+    {/if}
     <div class='post_edit'></div>
     <div class="post_full_like_wrap" n:if="$thisUser && $compact == false" n:ifcontent>
         <div class="post_full_like" n:ifcontent>

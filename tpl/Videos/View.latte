@@ -66,6 +66,7 @@
                         </span>
                     {/if}
                 </div>
+                {include "../components/like_faces.latte", item => $video, type => 'video'}
                 <div class="video_info_author clear_fix">
                     <a href="{$video->getOwner()->getURL()}" class="video_info_author_image">
                         {include '../components/avatar.latte', author => $video->getOwner(), size => 'miniscule', class => 'post-avatar'}
