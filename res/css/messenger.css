@@ -156,6 +156,7 @@ body.body_im .page_body {
 .messenger-app--messages {
     margin: 0;
     padding: 0 10px;
+    box-sizing: border-box;
 }
 
 .messenger-app--messages::-webkit-scrollbar-track {
@@ -408,6 +409,11 @@ body.vkify-force-classic label:has(> input#im\.modern_mode) {
 
 .at_page:not(.compact) .messenger-pinned-bar:before {
     left: 14px;
+}
+
+#im_container.compact .messages--peers-header-wrap .messenger-pinned-bar,
+#im_container.compact .messenger-app--messages {
+    width: var(--messenger-width);
 }
 
 /* Message selection actions */

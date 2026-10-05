@@ -401,6 +401,7 @@
 }
 
 .ovk-photo-view-dimmer.queue-shown .ovk-modal-video-window {
+  display: block;
   width: calc(var(--ovk-modal-video-width) + var(--ovk-video-queue-width));
 }
 
@@ -417,6 +418,10 @@
   flex: 1 1 auto;
   min-width: 0;
   min-height: 0;
+}
+
+.ovk-modal-video-window #player-infos .center-part {
+  height: 100%;
 }
 #video_top_controls_wrapper {
   position: absolute;
@@ -553,7 +558,7 @@
 }
 
 .ovk-photo-view-dimmer.ovk-msg-minimized #video_top_controls_wrapper,
-.ovk-modal-video-window .top-part {
+.ovk-modal-video-window #player-infos .top-part {
   display: none;
 }
 

@@ -720,7 +720,7 @@ vkify.once('mediaModals', function () {
         const template = u(`
         <div class="ovk-photo-view-dimmer">
             <div class="ovk-photo-view-overlay ovk-photo-view-overlay-right"></div>
-            <div class="ovk-modal-video-window">
+            <div class="ovk-modal-video-window ovk-modal-player-window">
                 <div id="video_top_controls_wrapper">
                     <div id="video_top_controls">
                         <div id="__modal_player_close" class="video_top_button video_top_close" role="button" tabindex="0" aria-label="Close">
