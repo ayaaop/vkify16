@@ -351,4 +351,48 @@ export async function installMessengerRenderer() {
         }
     };
 
+    const origToggleMessageSelection = MessengerPage.prototype.toggleMessageSelection;
+
+    MessengerPage.prototype.toggleMessageSelection = function vkifyToggleMessageSelection(msg, e) {
+        const isMobile = Boolean(window.im?.state?.is_mobile || document.body.classList.contains('im_mobile'));
+        if (!isMobile || typeof origToggleMessageSelection !== 'function') {
+            return origToggleMessageSelection?.call(this, msg, e);
+        }
+
+        const messenger = window.im?.messenger;
+        if (!messenger || msg.isDeleted() || messenger.isForwarded()) {
+            return;
+        }
+
+        if (msg.id == null || !(Number(msg.id) > 0)) {
+            if (!e?.target?.closest?.(".error-checkmark")) {
+                new CMessageBox({
+                    title: tr("confirm"),
+                    body: tr("cancel_sending_confirmation"),
+                    buttons: [tr("yes"), tr("no")],
+                    callbacks: [() => {
+                        msg.setDeleted();
+                        this._triggerUpdate();
+                    }, () => { }]
+                });
+                return;
+            }
+        }
+
+        if (messenger.isEditing()) {
+            this._triggerCancelEditingDialog();
+            return;
+        }
+
+        const msgEl = e?.target?.closest?.('.messenger-app--messages---message') ?? null;
+        if (msgEl?.classList.contains('has-active-dropdown')) {
+            return;
+        }
+
+        const rect = msgEl?.getBoundingClientRect();
+        this.activeDropdownOpenUp = rect ? (window.innerHeight - rect.bottom) < 230 : false;
+        this.activeDropdownMsgId = msg.id;
+        this.update();
+    };
+
 }

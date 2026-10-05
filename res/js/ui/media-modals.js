@@ -9,11 +9,6 @@ vkify.once('mediaModals', function () {
     const showLoader = (node) => { if (node && window.LoaderUtils) window.LoaderUtils.show(node); };
     const hideLoader = (node) => { if (node && window.LoaderUtils) window.LoaderUtils.hide(node); };
 
-    // Upstream _updFrame pre-loads the stock loader gif into #ovk-photo-img
-    // before assigning the real url. The gif decodes instantly (always cached)
-    // and stays as the img's displayed frame while the photo downloads, which
-    // our .pv_photo img rules stretch to full size. Swallow those assignments
-    // so the gif never reaches the element; LoaderUtils covers the wait.
     function guardPhotoImgSrc(img) {
         if (!img || img.dataset.vkifySrcGuard) return;
         const desc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');

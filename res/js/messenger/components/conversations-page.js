@@ -72,7 +72,6 @@ export async function installConversationsRenderer({ html, render, h, Fragment, 
             convs = orig_convs;
         }
 
-        // Parity with upstream: empty list kicks off next page, but only when nothing was loaded yet.
         if (convs.length === 0 && window.im?.conversations && !window.im.conversations.isLoadingMore && !window.im.conversations._hasNoMore && window.im.conversations.all_convs.length === 0) {
             window.im.conversations.loadNext().then(() => this.update()).catch(console.error);
         }

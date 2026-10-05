@@ -7,47 +7,32 @@ export function createInputArea({ html, tr, AttachmentMenu, getReplySnippet, get
         const cls = inputEndClass({ editMsg, replyTo, forwarded_msg, convo });
 
         const hasContentEditable = typeof window !== 'undefined' && window.ContentEditable && typeof window.ContentEditable.isSupported === 'function' && window.ContentEditable.isSupported();
-        let hiddenTextarea = null;
-
-        const textareaRef = (el) => { hiddenTextarea = el; };
 
         const inputRef = (el) => {
             if (!el) return;
-            if (hasContentEditable && !el._contentEditable && window.ContentEditable) {
-                new window.ContentEditable(el, { hiddenInput: hiddenTextarea, submitOnEnter: true, placeholder: tr('enter_message') });
+            if (!el._contentEditable && window.ContentEditable) {
+                new window.ContentEditable(el, { submitOnEnter: true, placeholder: tr('enter_message') });
                 el._lastConvoId = convo?.id;
-                if (currentDraft != null && typeof el.setText === 'function' && el.getText() !== currentDraft) {
+                if (currentDraft) {
                     el.setText(currentDraft);
                 }
-            } else if (hasContentEditable && el._contentEditable && currentDraft != null && el.getText() !== currentDraft) {
-                // Only push the draft on conversation switch; re-renders happen
-                // on every keystroke and would clobber in-progress typing.
-                if (convo && convo.id !== el._lastConvoId) {
-                    el._lastConvoId = convo.id;
-                    el.setText(currentDraft);
-                }
+            } else if (el._contentEditable && convo && convo.id !== el._lastConvoId) {
+                el._lastConvoId = convo.id;
+                el.setText(currentDraft || '');
             }
         };
 
         const inputEl = hasContentEditable ? html`
-            <div class="im-chat-input--text-wrap">
-                <textarea
-                    class="small-textarea im_editable"
-                    name="text"
-                    style="display: none;"
-                    ref=${textareaRef}
-                ></textarea>
-                <div
-                    class="small-textarea content-editable im_editable im-chat-input--text"
-                    contenteditable="true"
-                    role="textbox"
-                    aria-multiline="true"
-                    data-placeholder=${tr('enter_message')}
-                    onInput=${onInput}
-                    onKeyDown=${onKeyPress}
-                    ref=${inputRef}
-                ></div>
-            </div>
+            <div
+                class="small-textarea content-editable im_editable im-chat-input--text"
+                contenteditable="true"
+                role="textbox"
+                aria-multiline="true"
+                data-placeholder=${tr('enter_message')}
+                onInput=${onInput}
+                onKeyDown=${onKeyPress}
+                ref=${inputRef}
+            ></div>
         ` : html`
             <textarea
                 class="small-textarea im_editable im-chat-input--text"

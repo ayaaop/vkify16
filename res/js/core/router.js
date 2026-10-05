@@ -13,9 +13,21 @@ window.router = new class Router {
         this._pendingScripts = new Map();
         this._activeNavigation = null;
         this._navigationId = 0;
+        this._pageCache = new Map();
         this._captureExistingManagedStyles();
         this._cacheExistingScripts();
         this.replaceHistory(location.href, 'page');
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
+        let scrollSaveTimer = null;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollSaveTimer);
+            scrollSaveTimer = setTimeout(() => {
+                if (!this._activeNavigation) this._saveScrollForCurrentEntry();
+            }, 150);
+        }, { passive: true });
     }
 
     _cacheExistingScripts() {
@@ -45,12 +57,45 @@ window.router = new class Router {
         };
     }
 
+    _saveScrollForCurrentEntry() {
+        const st = history.state;
+        if (st && typeof st === 'object' && st.vkify) {
+            history.replaceState({ ...st, vkify: { ...st.vkify, scroll: window.scrollY } }, '');
+        }
+    }
+
+    _pageCacheSet(url, html) {
+        this._pageCache.delete(url);
+        this._pageCache.set(url, html);
+        while (this._pageCache.size > 8) {
+            this._pageCache.delete(this._pageCache.keys().next().value);
+        }
+    }
+
+    _snapshotCurrentPage(url) {
+        const pageBody = document.querySelector('.page_body');
+        const sidebar = document.querySelector('.sidebar');
+        const header = document.querySelector('.page_header');
+        const appbar = document.querySelector('.appbar');
+        if (!pageBody || !sidebar || !header || !appbar) return;
+
+        const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"][data-vkify-route-style]'))
+            .map(l => l.outerHTML).join('');
+        const backdrop = document.querySelector('#backdrop');
+        const title = document.title.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+        const html = `<!doctype html><html><head><title>${title}</title><meta name="csrf" content="${this.csrf}">${styles}</head>` +
+            `<body data-themepack="vkify16">${pageBody.outerHTML}${sidebar.outerHTML}${header.outerHTML}${appbar.outerHTML}${backdrop ? backdrop.outerHTML : ''}</body></html>`;
+        this._pageCacheSet(url, html);
+    }
+
     pushHistory(url, kind = 'page', state = {}) {
         history.pushState(this._historyState(url, kind, state), '', url);
+        this._currentUrl = new URL(url, location.origin).href;
     }
 
     replaceHistory(url, kind = 'page', state = {}) {
         history.replaceState(this._historyState(url, kind, state), '', url);
+        this._currentUrl = new URL(url, location.origin).href;
     }
 
     updateHistory(url, { replace = false, kind = 'ui', state = {} } = {}) {
@@ -363,7 +408,8 @@ window.router = new class Router {
     }
 
     canHandlePopstateNavigation(event) {
-        return this.checkUrl(location.href) && event.state?.vkify?.kind === 'page';
+        const kind = event.state?.vkify?.kind;
+        return this.checkUrl(location.href) && (kind === 'page' || kind === 'tab');
     }
 
     savePreviousPage() {
@@ -389,9 +435,24 @@ window.router = new class Router {
             controller: new AbortController(),
         };
         this._activeNavigation = navigation;
-        u('body').addClass('ajax_request_made');
 
         try {
+            const isGet = (params.method || 'GET') === 'GET';
+            const cachedHtml = params.history === 'none' && isGet ? this._pageCache.get(resolvedUrl.href) : null;
+            if (cachedHtml) {
+                const oldPageBody = document.querySelector('.page_body');
+                await window.vkify?.runPageLifecycle?.('beforePageLeave', { container: document, pageBody: oldPageBody });
+                this._closeMsgs();
+                this._snapshotCurrentPage(this._currentUrl || location.href);
+                await this._appendPage(new DOMParser().parseFromString(cachedHtml, 'text/html'));
+                if (this._activeNavigation !== navigation) return { aborted: true };
+                await this._integratePage(params.scrolling ?? 0);
+                this._currentUrl = resolvedUrl.href;
+                this.completeNavigation();
+                return { committed: true, url: resolvedUrl.href };
+            }
+
+            u('body').addClass('ajax_request_made');
             const response = await fetch(resolvedUrl, {
                 method: params.method || 'GET',
                 body: params.body || null,
@@ -406,7 +467,8 @@ window.router = new class Router {
                 return { noContent: true, url: response.url };
             }
 
-            const parsedContent = new DOMParser().parseFromString(await response.text(), 'text/html');
+            const responseText = await response.text();
+            const parsedContent = new DOMParser().parseFromString(responseText, 'text/html');
             const nextBody = parsedContent.querySelector('body');
             if (!nextBody || nextBody.getAttribute('data-themepack') !== 'vkify16') {
                 return { fullLoad: true, url: response.redirected ? response.url : resolvedUrl.href };
@@ -418,8 +480,9 @@ window.router = new class Router {
             const oldPageBody = document.querySelector('.page_body');
             await window.vkify?.runPageLifecycle?.('beforePageLeave', { container: document, pageBody: oldPageBody });
             this._closeMsgs();
-            await this._appendPage(parsedContent);
-            if (this._activeNavigation !== navigation) return { aborted: true };
+            if (params.history !== 'none') this._saveScrollForCurrentEntry();
+            this._snapshotCurrentPage(this._currentUrl || location.href);
+            if (isGet) this._pageCacheSet(finalUrl.href, responseText);
 
             if (params.history !== 'none') {
                 if (params.history === 'replace' || params.push_state === false) {
@@ -429,7 +492,11 @@ window.router = new class Router {
                 }
             }
 
+            await this._appendPage(parsedContent);
+            if (this._activeNavigation !== navigation) return { aborted: true };
+
             await this._integratePage(params.scrolling ?? 0);
+            this._currentUrl = finalUrl.href;
 
             this.completeNavigation();
             return { committed: true, url: finalUrl.href };
@@ -553,13 +620,14 @@ u(document).on('submit', 'form', async (e) => {
 });
 
 window.addEventListener('popstate', async (e) => {
-    if (e.state?.vkify?.kind && e.state.vkify.kind !== 'page') return;
+    const kind = e.state?.vkify?.kind;
+    if (kind && kind !== 'page' && kind !== 'tab') return;
     if (!window.router.canHandlePopstateNavigation(e)) {
         location.assign(location.href);
         return;
     }
 
-    const result = await window.router.route({ url: location.href, history: 'none' });
+    const result = await window.router.route({ url: location.href, history: 'none', scrolling: e.state?.vkify?.scroll ?? 0 });
     if (result.fullLoad || result.error) location.assign(result.url || location.href);
 });
 

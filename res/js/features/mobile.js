@@ -84,11 +84,10 @@
         const appbar = document.getElementById('appbar');
         if (!appbar || !appbar.classList.contains('appbar--transparent')) return;
 
-        const hero = document.querySelector('.mobile-profile-hero');
-
         document.body.classList.add('has-transparent-appbar');
-        const heroHeight = hero ? hero.offsetHeight : 200;
         const applyAppbarScrollState = function() {
+            const hero = document.querySelector('.mobile-profile-hero');
+            const heroHeight = hero ? hero.offsetHeight : 200;
             const scrollY = window.scrollY || window.pageYOffset;
             const progress = Math.min(scrollY / Math.max(heroHeight - 56, 1), 1);
             appbar.style.setProperty('--appbar-bg-alpha', progress);
@@ -166,7 +165,7 @@
     vkify.onPageLifecycle('beforePageLeave', () => {
         resetTransparentAppbar();
     });
-    vkify.onPageLifecycle('afterPageReady', () => {
+    vkify.onPage(() => {
         setupTransparentAppbar();
         setupAppbarElevation();
     });

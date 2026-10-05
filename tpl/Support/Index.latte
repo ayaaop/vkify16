@@ -42,7 +42,9 @@
                             </div>
                         </div>
                     {else}
-                        <div class="page_block page_padding">
+                        <div class="page_block">
+                            <div class="settings_block_msg">{=vkifyTr('support_bug_theme_notice')|noescape}</div>
+                            <div class="page_padding">
                             <div class="new">
                                 <div class="form_group tickets_create_form">
                                     <form action="/support" method="post" style="margin:0;">
@@ -64,6 +66,7 @@
                                         </div>
                                     </form>
                                 </div>
+                            </div>
                             </div>
                         </div>
                     {/if}

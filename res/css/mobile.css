@@ -2278,7 +2278,8 @@
     }
 
     .mobile_profile_actions .profile_sub_wrapper {
-        width: 100%;
+        flex: 1 1 50%;
+        min-width: 0;
     }
 
     .profile_sub_wrapper.ui_actions_menu_wrap.shown .ui_actions_menu {
