@@ -1384,7 +1384,6 @@ vkify.once('repostModalLayout', () => {
         dialogBody.find('.post-buttons').attr('style', 'display:block');
 
         if (hasGroupOpts) {
-            repostSignsEl.attr('style', 'display:none !important');
             const optsTrigger = dialogBody.find('#__vkifyRepostOptsTrigger');
 
             const origAsGroup = repostSignsEl.find('input[name="asGroup"]');
@@ -1401,7 +1400,6 @@ vkify.once('repostModalLayout', () => {
 
             dialogBody.on('change', `input[name='repost_type']`, (e) => {
                 optsTrigger.attr('style', e.target.value === 'group' ? '' : 'display:none');
-                repostSignsEl.attr('style', 'display:none !important');
             });
         }
 

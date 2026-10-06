@@ -1255,3 +1255,7 @@ body:not(.dark-mode) {
   border-top: 1px solid var(--border-color);
 }
 
+
+.ovk-msg-sheet #repost_signs {
+  display: none !important;
+}

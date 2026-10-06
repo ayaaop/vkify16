@@ -510,7 +510,6 @@
                                     <div class="form_label">{_style}</div>
                                     <div class="form_data">
                                         <select name="style">
-                                            <option value="ovk" {if $user->getStyle() == 'ovk'}selected{/if}>OpenVK ({_default})</option>
                                             <option n:foreach="$themes as $id => $themeName"
                                                     n:attr="selected => $user->getStyle() === $id"
                                                     value="{$id}">

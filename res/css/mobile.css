@@ -999,6 +999,7 @@
     .ovk-diag-cont {
         width: min(560px, calc(100vw - 80px))!important;
         min-width: min(280px, calc(100vw - 80px));
+        padding: 0 !important;
         height: auto!important;
         top: 50%;
         bottom: auto;
