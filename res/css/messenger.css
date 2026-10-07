@@ -28,6 +28,18 @@ body {
     --post-head: var(--muted-text-color);
     --unread: color-mix(in srgb, var(--muted-text-color) 20%, var(--transparent));
     --unread-mark: var(--message-warning-border);
+
+    /* VK 2016 messenger palette (im.css) */
+    --vk-im-hover: #f5f7fa;
+    --vk-im-divider: #e7e8ec;
+    --vk-im-bubble: #f0f2f5;
+    --vk-im-bubble-hover: #e9edf2;
+    --vk-im-unread-bg: #edf0f5;
+    --vk-im-badge: var(--accent-color-2);
+    --vk-im-badge-muted: #b2b7c2;
+    --vk-im-date: #777e8c;
+    --vk-im-who: #8b939b;
+    --vk-im-time: hsla(220, 8%, 51%, .6);
 }
 
 html:has(.body_im),body.body_im,.body_im .layout {
@@ -723,6 +735,239 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     color: var(--muted-text-color)
 }
 
+/* Classic (non-compact) rows follow VK's .nim-dialog_classic: 71px rows, name
+   + date on the first line, preview + counter on the second. */
+@media (min-width: 769px) {
+    #im_container:not(.compact) .crp-entry {
+        display: grid;
+        grid-template-columns: 50px minmax(0, 1fr) auto;
+        grid-template-rows: auto auto;
+        column-gap: 14px;
+        row-gap: 7px;
+        align-content: center;
+        align-items: center;
+        height: 71px;
+        min-height: 71px;
+        margin: 0;
+        padding: 0 15px 0 20px;
+        border-bottom: 0;
+        box-sizing: border-box;
+        background: var(--transparent);
+    }
+
+    /* Flatten the stock wrappers so name/date/preview/badge sit on one grid. */
+    #im_container:not(.compact) .crp-entry--main,
+    #im_container:not(.compact) .crp-entry--info,
+    #im_container:not(.compact) .crp-entry--info-wrap {
+        display: contents;
+    }
+
+    /* Inset divider that vanishes around hovered and unread rows */
+    #im_container:not(.compact) .crp-entry::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 84px;
+        right: 15px;
+        border-top: 1px solid var(--vk-im-divider);
+        pointer-events: none;
+    }
+
+    #im_container:not(.compact) .crp-entry:first-child::before,
+    #im_container:not(.compact) .crp-entry:hover::before,
+    #im_container:not(.compact) .crp-entry:hover+.crp-entry::before,
+    #im_container:not(.compact) .crp-entry.unread::before,
+    #im_container:not(.compact) .crp-entry.unread+.crp-entry::before {
+        border-top-color: var(--transparent);
+    }
+
+    #im_container:not(.compact) .crp-entry:hover,
+    #im_container:not(.compact) .crp-entry.unread {
+        background: var(--vk-im-hover);
+    }
+
+    #im_container:not(.compact) .crp-entry--image {
+        grid-column: 1;
+        grid-row: 1 / 3;
+        width: 50px;
+        height: 50px;
+        margin: 0;
+    }
+
+    #im_container:not(.compact) .crp-entry--image>img,
+    #im_container:not(.compact) .crp-entry--image>.chat_table_avatar {
+        border-radius: 50%;
+        object-position: center;
+    }
+
+    /* Name */
+    #im_container:not(.compact) .crp-entry--info a {
+        grid-column: 2;
+        grid-row: 1;
+        display: block;
+        min-width: 0;
+        max-height: none;
+        font-size: 13px;
+        line-height: 16px;
+        font-weight: 500;
+        color: var(--heading-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -webkit-line-clamp: unset;
+        line-clamp: unset;
+        -webkit-font-smoothing: subpixel-antialiased;
+        -moz-osx-font-smoothing: auto;
+    }
+
+    /* Date; the members count (first of two spans) is dropped from the row */
+    #im_container:not(.compact) .crp-entry--excess {
+        grid-column: 3;
+        grid-row: 1;
+        justify-self: end;
+        margin: 0;
+        flex-direction: row;
+        gap: 0;
+    }
+
+    #im_container:not(.compact) .crp-entry--excess span {
+        font-size: 12.5px;
+        line-height: 16px;
+        color: var(--vk-im-date);
+        opacity: .9;
+    }
+
+    #im_container:not(.compact) .crp-entry--excess span:first-child:not(:last-child) {
+        display: none;
+    }
+
+    #im_container:not(.compact) .crp-entry--info .im-mute-indicator {
+        grid-column: 2;
+        grid-row: 1;
+        justify-self: end;
+        align-self: center;
+        margin-right: 2px;
+    }
+
+    /* Preview row */
+    #im_container:not(.compact) .crp-entry--message {
+        grid-column: 2;
+        grid-row: 2;
+        align-self: center;
+        padding: 0;
+        min-height: 16px;
+        border-radius: 3px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    /* Outgoing message the peer hasn't read yet */
+    #im_container:not(.compact) .crp-entry .crp-entry--message.unread {
+        width: auto;
+        max-width: 100%;
+        padding: 5px 8px;
+        background: var(--vk-im-bubble);
+        color: var(--muted-text-color-2);
+    }
+
+    #im_container:not(.compact) .crp-entry:hover .crp-entry--message.unread,
+    #im_container:not(.compact) .crp-entry.unread .crp-entry--message.unread {
+        background: var(--vk-im-bubble-hover);
+    }
+
+    #im_container:not(.compact) .crp-entry--message---av {
+        width: 20px;
+        min-width: 20px;
+        height: 20px;
+        margin-right: 6px;
+        border-radius: 50%;
+    }
+
+    #im_container:not(.compact) .crp-entry--message---av img {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+    }
+
+    #im_container:not(.compact) .crp-entry--message---content {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    /* "Author:" prefix inline with the text, as in VK's preview */
+    #im_container:not(.compact) .crp-entry--message---author {
+        flex: 0 1 auto;
+        max-width: 45%;
+        margin: 0 4px 0 0;
+        font-size: 13px;
+        line-height: 16px;
+        font-weight: 400;
+        color: var(--vk-im-who);
+    }
+
+    #im_container:not(.compact) .crp-entry--message---author::after {
+        content: ':';
+    }
+
+    #im_container:not(.compact) .crp-entry--message---text {
+        font-size: 13px;
+        line-height: 16px;
+        color: var(--muted-text-color-2);
+    }
+
+    #im_container:not(.compact) .crp-entry:hover .crp-entry--message---text,
+    #im_container:not(.compact) .crp-entry.unread .crp-entry--message---text {
+        color: #4e5966;
+    }
+
+    #im_container:not(.compact) .crp-entry--message---text .conv_prev_attachment_text {
+        color: #4a6f97;
+    }
+
+    #im_container:not(.compact) .crp-entry--message---text .conv_prev_img {
+        width: 16px;
+        height: 16px;
+        border-radius: 2px;
+    }
+
+    /* Unread counter badge */
+    #im_container:not(.compact) .crp-entry .unread-msgs-count {
+        position: static;
+        grid-column: 3;
+        grid-row: 2;
+        align-self: center;
+        justify-self: end;
+        margin: 0;
+        min-width: 6px;
+        height: 18px;
+        padding: 0 6px;
+        border-radius: 18px;
+        box-sizing: border-box;
+        background: var(--vk-im-badge);
+        color: var(--accent-text-color);
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 19px;
+        text-align: center;
+        -webkit-font-smoothing: subpixel-antialiased;
+        -moz-osx-font-smoothing: auto;
+    }
+
+    /* Stock renders "+N"; VK shows a bare number. */
+    #im_container:not(.compact) .crp-entry .unread-msgs-count::first-letter {
+        font-size: 0;
+    }
+
+    #im_container:not(.compact) .crp-entry:has(.im-mute-indicator) .unread-msgs-count {
+        background: var(--vk-im-badge-muted);
+    }
+
+    #im_container:not(.compact) .crp-entry:not(.unread) .unread-msgs-count {
+        display: none;
+    }
+}
+
 /* Create group chat */
 .messenger-app--tab-friends {
     display: flex;
@@ -821,14 +1066,14 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     position: relative;
     box-sizing: border-box;
     cursor: pointer;
-    margin-top: 8px;
-    padding: 4px 0;
+    margin-top: 0;
+    padding: 6px 0 7px;
     transition: background-color 0.1s ease;
 }
 
 .messenger-app--messages---message.same-author {
     margin-top: 0;
-    padding: 2px 0;
+    padding: 3px 0 4px;
 }
 
 .messenger-app--messages---message>.messenger-app--messages---message--wrap {
@@ -852,6 +1097,15 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     line-height: 18px;
     box-sizing: border-box;
     position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+}
+
+/* Everything except the name/time line takes a full row. */
+.messenger-app--messages---message ._content>*:not(._sender):not(.msg-header-right) {
+    flex: 0 0 100%;
+    max-width: 100%;
 }
 
 #im_container.compact .messenger-app--messages---message ._content {
@@ -909,10 +1163,11 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     display: inline-block;
     font-size: 12.5px;
     font-weight: 700;
-    color: var(--link-color) !important;
-    line-height: 1.25;
+    color: var(--post-action-color) !important;
+    line-height: 18px;
     text-decoration: none;
     vertical-align: baseline;
+    order: -2;
 }
 
 .messenger-app--messages---message ._sender:hover {
@@ -923,22 +1178,28 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     display: none !important;
 }
 
+/* Time sits right after the name, VK-style; follow-ups pin it to the corner. */
 .messenger-app--messages---message .msg-header-right {
-    float: right;
+    order: -1;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    height: 14px;
-    margin-left: 8px;
-    margin-top: 2px;
+    gap: 4px;
+    margin-left: 5px;
+}
+
+.messenger-app--messages---message.same-author .msg-header-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
 }
 
 .messenger-app--messages---message .time {
     margin-left: 0;
-    font-size: 11px;
-    color: var(--muted-text-color-3);
+    font-size: 12px;
+    color: var(--vk-im-time);
     opacity: 1;
-    line-height: 1.25;
+    line-height: 18px;
     height: auto;
     cursor: pointer;
     transition: opacity 0.15s ease;
@@ -983,6 +1244,10 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     position: relative;
 }
 
+.messenger-app--messages---message.unread:not(.msg-selected):not(.msg-editing-this) {
+    background-color: var(--vk-im-unread-bg) !important;
+}
+
 .messenger-app--messages---message.msg-editing-this {
     box-shadow: none;
     border-radius: 4px;
@@ -1011,6 +1276,36 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
 .messenger-app--messages---message.msg-selected:last-child {
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
+}
+
+/* Classic: unread messages form an inset block (VK .im-mess_unread) that
+   doesn't span the whole column; the checkbox sits in the gutter outside it. */
+#im_container:not(.compact) .messenger-app--messages---message.unread:not(.msg-selected):not(.msg-editing-this) {
+    margin-left: 23px;
+    margin-right: 23px;
+    border-radius: 0;
+}
+
+#im_container:not(.compact) .messenger-app--messages---message.unread:not(.msg-selected):not(.msg-editing-this)>.messenger-app--messages---message--wrap {
+    padding-left: 7px;
+    padding-right: 7px;
+}
+
+#im_container:not(.compact) .messenger-app--messages---message.unread:not(.msg-selected):not(.msg-editing-this) .click-territory {
+    left: -23px;
+    width: 23px;
+}
+
+#im_container:not(.compact) .messenger-app--messages---message:not(.unread)+.messenger-app--messages---message.unread:not(.msg-selected),
+#im_container:not(.compact) .messenger-app--messages---message.unread:first-child:not(.msg-selected) {
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+#im_container:not(.compact) .messenger-app--messages---message.unread:last-child:not(.msg-selected),
+#im_container:not(.compact) .messenger-app--messages---message.unread:not(.msg-selected):has(+ .messenger-app--messages---message:not(.unread)) {
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
 }
 
 /* Selection territory & checkbox */
@@ -1058,8 +1353,10 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
 
 /* Hover quick actions */
 .messenger-app--messages---message .actions-2 {
-    position: static;
-    height: auto;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 18px;
     min-width: auto;
     display: inline-flex;
     align-items: center;
@@ -2537,357 +2834,4 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     .im_mobile .msg-media-tile, .msg-attach-j-photo {
         height: 100% !important;
     }
-}
-
-/* ==========================================================================
-   VK 2016 refinements (reference: vk.com/css/al/im.css, .nim-dialog_classic
-   and .im-mess). Selectors map to the stock Preact DOM, not VK's.
-   ========================================================================== */
-
-#im_container {
-    --vk-im-hover: #f5f7fa;
-    --vk-im-divider: #e7e8ec;
-    --vk-im-bubble: #f0f2f5;
-    --vk-im-bubble-hover: #e9edf2;
-    --vk-im-unread-bg: #edf0f5;
-    --vk-im-badge: var(--accent-color-2);
-    --vk-im-badge-muted: #b2b7c2;
-    --vk-im-date: #777e8c;
-    --vk-im-who: #8b939b;
-    --vk-im-time: hsla(220, 8%, 51%, .6);
-}
-
-/* ---- Conversations list (classic / non-compact) ---- */
-@media (min-width: 769px) {
-    #im_container:not(.compact) .crp-entry {
-        display: grid;
-        grid-template-columns: 50px minmax(0, 1fr) auto;
-        grid-template-rows: auto auto;
-        column-gap: 14px;
-        row-gap: 7px;
-        align-content: center;
-        align-items: center;
-        height: 71px;
-        min-height: 71px;
-        margin: 0;
-        padding: 0 15px 0 20px;
-        border-bottom: 0;
-        box-sizing: border-box;
-        background: var(--transparent);
-    }
-
-    /* Flatten the stock wrappers so name/date/preview/badge can be placed on
-       a single grid, like VK's name row + preview row. */
-    #im_container:not(.compact) .crp-entry--main,
-    #im_container:not(.compact) .crp-entry--info,
-    #im_container:not(.compact) .crp-entry--info-wrap {
-        display: contents;
-    }
-
-    /* Inset divider that vanishes around hovered / unread rows */
-    #im_container:not(.compact) .crp-entry::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 84px;
-        right: 15px;
-        border-top: 1px solid var(--vk-im-divider);
-        pointer-events: none;
-    }
-
-    #im_container:not(.compact) .crp-entry:first-child::before,
-    #im_container:not(.compact) .crp-entry:hover::before,
-    #im_container:not(.compact) .crp-entry:hover+.crp-entry::before,
-    #im_container:not(.compact) .crp-entry.unread::before,
-    #im_container:not(.compact) .crp-entry.unread+.crp-entry::before {
-        border-top-color: var(--transparent);
-    }
-
-    #im_container:not(.compact) .crp-entry:hover,
-    #im_container:not(.compact) .crp-entry.unread {
-        background: var(--vk-im-hover);
-    }
-
-    #im_container:not(.compact) .crp-entry--image {
-        grid-column: 1;
-        grid-row: 1 / 3;
-        width: 50px;
-        height: 50px;
-        margin: 0;
-        border-radius: 50%;
-    }
-
-    #im_container:not(.compact) .crp-entry--image>img,
-    #im_container:not(.compact) .crp-entry--image>.chat_table_avatar {
-        border-radius: 50%;
-        object-position: center;
-    }
-
-    /* Name */
-    #im_container:not(.compact) .crp-entry--info a {
-        grid-column: 2;
-        grid-row: 1;
-        display: block;
-        min-width: 0;
-        max-height: none;
-        font-size: 13px;
-        line-height: 16px;
-        font-weight: 500;
-        color: var(--heading-color);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        -webkit-line-clamp: unset;
-        -webkit-font-smoothing: subpixel-antialiased;
-        -moz-osx-font-smoothing: auto;
-    }
-
-    /* Date (members count is dropped from the row; the date is the last span) */
-    #im_container:not(.compact) .crp-entry--excess {
-        grid-column: 3;
-        grid-row: 1;
-        justify-self: end;
-        margin: 0;
-        flex-direction: row;
-        gap: 0;
-    }
-
-    #im_container:not(.compact) .crp-entry--excess span {
-        font-size: 12.5px;
-        line-height: 16px;
-        color: var(--vk-im-date);
-        opacity: .9;
-    }
-
-    #im_container:not(.compact) .crp-entry--excess span:first-child:not(:last-child) {
-        display: none;
-    }
-
-    #im_container:not(.compact) .crp-entry--info .im-mute-indicator {
-        grid-column: 2;
-        grid-row: 1;
-        justify-self: end;
-        align-self: center;
-        margin-right: 2px;
-    }
-
-    /* Preview row */
-    #im_container:not(.compact) .crp-entry--message {
-        grid-column: 2;
-        grid-row: 2;
-        width: auto;
-        padding: 0;
-        min-height: 16px;
-        border-radius: 3px;
-        box-sizing: border-box;
-        overflow: hidden;
-        align-self: center;
-    }
-
-    #im_container:not(.compact) .crp-entry .crp-entry--message.unread {
-        width: auto;
-        max-width: 100%;
-        padding: 5px 8px;
-        background: var(--vk-im-bubble);
-        color: var(--muted-text-color-2);
-    }
-
-    #im_container:not(.compact) .crp-entry:hover .crp-entry--message.unread,
-    #im_container:not(.compact) .crp-entry.unread .crp-entry--message.unread {
-        background: var(--vk-im-bubble-hover);
-    }
-
-    #im_container:not(.compact) .crp-entry--message---av {
-        width: 20px;
-        min-width: 20px;
-        height: 20px;
-        margin-right: 6px;
-        border-radius: 50%;
-    }
-
-    #im_container:not(.compact) .crp-entry--message---av img {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-    }
-
-    #im_container:not(.compact) .crp-entry--message---content {
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
-    }
-
-    /* "Author:" prefix inline with the text, as in VK's preview */
-    #im_container:not(.compact) .crp-entry--message---author {
-        flex: 0 1 auto;
-        max-width: 45%;
-        margin: 0 4px 0 0;
-        font-size: 13px;
-        line-height: 16px;
-        font-weight: 400;
-        color: var(--vk-im-who);
-    }
-
-    #im_container:not(.compact) .crp-entry--message---author::after {
-        content: ':';
-    }
-
-    #im_container:not(.compact) .crp-entry--message---text {
-        font-size: 13px;
-        line-height: 16px;
-        color: var(--muted-text-color-2);
-    }
-
-    #im_container:not(.compact) .crp-entry:hover .crp-entry--message---text,
-    #im_container:not(.compact) .crp-entry.unread .crp-entry--message---text {
-        color: #4e5966;
-    }
-
-    #im_container:not(.compact) .crp-entry--message---text .conv_prev_attachment_text {
-        color: #4a6f97;
-    }
-
-    #im_container:not(.compact) .crp-entry--message---text .conv_prev_img {
-        width: 16px;
-        height: 16px;
-        border-radius: 2px;
-    }
-
-    /* Unread counter badge */
-    #im_container:not(.compact) .crp-entry .unread-msgs-count {
-        position: static;
-        grid-column: 3;
-        grid-row: 2;
-        align-self: center;
-        justify-self: end;
-        margin: 0;
-        min-width: 6px;
-        height: 18px;
-        padding: 0 6px;
-        border-radius: 18px;
-        box-sizing: border-box;
-        background: var(--vk-im-badge);
-        color: var(--accent-text-color);
-        font-size: 11px;
-        font-weight: 500;
-        line-height: 19px;
-        text-align: center;
-        -webkit-font-smoothing: subpixel-antialiased;
-        -moz-osx-font-smoothing: auto;
-    }
-
-    /* Stock renders "+N"; VK shows a bare number. */
-    #im_container:not(.compact) .crp-entry .unread-msgs-count::first-letter {
-        font-size: 0;
-    }
-
-    #im_container:not(.compact) .crp-entry:has(.im-mute-indicator) .unread-msgs-count {
-        background: var(--vk-im-badge-muted);
-    }
-
-    /* Outgoing-unread rows carry the bubble instead of a counter */
-    #im_container:not(.compact) .crp-entry:not(.unread) .unread-msgs-count {
-        display: none;
-    }
-}
-
-/* ---- Conversation history ---- */
-.messenger-app--messages---message {
-    margin-top: 0;
-    padding: 6px 0 7px;
-}
-
-.messenger-app--messages---message.same-author {
-    margin-top: 0;
-    padding: 3px 0 4px;
-}
-
-/* Name followed by a light timestamp on the same line */
-.messenger-app--messages---message ._content {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-}
-
-.messenger-app--messages---message ._content>*:not(._sender):not(.msg-header-right) {
-    flex: 0 0 100%;
-    max-width: 100%;
-    order: 0;
-}
-
-.messenger-app--messages---message ._content>._sender {
-    order: -2;
-    color: var(--post-action-color) !important;
-    font-size: 12.5px;
-    line-height: 18px;
-}
-
-.messenger-app--messages---message ._content>.msg-header-right {
-    order: -1;
-    float: none;
-    height: auto;
-    margin: 0 0 0 5px;
-    gap: 4px;
-    position: static;
-}
-
-.messenger-app--messages---message .time {
-    font-size: 12px;
-    line-height: 18px;
-    color: var(--vk-im-time);
-}
-
-.messenger-app--messages---message .time span {
-    color: inherit;
-}
-
-.messenger-app--messages---message.same-author ._content>.msg-header-right {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 0;
-}
-
-/* Hover actions live at the far right of the row, like .im-mess--actions */
-.messenger-app--messages---message .actions-2 {
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 18px;
-}
-
-.messenger-app--messages---message .normalText,
-.messenger-app--messages---message .text {
-    font-size: 13px;
-    line-height: 18px;
-}
-
-/* Unread messages: inset block that doesn't span the whole column */
-#im_container:not(.compact) .messenger-app--messages---message.unread:not(.msg-selected):not(.msg-editing-this) {
-    margin-left: 23px;
-    margin-right: 23px;
-    background-color: var(--vk-im-unread-bg) !important;
-    border-radius: 0;
-}
-
-#im_container:not(.compact) .messenger-app--messages---message.unread:not(.msg-selected):not(.msg-editing-this)>.messenger-app--messages---message--wrap {
-    padding-left: 7px;
-    padding-right: 7px;
-}
-
-#im_container:not(.compact) .messenger-app--messages---message.unread:not(.msg-selected):not(.msg-editing-this) .click-territory {
-    left: -23px;
-    width: 23px;
-}
-
-#im_container:not(.compact) .messenger-app--messages---message:not(.unread)+.messenger-app--messages---message.unread:not(.msg-selected),
-#im_container:not(.compact) .messenger-app--messages---message.unread:first-child:not(.msg-selected) {
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-}
-
-#im_container:not(.compact) .messenger-app--messages---message.unread:last-child:not(.msg-selected),
-#im_container:not(.compact) .messenger-app--messages---message.unread:not(.msg-selected):has(+ .messenger-app--messages---message:not(.unread)) {
-    border-bottom-left-radius: 3px;
-    border-bottom-right-radius: 3px;
 }
