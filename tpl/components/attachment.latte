@@ -112,6 +112,10 @@
     <div style="width:100%;" data-att_type='audio' data-att_id="{$attachment->getPrettyId()}">
         {include "../Audio/player.latte", audio => $attachment}
     </div>
+{elseif $attachment instanceof \openvk\Web\Models\Entities\Messages\Sticker}
+    <div class="msg-attach-w msg-attach-w-sticker" data-sticker-id="{$attachment->getId()}">
+        <img class="msg-sticker-img" src="{$attachment->getImageUrl(128)}" alt="sticker" loading="lazy" />
+    </div>
 {else}
     <span style="color:red;">{_version_incompatibility}</span>
 {/if}   
