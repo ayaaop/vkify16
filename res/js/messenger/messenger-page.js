@@ -5,6 +5,7 @@ import { createPinnedMessageBar } from './components/pinned-message-bar.js';
 import { createAttachmentMenu } from './components/attachment-menu.js';
 import { createInputArea } from './components/input-area.js';
 import { createStockInputArea } from './components/input-area-stock.js';
+import { createActionsBar } from './components/actions-bar.js';
 import { installPeerWindow } from './components/peer-window.js';
 import { installClassicTabBar } from './components/classic-tab-bar.js';
 import { installConversationsRenderer } from './components/conversations-page.js';
@@ -84,6 +85,7 @@ export async function installMessengerRenderer() {
     const StockInputArea = createStockInputArea({ html, tr, getDisplayRecentSmiles, onRecentSmileClick, getEmojiHex, getReplySnippet, PeerAvatar, MentionAutocomplete });
     const PeerInfoView = createPeerInfoView({ html, tr });
     const PinnedMessageBar = createPinnedMessageBar({ html, tr });
+    const VkActionsBar = createActionsBar({ ActionsBar });
 
     const use2018 = window.vkify ? window.vkify.getSetting('mode2018') : false;
     const InputAreaComponent = (use2018 || isMobileViewport()) ? VkInputArea : StockInputArea;
@@ -107,7 +109,7 @@ export async function installMessengerRenderer() {
         try {
             const result = await vkifyRenderMessenger.call(this, container, options, orig_messenger, {
                 html, render, h, Fragment, ErrorConversation, MessageListView,
-                ActionsBar, PeerInfoView, PinnedMessageBar, InputAreaComponent,
+                ActionsBar: VkActionsBar, PeerInfoView, PinnedMessageBar, InputAreaComponent,
             });
             lastRenderError = null;
             return result;
