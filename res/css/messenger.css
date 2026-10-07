@@ -29,7 +29,6 @@ body {
     --unread: color-mix(in srgb, var(--muted-text-color) 20%, var(--transparent));
     --unread-mark: var(--message-warning-border);
 
-    /* VK 2016 messenger palette (im.css) */
     --vk-im-hover: #f5f7fa;
     --vk-im-divider: #e7e8ec;
     --vk-im-bubble: #f0f2f5;
@@ -735,79 +734,103 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     color: var(--muted-text-color)
 }
 
-/* Classic (non-compact) rows follow VK's .nim-dialog_classic: 71px rows, name
-   + date on the first line, preview + counter on the second. */
-@media (min-width: 769px) {
-    #im_container:not(.compact) .crp-entry {
+#im_container {
+    --crp-h: 71px;
+    --crp-pad-l: 20px;
+    --crp-pad-r: 15px;
+    --crp-ava: 50px;
+    --crp-gap: 14px;
+    --crp-row-gap: 7px;
+    --crp-fs: 13px;
+}
+
+#im_container.compact {
+    --crp-h: 63px;
+    --crp-pad-l: 15px;
+    --crp-ava: 46px;
+    --crp-gap: 11px;
+    --crp-row-gap: 4px;
+    --crp-fs: 12.5px;
+}
+
+body:not(.im_mobile) #im_container.compact .im_page.page-conversations .crp-entry--excess {
+    display: flex !important;
+}
+
+body:not(.im_mobile) #im_container .crp-list {
+    .crp-entry {
         display: grid;
-        grid-template-columns: 50px minmax(0, 1fr) auto;
+        grid-template-areas:
+            "avatar name date"
+            "avatar message badge";
+        grid-template-columns: var(--crp-ava) minmax(0, 1fr) auto;
         grid-template-rows: auto auto;
-        column-gap: 14px;
-        row-gap: 7px;
+        column-gap: var(--crp-gap);
+        row-gap: var(--crp-row-gap);
         align-content: center;
         align-items: center;
-        height: 71px;
-        min-height: 71px;
+        height: var(--crp-h);
+        min-height: var(--crp-h);
         margin: 0;
-        padding: 0 15px 0 20px;
+        padding: 0 var(--crp-pad-r) 0 var(--crp-pad-l);
         border-bottom: 0;
         box-sizing: border-box;
         background: var(--transparent);
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: calc(var(--crp-pad-l) + var(--crp-ava) + var(--crp-gap));
+            right: var(--crp-pad-r);
+            border-top: 1px solid var(--vk-im-divider);
+            pointer-events: none;
+        }
+
+        &:first-child::before,
+        &:hover::before,
+        &:hover+.crp-entry::before,
+        &.unread::before,
+        &.unread+.crp-entry::before {
+            border-top-color: var(--transparent);
+        }
+
+        &:hover,
+        &.unread {
+            background: var(--vk-im-hover);
+        }
     }
 
-    /* Flatten the stock wrappers so name/date/preview/badge sit on one grid. */
-    #im_container:not(.compact) .crp-entry--main,
-    #im_container:not(.compact) .crp-entry--info,
-    #im_container:not(.compact) .crp-entry--info-wrap {
+    .crp-entry--main,
+    .crp-entry--info,
+    .crp-entry--info-wrap {
         display: contents;
     }
 
-    /* Inset divider that vanishes around hovered and unread rows */
-    #im_container:not(.compact) .crp-entry::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 84px;
-        right: 15px;
-        border-top: 1px solid var(--vk-im-divider);
-        pointer-events: none;
-    }
-
-    #im_container:not(.compact) .crp-entry:first-child::before,
-    #im_container:not(.compact) .crp-entry:hover::before,
-    #im_container:not(.compact) .crp-entry:hover+.crp-entry::before,
-    #im_container:not(.compact) .crp-entry.unread::before,
-    #im_container:not(.compact) .crp-entry.unread+.crp-entry::before {
-        border-top-color: var(--transparent);
-    }
-
-    #im_container:not(.compact) .crp-entry:hover,
-    #im_container:not(.compact) .crp-entry.unread {
-        background: var(--vk-im-hover);
-    }
-
-    #im_container:not(.compact) .crp-entry--image {
-        grid-column: 1;
-        grid-row: 1 / 3;
-        width: 50px;
-        height: 50px;
+    .crp-entry--info {
+        width: auto;
         margin: 0;
     }
 
-    #im_container:not(.compact) .crp-entry--image>img,
-    #im_container:not(.compact) .crp-entry--image>.chat_table_avatar {
-        border-radius: 50%;
-        object-position: center;
+    .crp-entry--image {
+        grid-area: avatar;
+        width: var(--crp-ava);
+        height: var(--crp-ava);
+        margin: 0;
+
+        >img,
+        >.chat_table_avatar {
+            border-radius: 50%;
+            object-position: center;
+        }
     }
 
-    /* Name */
-    #im_container:not(.compact) .crp-entry--info a {
-        grid-column: 2;
-        grid-row: 1;
+    .crp-entry--info a {
+        grid-area: name;
         display: block;
         min-width: 0;
         max-height: none;
-        font-size: 13px;
+        font-size: var(--crp-fs);
         line-height: 16px;
         font-weight: 500;
         color: var(--heading-color);
@@ -820,122 +843,121 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
         -moz-osx-font-smoothing: auto;
     }
 
-    /* Date; the members count (first of two spans) is dropped from the row */
-    #im_container:not(.compact) .crp-entry--excess {
-        grid-column: 3;
-        grid-row: 1;
-        justify-self: end;
-        margin: 0;
-        flex-direction: row;
-        gap: 0;
-    }
-
-    #im_container:not(.compact) .crp-entry--excess span {
-        font-size: 12.5px;
-        line-height: 16px;
-        color: var(--vk-im-date);
-        opacity: .9;
-    }
-
-    #im_container:not(.compact) .crp-entry--excess span:first-child:not(:last-child) {
-        display: none;
-    }
-
-    #im_container:not(.compact) .crp-entry--info .im-mute-indicator {
-        grid-column: 2;
-        grid-row: 1;
+    .crp-entry--info .im-mute-indicator {
+        grid-area: name;
         justify-self: end;
         align-self: center;
         margin-right: 2px;
     }
 
-    /* Preview row */
-    #im_container:not(.compact) .crp-entry--message {
-        grid-column: 2;
-        grid-row: 2;
-        align-self: center;
+    .crp-entry--excess {
+        grid-area: date;
+        justify-self: end;
+        margin: 0;
+        flex-direction: row;
+        gap: 0;
+
+        span {
+            font-size: 12.5px;
+            line-height: 16px;
+            color: var(--vk-im-date);
+            opacity: .9;
+        }
+
+        span:first-child:not(:last-child) {
+            display: none;
+        }
+    }
+
+    .crp-entry .crp-entry--message {
+        grid-area: message;
+        position: static;
+        inset: auto;
+        width: auto;
+        height: auto;
         padding: 0;
         min-height: 16px;
+        align-self: center;
         border-radius: 3px;
         box-sizing: border-box;
         overflow: hidden;
     }
 
-    /* Outgoing message the peer hasn't read yet */
-    #im_container:not(.compact) .crp-entry .crp-entry--message.unread {
-        width: auto;
+    .crp-entry .crp-entry--message.unread {
         max-width: 100%;
         padding: 5px 8px;
         background: var(--vk-im-bubble);
         color: var(--muted-text-color-2);
     }
 
-    #im_container:not(.compact) .crp-entry:hover .crp-entry--message.unread,
-    #im_container:not(.compact) .crp-entry.unread .crp-entry--message.unread {
+    .crp-entry:hover .crp-entry--message.unread,
+    .crp-entry.unread .crp-entry--message.unread {
         background: var(--vk-im-bubble-hover);
     }
 
-    #im_container:not(.compact) .crp-entry--message---av {
+    .crp-entry--message---av {
         width: 20px;
         min-width: 20px;
         height: 20px;
         margin-right: 6px;
         border-radius: 50%;
+
+        img {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            border-radius: 50%;
+        }
     }
 
-    #im_container:not(.compact) .crp-entry--message---av img {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-    }
-
-    #im_container:not(.compact) .crp-entry--message---content {
+    .crp-entry--message---content {
         flex-direction: row;
         align-items: center;
         justify-content: flex-start;
     }
 
-    /* "Author:" prefix inline with the text, as in VK's preview */
-    #im_container:not(.compact) .crp-entry--message---author {
+    .crp-entry--message---author {
         flex: 0 1 auto;
         max-width: 45%;
         margin: 0 4px 0 0;
-        font-size: 13px;
+        font-size: var(--crp-fs);
         line-height: 16px;
         font-weight: 400;
         color: var(--vk-im-who);
+
+        &::after {
+            content: ':';
+        }
     }
 
-    #im_container:not(.compact) .crp-entry--message---author::after {
-        content: ':';
-    }
-
-    #im_container:not(.compact) .crp-entry--message---text {
-        font-size: 13px;
+    .crp-entry--message---text {
+        height: auto;
+        margin: 0;
+        align-items: center;
+        font-size: var(--crp-fs);
         line-height: 16px;
         color: var(--muted-text-color-2);
+
+        .conv_prev_attachment_text {
+            color: #4a6f97;
+        }
+
+        .conv_prev_img {
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+        }
     }
 
-    #im_container:not(.compact) .crp-entry:hover .crp-entry--message---text,
-    #im_container:not(.compact) .crp-entry.unread .crp-entry--message---text {
+    .crp-entry:hover .crp-entry--message---text,
+    .crp-entry.unread .crp-entry--message---text {
         color: #4e5966;
     }
 
-    #im_container:not(.compact) .crp-entry--message---text .conv_prev_attachment_text {
-        color: #4a6f97;
-    }
-
-    #im_container:not(.compact) .crp-entry--message---text .conv_prev_img {
-        width: 16px;
-        height: 16px;
-        border-radius: 2px;
-    }
-
-    /* Unread counter badge */
-    #im_container:not(.compact) .crp-entry .unread-msgs-count {
+    .crp-entry .unread-msgs-count {
+        grid-area: badge;
         position: static;
-        grid-column: 3;
-        grid-row: 2;
+        inset: auto;
         align-self: center;
         justify-self: end;
         margin: 0;
@@ -952,20 +974,20 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
         text-align: center;
         -webkit-font-smoothing: subpixel-antialiased;
         -moz-osx-font-smoothing: auto;
+
+        /* Stock renders "+N"; VK shows a bare number. */
+        &::first-letter {
+            font-size: 0;
+        }
     }
 
-    /* Stock renders "+N"; VK shows a bare number. */
-    #im_container:not(.compact) .crp-entry .unread-msgs-count::first-letter {
-        font-size: 0;
-    }
-
-    #im_container:not(.compact) .crp-entry:has(.im-mute-indicator) .unread-msgs-count {
+    .crp-entry:has(.im-mute-indicator) .unread-msgs-count {
         background: var(--vk-im-badge-muted);
     }
+}
 
-    #im_container:not(.compact) .crp-entry:not(.unread) .unread-msgs-count {
-        display: none;
-    }
+body:not(.im_mobile) #im_container.compact .crp-list .crp-entry--message---av {
+    display: none;
 }
 
 /* Create group chat */
@@ -1102,7 +1124,6 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     align-items: baseline;
 }
 
-/* Everything except the name/time line takes a full row. */
 .messenger-app--messages---message ._content>*:not(._sender):not(.msg-header-right) {
     flex: 0 0 100%;
     max-width: 100%;
@@ -1178,7 +1199,6 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     display: none !important;
 }
 
-/* Time sits right after the name, VK-style; follow-ups pin it to the corner. */
 .messenger-app--messages---message .msg-header-right {
     order: -1;
     display: inline-flex;
@@ -1278,8 +1298,6 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     border-bottom-right-radius: 4px;
 }
 
-/* Classic: unread messages form an inset block (VK .im-mess_unread) that
-   doesn't span the whole column; the checkbox sits in the gutter outside it. */
 #im_container:not(.compact) .messenger-app--messages---message.unread:not(.msg-selected):not(.msg-editing-this) {
     margin-left: 23px;
     margin-right: 23px;
@@ -2734,36 +2752,6 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
 
 .compact .crp-list {
     border-top: 1px solid var(--border-color);
-}
-
-.compact .im_page .crp-entry--message---av {
-    display: none;
-}
-
-.compact .im_page .crp-entry--main {
-    width: 100%;
-}
-
-.compact .im_page .crp-entry--main .crp-entry--info {
-    anchor-name: --crp-entry;
-    position: relative;
-}
-
-#im_container.compact .crp-list .crp-entry .crp-entry--message {
-    position: absolute;
-    left: 75px;
-    top: 25px;
-    width: 222px;
-    height: 24px;
-    overflow-y: hidden;
-    display: flex;
-    align-items: center;
-    padding-block: 0;
-}
-
-#im_container.compact .crp-entry--info {
-    width: 160px;
-    margin-bottom: 20px;
 }
 
 /* ==========================================================================
