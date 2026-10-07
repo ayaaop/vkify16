@@ -1,4 +1,4 @@
-import { imImport, fallbackReplySnippet, fallbackEmojiHex, fallbackRecentSmiles, fallbackRecentSmileClick, fallbackPeerAvatar, ensureVideoPreviews, syncBodyNoScroll, isCompactMode } from './shared.js';
+import { imImport, waitForStockIm, fallbackReplySnippet, fallbackEmojiHex, fallbackRecentSmiles, fallbackRecentSmileClick, fallbackPeerAvatar, ensureVideoPreviews, syncBodyNoScroll, isCompactMode } from './shared.js';
 import { isMobileViewport } from './mobile-mode.js';
 import { createPeerInfoView } from './components/peer-info-view.js';
 import { createPinnedMessageBar } from './components/pinned-message-bar.js';
@@ -27,6 +27,8 @@ export async function installMessengerRenderer() {
     }
     installed = true;
 
+    await waitForStockIm();
+
     const moduleUrls = [
         './pages/messenger.js',
         './components/message.js',
@@ -34,14 +36,16 @@ export async function installMessengerRenderer() {
         './components/render.js',
         '../node_modules/preact/dist/preact.mjs',
     ];
-    const results = await Promise.allSettled(moduleUrls.map((u) => imImport(u)));
-    const [messengerPagesMod, messageMod, commonMod, renderMod, preactMod] = results.map((r, i) => {
-        if (r.status === 'rejected') {
-            console.error('vkify16 | Failed to load', moduleUrls[i], ':', r.reason && r.reason.message, r.reason);
-            return null;
+    const loaded = [];
+    for (const u of moduleUrls) {
+        try {
+            loaded.push(await imImport(u));
+        } catch (e) {
+            console.error('vkify16 | Failed to load', u, ':', e && e.message, e);
+            loaded.push(null);
         }
-        return r.value;
-    });
+    }
+    const [messengerPagesMod, messageMod, commonMod, renderMod, preactMod] = loaded;
 
     const { MessengerPage } = messengerPagesMod || {};
     const { MessageListView } = messageMod || {};
@@ -240,10 +244,7 @@ export async function installMessengerRenderer() {
 
         render(chatPage, container);
 
-        // New upstream scroll model (4c462220): the pill/observer/underflow
-        // helpers live on the page instance. Mirror showHook/render side
-        // effects so the mountain pill, read receipts and underflow fill keep
-        // working; every call is guarded for older upstream.
+        // Mirror upstream showHook/render side effects; guarded for older upstream.
         try {
             if (typeof this.updateMountainButton === 'function') this.updateMountainButton();
         } catch (e) {
@@ -275,11 +276,8 @@ export async function installMessengerRenderer() {
             console.error('vkify16 | _updPadding failed:', e);
         }
 
-        // Classic rail: refresh peer tabs when they actually change. The
-        // messenger re-renders on every keystroke/LongPoll tick, so compare a
-        // signature of opened_tabs+currentChatId and only re-render the bar
-        // on a real change. updateTabs only re-renders the tab bar — no
-        // recursion into here.
+        // Re-render peer tabs only when opened_tabs/currentChatId change;
+        // updateTabs doesn't recurse into this render.
         try {
             if (currentConv && !isCompactMode(window.im) && typeof window.im?.updateTabs === 'function') {
                 const sig = peerTabsSignature(orig_messenger);
@@ -310,11 +308,7 @@ export async function installMessengerRenderer() {
 
     const origTogglePeerInfo = MessengerPage.prototype.togglePeerInfo;
 
-    // Upstream 5796d6fa moved the toggle logic inside `if (false)`, leaving
-    // the method a no-op: header/author clicks and the contact page's own
-    // "back" button no longer open/close the peer tab. Restore the toggle
-    // here, keeping upstream's new close() of the contact tab on the way
-    // back (IMTab.close() now also drops the container and re-renders tabs).
+    // Upstream 5796d6fa no-oped togglePeerInfo; restore the open/close toggle.
     MessengerPage.prototype.togglePeerInfo = async function vkifyTogglePeerInfo(sender = null) {
         const messenger = window.im?.messenger;
         if (!messenger || messenger.is_switching === true) {

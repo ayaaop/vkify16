@@ -15,22 +15,39 @@ export function isCompactMode(im) {
 }
 
 export function imImport(relUrl) {
-    // Plain (query-less) URLs so we land on the same module instances as
-    // upstream: its internal es6import_Im() resolves relative to import.meta
-    // (query is dropped), and the chandler {script}/{script_module} ?mod=
-    // cache-buster would otherwise give us a second copy of every module
-    // (notably preact.mjs's shared `options`). Patching a copy's prototype
-    // leaves the live upstream classes untouched, i.e. stock renders.
+    // Query-less URLs so we share upstream's module instances (its ?mod=
+    // cache-buster would give us a second copy; patching a copy does nothing).
     const base = new URL('/assets/packages/static/openvk/js/messages/', location.href);
     return import(String(new URL(relUrl, base)));
 }
 
+// Safari resolves concurrent import() of a top-level-await module early/rejected
+// (WebKit bug 242740), so no stock module may be imported before im.js finishes.
+export function waitForStockIm() {
+    return new Promise((resolve) => {
+        if (window.im_class != null) {
+            resolve(window.im_class);
+            return;
+        }
+        let value;
+        Object.defineProperty(window, 'im_class', {
+            configurable: true,
+            enumerable: true,
+            get() {
+                return value;
+            },
+            set(v) {
+                Object.defineProperty(window, 'im_class', { value: v, writable: true, configurable: true, enumerable: true });
+                resolve(v);
+            },
+        });
+    });
+}
+
 export const BANNER_HIDE_FLAG = 'tw.im.hide_new_interface_banner';
 
-// Restores the old upstream behaviour (dropped when upstream moved to an
-// internally-scrolling chat): `no-scroll` is present on <body> exactly while
-// a chat page (history + input visible) is open, and removed the moment the
-// user leaves it. Idempotent; safe to call from every render path.
+// Keeps `no-scroll` on <body> exactly while a chat page is open (upstream
+// dropped this); idempotent, safe to call from any render path.
 export function syncBodyNoScroll() {
     try {
         const im = (typeof window !== 'undefined') ? window.im : null;
@@ -163,13 +180,8 @@ export function ensureVideoPreviews(dayDividedChunks) {
     }
 }
 
-// Upstream month_day_string() feeds window.openvk.locale (a PHP-style locale
-// like "en_US.UTF-8") straight into toLocaleDateString whenever the active
-// locale has no day_template string - which is every locale except ru -
-// throwing RangeError and taking the whole messenger render down with it.
-// Reimplement the day-divider label on top of Intl directly: localized
-// "12 September" / "12 September 2020" in every language, correct month case
-// and order for free, and no dependence on tr keys upstream may not ship.
+// Upstream month_day_string() throws on PHP-style locales like "en_US.UTF-8"
+// and takes the render down; reimplement the day divider via Intl instead.
 export function patchMonthDayString() {
     const toBcp47 = (raw) => {
         const tag = String(raw || '').split(';')[0].split('.')[0].split('@')[0].replace(/_/g, '-');

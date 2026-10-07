@@ -13,14 +13,13 @@
     function loadPage() {
         const n_url = new URL(location.href);
 
-        if (window.im_class == null) {
+        if (window.im_class == null || window.vkifyImReady !== true) {
             const o_url = new URL(location.href);
             return setTimeout(() => {
-                console.log("IM | Delay init")
                 if (o_url.href == n_url.href) {
                     this.loadPage();
                 }
-            }, 1000);
+            }, 200);
         }
 
         if (!document.querySelector('.page_content #im_container')) {

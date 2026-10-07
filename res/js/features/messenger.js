@@ -33,7 +33,11 @@ function resetScrollIfEnteredIm() {
 window.vkify?.onPageLifecycle?.('afterPageReady', resetScrollIfEnteredIm);
 
 vkify.once('imHeader', async function () {
-    await installMessengerRenderer();
+    try {
+        await installMessengerRenderer();
+    } finally {
+        window.vkifyImReady = true;
+    }
 
     let attempts = 0;
     const reRenderIfNeeded = () => {

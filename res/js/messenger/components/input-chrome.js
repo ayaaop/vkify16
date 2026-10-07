@@ -78,11 +78,8 @@ export function createInputChrome({ html, tr, getReplySnippet }) {
 
     function inputEndClass({ editMsg, replyTo, forwarded_msg }) {
         const isForwarded = forwarded_msg && forwarded_msg.length && forwarded_msg.length > 0;
-        // NOTE: no m-mountain/m-mountain-fatal here. Upstream 4c462220 drives
-        // the scroll-to-end pill solely via updateMountainButton(), which adds
-        // and REMOVES m-mountain as the viewport moves. Emitting mountain
-        // classes from the class list (true whenever a scroll position exists)
-        // pins the pill visible forever, since nothing ever removes them.
+        // No m-mountain here: updateMountainButton() toggles it, and emitting it
+        // from the class list would pin the scroll pill visible forever.
         return [
             "messenger-app-end",
             (replyTo || editMsg || isForwarded) ? 'm-selected' : '',
