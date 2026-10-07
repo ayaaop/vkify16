@@ -69,7 +69,7 @@
             style="resize: none;"
             placeholder="{ifset $placeholder}{$placeholder}{else}{_write}{/ifset}"
         ></textarea>
-        <div class="emoji_picker_entrypoint emoji_smile" role="button">
+        <div class="emoji_picker_entrypoint emoji_smile" role="button" n:attr="data-stickers => $isPostComposer ? '0' : null">
             <div class="emoji_smile_icon_vector emoji_smile_icon"></div>
         </div>
 
