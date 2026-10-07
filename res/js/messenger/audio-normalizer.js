@@ -1,7 +1,5 @@
 // Normalizes upstream IM audio-track markup to the site player structure so
 // music-popup.js/stylesheet.css work on it (see .devin/adapting_messages.md).
-// The MutationObserver re-applies after Preact re-renders; normalizeTrack
-// early-outs on a healthy track so the observer can't loop on itself.
 
 function normalizeTrack(track) {
     let rail = track.querySelector(':scope > .selectableTrackRail');

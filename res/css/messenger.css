@@ -505,6 +505,7 @@ body.vkify-force-classic label:has(> input#im\.modern_mode) {
 
 .messages--actions>div .message-tab {
     margin-left: 6px;
+    border: 0!important;
 }
 
 /* ==========================================================================

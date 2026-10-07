@@ -14,11 +14,8 @@ export async function installClassicTabBar({ html, render, commonMod }) {
         return;
     }
 
-    // Never import im.js ourselves: upstream loads that entry with ?mod=
-    // while its internal imports are query-less, so a query-less import
-    // would evaluate a SECOND copy (double window.im_class assignment and
-    // double auto-init) and our prototype patch could land on the dead one.
-    // Take the class from the live instance / published reference instead.
+    // Importing im.js here would evaluate a second copy (upstream loads it
+    // with a ?mod= query); take the class from the live instance instead.
     let ImClass = (window.im && window.im.constructor) || window.im_class;
     if (!ImClass || !ImClass.prototype || typeof ImClass.prototype._renderTabBar !== 'function') {
         ImClass = await new Promise((resolve) => {
@@ -101,8 +98,7 @@ export async function installClassicTabBar({ html, render, commonMod }) {
                 }
             }
         } catch (e) {
-            // Peer tabs are decorative: never let them take down the whole
-            // tab bar (which would fall back to stock entirely).
+            // Peer tabs are decorative; don't let them take down the tab bar.
             console.error('vkify16 | peer tabs failed, continuing without them:', e);
             peerTabs = null;
         }
@@ -130,9 +126,8 @@ export async function installClassicTabBar({ html, render, commonMod }) {
         if (MessagesNewInterfaceBanner && t === MessagesNewInterfaceBanner) {
             return true;
         }
-        // Fall back to the component name: survives a dual module instance
-        // (e.g. stale HTTP cache serving different copies of common.js),
-        // where identity comparison fails but the banner must still go.
+        // Component-name fallback for a dual common.js instance, where the
+        // identity check above fails but the banner must still go.
         if (typeof t === 'function' && t.name === 'MessagesNewInterfaceBanner') {
             return true;
         }
