@@ -1239,13 +1239,20 @@ body #im_container.compact .crp-list .crp-entry--message---av {
 .messenger-app--tab-friends .friends-list-top {
     width: var(--messenger-width);
     box-sizing: border-box;
-    padding: 15px;
+    padding: 15px!important;
+}
+
+.messenger-app--tab-friends .friends-list-side {
+    border: 0;
 }
 
 .messenger-app--tab-friends .friends-list-top:has(.search_input) {
-    padding: 0;
     border-top: 1px solid var(--border-color);
     border-bottom: 1px solid var(--border-color)
+}
+
+.messenger-app--tab-friends .friends-list-top .search_input {
+    margin: -15px;
 }
 
 .messenger-app--tab-friends .friends-list .friends-list-item img {
