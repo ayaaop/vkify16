@@ -2028,7 +2028,7 @@
         background-position: 0px -68px;
     }
 
-    .audiosSideContainer .scroll_node:not(:last-child) .audioEmbed {
+    .audiosSideContainer .scroll_node:not(:last-child) .audioEmbed,.AudioPlaylistSnippet__audioRow:not(:last-child),.AudioPlaylistSnippet .ActionButton--shuffle {
         margin-bottom: 10px;
     }
     .musfooter {
