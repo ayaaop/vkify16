@@ -51,7 +51,7 @@ export async function installMessengerRenderer() {
 
     const { MessengerPage } = messengerPagesMod || {};
     const { MessageListView } = messageMod || {};
-    const { ActionsBar, ErrorConversation, MentionAutocomplete } = commonMod || {};
+    const { ErrorConversation, MentionAutocomplete } = commonMod || {};
     const {
         PeerAvatar: UpstreamPeerAvatar,
         getReplySnippet: upstreamReplySnippet,
@@ -62,7 +62,7 @@ export async function installMessengerRenderer() {
     const { html, render } = renderMod || {};
     const { h, Fragment } = preactMod || {};
 
-    if (!MessengerPage || !MessageListView || !ActionsBar || !ErrorConversation || !html || !render || !h || !Fragment) {
+    if (!MessengerPage || !MessageListView || !ErrorConversation || !html || !render || !h || !Fragment) {
         console.error('vkify16 | messenger renderer aborted: module exports missing', {
             messengerPagesMod, messageMod, commonMod, renderMod, preactMod,
         });
@@ -85,7 +85,7 @@ export async function installMessengerRenderer() {
     const StockInputArea = createStockInputArea({ html, tr, getDisplayRecentSmiles, onRecentSmileClick, getEmojiHex, getReplySnippet, PeerAvatar, MentionAutocomplete });
     const PeerInfoView = createPeerInfoView({ html, tr });
     const PinnedMessageBar = createPinnedMessageBar({ html, tr });
-    const VkActionsBar = createActionsBar({ ActionsBar });
+    const VkActionsBar = createActionsBar({ html, tr });
 
     const use2018 = window.vkify ? window.vkify.getSetting('mode2018') : false;
     const InputAreaComponent = (use2018 || isMobileViewport()) ? VkInputArea : StockInputArea;

@@ -429,6 +429,109 @@ body.vkify-force-classic label:has(> input#im\.modern_mode) {
     width: var(--messenger-width);
 }
 
+/* VK modern (.im-page--chat-header): 48px, single-line left-aligned
+   title (name + inline meta), no back button — the tab rail navigates. */
+body:not(.im_mobile) #im_container.compact .messenger-app--header.messages--peers-header-peer-name {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    min-height: 0;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+body:not(.im_mobile) #im_container.compact .messenger-app--header--back {
+    display: none;
+}
+
+body:not(.im_mobile) #im_container.compact .messenger-app--header--info {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: baseline;
+    text-align: left;
+}
+
+body:not(.im_mobile) #im_container.compact .messenger-app--header--info .messenger-app--header--name,
+body:not(.im_mobile) #im_container.compact .messenger-app--header--info .messenger-app--header--online {
+    display: inline-block;
+    width: auto;
+}
+
+body:not(.im_mobile) #im_container.compact .messenger-app--header--info .messenger-app--header--name {
+    flex: 0 1 auto;
+    min-width: 0;
+    font-size: 14px;
+}
+
+body:not(.im_mobile) #im_container.compact .messenger-app--header--info .messenger-app--header--online {
+    flex: 0 0 auto;
+    margin-left: 8px;
+}
+
+body:not(.im_mobile) #im_container.compact .messenger-app-header--actions {
+    position: static;
+    flex: 0 0 auto;
+    width: auto;
+    height: 48px;
+    gap: 0;
+    padding-right: 0;
+    margin-left: 15px;
+}
+
+body:not(.im_mobile) #im_container.compact .messenger-app-header--more-actions--trigger {
+    width: 40px;
+}
+
+/* VK .im-page-pinned typography is shared between modes: 35px content +
+   16px padding = 51px total, 12.5px bold blue title, 13px preview,
+   24px close button. Classic only differs in the gutter (.at_page rule). */
+body:not(.im_mobile) #im_container .messenger-pinned-bar {
+    height: 51px;
+    font-size: 12.5px;
+    line-height: 17px;
+}
+
+body:not(.im_mobile) #im_container .messenger-pinned-bar--title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--link-color);
+}
+
+body:not(.im_mobile) #im_container .messenger-pinned-bar--text {
+    font-size: 13px;
+}
+
+body:not(.im_mobile) #im_container .messenger-pinned-bar--text b {
+    font-weight: 700;
+    color: var(--link-color);
+}
+
+body:not(.im_mobile) #im_container .messenger-pinned-bar--close {
+    width: 24px;
+    height: 24px;
+    margin: 6px;
+    opacity: .7;
+}
+
+body:not(.im_mobile) #im_container .messenger-pinned-bar--close:hover {
+    opacity: 1;
+}
+
+/* VK modern .im-page--mess-actions lives inside the 48px header;
+   counter is left-aligned with 500 weight, actions right. */
+body:not(.im_mobile) #im_container.compact .messages--actions {
+    height: 48px;
+    padding: 0 12px 0 20px;
+}
+
+body:not(.im_mobile) #im_container.compact .messages--actions .message-tab.message-tab-counter a {
+    font-weight: 500;
+}
+
 /* Message selection actions */
 .messages--actions,
 #im_container.compact .messages--actions {
@@ -518,6 +621,7 @@ body:not(.im_mobile) .messages--actions {
     border-bottom: 1px solid var(--vk-im-divider);
     font-size: 13px;
     line-height: 18px;
+    z-index: 12;
 }
 
 body:not(.im_mobile) .messages--actions>div {
@@ -556,7 +660,9 @@ body:not(.im_mobile) .messages--actions .message-tab.message-tab-counter a:hover
 
 body:not(.im_mobile) .messages--actions .message-tab--delete a,
 body:not(.im_mobile) .messages--actions .message-tab--pin a,
-body:not(.im_mobile) .messages--actions .message-tab--unpin a {
+body:not(.im_mobile) .messages--actions .message-tab--unpin a,
+body:not(.im_mobile) .messages--actions .message-tab--report a,
+body:not(.im_mobile) .messages--actions .message-tab--viewers a {
     display: block;
     width: 36px;
     min-height: 0;
@@ -575,7 +681,9 @@ body:not(.im_mobile) .messages--actions .message-tab--unpin a {
 
 body:not(.im_mobile) .messages--actions .message-tab--delete a:hover,
 body:not(.im_mobile) .messages--actions .message-tab--pin a:hover,
-body:not(.im_mobile) .messages--actions .message-tab--unpin a:hover {
+body:not(.im_mobile) .messages--actions .message-tab--unpin a:hover,
+body:not(.im_mobile) .messages--actions .message-tab--report a:hover,
+body:not(.im_mobile) .messages--actions .message-tab--viewers a:hover {
     background-color: transparent;
     opacity: 1;
 }
@@ -593,20 +701,12 @@ body:not(.im_mobile) .messages--actions .message-tab--unpin a {
     opacity: 1;
 }
 
-body:not(.im_mobile) .messages--actions .message-tab--extra a {
-    min-height: 0;
-    padding: 0 8px;
-    background: none;
-    color: var(--link-color);
-    font-size: 13px;
-    line-height: 18px;
-    cursor: pointer;
+body:not(.im_mobile) .messages--actions .message-tab--report a {
+    background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23828A99%22%20d%3D%22M4.6%2012.9c.9.7%202.1%201.1%203.4%201.1%203.3%200%206-2.7%206-6%200-1.3-.4-2.5-1.1-3.4l-8.3%208.3zm-1.5-1.5l8.4-8.4c-1-.6-2.2-1-3.5-1-3.3%200-6%202.7-6%206%200%201.3.4%202.5%201.1%203.4zm4.9%204.6c-4.4%200-8-3.6-8-8s3.6-8%208-8%208%203.6%208%208-3.6%208-8%208z%22%2F%3E%3C%2Fsvg%3E');
 }
 
-body:not(.im_mobile) .messages--actions .message-tab--extra a:hover {
-    background: none;
-    color: var(--link-color);
-    text-decoration: underline;
+body:not(.im_mobile) .messages--actions .message-tab--viewers a {
+    background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2210%22%20viewBox%3D%221%202%2014%2010%22%3E%3Cpath%20fill%3D%22%23828A99%22%20d%3D%22M8%2012C3.8%2012%201%208%201%207%201%206%203.8%202%208%202%2012.2%202%2015%206%2015%207%2015%208%2012.2%2012%208%2012ZM8%2010.5C9.9%2010.5%2011.5%208.9%2011.5%207%2011.5%205.1%209.9%203.5%208%203.5%206.1%203.5%204.5%205.1%204.5%207%204.5%208.9%206.1%2010.5%208%2010.5ZM8%208.6C7.1%208.6%206.4%207.9%206.4%207%206.4%206.1%207.1%205.4%208%205.4%208.9%205.4%209.6%206.1%209.6%207%209.6%207.9%208.9%208.6%208%208.6Z%22%2F%3E%3C%2Fsvg%3E');
 }
 
 body:not(.im_mobile) .messages--actions .message-tab--reply a,
