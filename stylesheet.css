@@ -2256,7 +2256,7 @@ table,
 }
 #_addAudioAdditional #_content {
     margin-top: 0;
-    padding: 0;
+    padding-top: 0!important;
 }
 
 /* graffiti */
@@ -5148,4 +5148,5 @@ body.banned {
 
 .sticker-picker-item:hover {
     transform: none;
+    background: var(--module-header-background-color)
 }

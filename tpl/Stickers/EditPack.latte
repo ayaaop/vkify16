@@ -139,11 +139,9 @@
                             </div>
                         </form>
                     </div>
-                    <div class="page_block_footer">
-                        {if !$isNew}
-                            {_you_can_also}
-                            <a onclick="confirmDeletePack(document.getElementById('packForm'));">{_stickers_delete_pack|lower}</a>.
-                        {/if}
+                    <div n:if="!$isNew" class="page_block_footer">
+                        {_you_can_also}
+                        <a onclick="confirmDeletePack(document.getElementById('packForm'));">{_stickers_delete_pack|lower}</a>.
                     </div>
                 </div>
                 <script>
