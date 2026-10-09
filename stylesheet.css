@@ -2835,7 +2835,7 @@ table,
     margin: 0;
     float: left;
     opacity: 0.35;
-    color: var(--post-action-color);
+    color: var(--accent-color);
 }
 .action_icon use.i18 {
     display: none;
