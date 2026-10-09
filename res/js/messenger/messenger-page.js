@@ -119,6 +119,25 @@ export async function installMessengerRenderer() {
     await installClassicTabBar({ html, render, commonMod });
     await installConversationsRenderer({ html, render, h, Fragment, commonMod });
 
+    // Upstream selectTab() logs a TypeError on the first tab selection because
+    // getSelectedTab() is null until selectedTabId is set a few lines below.
+    // Shadow the method for the duration of the call so the diagnostic oldId
+    // read stays silent without patching upstream sources.
+    const ImClass = window.im_class || (window.im && window.im.constructor);
+    if (ImClass && ImClass.prototype && typeof ImClass.prototype.selectTab === 'function') {
+        const emptyTab = { getId: () => 0, getPageId: () => null };
+        const origSelectTab = ImClass.prototype.selectTab;
+        ImClass.prototype.selectTab = function vkifySelectTab(tab) {
+            const getSelected = this.getSelectedTab;
+            this.getSelectedTab = () => getSelected.call(this) || emptyTab;
+            try {
+                return origSelectTab.call(this, tab);
+            } finally {
+                delete this.getSelectedTab;
+            }
+        };
+    }
+
     MessengerPage.prototype.render = async function vkifyMessengerPageRender(container, options = {}, messenger = null) {
         if (!container) {
             console.error('vkify16 | MessengerPage.render called without container');
