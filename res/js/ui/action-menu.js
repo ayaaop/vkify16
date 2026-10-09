@@ -112,6 +112,11 @@ vkify.once('uiActionsMenu', function () {
     return null;
   }
 
+  function appendParentEl(cls, el) {
+    if (cls === 'body') return document.body;
+    return domClosest(cls, el);
+  }
+
   function ensureMenu(el, menuId) {
     let menu = geByClass1('ui_actions_menu', el);
     if (!menu && menuId) {
@@ -195,7 +200,7 @@ vkify.once('uiActionsMenu', function () {
   function positionDummyMenu(dummyWrap) {
     const origEl = data(dummyWrap, 'origMenu');
     const menu = geByClass1('ui_actions_menu', dummyWrap);
-    const appendEl = domClosest(data(dummyWrap, 'appendParentCls'), menu);
+    const appendEl = appendParentEl(data(dummyWrap, 'appendParentCls'), menu);
     if (!menu || !appendEl || !origEl) return;
 
     menu.style.display = 'block';
@@ -441,6 +446,15 @@ vkify.once('uiActionsMenu', function () {
     show(el, ev, options = {}) {
       if (window.isMobile && window.isMobile()) return;
 
+      // A portaled dummy outlives its source wrap (it's appended to an
+      // ancestor outside the page container). If the source is gone the
+      // dummy is just an invisible hover target — drop it.
+      const origSource = data(el, 'origMenu');
+      if (origSource && !origSource.isConnected) {
+        el.remove();
+        return;
+      }
+
       // cancel any pending hide
       let ht = data(el, 'hidetimer');
       if (ht) {
@@ -485,7 +499,7 @@ vkify.once('uiActionsMenu', function () {
           // already portaled (e.g. hover re-entry on the dummy itself):
           // keep el so it only gets repositioned below.
         } else if (menu) {
-          const appendEl = domClosest(options.appendParentCls, menu);
+          const appendEl = appendParentEl(options.appendParentCls, menu);
           const menuWrap = domClosest('ui_actions_menu_wrap', el);
           const newWrap = se(
             `<div class="${menuWrap ? menuWrap.className : 'ui_actions_menu_wrap'} ui_actions_menu_dummy_wrap"
@@ -623,4 +637,14 @@ vkify.once('uiActionsMenu', function () {
       }
     });
   }, true);
+
+  // Portaled dummies outlive the swapped containers (body-appended ones
+  // especially); drop them on navigation so detached menus don't pile up.
+  vkify.onPageLifecycle?.('beforePageLeave', () => {
+    document.querySelectorAll('.ui_actions_menu_dummy_wrap').forEach(dummy => {
+      const orig = data(dummy, 'origMenu');
+      if (orig) data(orig, 'dummyMenu', null);
+      dummy.remove();
+    });
+  });
 });

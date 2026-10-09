@@ -384,7 +384,7 @@
                             <div class="left_menu_nav_wrap">
                                 <a href="/club1">{_footer_blog|firstUpper}</a>
                                 <a href="/terms">{_footer_rules|firstUpper}</a>
-                                <div class="ui_actions_menu_wrap" onmouseover="{='uiActionsMenu.show(this, null, {autopos: true});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
+                                <div class="ui_actions_menu_wrap" onmouseover="{='uiActionsMenu.show(this, null, {autopos: true, appendParentCls: \'body\'});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
                                     <a href="javascript:void(0);" id="moreOptionsLink">{=vkifyTr('more')}</a>
                                     <div id="moreOptionsContent" class="ui_actions_menu">
                                         <a href="/about">{_footer_about_instance|firstUpper}</a>
