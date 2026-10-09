@@ -35,6 +35,7 @@ const modules = [
     'ui/search-fasttips.js',
 
     'compat/player-stub.js',
+    'compat/viewer-author-guard.js',
 
     'ui/search.js',
     'ui/music-popup.js',
