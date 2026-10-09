@@ -23,6 +23,31 @@ function logRenderErrorOnce(prefix, e) {
     console.error(prefix, e);
 }
 
+const ATTACHMENT_LOADER_IMG = 'img[src$="loading_mini.gif"]';
+const ATTACHMENT_LOADER_SCOPE = '.messenger-app--messages---message ._content';
+
+// Upstream renders a bare loading_mini.gif while a message's attachments are
+// being lazy-loaded. Hide the img in place (preact owns and removes it on the
+// next diff) and show the LoaderUtils .pr spinner instead. Runs after each
+// render so orphan spinners from upstream removals are cleaned up too.
+function syncAttachmentLoaders(container) {
+    if (!container || !window.LoaderUtils) {
+        return;
+    }
+    container.querySelectorAll(`${ATTACHMENT_LOADER_SCOPE} > ${ATTACHMENT_LOADER_IMG}`).forEach((img) => {
+        img.style.display = 'none';
+        const pr = window.LoaderUtils.show(img.parentElement, { size: 'medium', className: 'vkify-att-loader' });
+        if (pr && pr.length) {
+            pr.addClass('vkify-att-loader');
+        }
+    });
+    container.querySelectorAll(`${ATTACHMENT_LOADER_SCOPE} > .pr.vkify-att-loader`).forEach((pr) => {
+        if (!pr.parentElement.querySelector(`:scope > ${ATTACHMENT_LOADER_IMG}`)) {
+            pr.remove();
+        }
+    });
+}
+
 export async function installMessengerRenderer() {
     if (installed) {
         return;
@@ -247,6 +272,7 @@ export async function installMessengerRenderer() {
         `;
 
         render(chatPage, container);
+        syncAttachmentLoaders(container);
 
         // Mirror upstream showHook/render side effects; guarded for older upstream.
         try {
