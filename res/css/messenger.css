@@ -757,6 +757,7 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-tabs {
     cursor: pointer;
     margin: 0;
     border-radius: 0;
+    gap: 0;
 }
 
 .at_page:not(.compact) .messages--peers-tabs .messages--peers-tab {
@@ -843,6 +844,29 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     line-height: 1.2;
     height: unset;
     color: var(--muted-text-color);
+}
+
+
+.messages--peers-tabs .messages--peers-tab.unread .messages--peers-tab-counter {
+    margin: 0;
+    min-width: 6px;
+    height: 18px;
+    padding: 0 6px;
+    border-radius: 18px;
+    box-sizing: border-box;
+    background: var(--vk-im-badge);
+    color: var(--accent-text-color);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 19px;
+    text-align: center;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+
+    /* Stock renders "+N"; VK shows a bare number. */
+    &::first-letter {
+        font-size: 0;
+    }
 }
 
 .messages--peers-tabs .messages--peers-tab-close .cross {
