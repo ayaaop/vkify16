@@ -153,6 +153,36 @@ vkify.bindOnce('messageBoxOverrides', () => {
                 update();
             };
 
+            // Pins fullscreen dialogs to the visual viewport so bottom-anchored
+            // UI isn't covered by the on-screen keyboard or dynamic browser
+            // chrome on browsers that only shrink the visual viewport
+            // (interactive-widget=resizes-content already covers Chromium).
+            const syncFullscreenToVisualViewport = (el) => {
+                const vv = window.visualViewport;
+                if (!vv || el.__vkifyVvSynced) return;
+                el.__vkifyVvSynced = true;
+                const apply = () => {
+                    if (!el.isConnected) {
+                        vv.removeEventListener('resize', apply);
+                        vv.removeEventListener('scroll', apply);
+                        return;
+                    }
+                    const mobile = typeof window.isMobile === 'function'
+                        ? window.isMobile()
+                        : window.matchMedia('(max-width: 768px)').matches;
+                    if (!mobile) {
+                        el.style.removeProperty('--ovk-vv-height');
+                        el.style.top = '';
+                        return;
+                    }
+                    el.style.setProperty('--ovk-vv-height', vv.height + 'px');
+                    el.style.top = vv.offsetTop + 'px';
+                };
+                vv.addEventListener('resize', apply);
+                vv.addEventListener('scroll', apply);
+                apply();
+            };
+
             enableSheetGestures = (el) => {
                 const diag = el.querySelector('.ovk-diag');
                 const body = el.querySelector('.ovk-diag-body');
@@ -393,6 +423,9 @@ vkify.bindOnce('messageBoxOverrides', () => {
                                 decorateDialog(node);
                                 classifyDialog(node);
                                 watchDialogBodyScroll(node);
+                                if (node.classList.contains('ovk-msg-fullscreen')) {
+                                    syncFullscreenToVisualViewport(node);
+                                }
                                 if (node.classList.contains('ovk-msg-sheet')) {
                                     document.body.classList.add('ovk-sheet-dim');
                                     enableSheetGestures(node);

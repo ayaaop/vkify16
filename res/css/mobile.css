@@ -1241,6 +1241,7 @@
     .ovk-diag-cont.ovk-msg-fullscreen {
         width: 100%!important;
         height: 100%!important;
+        height: var(--ovk-vv-height, 100dvh) !important;
         min-width: 0;
         max-width: none;
         top: 0;
@@ -1386,9 +1387,18 @@
         min-height: 0;
         height: 100%;
     }
+    .ovk-msg-fullscreen #_edit_post_modal .edit-menu-textarea {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+    }
+    /* height:auto important overrides the inline height written by
+       vkifyTextareaAutosize, which caps textareas at 120px on mobile */
     .ovk-msg-fullscreen #_edit_post_modal textarea {
         flex: 1;
-        min-height: 140px;
+        min-height: 0;
+        height: auto !important;
         width: 100%;
         box-sizing: border-box;
         border: none;
@@ -1400,11 +1410,38 @@
         resize: none;
     }
     .ovk-msg-fullscreen #_edit_post_modal .post-buttons {
+        display: flex;
+        flex-direction: column;
+        flex: none;
+        min-height: 0;
+        max-height: 45%;
         margin-top: auto;
+        padding: 0;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-horizontal,
+    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-vertical {
+        flex: 0 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-horizontal:not(:empty),
+    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-vertical:not(:empty) {
         padding: 8px 16px;
     }
+    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-repost,
+    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-source {
+        flex: none;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-repost:not(:empty),
+    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-source:not(:empty) {
+        padding: 4px 16px;
+    }
     .ovk-msg-fullscreen #_edit_post_modal .post-bottom-acts {
-        padding-top: 0;
+        flex: none;
+        margin-top: auto;
+        padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px));
+        border-top: 1px solid var(--border-color);
+        background-color: var(--module-header-background-color);
     }
     .ovk-msg-fullscreen #_edit_post_modal .edit_menu_buttons {
         display: none;

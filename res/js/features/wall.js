@@ -1146,10 +1146,6 @@ function bindPostEditOnce() {
             NewNotification(tr('error'), tr('error_loading_post'), null, () => {}, 4000, false);
         }
         u(editBtn).removeClass('lagged');
-
-        post.addClass('editing');
-        const ta = edit_place.find('textarea').first();
-        if (ta) window.vkifyTextareaAutosize?.apply?.(ta);
     }, true);
 }
 
