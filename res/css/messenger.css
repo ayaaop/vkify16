@@ -2307,6 +2307,40 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     display: block;
 }
 
+/* Shared materials page (#materials-page-im) */
+#materials-page-im .materials-photo-cell,
+#materials-page-im .materials-video-cell,
+#materials-page-im .materials-list-row,
+.msg-media-tile {
+    background: var(--module-header-background-color);
+    border-color: var(--border-color);
+}
+
+#materials-page-im .materials-page-content {
+    padding: 12px 4px;
+}
+
+#materials-page-im .materials-audio-list,
+#materials-page-im .materials-docs-list,
+#materials-page-im .materials-links-list {
+    padding: 0 6px;
+}
+
+#materials-page-im .materials-list-row,
+#materials-page-im .materials-item-sub {
+    font-size: 12.5px;
+    line-height: 17px;
+}
+
+#materials-page-im .materials-item-sub {
+    color: var(--muted-text-color);
+}
+
+#materials-page-im .materials-download-btn {
+    padding: 7px 16px 8px;
+    font-size: 12.5px;
+}
+
 /* ==========================================================================
    Date dividers
    ========================================================================== */
