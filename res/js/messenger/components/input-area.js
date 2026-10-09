@@ -1,10 +1,12 @@
 import { createInputChrome } from './input-chrome.js';
 
 export function createInputArea({ html, tr, AttachmentMenu, getReplySnippet, getEmojiHex, MentionAutocomplete }) {
-    const { ReplyBar, EditBar, ForwardBar, MountainPill, inputEndClass } = createInputChrome({ html, tr, getReplySnippet });
+    const { ReplyBar, EditBar, ForwardBar, MountainPill, CantWriteBar, getCantWriteInfo, inputEndClass } = createInputChrome({ html, tr, getReplySnippet });
     return function InputArea({ editMsg, replyTo, onRemoveReply, onSend, onKeyPress, currentDraft, onInput, togglePeerInfo, clickOnReply, convo, forwarded_msg, onRemoveForward, mentionActive, mentionMatches, mentionSelectedIndex, onApplyMention }) {
         const is_editing = editMsg != null;
         const cls = inputEndClass({ editMsg, replyTo, forwarded_msg, convo });
+        const cantWriteInfo = getCantWriteInfo(convo);
+        const canWrite = cantWriteInfo.allowed !== false;
 
         const hasContentEditable = typeof window !== 'undefined' && window.ContentEditable && typeof window.ContentEditable.isSupported === 'function' && window.ContentEditable.isSupported();
 
@@ -46,10 +48,15 @@ export function createInputArea({ html, tr, AttachmentMenu, getReplySnippet, get
 
         return html`
         <div class="${cls}">
-            <${ReplyBar} replyTo=${replyTo} onRemoveReply=${onRemoveReply} clickOnReply=${clickOnReply} />
-            <${EditBar} editMsg=${editMsg} clickOnReply=${clickOnReply} />
-            <${ForwardBar} forwarded_msg=${forwarded_msg} onRemoveForward=${onRemoveForward} />
+            ${canWrite ? html`
+                <${ReplyBar} replyTo=${replyTo} onRemoveReply=${onRemoveReply} clickOnReply=${clickOnReply} />
+                <${EditBar} editMsg=${editMsg} clickOnReply=${clickOnReply} />
+                <${ForwardBar} forwarded_msg=${forwarded_msg} onRemoveForward=${onRemoveForward} />
+            ` : ''}
             <${MountainPill} convo=${convo} />
+            ${!canWrite ? html`
+                <${CantWriteBar} info=${cantWriteInfo} />
+            ` : html`
             <div class="im-chat-input clear_fix im-chat-input_classic ${is_editing ? 'is_msg_editing' : ''}" id="write">
                 <div class="im-chat-input--textarea messenger-app--input---messagebox">
                     ${MentionAutocomplete && mentionActive && mentionMatches && mentionMatches.length > 0 ? html`
@@ -91,6 +98,7 @@ export function createInputArea({ html, tr, AttachmentMenu, getReplySnippet, get
                     </div>
                 </div>
             </div>
+            `}
         </div>
       `;
     };

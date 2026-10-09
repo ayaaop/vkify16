@@ -3088,25 +3088,65 @@ body:not(.im_mobile) #im_container.compact .crp-list .crp-entry--message---av {
     margin-left: 5px;
 }
 
-/* "Can't write" bars */
-.im-cant-write-container,
-.im-cant-write-text,
-.fc_cant_write_bar,
-.fc_cant_write_text {
-    font-size: 12.5px;
-    color: var(--muted-text-color);
-    background: var(--module-background-color--secondary);
-    border-top: 1px solid var(--border-color-2);
+/* "Can't write" bars — styled after VK's .im-chat-input_error state:
+   a muted strip with an alert icon on the left and vertically centered text. */
+.im-cant-write-container {
+    position: relative;
+    background: var(--module-header-background-color);
+    border-top: 1px solid var(--border-color);
 }
 
-.im-cant-write-container,
+.messenger-app--cant-write {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    box-sizing: border-box;
+    min-height: 80px;
+    padding: 15px 36px 15px 82px;
+    border: 0;
+}
+
+.messenger-app--cant-write::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 36px;
+    width: 36px;
+    height: 36px;
+    margin-top: -18px;
+    background: url(../icons/alert.svg) 50% / 36px 36px no-repeat;
+}
+
 .im-cant-write-text {
-    padding: 10px 15px;
+    color: var(--text-color);
+    font-size: 13px;
+    line-height: 19px;
+    text-align: left;
 }
 
-.fc_cant_write_bar,
+.fc_cant_write_bar {
+    position: relative;
+    justify-content: flex-start;
+    background: var(--module-header-background-color);
+    border-top: 1px solid var(--border-color);
+    padding: 8px 14px 8px 46px;
+}
+
+.fc_cant_write_bar::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+    background: url(../icons/alert.svg) 50% / 20px 20px no-repeat;
+}
+
 .fc_cant_write_text {
-    padding: 8px 12px;
+    color: var(--text-color);
+    text-align: left;
 }
 
 /* ==========================================================================

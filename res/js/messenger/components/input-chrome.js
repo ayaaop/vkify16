@@ -76,15 +76,40 @@ export function createInputChrome({ html, tr, getReplySnippet }) {
         `;
     }
 
-    function inputEndClass({ editMsg, replyTo, forwarded_msg }) {
+    function getCantWriteInfo(convo) {
+        if (convo && typeof convo.getCantWriteInfo === 'function') {
+            return convo.getCantWriteInfo();
+        }
+        if (convo && convo.peer && typeof convo.peer.getCantWriteInfo === 'function') {
+            return convo.peer.getCantWriteInfo();
+        }
+        const current = window.im?.state?.getCurrentConvo?.();
+        if (current && typeof current.getCantWriteInfo === 'function') {
+            return current.getCantWriteInfo();
+        }
+        return { allowed: true, text: "" };
+    }
+
+    function CantWriteBar({ info }) {
+        return html`
+            <div class="post-buttons im-cant-write-container">
+                <div class="messenger-app--cant-write">
+                    <div class="im-cant-write-text">${(info && info.text) || tr('cannot_write_default')}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    function inputEndClass({ editMsg, replyTo, forwarded_msg, convo }) {
         const isForwarded = forwarded_msg && forwarded_msg.length && forwarded_msg.length > 0;
+        const canWrite = getCantWriteInfo(convo).allowed !== false;
         // No m-mountain here: updateMountainButton() toggles it, and emitting it
         // from the class list would pin the scroll pill visible forever.
         return [
             "messenger-app-end",
-            (replyTo || editMsg || isForwarded) ? 'm-selected' : '',
+            (canWrite && (replyTo || editMsg || isForwarded)) ? 'm-selected' : '',
         ].join(" ");
     }
 
-    return { ReplyBar, EditBar, ForwardBar, MountainPill, inputEndClass };
+    return { ReplyBar, EditBar, ForwardBar, MountainPill, CantWriteBar, getCantWriteInfo, inputEndClass };
 }

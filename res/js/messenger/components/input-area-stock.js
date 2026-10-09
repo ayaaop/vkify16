@@ -3,7 +3,7 @@ import { createInputChrome } from './input-chrome.js';
 
 export function createStockInputArea({ html, tr, getDisplayRecentSmiles, onRecentSmileClick, getEmojiHex, getReplySnippet, PeerAvatar, MentionAutocomplete }) {
     const StockAttachmentMenu = createStockAttachmentMenu({ html, tr });
-    const { ReplyBar, EditBar, ForwardBar, MountainPill, inputEndClass } = createInputChrome({ html, tr, getReplySnippet });
+    const { ReplyBar, EditBar, ForwardBar, MountainPill, CantWriteBar, getCantWriteInfo, inputEndClass } = createInputChrome({ html, tr, getReplySnippet });
 
     return function StockInputArea({ editMsg, replyTo, onRemoveReply, onSend, onKeyPress, currentDraft, onInput, togglePeerInfo, clickOnReply, convo, forwarded_msg, onRemoveForward, mentionActive, mentionMatches, mentionSelectedIndex, onApplyMention }) {
         const is_editing = editMsg != null;
@@ -11,13 +11,20 @@ export function createStockInputArea({ html, tr, getDisplayRecentSmiles, onRecen
         const corresponder = window.im.state.getCurrentConvo();
         const recentSmiles = getDisplayRecentSmiles();
         const cls = inputEndClass({ editMsg, replyTo, forwarded_msg, convo }) + " stock-input-bar";
+        const cantWriteInfo = getCantWriteInfo(convo);
+        const canWrite = cantWriteInfo.allowed !== false;
 
         return html`
         <div class="${cls}">
-            <${ReplyBar} replyTo=${replyTo} onRemoveReply=${onRemoveReply} clickOnReply=${clickOnReply} />
-            <${EditBar} editMsg=${editMsg} clickOnReply=${clickOnReply} />
-            <${ForwardBar} forwarded_msg=${forwarded_msg} onRemoveForward=${onRemoveForward} />
+            ${canWrite ? html`
+                <${ReplyBar} replyTo=${replyTo} onRemoveReply=${onRemoveReply} clickOnReply=${clickOnReply} />
+                <${EditBar} editMsg=${editMsg} clickOnReply=${clickOnReply} />
+                <${ForwardBar} forwarded_msg=${forwarded_msg} onRemoveForward=${onRemoveForward} />
+            ` : ''}
             <${MountainPill} convo=${convo} />
+            ${!canWrite ? html`
+                <${CantWriteBar} info=${cantWriteInfo} />
+            ` : html`
             <div class="post-buttons">
                 <div class="model_content_textarea messenger-app--input has_emoji_picker expanded-textarea" id="write">
                     <img class="ava" src=${current_user.getAvatar("mid", false)} alt=${current_user.getName()} />
@@ -98,6 +105,7 @@ export function createStockInputArea({ html, tr, getDisplayRecentSmiles, onRecen
                         onClick=${() => { window.im.openTabByName("contact") }} />
                 </div>
             </div>
+            `}
         </div>
         `;
     };
