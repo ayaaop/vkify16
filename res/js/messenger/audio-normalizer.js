@@ -1,6 +1,20 @@
 // Normalizes upstream IM audio-track markup to the site player structure so
 // music-popup.js/stylesheet.css work on it (see .devin/adapting_messages.md).
 
+// Upstream IM renders .playIcon empty; the site player template ships SVG
+// glyphs that the stylesheet toggles via .paused / .nowPlaying.
+const PLAY_GLYPHS =
+    '<svg class="playGlyph" viewBox="0 0 24 24"><use href="#play-24"/></svg>' +
+    '<svg class="pauseGlyph" viewBox="0 0 24 24"><use href="#pause-24"/></svg>';
+
+function normalizePlayer(player) {
+    const icon = player.querySelector('.playerButton .playIcon');
+    if (icon && !icon.querySelector('.playGlyph')) {
+        icon.innerHTML = PLAY_GLYPHS;
+    }
+    player.querySelectorAll('.selectableTrack').forEach(normalizeTrack);
+}
+
 function normalizeTrack(track) {
     let rail = track.querySelector(':scope > .selectableTrackRail');
     let played = track.querySelector(':scope > .selectableTrackPlayed');
@@ -74,11 +88,9 @@ export function installAudioNormalizer() {
                 node.querySelectorAll('.msg-attach-audio-player').forEach(el => players.add(el));
             });
         }
-        players.forEach(player => {
-            player.querySelectorAll('.selectableTrack').forEach(normalizeTrack);
-        });
+        players.forEach(normalizePlayer);
     };
 
     new MutationObserver(collect).observe(document.body, { childList: true, subtree: true });
-    document.querySelectorAll('.msg-attach-audio-player .selectableTrack').forEach(normalizeTrack);
+    document.querySelectorAll('.msg-attach-audio-player').forEach(normalizePlayer);
 }
