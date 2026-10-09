@@ -1,6 +1,7 @@
 let installed = false;
 
-const HEADER_ROW_IDS = ['dm_files', 'search', 'pinned'];
+const HEADER_ROW_IDS = ['dm_files', 'pinned'];
+const HIDDEN_ROW_IDS = new Set(['search']);
 const MANAGE_ROW_IDS = ['rights', 'ava', 'notify_toggle', 'clean'];
 const FOOTER_ROW_IDS = ['return_to_chat'];
 
@@ -84,7 +85,7 @@ export function installPeerWindow({ h, preactMod, commonMod }) {
         }
 
         const ul = childList(actions).find((c) => c.type === 'ul');
-        const lis = childList(ul);
+        const lis = childList(ul).filter((li) => !(li && li.props && HIDDEN_ROW_IDS.has(li.props.id)));
         const used = new Set();
         const pick = (ids) => ids.map((id) => lis.find((li) => li.props && li.props.id === id)).filter((li) => {
             if (li) {

@@ -804,8 +804,8 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     order: 2;
 }
 
-.at_page:not(.compact) .messages--peers-tabs .cross {
-    margin: 0;
+.at_page .cross {
+    margin: 0!important;
 }
 
 .at_page:not(.compact) .messages--peers-tabs .messages--peers-tab.selected {
@@ -3205,7 +3205,7 @@ body:not(.im_mobile) #im_container.compact .crp-list .crp-entry--message---av {
         z-index: 2;
         display: block;
         height: 19px;
-        padding: 14px 20px 15px 36px;
+        padding: 15px 20px 15px 36px;
         background: var(--bg-page) url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%229%22%20height%3D%2216%22%20viewBox%3D%220%200%209%2016%22%3E%3Cpath%20fill%3D%22%23828A99%22%20d%3D%22M8%2015.9c-.2%200-.4-.1-.6-.3l-7-7c-.3-.3-.3-.9%200-1.2l7-7c.3-.3.9-.3%201.2%200%20.3.3.3.9%200%201.2l-6.4%206.4%206.4%206.4c.3.3.3.9%200%201.2-.2.2-.4.3-.6.3z%22%20opacity%3D%22.7%22%2F%3E%3C%2Fsvg%3E') 15px 16px no-repeat;
         border-bottom: 1px solid var(--vk-im-divider);
         color: #818d99;
@@ -3213,6 +3213,7 @@ body:not(.im_mobile) #im_container.compact .crp-list .crp-entry--message---av {
         line-height: 19px;
         text-decoration: none;
         cursor: pointer;
+        z-index: 10;
 
         &:hover {
             background-color: var(--vk-im-hover);
@@ -3221,10 +3222,10 @@ body:not(.im_mobile) #im_container.compact .crp-list .crp-entry--message---av {
     }
 
     .peer-side {
-        gap: 12px;
         padding-bottom: 12px;
-        background: var(--vk-im-gap);
+        background: var(--module-background-color);
         flex: 1 0 auto;
+        gap: 0;
     }
 
     .peer-side .peer-info {
@@ -3238,6 +3239,10 @@ body:not(.im_mobile) #im_container.compact .crp-list .crp-entry--message---av {
         border-radius: 0;
         background: var(--bg-page);
         box-shadow: 0 1px 0 var(--vk-im-shadow);
+    }
+
+    .peer-side .peer-info,.peer-side .peer-block {
+        border-bottom:12px solid var(--vk-im-gap);
     }
 
     .peer-side .peer-info .peer-avatar {
@@ -3371,10 +3376,6 @@ body:not(.im_mobile) #im_container.compact .crp-list .crp-entry--message---av {
 
     .peer-rows li#dm_files a::before {
         background: #5c9ce6 url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M6.3%2015.9c-1.3%200-2.7-.5-3.7-1.5s-1.5-2.3-1.5-3.7.5-2.7%201.5-3.7l5.5-5.4c.7-.7%201.7-1.1%202.7-1.1%201%200%202%20.4%202.7%201.1%201.5%201.5%201.5%203.9%200%205.4l-5.5%205.5c-.8.8-2.2.9-3.1.2l-.1-.1c-.4-.4-.7-.9-.8-1.5s0-1.1.4-1.6l.1-.1%203.7-3.8c.3-.3.8-.3%201.1%200%20.3.3.3.8%200%201.1l-3.7%203.8c-.2.2-.2.4-.2.5%200%20.2.1.3.2.4l.1.1c.3.3.8.2%201.1-.1l5.5-5.5c.9-.9.9-2.4%200-3.3-.4-.4-1-.7-1.6-.7-.6%200-1.2.2-1.6.7l-5.4%205.4c-.7.7-1.1%201.7-1.1%202.7s.4%202%201.1%202.7c1.4%201.4%203.8%201.4%205.2%200l3.6-3.5c.3-.3.8-.3%201.1%200%20.3.3.3.8%200%201.1l-3.6%203.5c-1.1%201-2.4%201.4-3.7%201.4z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
-    }
-
-    .peer-rows li#search a::before {
-        background: #99a2ad url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23fff' d='M7 11.5a4.5 4.5 0 100-9 4.5 4.5 0 000 9zm4.7.4l3 3-1.4 1.4-3-3a6.5 6.5 0 111.4-1.4z'/%3E%3C/svg%3E") 50% no-repeat;
     }
 
     .peer-rows li#pinned a::before {
