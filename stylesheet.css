@@ -4882,6 +4882,147 @@ body.banned {
     margin: 0 0 9px;
 }
 
+/* stickers shop & pack editor */
+.stickers_shop_banner {
+    border-radius: var(--module-border-radius) var(--module-border-radius) 0 0;
+    overflow: hidden;
+}
+
+.stickers_shop_banner .stickers_shop_banner_img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.stickers_shop_banner a {
+    display: block;
+    line-height: 0;
+}
+
+.stickers_packs_grid {
+    gap: 16px;
+    margin-top: 0;
+    padding: 16px;
+    background-color: var(--module-background-color--secondary);
+}
+
+.stickers_pack_card {
+    flex: 0 0 calc((100% - 16px) / 2);
+    max-width: calc((100% - 16px) / 2);
+    border: 0;
+    padding: 0;
+    position: relative;
+    top: 0;
+    background: var(--module-background-color);
+    border-radius: var(--module-border-radius);
+    box-shadow: 0 0 1px rgba(0, 0, 0, .08), 0 1px 2px rgba(0, 0, 0, .06);
+    transition: top 0.1s ease;
+}
+
+.stickers_pack_card:hover {
+    top: -2px;
+}
+
+.stickers_pack_thumb {
+    aspect-ratio: 1.6 / 1;
+    background: var(--module-header-background-color);
+    border-radius: var(--module-border-radius) var(--module-border-radius) 0 0;
+    margin-bottom: 0;
+}
+
+.stickers_pack_name {
+    padding: 8px 10px 4px;
+    font-size: 12.5px;
+    line-height: 17px;
+}
+
+.stickers_pack_name a {
+    color: var(--text-color);
+}
+
+.stickers_pack_author {
+    color: var(--muted-text-color);
+    font-size: 12.5px;
+    margin-top: 0;
+    padding: 0 10px 6px;
+}
+
+.stickers_pack_footer {
+    margin-top: 0;
+    padding: 0 10px 8px;
+}
+
+.stickers_pack_desc_empty,
+.stickers_pack_desc {
+    display: none;
+}
+
+.stickers_pack_price_free {
+    color: var(--success-color);
+    font-size: 12.5px;
+}
+
+.stickers_pack_price_paid,
+.stickers_pack_balance_val {
+    color: var(--link-color);
+}
+
+.stickers_modal_cover_wrap,
+.stickers_modal_item:hover {
+    border: 1px solid var(--border-color);
+    border-radius: var(--button-border-radius);
+    background: var(--module-header-background-color);
+}
+
+.stickers_modal_count,
+.stickers_modal_author,
+.stickers_pack_status_purchased,
+.stickers_pack_author_balance,
+.sticker-empty-text {
+    font-size: 12.5px;
+    color: var(--muted-text-color);
+}
+
+.stickers_modal_desc {
+    font-size: 12.5px;
+    color: var(--muted-text-color-2);
+}
+
+.stickers_modal_copy_link,
+.stickers_pack_price_paid {
+    font-size: 12.5px;
+}
+
+.stickers_modal_title {
+    font-size: 15px;
+    color: var(--text-color);
+}
+
+.stickers_cards_grid {
+    gap: 16px;
+}
+
+.existing_sticker_card,
+.draft_sticker_card {
+    border: 1px solid var(--border-color);
+    background: var(--module-background-color);
+    border-radius: var(--module-border-radius);
+    padding: 8px;
+    width: 159.33px;
+    text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.sticker-empty-text {
+    margin-bottom: 10px;
+}
+
 .stickers_form_btn_save {
     float: none;
 }

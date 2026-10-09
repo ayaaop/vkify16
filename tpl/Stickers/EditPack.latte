@@ -16,24 +16,23 @@
             <div class="wide_column">
                 <div class="page_block stickers_edit_page">
                     {include "../components/page_block_header.latte", title => $isNew ? 'stickers_new_pack' : 'stickers_edit_pack'}
-                    {if !$isNew && $pack}
-                        <div class="msg information">
-                            <ul>
-                                <li>{_stickers_pack_balance}: <b>{tr('coins', (int) round($pack->getBalance()))}</b>
-                                    {if $pack->getBalance() > 0}
-                                        (<a href="javascript:withdrawStickers({$pack->getId()}, {$pack->getBalance()})">{_stickers_withdrawal_q}</a>)
-                                    {/if}
-                                </li>
-                            </ul>
-                            {if $pack->getBalance() > 0}
-                                <button type="button" class="button" onclick="withdrawStickers({$pack->getId()}, {$pack->getBalance()});">
-                                    {_stickers_withdraw_btn}
-                                </button>
-                            {/if}
-                        </div>
-                    {/if}
-
                     <div class="form_group settings_padding stickers_edit_form">
+                        {if !$isNew && $pack}
+                            <div class="msg information">
+                                <ul>
+                                    <li>{_stickers_pack_balance}: <b>{tr('coins', (int) round($pack->getBalance()))}</b>
+                                        {if $pack->getBalance() > 0}
+                                            (<a href="javascript:withdrawStickers({$pack->getId()}, {$pack->getBalance()})">{_stickers_withdrawal_q}</a>)
+                                        {/if}
+                                    </li>
+                                </ul>
+                                {if $pack->getBalance() > 0}
+                                    <button type="button" class="button" onclick="withdrawStickers({$pack->getId()}, {$pack->getBalance()});">
+                                        {_stickers_withdraw_btn}
+                                    </button>
+                                {/if}
+                            </div>
+                        {/if}
                         <form id="packForm" method="POST" enctype="multipart/form-data" action="{if $isNew}/stickers/new{else}/stickers/edit/{$pack->getId()}{/if}">
                             <input type="hidden" name="hash" value="{$csrfToken}" />
 
@@ -137,14 +136,14 @@
                                 <button type="submit" class="button stickers_form_btn_save">
                                     {if $isNew}{_stickers_save_pack}{else}{_save}{/if}
                                 </button>
-
-                                {if !$isNew}
-                                    <button type="button" class="button stickers_form_btn_delete" onclick="confirmDeletePack(document.getElementById('packForm'));">
-                                        {_stickers_delete_pack}
-                                    </button>
-                                {/if}
                             </div>
                         </form>
+                    </div>
+                    <div class="page_block_footer">
+                        {if !$isNew}
+                            {_you_can_also}
+                            <a onclick="confirmDeletePack(document.getElementById('packForm'));">{_stickers_delete_pack|lower}</a>.
+                        {/if}
                     </div>
                 </div>
                 <script>
