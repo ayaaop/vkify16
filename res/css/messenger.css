@@ -2800,7 +2800,71 @@ body:not(.im_mobile) #im_container.compact .crp-list .crp-entry--message---av {
 .messenger-app-end.m-selected .input-m {
     border: 0;
     background: none;
-    padding: 10px 38px 10px 71px;
+    padding: 10px 38px 0;
+    height: unset;
+}
+
+.messenger-app-end.m-selected:not(.stock-input-bar) .input-m.input-reply {
+    padding-right: 55px;
+    padding-left: 55px;
+}
+
+.messenger-app-end.m-selected.stock-input-bar .input-m.input-reply {
+    padding-right: 74px;
+    padding-left: 74px;
+}
+
+.compact .messenger-app-end.m-selected.stock-input-bar .input-m.input-reply {
+    padding-right: 18px;
+    padding-left: 15px;
+}
+
+/* Reply/edit/forward preview — VK .im-replied: 2px accent bar on the left,
+   bold 12.5px blue title, 13px text, 24px stroked-X remove button. */
+.messenger-app-end .input-m.input-reply .input-reply-content {
+    position: relative;
+    padding-left: 10px;
+}
+
+.messenger-app-end .input-m.input-reply .input-reply-content:before {
+    position: absolute;
+    top: 1px;
+    bottom: 1px;
+    left: 0;
+    width: 2px;
+    border-radius: 1px;
+    background: #dee6ee;
+    content: '';
+}
+
+.messenger-app-end .input-m.input-reply:hover .input-reply-content:before {
+    background: #a3bbd6;
+}
+
+.messenger-app-end .input-m.input-reply .input-reply-content .input-type,
+.messenger-app-end .input-m.input-reply .input-reply-content .input-reply-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--link-color);
+}
+
+.messenger-app-end .input-m.input-reply .input-reply-content .input-reply-text {
+    font-size: 13px;
+    color: var(--text-color);
+}
+
+.messenger-app-end .input-m.input-reply .input-close {
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    font-size: 0;
+    background: url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%0A%20%20%20%20%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%0A%20%20%20%20%20%20%20%20%3Crect%20width%3D%2224%22%20height%3D%2224%22%2F%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20stroke%3D%22%23828A99%22%20stroke-width%3D%222%22%20d%3D%22M8%2C8%20L16%2C16%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20stroke%3D%22%23828A99%22%20stroke-width%3D%222%22%20d%3D%22M8%2C8%20L16%2C16%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20transform%3D%22matrix(-1%200%200%201%2024%200)%22%2F%3E%0A%20%20%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E') 50% no-repeat;
+    opacity: .7;
+}
+
+.messenger-app-end .input-m.input-reply .input-close:hover {
+    opacity: 1;
 }
 
 /* Kill stock's hover wash on the plain mountain base; the pill brings its
@@ -3043,6 +3107,7 @@ body:not(.im_mobile) #im_container.compact .crp-list .crp-entry--message---av {
     padding: 12px 14px 17px;
     background: var(--module-background-color);
     justify-content: unset;
+    border: 0;
 }
 
 .compact .stock-input-bar .messenger-app--input {
