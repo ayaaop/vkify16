@@ -3495,6 +3495,13 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     .peer-side .peer-info .avatar-opener {
         height: 26px;
     }
+    .peer-side .peer-info .avatar-opener .lupa {
+        width: 13px;
+        height: 13px;
+        background: url(../icons/zoom_photo.png) 0px 0px;
+        filter: none;
+        opacity: 0.75;
+    }
 
     .peer-side .peer-info .peer-name {
         gap: 0;
