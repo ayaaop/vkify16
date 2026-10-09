@@ -450,14 +450,23 @@ function replaceMbTabs(mbTabs) {
     if (mbTabs.__vkifyReplaced) return;
     mbTabs.__vkifyReplaced = true;
 
-    const tabs = [...mbTabs.querySelectorAll('.mb_tab')].map(t => ({
-        name: t.dataset.name,
+    // a wholesale re-render can replace .mb_tabs and orphan the previous header
+    const stale = mbTabs.previousElementSibling;
+    if (stale?.classList.contains('vkify-mb-tabs')) {
+        stale.remove();
+    }
+
+    // the IM materials page renders .mb_tab without data-name — fall back to the index
+    const readTabs = () => [...mbTabs.querySelectorAll('.mb_tab')].map((t, i) => ({
+        el: t,
+        name: t.dataset.name ?? `tab-${i}`,
         label: t.textContent.trim(),
         active: t.id === 'active',
     }));
+    const tabs = readTabs();
 
     const header = u(`
-        <h2 class="page_block_h2 tabs_header">
+        <h2 class="page_block_h2 tabs_header vkify-mb-tabs">
             <ul class="ui_tabs clear_fix ui_tabs_plain ui_tabs_sliding">
                 ${tabs.map(t => `
                     <li><a class="ui_tab${t.active ? ' ui_tab_sel' : ''}" href="#" data-name="${t.name}">${t.label}</a></li>
@@ -505,10 +514,16 @@ function replaceMbTabs(mbTabs) {
         e.preventDefault();
         const name = u(e.target).closest('.ui_tab').attr('data-name');
         activate(name);
-        mbTabs.querySelector(`.mb_tab[data-name='${name}'] a`)?.click();
+        const tab = readTabs().find(t => t.name === name)?.el;
+        (tab?.querySelector('a') ?? tab)?.click();
     });
 
     new MutationObserver(() => {
+        // Preact re-renders move id="active" between tabs without touching our header
+        const active = readTabs().find(t => t.active);
+        if (active && active.name !== currentTab) {
+            activate(active.name);
+        }
         mbTabs.querySelectorAll('input[type=button]').forEach((btn) => {
             ul.querySelectorAll(`.ui_tab_extra[data-owner-tab='${currentTab}']`).forEach(el => el.remove());
             const classes = [...btn.classList].filter(c => c !== 'button').join(' ');
@@ -518,7 +533,7 @@ function replaceMbTabs(mbTabs) {
         });
         updateExtrasVisibility();
         repositionSlider();
-    }).observe(mbTabs, { childList: true });
+    }).observe(mbTabs, { childList: true, subtree: true, attributes: true, attributeFilter: ['id'] });
 }
 
 vkify.onPage(() => {
