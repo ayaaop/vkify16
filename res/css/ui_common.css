@@ -230,7 +230,8 @@ input[type~="text"],
 input[type="url"], input[type~="url"],
 select,
 textarea,
-.PE_playlistEditPage textarea[name="description"] {
+.PE_playlistEditPage textarea[name="description"],
+.emoji-input-wrap,.emoji-input-wrap:focus-within {
     font-size: 13px;
     background-color: var(--module-background-color);
     border: 1px solid var(--border-color-3);
