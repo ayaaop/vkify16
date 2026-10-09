@@ -75,8 +75,8 @@ export function createStockAttachmentMenu({ html, tr }) {
         const compact = isCompactMode(im ?? (typeof window !== 'undefined' ? window.im : undefined));
         const inlineKeys = compact ? ['video', 'audio'] : [];
         const dropdownKeys = compact
-            ? ['document', 'note', 'graffiti']
-            : ['video', 'audio', 'document', 'note', 'graffiti'];
+            ? ['document', 'graffiti']
+            : ['video', 'audio', 'document', 'graffiti'];
         return html`
         <div id="wallAttachmentMenu" class="page_add_media post-attach-menu post-attach-menu--inline">
             ${inlineEntry(html, tr, 'photo')}
