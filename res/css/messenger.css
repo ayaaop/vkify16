@@ -41,6 +41,19 @@ body {
     --vk-im-gap: #edeef0;
     --vk-im-shadow: #e3e4e8;
     --vk-im-time: hsla(220, 8%, 51%, .6);
+    --vk-im-attach-color: #4a6f97;
+    --vk-im-preview-strong: #4e5966;
+    --vk-im-editing-bg: color-mix(in srgb, #e6a028 10%, transparent);
+    --vk-im-online: #8ac176;
+    --vk-im-hl-bg: #e7edf2;
+    --vk-im-reply-hover: #a3bbd6;
+    --vk-im-back: #818d99;
+    --vk-im-back-hover: #707d8c;
+    --vk-im-icon: #99a2ad;
+    --vk-im-icon-blue: #5c9ce6;
+    --vk-im-icon-green: #4bb34b;
+    --vk-im-icon-red: #e64646;
+    --vk-im-danger: #cb4f4f;
 }
 
 html:has(.body_im),body.body_im,.body_im .layout {
@@ -66,8 +79,7 @@ body.body_im .page_body {
    Page layout & scroll model
    ========================================================================== */
 
-/* Classic mode is a flex row (chat + static tabs rail). Upstream scrolls the
-   chat history inside .messenger-app--messages; nothing is fixed-positioned. */
+/* Classic mode is a flex row; history scrolls inside .messenger-app--messages. */
 #im_container.at_page {
     --messenger-width: calc(var(--page-width) - var(--sidebar-width, 245px));
     margin: 0;
@@ -106,8 +118,7 @@ body.body_im .page_body {
     position: relative;
 }
 
-/* Fixed-height flex column: .messenger-app--messages is the internal scroll
-   container upstream scroll math measures. */
+/* .messenger-app--messages is upstream's internal scroll container. */
 #im_container.at_page #im_page_containers {
     height: calc(100vh - var(--header-height) - 15px);
     height: calc(100dvh - var(--header-height) - 15px);
@@ -116,8 +127,7 @@ body.body_im .page_body {
     overflow: hidden;
 }
 
-/* If the flex height math is off by a few px, the page scrolls instead of
-   clipping the input bar. */
+/* Page scrolls instead of clipping the input bar if height math is off. */
 #im_container.at_page .im_page.page-other {
     height: calc(100dvh - var(--header-height) - 15px);
     display: flex;
@@ -134,8 +144,7 @@ body.body_im .page_body {
     min-height: calc(100dvh - var(--header-height) - 15px);
 }
 
-/* .crp-list (flex:1, internal scroll) needs a constrained parent or long
-   lists clip instead of scrolling. */
+/* .crp-list clips long lists unless its parent is height-constrained. */
 #im_container.at_page:not(.compact) .im_page.page-conversations {
     height: calc(100vh - var(--header-height) - 15px);
     height: calc(100dvh - var(--header-height) - 15px);
@@ -215,7 +224,7 @@ body.body_im .sidebar {
     z-index: 10;
 }
 
-/* Back-to-top never activates on IM pages (no window scroll drives it). */
+/* Back-to-top never activates on IM pages (no window scroll). */
 body.body_im .toTop {
     display: none;
 }
@@ -428,8 +437,7 @@ body.vkify-force-classic label:has(> input#im\.modern_mode) {
     width: var(--messenger-width);
 }
 
-/* VK modern (.im-page--chat-header): 48px, single-line left-aligned
-   title (name + inline meta), no back button — the tab rail navigates. */
+/* VK modern: single-line title, no back button (the tab rail navigates). */
 body:not(.im_mobile) #im_container.compact .messenger-app--header.messages--peers-header-peer-name {
     display: flex;
     align-items: center;
@@ -485,9 +493,7 @@ body:not(.im_mobile) #im_container.compact .messenger-app-header--more-actions--
     width: 40px;
 }
 
-/* VK .im-page-pinned typography is shared between modes: 35px content +
-   16px padding = 51px total, 12.5px bold blue title, 13px preview,
-   24px close button. Classic only differs in the gutter (.at_page rule). */
+/* VK shares this typography across modes; only the gutter differs in classic. */
 body:not(.im_mobile) #im_container .messenger-pinned-bar {
     height: 51px;
     font-size: 12.5px;
@@ -520,8 +526,7 @@ body:not(.im_mobile) #im_container .messenger-pinned-bar--close:hover {
     opacity: 1;
 }
 
-/* VK modern .im-page--mess-actions lives inside the 48px header;
-   counter is left-aligned with 500 weight, actions right. */
+/* VK's selection bar lives inside the 48px header. */
 body:not(.im_mobile) #im_container.compact .messages--actions {
     height: 48px;
     padding: 0 12px 0 20px;
@@ -1178,7 +1183,7 @@ body #im_container .crp-list {
         color: var(--muted-text-color-2);
 
         .conv_prev_attachment_text {
-            color: #4a6f97;
+            color: var(--vk-im-attach-color);
         }
 
         .conv_prev_img {
@@ -1190,7 +1195,7 @@ body #im_container .crp-list {
 
     .crp-entry:hover .crp-entry--message---text,
     .crp-entry.unread .crp-entry--message---text {
-        color: #4e5966;
+        color: var(--vk-im-preview-strong);
     }
 
     .crp-entry .unread-msgs-count {
@@ -1378,15 +1383,14 @@ body #im_container.compact .crp-list .crp-entry--message---av {
     max-width: 100%;
 }
 
-/* Upstream renders a bare loading_mini.gif for lazy-loading attachments;
-   keep it at natural size instead of stretching to a full row. */
+/* Lazy-load renders a bare loading_mini.gif; keep it at natural size. */
 .messenger-app--messages---message ._content>img[src$="loading_mini.gif"] {
     flex: 0 0 auto;
     width: auto;
     height: auto;
 }
 
-/* Bare .time children (forwarded-message modal) share the sender line. */
+/* Bare .time children (fwd modal) share the sender line. */
 .messenger-app--messages---message ._content>.time {
     margin-left: 5px;
 }
@@ -1395,13 +1399,13 @@ body #im_container.compact .crp-list .crp-entry--message---av {
     width: auto !important;
 }
 
-/* Upstream content width is 430px in non-compact desktop */
+/* Upstream content width is 430px in non-compact desktop. */
 @media (min-width: 769px) {
     #im_container:not(.compact) .messenger-app--messages---message ._content {
         width: 430px !important;
     }
 
-    /* Back-link arrow; mobile uses the arrow-left-outline-28 sprite instead. */
+    /* Back-link arrow; mobile uses a sprite instead. */
     .messenger-app--header--back a {
         background-color: var(--muted-text-color-3);
         -webkit-mask: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgOSAxNiI+PHBhdGggZmlsbD0iYmxhY2siIGQ9Ik04IDE1LjljLS4yIDAtLjQtLjEtLjYtLjNsLTctN2MtLjMtLjMtLjMtLjkgMC0xLjJsNy03Yy4zLS4zLjktLjMgMS4yIDAgLjMuMy4zLjkgMCAxLjJsLTYuNCA2LjQgNi40IDYuNGMuMy4zLjMuOSAwIDEuMi0uMi4yLS40LjMtLjYuM3oiIG9wYWNpdHk9Ii43Ii8+PC9zdmc+") 13px 16px no-repeat;
@@ -1478,9 +1482,7 @@ body #im_container.compact .crp-list .crp-entry--message---av {
     margin: 0;
 }
 
-/* Inside the absolutely-positioned header box both .time and .actions-2
-   would otherwise stack on top of each other; keep them in-flow so they
-   appear side by side ([time] [icons]) at the right edge on hover. */
+/* In-flow so .time and .actions-2 sit side by side on hover. */
 .messenger-app--messages---message.same-author .actions-2 {
     position: static;
     order: 1;
@@ -1544,7 +1546,7 @@ body #im_container.compact .crp-list .crp-entry--message---av {
 }
 
 .messenger-app--messages---message.msg-editing-this {
-    background: color-mix(in srgb, #e6a028 10%, var(--transparent)) !important;
+    background: var(--vk-im-editing-bg) !important;
     box-shadow: none;
     border-radius: 4px;
 }
@@ -1636,8 +1638,7 @@ body #im_container.compact .crp-list .crp-entry--message---av {
     margin: 0;
 }
 
-/* VK keeps the select check in its own left gutter: check at left: 6px,
-   avatar column starting at 43px (modern/compact) or 36px (classic). */
+/* VK: select check lives in its own left gutter. */
 body:not(.im_mobile) #im_container.compact .messenger-app--messages---message>.messenger-app--messages---message--wrap {
     padding-left: 43px;
 }
@@ -2024,8 +2025,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
    Attachments
    ========================================================================== */
 
-/* Photos & Makima grid: container, grid and row styles are identical to
-   stock messages.css, so only the deltas live here. */
+/* Photos & Makima grid */
 .msg-media-tile,
 .msg-attach-j-photo {
     position: relative;
@@ -2068,7 +2068,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     object-fit: cover;
 }
 
-/* Play-button visuals live in stock main.css, which this theme does not load. */
+/* Play-button visuals come from stock main.css, which this theme doesn't load. */
 .compact_video .play-button,
 .msg-attach-w-gif .docGalleryItem .play-button {
     width: 44px;
@@ -2114,9 +2114,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     line-height: 1;
 }
 
-/* Audio player: stock messages.css re-skins the site-wide player; these
-   overrides return it to the audios.css + stylesheet.css layout. The track
-   markup itself is normalized by res/js/messenger/audio-normalizer.js. */
+/* Audio player */
+/* Undo stock's IM re-skin of the site player; markup is normalized by audio-normalizer.js. */
 .messenger-app--messages---message .audioEmbed.msg-attach-audio-player,
 .ovk-attachments-modal-content .audioEmbed.msg-attach-audio-player {
     margin: 5px 0;
@@ -2135,8 +2134,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     padding: 8px 10px;
 }
 
-/* IM wraps the — separator in a span, so it needs explicit spacing. */
-.messenger-app--messages---message .audioEmbed.msg-attach-audio-player .status .tire {
+/* IM audios do not have the whitespace between artist and title */
+.at_page .audioEntry .tire {
     margin: 0 4px;
 }
 
@@ -2204,15 +2203,13 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     text-decoration: underline;
 }
 
-/* Stock boxes these at 280x190; the wall-post rule in stylesheet.css would
-   otherwise stretch GIFs to full width. */
+/* Re-box to 280x190 or stylesheet.css's wall-post rule stretches GIFs. */
 .attachments .msg-attach-w-gif .docGalleryItem.embeddable {
     width: 280px;
     height: 190px;
 }
 
-/* Bottom name/size panel is positioned by stock main.css, which this theme
-   does not load; pin it to the preview's bottom edge ourselves. */
+/* Stock main.css (not loaded) positions the bottom panel; pin it here. */
 .msg-attach-w-gif .docGalleryItem .doc_bottom_panel,
 .msg-attach-w-doc-image .docGalleryItem .doc_bottom_panel {
     position: absolute;
@@ -2247,9 +2244,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     flex-shrink: 0;
 }
 
-/* Wall repost card. Deliberately unscoped: stock messages.css scopes its
-   rules to .messenger-app--messages---message, which the fwd modal
-   (.fwd-modal-content) doesn't render, so these are the only styles there. */
+/* Wall repost card */
+/* Deliberately unscoped: the fwd modal doesn't render the message class. */
 .msg-attach-wall-card {
     max-width: 440px;
     width: 100%;
@@ -2376,7 +2372,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
    Date dividers
    ========================================================================== */
 
-/* Day divider: flat, unpronounced text in history */
+/* Day divider */
 .messenger-app--messages .messenger-app--messages-day-time {
     display: flex;
     justify-content: center;
@@ -2404,8 +2400,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     text-decoration: none;
 }
 
-/* Floating sticky date pill: absolutely positioned against the messenger
-   layer; hidden while the unread divider shows. */
+/* Floating sticky date pill */
 .messenger-app.messenger-layer .im_floating_date_wrap {
     position: absolute;
     top: 10px;
@@ -2480,8 +2475,9 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
    Status bar, system & special messages
    ========================================================================== */
 
+/* Offline state is already shown in the chat header. */
 .messenger-app .messenger-app-status .write-bar.is-offline {
-    display: none!important /* we already display this information in chat header */
+    display: none!important
 }
 
 .messenger-app .messenger-app-status {
@@ -2553,8 +2549,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 }
 
 /* Search results & deleted messages */
-/* modals.css applies .show_more { display:flex; margin-top:15px } globally;
-   the IM search pager is a plain block link. */
+/* modals.css's global .show_more flex doesn't fit the plain IM pager. */
 #search-page-im .show_more {
     display: block;
     margin-top: 0;
@@ -2587,7 +2582,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     right: 12px;
     width: 20px;
     height: 20px;
-    color: #828a99;
+    color: var(--muted-text-color-3);
     font-size: 18px;
     line-height: 20px;
 }
@@ -2649,14 +2644,14 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     font-size: 13px;
     font-weight: 500;
     line-height: 15px;
-    color: #222;
+    color: var(--heading-color);
     text-transform: none;
     letter-spacing: 0;
 }
 
 #search-page-im .im-search-section-count {
     font-size: 13px;
-    color: #939393;
+    color: var(--muted-text-color);
 }
 
 #search-page-im .im-search-peer-item {
@@ -2688,7 +2683,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     bottom: 0;
     width: 10px;
     height: 10px;
-    background: #8ac176;
+    background: var(--vk-im-online);
 }
 
 #search-page-im .im-search-peer-name {
@@ -2706,7 +2701,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     margin-top: 4px;
     font-size: 13px;
     line-height: 16px;
-    color: #656565;
+    color: var(--muted-text-color-2);
 }
 
 #search-page-im .im-search-item {
@@ -2727,13 +2722,13 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 #search-page-im .im-search-item-title {
     font-size: 13px;
     line-height: 16px;
-    color: #939393;
+    color: var(--muted-text-color);
 }
 
 #search-page-im .im-search-author,
 #search-page-im .im-search-chat-link {
     font-weight: 500;
-    color: #2a5885;
+    color: var(--link-color);
 }
 
 #search-page-im .im-search-author:hover,
@@ -2743,19 +2738,19 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 #search-page-im .im-search-date {
     font-size: 13px;
-    color: #939393;
+    color: var(--muted-text-color);
 }
 
 #search-page-im .im-search-item-text {
     font-size: 13px;
     line-height: 18px;
-    color: #000;
+    color: var(--text-color);
 }
 
 #search-page-im .im-search-hl {
     padding: 0;
     border-radius: 0;
-    background: #e7edf2;
+    background: var(--vk-im-hl-bg);
     font-weight: 400;
     color: inherit;
 }
@@ -2777,7 +2772,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     padding: 40px;
     font-size: 13px;
     line-height: 18px;
-    color: #939393;
+    color: var(--muted-text-color);
 }
 
 .messenger-app--messages---message.msg-searched {
@@ -2847,7 +2842,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     box-shadow: 0 1px 0 0 var(--shadow-bottom-color), 0 0 0 1px var(--shadow-outline-color);
 }
 
-/* "Go to end of history" pill (im-to-end), driven by m-mountain classes */
+/* "Go to end of history" pill */
+/* Driven by m-mountain classes. */
 .messenger-app-end .messenger-mountain.im-to-end {
     position: absolute;
     top: 0;
@@ -2942,8 +2938,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     padding-left: 15px;
 }
 
-/* Reply/edit/forward preview — VK .im-replied: 2px accent bar on the left,
-   bold 12.5px blue title, 13px text, 24px stroked-X remove button. */
+/* Reply/edit/forward preview */
 .messenger-app-end .input-m.input-reply .input-reply-content {
     position: relative;
     padding-left: 10px;
@@ -2956,12 +2951,12 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     left: 0;
     width: 2px;
     border-radius: 1px;
-    background: #dee6ee;
+    background: var(--quote-border-color);
     content: '';
 }
 
 .messenger-app-end .input-m.input-reply:hover .input-reply-content:before {
-    background: #a3bbd6;
+    background: var(--vk-im-reply-hover);
 }
 
 .messenger-app-end .input-m.input-reply .input-reply-content .input-type,
@@ -2990,8 +2985,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     opacity: 1;
 }
 
-/* Kill stock's hover wash on the plain mountain base; the pill brings its
-   own label hover. */
+/* The pill brings its own hover. */
 .messenger-app-end .messenger-mountain:hover {
     background: none;
 }
@@ -3013,7 +3007,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     padding-left: 0;
     padding-right: 0;
     border-top: 0;
-    /* Card chrome moved up to .messenger-app-end; keep this flat. */
+    /* Card chrome lives on .messenger-app-end; keep this flat. */
 }
 
 .messenger-app .im-chat-input--textarea {
@@ -3123,7 +3117,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     z-index: 119;
 }
 
-/* 2018 mode: paperclip trigger replaces the inline attach button. */
+/* 2018: paperclip trigger replaces the inline attach button. */
 .messenger-app .post-attach-menu:not(.post-attach-menu--inline) .post-attach-menu__trigger {
     background: var(--muted-text-color-3);
     -webkit-mask: url(data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%0A%20%20%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%0A%20%20%20%20%3Crect%20width%3D%2224%22%20height%3D%2224%22%2F%3E%0A%20%20%20%20%3Cpath%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20d%3D%22M20.0291094%2C15.0279907%20L14.6443834%2C20.2583795%20L14.6443834%2C20.2583795%20C12.0566785%2C22.7719155%207.93029511%2C22.7421861%205.37907548%2C20.1916257%20L5.37907548%2C20.1916257%20L5.37907548%2C20.1916257%20L5.37907548%2C20.1916257%20C2.76745218%2C17.5806772%202.76690514%2C13.3469463%205.37785362%2C10.735323%20C5.38546336%2C10.7277113%205.39309146%2C10.720118%205.40073787%2C10.7125431%20L13.4673115%2C2.72143747%20L13.4673115%2C2.72143747%20C15.2274317%2C0.977784268%2018.0678013%2C0.991133451%2019.8114545%2C2.7512537%20C19.8205797%2C2.76046506%2019.8296649%2C2.76971594%2019.8387099%2C2.77900608%20L19.8387099%2C2.77900608%20L19.8387099%2C2.77900608%20C21.5887922%2C4.57652514%2021.569373%2C7.4467765%2019.7951292%2C9.22045114%20L11.6642625%2C17.3487092%20L11.6642625%2C17.3487092%20C10.8163456%2C18.196354%209.46403082%2C18.26344%208.53638318%2C17.5038779%20L8.40267048%2C17.3943933%20L8.40267048%2C17.3943933%20C7.50791768%2C16.6617656%207.37648933%2C15.342513%208.10911705%2C14.4477602%20C8.14767542%2C14.4006692%208.18826865%2C14.3552816%208.23078109%2C14.311727%20L13.6981137%2C8.71035836%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E) center no-repeat;
@@ -3276,8 +3270,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     margin-left: 5px;
 }
 
-/* "Can't write" bars — styled after VK's .im-chat-input_error state:
-   a muted strip with an alert icon on the left and vertically centered text. */
+/* "Can't write" bars */
+/* Styled after VK's .im-chat-input_error state. */
 .im-cant-write-container {
     position: relative;
     background: var(--module-header-background-color);
@@ -3376,8 +3370,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     border: 1px solid var(--border-color);
 }
 
-/* Only one .im_page is visible at a time, so the side-by-side list offset
-   is dead space. */
+/* Only one .im_page is visible, so the side-by-side offset is dead space. */
 #im_container.at_page.compact #im_page_tabs {
     margin-left: 0;
     width: var(--messenger-width);
@@ -3442,7 +3435,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
         padding: 15px 20px 15px 36px;
         background: var(--bg-page) url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%229%22%20height%3D%2216%22%20viewBox%3D%220%200%209%2016%22%3E%3Cpath%20fill%3D%22%23828A99%22%20d%3D%22M8%2015.9c-.2%200-.4-.1-.6-.3l-7-7c-.3-.3-.3-.9%200-1.2l7-7c.3-.3.9-.3%201.2%200%20.3.3.3.9%200%201.2l-6.4%206.4%206.4%206.4c.3.3.3.9%200%201.2-.2.2-.4.3-.6.3z%22%20opacity%3D%22.7%22%2F%3E%3C%2Fsvg%3E') 15px 16px no-repeat;
         border-bottom: 1px solid var(--vk-im-divider);
-        color: #818d99;
+        color: var(--vk-im-back);
         font-size: 14px;
         line-height: 19px;
         text-decoration: none;
@@ -3451,7 +3444,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
         &:hover {
             background-color: var(--vk-im-hover);
-            color: #707d8c;
+            color: var(--vk-im-back-hover);
         }
     }
 
@@ -3485,7 +3478,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
         margin-top: -5px;
         overflow: hidden;
         border-radius: 50%;
-        background: #e6edf4;
+        background: var(--border-color);
     }
 
     .peer-side .peer-info .peer-avatar > img {
@@ -3516,7 +3509,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
         font-size: 19px;
         line-height: 23px;
         font-weight: 400;
-        color: #222;
+        color: var(--heading-color);
         word-wrap: break-word;
     }
 
@@ -3527,7 +3520,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     .peer-status span {
         font-size: 13px;
         line-height: 19px;
-        color: #656565;
+        color: var(--muted-text-color-2);
     }
 
     .peer-block {
@@ -3603,7 +3596,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
         height: 28px;
         margin-right: 12px;
         border-radius: 50%;
-        background: #99a2ad;
+        background: var(--vk-im-icon);
     }
 
     .peer-rows li a::after {
@@ -3616,27 +3609,27 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     }
 
     .peer-rows li#dm_files a::before {
-        background: #5c9ce6 url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M6.3%2015.9c-1.3%200-2.7-.5-3.7-1.5s-1.5-2.3-1.5-3.7.5-2.7%201.5-3.7l5.5-5.4c.7-.7%201.7-1.1%202.7-1.1%201%200%202%20.4%202.7%201.1%201.5%201.5%201.5%203.9%200%205.4l-5.5%205.5c-.8.8-2.2.9-3.1.2l-.1-.1c-.4-.4-.7-.9-.8-1.5s0-1.1.4-1.6l.1-.1%203.7-3.8c.3-.3.8-.3%201.1%200%20.3.3.3.8%200%201.1l-3.7%203.8c-.2.2-.2.4-.2.5%200%20.2.1.3.2.4l.1.1c.3.3.8.2%201.1-.1l5.5-5.5c.9-.9.9-2.4%200-3.3-.4-.4-1-.7-1.6-.7-.6%200-1.2.2-1.6.7l-5.4%205.4c-.7.7-1.1%201.7-1.1%202.7s.4%202%201.1%202.7c1.4%201.4%203.8%201.4%205.2%200l3.6-3.5c.3-.3.8-.3%201.1%200%20.3.3.3.8%200%201.1l-3.6%203.5c-1.1%201-2.4%201.4-3.7%201.4z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
+        background: var(--vk-im-icon-blue) url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M6.3%2015.9c-1.3%200-2.7-.5-3.7-1.5s-1.5-2.3-1.5-3.7.5-2.7%201.5-3.7l5.5-5.4c.7-.7%201.7-1.1%202.7-1.1%201%200%202%20.4%202.7%201.1%201.5%201.5%201.5%203.9%200%205.4l-5.5%205.5c-.8.8-2.2.9-3.1.2l-.1-.1c-.4-.4-.7-.9-.8-1.5s0-1.1.4-1.6l.1-.1%203.7-3.8c.3-.3.8-.3%201.1%200%20.3.3.3.8%200%201.1l-3.7%203.8c-.2.2-.2.4-.2.5%200%20.2.1.3.2.4l.1.1c.3.3.8.2%201.1-.1l5.5-5.5c.9-.9.9-2.4%200-3.3-.4-.4-1-.7-1.6-.7-.6%200-1.2.2-1.6.7l-5.4%205.4c-.7.7-1.1%201.7-1.1%202.7s.4%202%201.1%202.7c1.4%201.4%203.8%201.4%205.2%200l3.6-3.5c.3-.3.8-.3%201.1%200%20.3.3.3.8%200%201.1l-3.6%203.5c-1.1%201-2.4%201.4-3.7%201.4z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
     }
 
     .peer-rows li#pinned a::before {
-        background: #4bb34b url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2213%22%20height%3D%2213%22%20viewBox%3D%220%200%2013%2013%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M5.3%208.3l-2.9%202.9c-.4.4-1%20.4-1.4%200-.4-.4-.4-1%200-1.4l2.9-2.9-2.9-2.8v-.2c0-.1.1-.2.2-.2h2c1.6%200%203.1-.6%204.2-1.7l.2-.2.4-1.6s0-.1.1-.1c0-.1.1-.1.2%200l3.9%203.9s0%20.1.1.1c0%20.1%200%20.2-.1.2l-1.6.4-.2.2c-1.3%201.1-1.9%202.6-1.9%204.2v2c0%20.1%200%20.1-.1.1-.1.1-.2.1-.3%200l-2.8-2.9z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
+        background: var(--vk-im-icon-green) url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2213%22%20height%3D%2213%22%20viewBox%3D%220%200%2013%2013%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M5.3%208.3l-2.9%202.9c-.4.4-1%20.4-1.4%200-.4-.4-.4-1%200-1.4l2.9-2.9-2.9-2.8v-.2c0-.1.1-.2.2-.2h2c1.6%200%203.1-.6%204.2-1.7l.2-.2.4-1.6s0-.1.1-.1c0-.1.1-.1.2%200l3.9%203.9s0%20.1.1.1c0%20.1%200%20.2-.1.2l-1.6.4-.2.2c-1.3%201.1-1.9%202.6-1.9%204.2v2c0%20.1%200%20.1-.1.1-.1.1-.2.1-.3%200l-2.8-2.9z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
     }
 
     .peer-rows li#rights a::before {
-        background: #99a2ad url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M5.7%202.4c1-.6%201.2-1.2%201.3-1.8.1-.6.3-.6.7-.6h.6c.4%200%20.5%200%20.7.7.2.6.3%201.2%201.3%201.8%201.1.3%201.7%200%202.2-.3.6-.4.7-.2.9%200l.5.5c.2.2.3.3%200%20.9-.3.6-.6%201.1-.3%202.2.6%201%201.2%201.2%201.8%201.3.6%200%20.6.2.6.6v.6c0%20.3%200%20.5-.7.7-.6.2-1.2.3-1.8%201.3-.3%201.1%200%201.7.3%202.2.4.6.2.7%200%20.9l-.5.5s-.3.3-.9%200c-.6-.3-1.1-.6-2.2-.3-1%20.6-1.2%201.2-1.3%201.8%200%20.6-.2.6-.6.6h-.6c-.3%200-.5%200-.7-.7-.2-.6-.3-1.2-1.3-1.8-1.1-.3-1.7%200-2.2.3-.6.4-.7.2-.9%200l-.5-.5c-.2-.2-.3-.3%200-.9.3-.6.6-1.1.3-2.2-.5-.9-1.1-1.1-1.7-1.2-.7-.1-.7-.3-.7-.7v-.6c0-.4%200-.5.7-.7.6-.2%201.2-.3%201.8-1.3.3-1.1%200-1.7-.3-2.2-.5-.5-.3-.7-.1-.9l.5-.5c.2-.2.3-.3.9%200%20.6.3%201.1.6%202.2.3zm2.3%209c1.9%200%203.4-1.5%203.4-3.4s-1.5-3.4-3.4-3.4-3.4%201.5-3.4%203.4%201.5%203.4%203.4%203.4z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
+        background: var(--vk-im-icon) url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M5.7%202.4c1-.6%201.2-1.2%201.3-1.8.1-.6.3-.6.7-.6h.6c.4%200%20.5%200%20.7.7.2.6.3%201.2%201.3%201.8%201.1.3%201.7%200%202.2-.3.6-.4.7-.2.9%200l.5.5c.2.2.3.3%200%20.9-.3.6-.6%201.1-.3%202.2.6%201%201.2%201.2%201.8%201.3.6%200%20.6.2.6.6v.6c0%20.3%200%20.5-.7.7-.6.2-1.2.3-1.8%201.3-.3%201.1%200%201.7.3%202.2.4.6.2.7%200%20.9l-.5.5s-.3.3-.9%200c-.6-.3-1.1-.6-2.2-.3-1%20.6-1.2%201.2-1.3%201.8%200%20.6-.2.6-.6.6h-.6c-.3%200-.5%200-.7-.7-.2-.6-.3-1.2-1.3-1.8-1.1-.3-1.7%200-2.2.3-.6.4-.7.2-.9%200l-.5-.5c-.2-.2-.3-.3%200-.9.3-.6.6-1.1.3-2.2-.5-.9-1.1-1.1-1.7-1.2-.7-.1-.7-.3-.7-.7v-.6c0-.4%200-.5.7-.7.6-.2%201.2-.3%201.8-1.3.3-1.1%200-1.7-.3-2.2-.5-.5-.3-.7-.1-.9l.5-.5c.2-.2.3-.3.9%200%20.6.3%201.1.6%202.2.3zm2.3%209c1.9%200%203.4-1.5%203.4-3.4s-1.5-3.4-3.4-3.4-3.4%201.5-3.4%203.4%201.5%203.4%203.4%203.4z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
     }
 
     .peer-rows li#ava a::before {
-        background: #5c9ce6 url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M3%2011l2%202-.6.6-2.2.4c-.1%200-.2-.1-.2-.2l.4-2.2.6-.6zm1.5-1.5l7.2-7.2c.4-.4%201-.4%201.4%200l.6.6c.4.4.4%201%200%201.4l-7.2%207.2-2-2z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
+        background: var(--vk-im-icon-blue) url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M3%2011l2%202-.6.6-2.2.4c-.1%200-.2-.1-.2-.2l.4-2.2.6-.6zm1.5-1.5l7.2-7.2c.4-.4%201-.4%201.4%200l.6.6c.4.4.4%201%200%201.4l-7.2%207.2-2-2z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
     }
 
     .peer-rows li#notify_toggle a::before {
-        background: #e64646 url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M10%2013.4c0%201-.5%201.3-1.5.5-1.4-1.2-3-2.6-3.5-3-.5-.4-1.3-.5-2.5-.5s-1.5-.5-1.5-1v-3c.1-.7.3-1%201.5-1s2-.1%202.5-.5%202.1-1.8%203.5-3c1-.8%201.5-.5%201.5.5v11zm3.2-1.6c-.3.2-.7.3-1%200-.3-.2-.3-.6%200-.9.9-.8%201.4-1.8%201.4-3s-.5-2.2-1.4-2.9c-.3-.2-.3-.6%200-.9.3-.2.7-.2%201%200%201.1%201.1%201.8%202.4%201.8%203.9s-.7%202.8-1.8%203.8z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
+        background: var(--vk-im-icon-red) url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M10%2013.4c0%201-.5%201.3-1.5.5-1.4-1.2-3-2.6-3.5-3-.5-.4-1.3-.5-2.5-.5s-1.5-.5-1.5-1v-3c.1-.7.3-1%201.5-1s2-.1%202.5-.5%202.1-1.8%203.5-3c1-.8%201.5-.5%201.5.5v11zm3.2-1.6c-.3.2-.7.3-1%200-.3-.2-.3-.6%200-.9.9-.8%201.4-1.8%201.4-3s-.5-2.2-1.4-2.9c-.3-.2-.3-.6%200-.9.3-.2.7-.2%201%200%201.1%201.1%201.8%202.4%201.8%203.9s-.7%202.8-1.8%203.8z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
     }
 
     .peer-rows li#clean a::before {
-        background: #e64646 url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M8%209.4l2.8%202.8c.4.4%201%20.4%201.4%200%20.4-.4.4-1%200-1.4l-2.8-2.8%202.8-2.8c.4-.4.4-1%200-1.4-.4-.4-1-.4-1.4%200l-2.8%202.8-2.8-2.8c-.4-.4-1-.4-1.4%200-.4.4-.4%201%200%201.4l2.8%202.8-2.8%202.8c-.4.4-.4%201%200%201.4.4.4%201%20.4%201.4%200l2.8-2.8z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
+        background: var(--vk-im-icon-red) url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M8%209.4l2.8%202.8c.4.4%201%20.4%201.4%200%20.4-.4.4-1%200-1.4l-2.8-2.8%202.8-2.8c.4-.4.4-1%200-1.4-.4-.4-1-.4-1.4%200l-2.8%202.8-2.8-2.8c-.4-.4-1-.4-1.4%200-.4.4-.4%201%200%201.4l2.8%202.8-2.8%202.8c-.4.4-.4%201%200%201.4.4.4%201%20.4%201.4%200l2.8-2.8z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
     }
 
     .peer-rows li#return_to_chat a::before,
@@ -3659,7 +3652,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     }
 
     .peer-rows li#kick_user a {
-        color: #cb4f4f;
+        color: var(--vk-im-danger);
     }
 
     .peer-block--manage .peer-invite-section {
@@ -3678,7 +3671,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     }
 
     .peer-block--manage .peer-invite-section .chat-tab-2-header b::before {
-        background: #4bb34b url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M12%203h-7c-.6%200-1%20.4-1%201s.4%201%201%201h4.6l-6.3%206.3c-.4.4-.4%201%200%201.4.2.2.4.3.7.3s.5-.1.7-.3l6.3-6.3v4.6c0%20.6.4%201%201%201s1-.4%201-1v-7c0-.6-.4-1-1-1z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
+        background: var(--vk-im-icon-green) url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M12%203h-7c-.6%200-1%20.4-1%201s.4%201%201%201h4.6l-6.3%206.3c-.4.4-.4%201%200%201.4.2.2.4.3.7.3s.5-.1.7-.3l6.3-6.3v4.6c0%20.6.4%201%201%201s1-.4%201-1v-7c0-.6-.4-1-1-1z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
     }
 
     .peer-invite-body {
@@ -3722,11 +3715,11 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
         display: block;
         margin: 0 4px -1px;
         padding: 16px 6px 13px;
-        border-bottom: 2px solid #5181b8;
+        border-bottom: 2px solid var(--accent-color-2);
         font-size: 13px;
         line-height: 14px;
         font-weight: 400;
-        color: #000;
+        color: var(--text-color);
     }
 
     .peer-add-row {
@@ -3736,7 +3729,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     .peer-add-row a {
         display: inline-flex;
         align-items: center;
-        color: #2a5885;
+        color: var(--link-color);
         font-weight: 500;
         text-decoration: none;
         cursor: pointer;
@@ -3754,9 +3747,9 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
         height: 38px;
         margin-right: 12px;
         box-sizing: border-box;
-        border: 1px solid #e6edf4;
+        border: 1px solid var(--border-color);
         border-radius: 50%;
-        background: #fff url('data:image/svg+xml;charset=utf-8,%3Csvg%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20width%3D%2216%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M9%207h6c.552%200%201%20.448%201%201s-.448%201-1%201h-6v6c0%20.552-.448%201-1%201s-1-.448-1-1v-6h-6c-.552%200-1-.448-1-1s.448-1%201-1h6v-6c0-.552.448-1%201-1s1%20.448%201%201z%22%20fill%3D%22%239bb2cc%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
+        background: var(--module-background-color) url('data:image/svg+xml;charset=utf-8,%3Csvg%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20width%3D%2216%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M9%207h6c.552%200%201%20.448%201%201s-.448%201-1%201h-6v6c0%20.552-.448%201-1%201s-1-.448-1-1v-6h-6c-.552%200-1-.448-1-1s.448-1%201-1h6v-6c0-.552.448-1%201-1s1%20.448%201%201z%22%20fill%3D%22%239bb2cc%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
     }
 
     .chat-members-list {
@@ -3801,7 +3794,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: #efefef;
+        background: var(--module-background-color--secondary);
     }
 
     .chat-members-list .chat-member-item .chat-member-name {
@@ -3810,14 +3803,14 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
         font-size: 13px;
         line-height: 15px;
         font-weight: 500;
-        color: #2a5885;
+        color: var(--link-color);
     }
 
     .chat-members-list .chat-member-item .chat-member-badge {
         grid-area: role;
         padding: 0;
         background: none;
-        color: #939393;
+        color: var(--muted-text-color);
         font-size: 13px;
         line-height: 15px;
         font-weight: 400;
@@ -3829,7 +3822,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
         margin: 0;
         font-size: 13px;
         line-height: 15px;
-        color: #939393;
+        color: var(--muted-text-color);
     }
 
     .chat-members-list .chat-member-item .chat-member-actions {
@@ -3872,7 +3865,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
         font-size: 13px;
         line-height: 54px;
         text-align: center;
-        color: #cb4f4f;
+        color: var(--vk-im-danger);
         text-decoration: none;
         cursor: pointer;
     }
@@ -3893,7 +3886,6 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     padding-left: 15px;
     padding-right: 15px;
 }
-
 
 .msg-mobile-actions {
     display: flex;

@@ -106,6 +106,30 @@ body.dark-mode {
 	--album-title-muted-color: #76787a;
 	--profile-border-color: #363738;
 	--profile-button-border-color: #e1e3e6;
+
+	/* Messenger colors */
+	--vk-im-hover: var(--button-background-color--light);
+	--vk-im-divider: var(--border-color);
+	--vk-im-bubble: var(--button-background-color);
+	--vk-im-bubble-hover: var(--border-color);
+	--vk-im-unread-bg: var(--button-background-color--light);
+	--vk-im-badge-muted: var(--border-color-2);
+	--vk-im-date: var(--muted-text-color-2);
+	--vk-im-who: var(--muted-text-color-3);
+	--vk-im-gap: var(--body-background-color);
+	--vk-im-shadow: var(--border-color);
+	--vk-im-time: color-mix(in srgb, var(--muted-text-color-3) 60%, var(--transparent));
+	--vk-im-attach-color: var(--link-color);
+	--vk-im-preview-strong: var(--text-color);
+	--vk-im-editing-bg: color-mix(in srgb, #e6a028 15%, var(--transparent));
+	--vk-im-online: var(--success-color);
+	--vk-im-hl-bg: var(--border-color-2);
+	--vk-im-reply-hover: var(--border-color-3);
+	--vk-im-back: var(--muted-text-color-3);
+	--vk-im-back-hover: var(--text-color);
+	--vk-im-icon: var(--muted-text-color-2);
+	--vk-im-icon-blue: var(--accent-color-2);
+	--vk-im-danger: var(--message-warning-border);
 }
 
 body.dark-mode .home_navigation .top_nav_btn_icon,
