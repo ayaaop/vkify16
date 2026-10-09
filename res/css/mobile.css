@@ -1393,8 +1393,7 @@
         flex: 1;
         min-height: 0;
     }
-    /* height:auto important overrides the inline height written by
-       vkifyTextareaAutosize, which caps textareas at 120px on mobile */
+    /* !important beats the inline height vkifyTextareaAutosize writes */
     .ovk-msg-fullscreen #_edit_post_modal textarea {
         flex: 1;
         min-height: 0;
@@ -1978,7 +1977,7 @@
         color: var(--muted-text-color-2);
     }
     .audioEntry .tire {
-        display: none;
+        display: none!important;
     }
     .audioEntry .explicitMark {
         flex-shrink: 0;
@@ -2829,8 +2828,7 @@
         width: calc(100% - 80px)
     }
 
-    /* Chat header takes over the appbar while a conversation is open: it is
-       fixed over the (static, in-flow) appbar and reuses its chrome. */
+    /* chat header overlays the appbar while a conversation is open */
     body.body_im .messenger-app--header.messages--peers-header-peer-name {
         position: fixed;
         top: 0;
@@ -2912,15 +2910,14 @@
     body.body_im .messenger-app--header--ava .messenger-app--header--online {
         border-color: var(--accent-color);
     }
-    /* Selection bar overlays the (now fixed) header, same as upstream. */
+    /* selection bar overlays the fixed header */
     body.body_im .messages--actions {
         position: fixed;
         top: 0;
         height: var(--header-height);
     }
 
-    /* Input bar styled after the VKUI WriteBar: flat bar with an upward
-       elevation shadow, 44x52 icon slots at the edges, borderless field. */
+    /* input bar styled after the VKUI WriteBar */
     body.body_im .messenger-app-end {
         border-radius: 0;
         box-shadow: none;
@@ -2957,8 +2954,7 @@
     body.body_im .messenger-app .im-chat-input--scroll .im-chat-input--attaches {
         margin-top: 0;
     }
-    /* VKUI WriteBar has a single paperclip on the left; the in-field camera
-       is redundant with the attach menu. */
+    /* the in-field camera is redundant with the attach menu */
     body.body_im .messenger-app .im-chat-input--attach {
         display: none;
     }
@@ -3009,7 +3005,7 @@
     body.body_im .messenger-app .im-send-btn:after {
         display: none;
     }
-    /* VKUI done mode: check_circle_outline in place of send while editing. */
+    /* done icon replaces send while editing */
     body.body_im .messenger-app .im-send-btn .wb-done {
         display: none !important;
     }
@@ -3023,7 +3019,20 @@
         display: block !important;
     }
 
-    /* upstream 4c462220 mobile parity: fastchats hidden, sticker shop/modal fit */
+    /* reply preview is a separated strip, no accent bar */
+    body.body_im .messenger-app-end.m-selected:not(.stock-input-bar) .input-m.input-reply {
+        padding: 3px 15px;
+        background: var(--module-background-color--secondary);
+        border-top: 1px solid var(--border-color);
+    }
+    body.body_im .messenger-app-end .input-m.input-reply .input-reply-content {
+        padding-left: 0;
+    }
+    body.body_im .messenger-app-end .input-m.input-reply .input-reply-content:before {
+        display: none;
+    }
+
+    /* fastchats hidden, sticker shop/modal fit */
     #fastchats_container {
         display: none !important;
     }
