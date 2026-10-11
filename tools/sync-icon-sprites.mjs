@@ -396,18 +396,35 @@ function syncSvgViewBoxes(files, viewBoxMap, write = true) {
     const content = fs.readFileSync(file, 'utf8');
     let changed = false;
     const updated = content.replace(svgUseRe, (svgMatch, svgAttrs, svgBody) => {
-      const useMatch = svgBody.match(
-        /<use\b[^>]*(?:xlink:)?href="#([a-z0-9][a-z0-9-]*)"/i,
-      );
-      if (!useMatch) {
+      const useIds = [
+        ...new Set(
+          [
+            ...svgBody.matchAll(
+              /<use\b[^>]*(?:xlink:)?href="#([a-z0-9][a-z0-9-]*)"/gi,
+            ),
+          ].map((m) => m[1]),
+        ),
+      ];
+      if (useIds.length === 0) {
         return svgMatch;
       }
 
-      const iconId = useMatch[1];
-      const dims = viewBoxMap.get(iconId);
-      if (!dims) {
+      // Multi-<use> icons (e.g. .i16/.i18 action buttons) swap glyphs via CSS;
+      // only sync when every referenced icon shares the same viewBox.
+      const viewBoxes = new Set();
+      for (const iconId of useIds) {
+        const dims = viewBoxMap.get(iconId);
+        if (!dims) {
+          return svgMatch;
+        }
+        viewBoxes.add(dims.viewBox);
+      }
+      if (viewBoxes.size !== 1) {
         return svgMatch;
       }
+
+      const iconId = useIds[0];
+      const dims = viewBoxMap.get(iconId);
 
       const existingViewBox = svgAttrs.match(/\bviewBox="([^"]*)"/i);
       if (existingViewBox && existingViewBox[1] === dims.viewBox) {
