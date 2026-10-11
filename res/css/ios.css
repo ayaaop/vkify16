@@ -539,4 +539,78 @@
         background-color: transparent;
         color: var(--accent-color-2);
     }
+
+    /* gift recipient multiselect */
+    .platform-ios .stickers_gift_selector_box {
+        min-height: 44px;
+        padding: 6px 28px 6px 12px;
+        border: none;
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--text-color) 5%, transparent);
+    }
+    .platform-ios .stickers_gift_selector_box:focus-within {
+        box-shadow: inset 0 0 0 1px var(--accent-color-2);
+    }
+    .platform-ios .stickers_gift_selector_arrow {
+        right: 12px;
+    }
+    .platform-ios .stickers_gift_selector_box .stickers_gift_input {
+        width: auto;
+        height: auto;
+        min-height: 0;
+        padding: 4px 0;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+        font-size: 16px;
+        line-height: 22px;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+    .platform-ios .stickers_gift_selector_box .stickers_gift_input:focus {
+        box-shadow: none;
+    }
+    .platform-ios .stickers_gift_token {
+        min-height: 30px;
+        font-size: 14px;
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--text-color) 10%, transparent);
+        color: var(--text-color) !important;
+    }
+    .platform-ios .stickers_gift_token span {
+        color: var(--text-color) !important;
+        font-size: 14px;
+        padding: 4px 2px 4px 10px;
+    }
+    .platform-ios .stickers_gift_token_remove {
+        color: var(--muted-text-color-2);
+        padding: 6px 8px;
+        opacity: 1;
+    }
+    .platform-ios .stickers_gift_suggestions {
+        border: none;
+        border-radius: 10px;
+        margin-top: 4px;
+        padding: 0;
+        overflow: hidden;
+        background: var(--module-background-color);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, .18);
+    }
+    .platform-ios .stickers_gift_suggestion_item {
+        padding: 10px 12px;
+    }
+    .platform-ios .stickers_gift_suggestion_item + .stickers_gift_suggestion_item {
+        border-top: .5px solid var(--border-color);
+    }
+    .platform-ios .stickers_gift_suggestion_item:active {
+        background: color-mix(in srgb, var(--text-color) 5%, transparent);
+    }
+    .platform-ios .stickers_gift_suggestion_avatar {
+        width: 32px;
+        height: 32px;
+    }
+    .platform-ios .stickers_gift_suggestion_name {
+        font-size: 16px;
+    }
 }

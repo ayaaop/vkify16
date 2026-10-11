@@ -25,7 +25,7 @@
                     <div class="gifts_section_scroll">
                         <div class="gift_section_wrap">
                             {foreach array_slice(iterator_to_array($x->getGifts()), 0, 12) as $gift}
-                                <a href="/gifts?act=confirm&user={$user->getId()}&pack={$x->getId()}&elid={$gift->getId()}" class="gift_cell">
+                                <a href="/gifts?act=confirm&user={$user->getId()}&pack={$x->getId()}&elid={$gift->getId()}" n:class="gift_cell, gift_sel, $gift->getUsagesLeft($thisUser) !== \INF ? has_limit, !$gift->canUse($thisUser) ? disabled" data-modal="1" data-no-ajax="1" data-gift="{$gift->getId()}" data-gift-price="{$gift->getPrice()}" data-gift-img="{$gift->getImage(2)}" data-recipient-id="{$user->getId()}" data-recipient-name="{$user->getCanonicalName()}" data-recipient-first-name="{$user->getFirstName()}">
                                     <img width="107.5" height="107.5" class="gift_img" src="{$gift->getImage(2)}" alt="{_gift}" loading=lazy />
                                     <div class="{if $gift->isFree() || $gift->getPrice() <= 2}gift_free{else}gift_price{/if}">
                                         {if $gift->isFree()}

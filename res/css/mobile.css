@@ -3351,6 +3351,61 @@
         padding: 20px 16px!important;
     }
 
+    /* gift recipient multiselect */
+    .stickers_gift_selector_box {
+        min-height: 44px;
+        padding: 6px 24px 5px 0;
+        border: none;
+        border-bottom: 1px solid color-mix(in srgb, var(--text-color) 38%, transparent);
+        border-radius: 0;
+        background: transparent;
+    }
+    .stickers_gift_selector_box:focus-within {
+        border-bottom-color: var(--accent-color);
+        box-shadow: 0 1px 0 0 var(--accent-color);
+    }
+    .stickers_gift_selector_box .stickers_gift_input {
+        width: auto;
+        height: auto;
+        min-height: 0;
+        padding: 4px 0;
+        border-bottom: none;
+        box-shadow: none;
+        background: transparent;
+        font-size: 16px;
+        line-height: 24px;
+    }
+    .stickers_gift_selector_box .stickers_gift_input:focus {
+        border-bottom-color: transparent;
+        box-shadow: none;
+    }
+    .stickers_gift_selector_box.is-empty .stickers_gift_input {
+        padding-left: 18px;
+    }
+    .stickers_gift_token {
+        min-height: 28px;
+        font-size: 13px;
+    }
+    .stickers_gift_token span {
+        font-size: 13px;
+    }
+    .stickers_gift_token_remove {
+        padding: 4px 8px;
+    }
+    .stickers_gift_suggestions {
+        max-height: 240px;
+    }
+    .stickers_gift_suggestion_item {
+        padding: 10px 12px;
+    }
+    .stickers_gift_suggestion_avatar {
+        width: 32px;
+        height: 32px;
+    }
+    .stickers_gift_suggestion_name {
+        font-size: 14.5px;
+    }
+
     .emoji-tabs-divider {
         border-radius: 0;
     }

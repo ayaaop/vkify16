@@ -633,6 +633,7 @@
                 "max_attachments": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["wall"]["postSizes"]["maxAttachments"] ?? 10},
                 "max_filesize_mb": 100,
                 "current_id": {isset($thisUser) ? $thisUser->getId() : 0},
+                "coins": {ifset $thisUser}{$thisUser->getCoins()}{else}0{/ifset},
                 "status": {isset($thisUser) ? $thisUser->getStatus() : ""},
                 "broadcast_music": {isset($thisUser) ? $thisUser->isBroadcastEnabled() : false},
                 "disable_ajax": {isset($disable_ajax) ? $disable_ajax : 0},
@@ -656,6 +657,7 @@
         {script "js/options.js"}
         {script "js/content-editable.js"}
         {script "js/stickers.js"}
+        {script "js/gifts.js"}
         {script "js/messages/related.js"}
 
         <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/ui/page.js"></script>
