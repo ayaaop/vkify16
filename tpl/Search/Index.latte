@@ -141,7 +141,10 @@
                                                 <input type="hidden" name="act" value="{$actions[$subStatus]['act']}" />
                                                 <input type="hidden" name="id"  value="{$dat->getId()}" />
                                                 <input type="hidden" name="hash" value="{$csrfToken}" />
-                                                <input type="submit" value="{$actions[$subStatus]['label']}" class="button button_wide {if isset($actions[$subStatus]['class'])}{$actions[$subStatus]['class']}{/if}" />
+                                                <button type="submit" class="button button_wide {if isset($actions[$subStatus]['class'])}{$actions[$subStatus]['class']}{/if} profile_sub_btn" aria-label="{$actions[$subStatus]['label']}">
+                                                    <svg class="mobileonly" width="28" height="28" viewBox="0 0 28 28" fill="currentColor">{if $actions[$subStatus]['act'] === 'add'}<use href="#user-add-outline-28"></use>{else}<use href="#user-slash-outline-28"></use>{/if}</svg>
+                                                    <span class="nomobile">{$actions[$subStatus]['label']}</span>
+                                                </button>
                                             </form>
                                         {/if}
                                     </div>
@@ -185,7 +188,10 @@
                                                 <input type="hidden" name="act" value="{$actions[$subStatus ? 1 : 0]['act']}" />
                                                 <input type="hidden" name="id"  value="{$dat->getId()}" />
                                                 <input type="hidden" name="hash" value="{$csrfToken}" />
-                                                <input type="submit" value="{$actions[$subStatus ? 1 : 0]['label']}" class="button button_wide {if isset($actions[$subStatus ? 1 : 0]['class'])}{$actions[$subStatus ? 1 : 0]['class']}{/if}" />
+                                                <button type="submit" class="button button_wide {if isset($actions[$subStatus ? 1 : 0]['class'])}{$actions[$subStatus ? 1 : 0]['class']}{/if} profile_sub_btn" aria-label="{$actions[$subStatus ? 1 : 0]['label']}">
+                                                    <svg class="mobileonly" width="28" height="28" viewBox="0 0 28 28" fill="currentColor">{if $actions[$subStatus ? 1 : 0]['act'] === 'add'}<use href="#add-outline-28"></use>{else}<use href="#door-arrow-left-outline-28"></use>{/if}</svg>
+                                                    <span class="nomobile">{$actions[$subStatus ? 1 : 0]['label']}</span>
+                                                </button>
                                             </form>
                                         {/if}
                                     </div>

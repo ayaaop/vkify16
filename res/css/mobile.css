@@ -843,7 +843,7 @@
         overflow: hidden;
         transition: background-color 0.15s ease-out, color 0.15s ease-out, box-shadow 0.15s ease-out;
     }
-    .button:not(.button_light):not(.profile_link):not(:disabled):not([disabled]):active,
+    .button:not(.button_light):not(.profile_link):not(.profile_sub_btn):not(:disabled):not([disabled]):active,
     input[class="button"]:not(:disabled):not([disabled]):active {
         box-shadow: 0 1px 2px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
     }
@@ -887,6 +887,29 @@
     }
     .action_links .button {
         padding: 7px 16px 8px
+    }
+    .action_links button.profile_sub_btn {
+        width: 44px;
+        min-width: 44px;
+        height: 44px;
+        padding: 0;
+        flex: none;
+        border: none;
+        border-radius: 50%;
+        box-shadow: none;
+        background: transparent;
+        color: var(--accent-color-2);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .action_links button.profile_sub_btn:active {
+        box-shadow: none;
+        background: color-mix(in srgb, var(--accent-color-2) 12%, transparent);
+    }
+    .action_links button.profile_sub_btn.button_gray {
+        color: var(--muted-text-color-3);
+        background: transparent;
     }
 
     /* forms */

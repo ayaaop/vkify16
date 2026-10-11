@@ -107,21 +107,30 @@
                 <input type="hidden" name="act" value="add" />
                 <input type="hidden" name="id"  value="{$x->getId()}" />
                 <input type="hidden" name="hash" value="{$csrfToken}" />
-                <input type="submit" class="button button_wide button_small" value="{_friends_add}" />
+                <button type="submit" class="button button_wide button_small profile_sub_btn" aria-label="{_friends_add}">
+                    <svg class="mobileonly" width="28" height="28" viewBox="0 0 28 28" fill="currentColor"><use href="#user-add-outline-28"></use></svg>
+                    <span class="nomobile">{_friends_add}</span>
+                </button>
             </form>
         {elseif $subStatus === 1}
             <form action="/setSub/user" method="post" class="profile_link_form" id="_submitUserSubscriptionAction">
                 <input type="hidden" name="act" value="add" />
                 <input type="hidden" name="id"  value="{$x->getId()}" />
                 <input type="hidden" name="hash" value="{$csrfToken}" />
-                <input type="submit" class="button button_wide button_small" value="{_friends_accept}" />
+                <button type="submit" class="button button_wide button_small profile_sub_btn" aria-label="{_friends_accept}">
+                    <svg class="mobileonly" width="28" height="28" viewBox="0 0 28 28" fill="currentColor"><use href="#user-add-outline-28"></use></svg>
+                    <span class="nomobile">{_friends_accept}</span>
+                </button>
             </form>
             {if $act !== 'followers'}
                 <form action="/setSub/user" method="post" class="profile_link_form" id="_submitUserSubscriptionAction">
                     <input type="hidden" name="act" value="rej" />
                     <input type="hidden" name="id"  value="{$x->getId()}" />
                     <input type="hidden" name="hash" value="{$csrfToken}" />
-                    <input type="submit" class="button button_wide button_gray button_small" value="{_friends_leave_in_flw}" />
+                    <button type="submit" class="button button_wide button_gray button_small profile_sub_btn" aria-label="{_friends_leave_in_flw}">
+                        <svg class="mobileonly" width="28" height="28" viewBox="0 0 28 28" fill="currentColor"><use href="#user-slash-outline-28"></use></svg>
+                        <span class="nomobile">{_friends_leave_in_flw}</span>
+                    </button>
                 </form>
             {/if}
         {elseif $subStatus === 2}
@@ -129,14 +138,20 @@
                 <input type="hidden" name="act" value="rem" />
                 <input type="hidden" name="id"  value="{$x->getId()}" />
                 <input type="hidden" name="hash" value="{$csrfToken}" />
-                <input type="submit" class="button button_wide button_gray button_gray" value="{_friends_reject}" />
+                <button type="submit" class="button button_wide button_gray button_gray profile_sub_btn" aria-label="{_friends_reject}">
+                    <svg class="mobileonly" width="28" height="28" viewBox="0 0 28 28" fill="currentColor"><use href="#user-slash-outline-28"></use></svg>
+                    <span class="nomobile">{_friends_reject}</span>
+                </button>
             </form>
         {elseif $subStatus === 3}
             <form action="/setSub/user" method="post" class="profile_link_form" id="_submitUserSubscriptionAction">
                 <input type="hidden" name="act" value="rem" />
                 <input type="hidden" name="id"  value="{$x->getId()}" />
                 <input type="hidden" name="hash" value="{$csrfToken}" />
-                <input type="submit" class="button button_wide button_gray button_gray" value="{_friends_delete}" />
+                <button type="submit" class="button button_wide button_gray button_gray profile_sub_btn" aria-label="{_friends_delete}">
+                    <svg class="mobileonly" width="28" height="28" viewBox="0 0 28 28" fill="currentColor"><use href="#user-slash-outline-28"></use></svg>
+                    <span class="nomobile">{_friends_delete}</span>
+                </button>
             </form>
         {/if}
     {/if}

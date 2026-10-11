@@ -533,7 +533,7 @@
     // pointerdown listener covers SPA-swapped content with no rescan: the
     // positioning/clipping classes live only for the duration of the press,
     // so static layout is never affected.
-    const RIPPLE_BOUNDED_SELECTOR = '.button, .profile_link'
+    const RIPPLE_BOUNDED_SELECTOR = '.button:not(.profile_sub_btn), .profile_link'
         + ', .ui_actions_menu a, .ui_actions_menu button, .ui_actions_menu input'
         + ', .ui_actions_menu label, .ui_actions_menu .ui_actions_menu_item'
         + ', .ui_tab, .ui_tab_plain, .sidebar_inner .link, .mobile-info-row'
@@ -543,7 +543,8 @@
         + ', .ovk-msg-fullscreen .ovk-diag-head-close, .ovk-msg-fullscreen .ovk-diag-head-apply'
         + ', .ovk-msg-sheet .ovk-diag-head-close, .ovk-msg-sheet .ovk-diag-head-apply'
         + ', .ovk-modal-video-window .video_top_button'
-        + ', .messenger-app--header--ava, .messenger-app-header--more-actions--trigger';
+        + ', .messenger-app--header--ava, .messenger-app-header--more-actions--trigger'
+        + ', .profile_sub_btn';
 
     function rippleEnabled() {
         return !IS_IOS
