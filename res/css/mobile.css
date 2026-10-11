@@ -390,6 +390,10 @@
     body.menu-expanded {
         overflow: hidden;
     }
+    html:has(body.dimmed) {
+        overflow-y: hidden!important;
+        scrollbar-gutter: stable;
+    }
     .home_button {
         width: 100%;
         padding: .5rem 1rem;
@@ -1023,13 +1027,14 @@
     }
     .ovk-msg-dialog .ovk-diag-head {
         background: none!important;
-        border: 0!important;
+        border: 0;
+        border-bottom: 1px solid transparent;
         color: var(--text-color);
         height: auto;
         font-size: 20px;
         line-height: 28px;
         font-weight: 500;
-        padding: 24px 24px 20px;
+        padding: 24px 24px 20px!important;
         border-radius: 0;
         flex: none;
     }
@@ -1236,6 +1241,10 @@
         text-align: center;
     }
 
+    .ovk-diag-body .audiosInsert {
+        margin: 0;
+    }
+    
     /* full-screen dialog */
     .ovk-diag-cont.ovk-msg-fullscreen {
         width: 100%!important;
@@ -1327,6 +1336,33 @@
     }
     .ovk-msg-fullscreen .ovk-diag-action {
         display: none;
+    }
+
+    /* dialog tables */
+    .ovk-msg-all .flexible_table tbody,
+    .ovk-msg-all .flexible_table tr,
+    .ovk-msg-all .flexible_table td {
+        display: block;
+        width: 100%;
+        text-align: start;
+    }
+    .ovk-msg-all .flexible_table tr:not(:last-child) {
+        margin-bottom: 20px;
+    }
+    .ovk-msg-all .flexible_table tr td:first-child {
+        margin-bottom: 6px;
+    }
+    .ovk-msg-all .flexible_table tr.not_flexible_tr {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+    }
+    .ovk-msg-all .flexible_table tr.not_flexible_tr td {
+        width: auto;
+    }
+    .ovk-msg-all .flexible_table tr.not_flexible_tr td:first-child {
+        margin-bottom: 0;
     }
     /* tabs */
     .ovk-msg-fullscreen #_feed_settings_container,
@@ -1459,6 +1495,18 @@
     }
     .ovk-diag-cont.ovk-diag-can-scroll .ovk-diag-action {
         border-top-color: var(--border-color);
+    }
+    .ovk-diag-cont .ovk-diag-head {
+        border-bottom-color: transparent;
+    }
+    .ovk-diag-cont.ovk-diag-scrolled .ovk-diag-head {
+        border-bottom-color: var(--border-color);
+    }
+    body.dark-mode .ovk-msg-dialog .ovk-diag-head {
+        border-bottom-color: transparent;
+    }
+    body.dark-mode .ovk-msg-dialog.ovk-diag-scrolled .ovk-diag-head {
+        border-bottom-color: var(--border-color);
     }
     .ovk-diag .language_column {
         width: 100%;

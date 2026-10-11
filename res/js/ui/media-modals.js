@@ -684,9 +684,6 @@ vkify.once('mediaModals', function () {
         });
         showLoader(this.modal.getNode().find('.ovk-doc-viewer-body').nodes[0]);
         this.modal.getNode().find('#__modalDocClose').on('click', () => this.close());
-        this.modal.getNode().find('.ovk-photo-view-dimmer').on('click', (e) => {
-            if (e.target === e.currentTarget) this.close();
-        });
     };
 
     DocsViewer.prototype._loadDetails = async function (ids) {

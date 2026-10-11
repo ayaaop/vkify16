@@ -32,6 +32,28 @@ vkify.bindOnce('messageBoxOverrides', () => {
             }
         };
 
+        // Fullscreen msgbox containers (.ovk-photo-view-dimmer, .ovk-modern-msg)
+        // render above body > .dimmer, so stock's 'body.dimmed .dimmer' handler
+        // never sees clicks on their backdrop.
+        if (!window.__vkifyBackdropCloseBound) {
+            window.__vkifyBackdropCloseBound = true;
+            document.addEventListener('click', (e) => {
+                const t = e.target;
+                if (!(t instanceof Element)) return;
+                if (t.classList.contains('ovk-msg-minimized')) return;
+                if (!t.classList.contains('ovk-photo-view-dimmer') && !t.classList.contains('ovk-modern-msg')) return;
+
+                const stack = window.messagebox_stack;
+                const msg = stack && stack[stack.length - 1];
+                if (!msg) return;
+                if (msg._viewer && typeof msg._viewer.close === 'function') {
+                    msg._viewer.close();
+                } else {
+                    closeMessageBox(msg);
+                }
+            });
+        }
+
         if (!proto.addClass) {
             proto.addClass = function (className) {
                 this.getNode?.()?.addClass(className);
@@ -57,6 +79,11 @@ vkify.bindOnce('messageBoxOverrides', () => {
                     }
                 }
                 origExitDialog.call(this);
+                // Stock clears ?w only via viewer.close(); Escape, __closeMsgs
+                // and direct msg.close() bypass it and leave the param behind.
+                if (this._viewer && typeof this._viewer._removeW === 'function') {
+                    this._viewer._removeW();
+                }
             };
 
             const decorateDialog = (el) => {
@@ -110,8 +137,8 @@ vkify.bindOnce('messageBoxOverrides', () => {
             };
 
             // themepack dialogs opt in directly via addClass at creation
-            const SHEET_BODY_MARKERS = '.stickers_pack_modal, .audiosInsert, [id^="poll_editor"], #osm-map, #upload_container, #repostMsgInput, #_fast_video_upload';
-            const FULLSCREEN_BODY_MARKERS = '#_fullyDeleteAudio, #_edit_post_modal';
+            const SHEET_BODY_MARKERS = '.stickers_pack_modal, .audiosInsert, [id^="poll_editor"], #osm-map, #upload_container, #repostMsgInput, #_fast_video_upload, .message-viewers-modal-loader, .message-viewers-list-wrap, .pinned-message-modal-content';
+            const FULLSCREEN_BODY_MARKERS = '#_fullyDeleteAudio, #_edit_post_modal, .chat-permissions-desc';
             const classifyDialog = (el) => {
                 el.querySelectorAll('.ovk-diag-action > .button, .ovk-diag-action > button, .ovk-diag-action > input[type="button"], .ovk-diag-action > input[type="submit"]')
                     .forEach(btn => btn.classList.add('ovk-msg-btn'));
@@ -131,7 +158,9 @@ vkify.bindOnce('messageBoxOverrides', () => {
                 const body = el.querySelector('.ovk-diag-body');
                 if (!body) return;
                 const action = el.querySelector('.ovk-diag-action');
-                let ro, mo;
+                let ro, mo, scrollEndTimer = null;
+                const isScrollable = () => body.scrollHeight - body.clientHeight > 1;
+                const clearScrolled = () => el.classList.remove('ovk-diag-scrolled');
                 const update = () => {
                     if (!el.isConnected) {
                         ro?.disconnect();
@@ -140,16 +169,30 @@ vkify.bindOnce('messageBoxOverrides', () => {
                     }
                     const remaining = body.scrollHeight - body.clientHeight - body.scrollTop;
                     el.classList.toggle('ovk-diag-can-scroll', remaining > 1);
+                    if (!isScrollable() || body.scrollTop <= 1) {
+                        clearScrolled();
+                    }
                     if (action && !el.classList.contains('ovk-diag-stacked')) {
                         el.classList.toggle('ovk-diag-stacked', action.scrollWidth > action.clientWidth + 1);
                     }
+                };
+                // head divider shows only during an active scroll
+                const onBodyScroll = () => {
+                    update();
+                    if (!isScrollable() || body.scrollTop <= 1) {
+                        clearScrolled();
+                        return;
+                    }
+                    el.classList.add('ovk-diag-scrolled');
+                    clearTimeout(scrollEndTimer);
+                    scrollEndTimer = setTimeout(clearScrolled, 250);
                 };
                 ro = new ResizeObserver(update);
                 mo = new MutationObserver(update);
                 ro.observe(body);
                 if (action) ro.observe(action);
                 mo.observe(body, { childList: true, subtree: true, characterData: true });
-                body.addEventListener('scroll', update, { passive: true });
+                body.addEventListener('scroll', onBodyScroll, { passive: true });
                 update();
             };
 
