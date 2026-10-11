@@ -522,10 +522,51 @@ function bindSourceButtonOrderFix() {
     });
 }
 
+function vkifyDeleteModalComment(link) {
+    const msgbox = link.closest('.ovk-msg-all');
+    const comment = link.closest('.post');
+    if (!msgbox || !comment) return;
+
+    MessageBox(tr('warning'), tr('question_confirm'), [tr('yes'), tr('no')], [async () => {
+        const f = new FormData();
+        f.append('hash', window.router.csrf);
+        f.append('ajax', '1');
+
+        const res = await fetch(link.href, { method: 'POST', body: f });
+        const text = await res.text();
+        try {
+            JSON.parse(text);
+            if (res.status !== 200) {
+                fastError(res.status);
+                return;
+            }
+            comment.outerHTML = `<div class="post post-divider"><div class="post-deleted">${tr('comment_from_page_is_deleted')}</div></div>`;
+        } catch (err) {
+            console.error(err);
+            fastError(String(err));
+        }
+
+        if (typeof reset_msgbox_details === 'function') {
+            reset_msgbox_details(msgbox);
+        }
+    }, Function.noop]);
+}
+
 function bindWallAjaxActions() {
     if (!vkify.bindOnce('wallAjaxActions', bindWallAjaxActions)) return;
 
     document.addEventListener('click', (e) => {
+        // Inside viewer modals stock ajax_delete resolves the node via
+        // msgbox.querySelector('.post'), which hits the parent post.
+        const commentDelete = e.target.closest('.ovk-msg-all .reply_delete_action');
+        if (commentDelete) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            vkifyDeleteModalComment(commentDelete);
+            return;
+        }
+
         const deleteTarget = e.target.closest('#_wallDelete, #_ajaxDelete, .delete');
         if (deleteTarget && typeof window.ajax_delete === 'function') {
             e.preventDefault();
@@ -545,10 +586,25 @@ function bindWallAjaxActions() {
     }, true);
 }
 
+function bindAjaxPostCleanup() {
+    if (!vkify.bindOnce('ajaxPostCleanup', bindAjaxPostCleanup)) return;
+    if (typeof window.back_textarea_to_default !== 'function') return;
+
+    // vkify16 posts/comments already carry scroll_node + data-uniqueid,
+    // so the wrapper ajax_posting adds around them is redundant.
+    vkify.hook(window, 'back_textarea_to_default', () => {
+        document.querySelectorAll('.scroll_node > .post.scroll_node').forEach(post => {
+            const wrapper = post.parentElement;
+            if (wrapper.childElementCount === 1) wrapper.replaceWith(post);
+        });
+    });
+}
+
 setupWallCheckboxListeners();
 bindCommentCancelOnce();
 bindSourceButtonOrderFix();
 bindWallAjaxActions();
+bindAjaxPostCleanup();
 
 let _groupInfoTabsInitialized = false;
 function initGroupInfoTabs() {
