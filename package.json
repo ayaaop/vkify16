@@ -7,6 +7,8 @@
     "watch": "node build.mjs --watch"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "@types/node": "^26.6.5",
     "esbuild": "^0.23.0"
   }
 }
