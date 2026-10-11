@@ -53,6 +53,17 @@ vkify.once('mediaModals', function () {
         CMessageBox.toggleLoader(false);
     }, true);
 
+    document.addEventListener('click', (e) => {
+        const postLink = e.target.closest('.scroll_container .post_link');
+        if (!postLink) return;
+        const post = postLink.closest('.post');
+        if (!post || post.classList.contains('note_post')) return;
+        const postId = post.dataset.id;
+        if (!postId) return;
+
+        PostViewer.openById(e, postId);
+    }, true);
+
     PhotoViewer.openById = async function (ids, event = null) {
         if (ids && (typeof ids.preventDefault === 'function' || ids.target || ids instanceof Event)) {
             const t = ids;
