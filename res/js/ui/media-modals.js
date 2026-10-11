@@ -677,12 +677,14 @@ vkify.once('mediaModals', function () {
     DocsViewer.prototype.createMsgbox = function () {
         const template = u(`
         <div class="ovk-photo-view-dimmer ovk-msg-all">
-            <div class="ovk-modal-video-window">
+            <div class="ovk-modal-video-window ovk-modal-doc-window">
                 <div id="video_top_controls_wrapper">
                     <div id="video_top_controls">
                         <div id="__modalDocClose" class="video_top_button video_top_close" role="button" tabindex="0" aria-label="${tr('close')}">
                             <div class="video_close_icon"></div>
+                            <svg class="video_top_svg mobileonly" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><use href="#cancel-24"></use></svg>
                         </div>
+                        <span class="video_viewer_title mobileonly">${tr('document')}</span>
                     </div>
                 </div>
                 <div class="page_block ovk-doc-viewer-body"></div>
@@ -733,12 +735,15 @@ vkify.once('mediaModals', function () {
                     <div id="video_top_controls">
                         <div id="__modal_player_close" class="video_top_button video_top_close" role="button" tabindex="0" aria-label="Close">
                             <div class="video_close_icon"></div>
+                            <svg class="video_top_svg mobileonly" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><use href="#cancel-24"></use></svg>
                         </div>
-                        <div id="__modal_player_minimize" class="video_top_button video_top_minimize" title="Minimize">
+                        <span class="video_viewer_title mobileonly">${tr('video')}</span>
+                        <div id="__modal_player_minimize" class="video_top_button video_top_minimize nomobile" title="Minimize">
                             <div class="video_minimize_icon"></div>
                         </div>
                         <div id="toggleBar" class="video_top_button video_top_toggle_sideblock" title="Toggle sideblock">
                             <div class="video_toggle_sideblock_icon"></div>
+                            <svg class="video_top_svg mobileonly" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><use href="#list-bullet-outline-24"></use></svg>
                         </div>
                     </div>
                 </div>
@@ -898,7 +903,9 @@ vkify.once('mediaModals', function () {
                     <div id="video_top_controls">
                         <div id="ovk-photo-close" class="video_top_button video_top_close" role="button" tabindex="0" aria-label="${tr('close')}">
                             <div class="video_close_icon"></div>
+                            <svg class="video_top_svg mobileonly" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><use href="#cancel-24"></use></svg>
                         </div>
+                        <span class="video_viewer_title mobileonly">${tr('post')}</span>
                     </div>
                 </div>
                 <div class="page_block post_viewer_page">

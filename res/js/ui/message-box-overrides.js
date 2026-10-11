@@ -54,6 +54,19 @@ vkify.bindOnce('messageBoxOverrides', () => {
             });
         }
 
+        // appbar elevation for fullscreen viewers: .ovk-appbar-scrolled stays
+        // on while the viewer's scroll body is away from the top.
+        if (!window.__vkifyViewerScrollBound) {
+            window.__vkifyViewerScrollBound = true;
+            document.addEventListener('scroll', (e) => {
+                const scroller = e.target;
+                if (!(scroller instanceof Element)) return;
+                if (!scroller.matches('.post_viewer_page, .ovk-video-player-body, .ovk-doc-viewer-body')) return;
+                scroller.closest('.ovk-modal-video-window')
+                    ?.classList.toggle('ovk-appbar-scrolled', scroller.scrollTop > 0);
+            }, true);
+        }
+
         if (!proto.addClass) {
             proto.addClass = function (className) {
                 this.getNode?.()?.addClass(className);

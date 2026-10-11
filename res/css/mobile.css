@@ -1338,6 +1338,160 @@
         display: none;
     }
 
+    /* media viewers (fullscreen with appbar) */
+    .post_popup_modal .ovk-modal-video-window,
+    .ovk-photo-view-dimmer:not(.ovk-msg-minimized) .ovk-modal-player-window,
+    .ovk-modal-doc-window {
+        width: 100% !important;
+        height: var(--ovk-vv-height, 100dvh) !important;
+        max-height: none;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        transition: none;
+    }
+    .post_popup_modal #video_top_controls_wrapper,
+    .ovk-modal-player-window #video_top_controls_wrapper,
+    .ovk-modal-doc-window #video_top_controls_wrapper {
+        position: static;
+        height: auto;
+        flex: none;
+        background-color: var(--module-background-color)
+    }
+    .post_popup_modal #video_top_controls,
+    .ovk-modal-player-window #video_top_controls,
+    .ovk-modal-doc-window #video_top_controls {
+        position: static;
+        display: flex;
+        align-items: center;
+        height: var(--header-height);
+        padding: 0 4px;
+        background: var(--accent-color);
+        color: var(--accent-text-color);
+        position: relative;
+        z-index: 1;
+        transition: box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .ovk-appbar-scrolled #video_top_controls {
+        box-shadow: 0 2px 4px -1px rgba(0,0,0,.2), 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12);
+    }
+    .dark-mode .post_popup_modal #video_top_controls,
+    .dark-mode .ovk-modal-player-window #video_top_controls,
+    .dark-mode .ovk-modal-doc-window #video_top_controls {
+        --accent-color: var(--module-header-background-color);
+        --accent-text-color: var(--text-color);
+    }
+    .post_popup_modal #video_top_controls .video_top_button,
+    .ovk-modal-player-window #video_top_controls .video_top_button,
+    .ovk-modal-doc-window #video_top_controls .video_top_button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        opacity: 1;
+    }
+    .post_popup_modal #video_top_controls .video_top_button {
+        margin-right: 4px;
+    }
+    .ovk-modal-video-window .video_viewer_title {
+        display: block;
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 20px;
+        font-weight: 500;
+        letter-spacing: 0.0125em;
+    }
+    .ovk-modal-video-window #video_top_controls .video_top_button > div {
+        display: none;
+    }
+    .post_popup_modal .post_viewer_page {
+        flex: 1;
+        min-height: 0;
+        margin: 0;
+        border-radius: 0;
+        overflow-y: auto;
+    }
+    .post_popup_modal .post_viewer_page .page_block {
+        margin: 0;
+        border-radius: 0;
+    }
+
+    /* video viewer */
+    .ovk-modal-player-window .ovk-video-player-body {
+        flex: 1;
+        min-height: 0;
+        margin: 0;
+        border-radius: 0;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+    .ovk-modal-player-window .ovk-video-player-body .video_block_layout {
+        flex: none;
+    }
+    .ovk-modal-player-window #ovk-player-part {
+        flex: none;
+    }
+    .ovk-modal-player-window #player-infos .center-part {
+        flex: none;
+        aspect-ratio: 16 / 9;
+    }
+    .ovk-modal-player-window #ovk-player-info {
+        flex: none;
+    }
+    .ovk-photo-view-dimmer:not(.ovk-msg-minimized) .ovk-modal-player-window #player-video-queue {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        width: 100%;
+        height: auto;
+        max-height: 45%;
+        display: flex;
+        flex-direction: column;
+        white-space: normal;
+        transform: translateY(105%);
+        transition: transform 0.2s ease;
+        z-index: 10;
+    }
+    .ovk-photo-view-dimmer.queue-shown:not(.ovk-msg-minimized) .ovk-modal-player-window #player-video-queue {
+        width: 100%;
+        max-height: 45%;
+        transform: translateY(0);
+    }
+    .ovk-modal-player-window #player-video-queue #player-video-items {
+        height: auto;
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+    }
+
+    /* docs viewer */
+    .ovk-modal-doc-window .ovk-doc-viewer-body {
+        flex: 1;
+        min-height: 0;
+        margin: 0;
+        border-radius: 0;
+        overflow-y: auto;
+    }
+    .document_actions .post_full_like .action_button {
+        flex: 1;
+        min-width: 0;
+        justify-content: center;
+        margin-right: 0;
+    }
+    .document_actions .action_button .action_label {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     /* dialog tables */
     .ovk-msg-all .flexible_table tbody,
     .ovk-msg-all .flexible_table tr,
@@ -3275,7 +3429,8 @@
     .ovk-msg-fullscreen .ovk-diag-head-close, .ovk-msg-fullscreen .ovk-diag-head-close *,
     .ovk-msg-fullscreen .ovk-diag-head-apply, .ovk-msg-fullscreen .ovk-diag-head-apply *,
     .ovk-msg-sheet .ovk-diag-head-close, .ovk-msg-sheet .ovk-diag-head-close *,
-    .ovk-msg-sheet .ovk-diag-head-apply, .ovk-msg-sheet .ovk-diag-head-apply * {
+    .ovk-msg-sheet .ovk-diag-head-apply, .ovk-msg-sheet .ovk-diag-head-apply *,
+    .ovk-modal-video-window .video_top_button, .ovk-modal-video-window .video_top_button * {
         -webkit-touch-callout: none;
         -webkit-user-select: none;
         user-select: none;

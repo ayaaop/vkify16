@@ -1,5 +1,5 @@
 /* Photo modal */
-.ovk-photo-view-dimmer {
+.ovk-photo-view-overlay {
   pointer-events: none;
 }
 .ovk-photo-view-window {
@@ -1275,18 +1275,20 @@ body:not(.dark-mode) {
   overflow-y: auto;
 }
 
-.post_viewer_page #itemContent {
-  max-height: 50vh;
-  overflow-y: auto;
-}
 .post_viewer_page #itemContent .page_block {
   margin: 0;
 }
 
 .post_viewer_page #itemContentComments {
-  max-height: 35vh;
-  overflow-y: auto;
   border-top: 1px solid var(--border-color);
+}
+
+.post_popup_modal .pr {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 200px;
 }
 
 

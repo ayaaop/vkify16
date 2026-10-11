@@ -542,6 +542,7 @@
     const RIPPLE_UNBOUNDED_SELECTOR = '.appbar .hamburger, .appbar-extra-btn'
         + ', .ovk-msg-fullscreen .ovk-diag-head-close, .ovk-msg-fullscreen .ovk-diag-head-apply'
         + ', .ovk-msg-sheet .ovk-diag-head-close, .ovk-msg-sheet .ovk-diag-head-apply'
+        + ', .ovk-modal-video-window .video_top_button'
         + ', .messenger-app--header--ava, .messenger-app-header--more-actions--trigger';
 
     function rippleEnabled() {
