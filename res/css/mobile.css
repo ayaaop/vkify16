@@ -3389,6 +3389,16 @@
         border-radius: 0;
     }
 
+    /* message viewers dialog opens as a bottom sheet (sheet body pads 16px) */
+    .ovk-msg-sheet .ovk-diag-body .message-viewers-list-wrap {
+        margin: 0 -16px;
+    }
+    .ovk-msg-sheet .message-viewers-header,
+    .ovk-msg-sheet .message-viewer-row {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
     /* notes */
 
     #noteFactory .post_full_like_wrap {

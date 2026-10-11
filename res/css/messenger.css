@@ -2128,6 +2128,98 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     box-sizing: border-box;
 }
 
+/* Message viewers modal */
+.ovk-diag-body .message-viewers-list-wrap {
+    margin: 0 -25px;
+}
+.message-viewers-header {
+    padding: 4px 25px 10px;
+    border-bottom: 0;
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--muted-text-color-2);
+}
+
+.message-viewer-row {
+    padding: 7px 25px;
+    border-bottom: 0;
+}
+
+.message-viewer-row:hover {
+    background: var(--vk-im-hover);
+}
+
+.message-viewer-ava-link {
+    margin-right: 12px;
+}
+
+.message-viewer-ava {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--module-background-color--secondary);
+}
+
+.message-viewer-name {
+    font-size: 13px;
+    line-height: 15px;
+    font-weight: 500;
+    color: var(--link-color);
+}
+
+.message-viewer-time {
+    font-size: 13px;
+    line-height: 15px;
+    color: var(--muted-text-color);
+}
+
+/* Pinned message modal */
+.ovk-diag-cont:has(.pinned-message-modal-content) {
+    width: 580px !important;
+}
+
+.pinned-message-modal-inner {
+    gap: 12px;
+}
+
+.pinned-message-ava {
+    border-radius: 50%;
+    background: var(--module-background-color--secondary);
+}
+
+.pinned-message-header {
+    justify-content: flex-start;
+    gap: 5px;
+}
+
+.pinned-message-author {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--link-color);
+}
+
+.pinned-message-date {
+    font-size: 12.5px;
+    color: var(--muted-text-color);
+}
+
+.pinned-message-text {
+    margin-top: 3px;
+    font-size: 13px;
+    line-height: 17px;
+    color: var(--text-color);
+}
+
+/* "Закрыть" duplicates the head ×; the real secondary action is styled below */
+.ovk-diag-cont:has(.pinned-message-modal-content) .ovk-diag-action > .button:last-child {
+    display: none;
+}
+
+.ovk-diag-cont:has(.pinned-message-modal-content) .ovk-diag-action > .button:nth-last-child(2) {
+    color: var(--link-color);
+    background-color: transparent;
+}
+
 /* ==========================================================================
    Attachments
    ========================================================================== */
