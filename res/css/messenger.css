@@ -3954,3 +3954,148 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
         height: 100% !important;
     }
 }
+
+/* ==========================================================================
+   User send-message dialog (VK mail-compose box style)
+   ========================================================================== */
+
+#user-send-dialog {
+    padding: 0;
+}
+
+#user-send-dialog .user-send-centre {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+#user-send-dialog .user-send-left {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 72px;
+    text-align: center;
+}
+
+/* stock .user-send-left img sets 100px */
+#user-send-dialog .user-send-left img.udlg-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+#user-send-dialog .udlg-send-right #write {
+    margin-top: 0;
+}
+
+#user-send-dialog .udlg-goto {
+    font-size: 12px;
+    color: var(--link-color);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#user-send-dialog .udlg-goto:hover {
+    text-decoration: underline;
+}
+
+#user-send-dialog .udlg-send-right {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#user-send-dialog .udlg-info {
+    line-height: 18px;
+}
+
+#user-send-dialog .udlg-name {
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--heading-color);
+    text-decoration: none;
+}
+
+#user-send-dialog .udlg-online {
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--muted-text-color-2);
+}
+
+/* VK compose field */
+#user-send-dialog #write .udlg-textarea,
+#user-send-dialog #write .content-editable-wrap .content-editable {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 96px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color-3);
+    border-radius: 2px;
+    background: var(--module-background-color);
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--text-color);
+    outline: none;
+}
+
+#user-send-dialog .udlg-actions .attachment-icons {
+    display: flex;
+    justify-content: flex-start !important;
+    gap: 6px;
+}
+
+#user-send-dialog .udlg-actions .attachment-icons div {
+    width: 22px;
+    height: 22px;
+    display: inline-block;
+    cursor: pointer;
+    opacity: .7;
+    background: url(../icons/post_icon.png) no-repeat;
+}
+
+#user-send-dialog .udlg-actions .attachment-icons div:hover {
+    opacity: 1;
+}
+
+#user-send-dialog .udlg-actions .attachment-icons div img {
+    display: none;
+}
+
+#user-send-dialog .udlg-actions .attachment-icons #__photoAttachment    { background-position: left -65px; }
+#user-send-dialog .udlg-actions .attachment-icons #__videoAttachment    { background-position: left -87px; }
+#user-send-dialog .udlg-actions .attachment-icons #__audioAttachment    { background-position: left -109px; }
+#user-send-dialog .udlg-actions .attachment-icons #__documentAttachment { background-position: left -131px; }
+
+/* footer */
+#user-send-dialog .modal-footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+#user-send-dialog .modal-footer-actions > div:first-child {
+    display: none;
+}
+
+#user-send-dialog .modal-footer-actions #_close {
+    background: none;
+    border: 0;
+    box-shadow: none;
+    min-width: 0;
+    color: var(--link-color);
+    font-weight: 400;
+}
+
+#user-send-dialog .modal-footer-actions #_close:hover {
+    background: none;
+    text-decoration: underline;
+}

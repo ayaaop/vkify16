@@ -1083,6 +1083,17 @@
         flex: 0 1 auto;
         overflow-y: auto;
     }
+    #user-send-dialog #write .udlg-textarea,
+    #user-send-dialog #write .content-editable-wrap .content-editable {
+        font-size: 16px;
+    }
+    #user-send-dialog .user-send-left {
+        width: 60px;
+    }
+    #user-send-dialog .user-send-left img.udlg-avatar {
+        width: 52px;
+        height: 52px;
+    }
     .ovk-msg-dialog .ovk-diag-action {
         display: flex;
         justify-content: flex-end;
