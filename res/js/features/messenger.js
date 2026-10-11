@@ -1,7 +1,7 @@
 import { installMessengerRenderer } from '../messenger/messenger-page.js';
 import { forceClassicModeOnMobile, watchModernModeTweak, watchImVisualViewport } from '../messenger/mobile-mode.js';
 import { installAudioNormalizer } from '../messenger/audio-normalizer.js';
-import { patchMonthDayString } from '../messenger/shared.js';
+import { patchMonthDayString, syncBodyPeerWindow } from '../messenger/shared.js';
 
 installAudioNormalizer();
 patchMonthDayString();
@@ -32,6 +32,10 @@ function resetScrollIfEnteredIm() {
 }
 
 window.vkify?.onPageLifecycle?.('afterPageReady', resetScrollIfEnteredIm);
+window.vkify?.onPageLifecycle?.('afterPageReady', () => syncBodyPeerWindow());
+window.vkify?.onPageLifecycle?.('beforePageLeave', () => {
+    document.body?.classList.remove('peer-window-open');
+});
 
 vkify.once('imHeader', async function () {
     try {

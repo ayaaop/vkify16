@@ -1,4 +1,4 @@
-import { imImport, waitForStockIm, fallbackReplySnippet, fallbackEmojiHex, fallbackRecentSmiles, fallbackRecentSmileClick, fallbackPeerAvatar, ensureVideoPreviews, syncBodyNoScroll, isCompactMode } from './shared.js';
+import { imImport, waitForStockIm, fallbackReplySnippet, fallbackEmojiHex, fallbackRecentSmiles, fallbackRecentSmileClick, fallbackPeerAvatar, ensureVideoPreviews, syncBodyNoScroll, syncBodyPeerWindow, isCompactMode } from './shared.js';
 import { isMobileViewport } from './mobile-mode.js';
 import { createPeerInfoView } from './components/peer-info-view.js';
 import { createPinnedMessageBar } from './components/pinned-message-bar.js';
@@ -131,9 +131,22 @@ export async function installMessengerRenderer() {
             const getSelected = this.getSelectedTab;
             this.getSelectedTab = () => getSelected.call(this) || emptyTab;
             try {
-                return origSelectTab.call(this, tab);
+                const result = origSelectTab.call(this, tab);
+                Promise.resolve(result).then(() => syncBodyPeerWindow()).catch(() => {});
+                return result;
             } finally {
                 delete this.getSelectedTab;
+            }
+        };
+    }
+    if (ImClass && ImClass.prototype && typeof ImClass.prototype.updateTabs === 'function') {
+        // close() skips selectTab; updateTabs covers the contact tab closing
+        const origUpdateTabs = ImClass.prototype.updateTabs;
+        ImClass.prototype.updateTabs = function vkifyUpdateTabs() {
+            try {
+                return origUpdateTabs.apply(this, arguments);
+            } finally {
+                syncBodyPeerWindow();
             }
         };
     }

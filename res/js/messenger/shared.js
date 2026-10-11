@@ -67,6 +67,23 @@ export function syncBodyNoScroll() {
         }
     }
 }
+// Mirrors the contact (peer window) tab's visibility on <body>; tab switches
+// hide pages instead of unmounting them, so this runs from selectTab/updateTabs.
+export function syncBodyPeerWindow() {
+    try {
+        const onImPage = Boolean(document.querySelector('#im_container'))
+            || /^\/im(?:\/|$)/.test(window.location.pathname);
+        const inPeerWindow = onImPage
+            && window.im && typeof window.im.getSelectedTabId === 'function'
+            && window.im.getSelectedTabId() === 'contact';
+        document.body.classList.toggle('peer-window-open', inPeerWindow);
+    } catch (e) {
+        try {
+            document.body.classList.remove('peer-window-open');
+        } catch (_) {
+        }
+    }
+}
 export function shouldShowBanner(page = null, { checkForward = true } = {}) {
     try {
         if (checkForward && page && typeof page.isForward === 'function' && page.isForward()) {

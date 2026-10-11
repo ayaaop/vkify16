@@ -3445,6 +3445,12 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
    Peer window & misc
    ========================================================================== */
 
+.peer-window-open #im_container.at_page:not(.compact) #im_page_containers,
+.peer-window-open #im_container.compact .im_page.page-other {
+    border: 0!important;
+    box-shadow: none;
+}
+
 .peer-window {
     max-width: none;
     margin: 0;
