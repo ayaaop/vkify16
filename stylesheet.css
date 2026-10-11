@@ -93,6 +93,7 @@ body {
     --accent-color-2: #5181b8;
     --accent-color-3: #6287ae;
     --accent-color-4: #577ea2;
+    --accent-color-4--rgb: 87, 126, 162;
     --accent-color-5: #5185be;
     --accent-color-6: #638ab1;
 
@@ -1661,7 +1662,8 @@ div.container_gray > form > table {
     height: 50px;
 }
 
-.content_list .cl_element .cl_name {
+.content_list .cl_element .cl_name,
+.stickers_stats_title,.stickers_period_link,.stickers_stats_total {
     font-size: 12.5px;
 }
 
@@ -5149,6 +5151,29 @@ body.banned {
 
 .stickers_form_btn_save {
     float: none;
+}
+
+.stickers_stats_wrapper {
+    border-top-color: var(--border-color);
+}
+
+.stickers_stats_title,
+.stickers_period_link {
+    color: var(--link-color-2);
+}
+
+.stickers_period_switcher {
+    background: var(--module-background-color--secondary);
+}
+
+.stickers_period_link:hover {
+    color: var(--link-color);
+    background: var(--button-background-color--hover);
+}
+
+.stickers_period_link.active {
+    background: var(--accent-color-4);
+    color: var(--accent-text-color);
 }
 
 
