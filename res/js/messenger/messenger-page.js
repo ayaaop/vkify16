@@ -101,14 +101,14 @@ export async function installMessengerRenderer() {
     const getEmojiHex = upstreamEmojiHex || fallbackEmojiHex;
     const getDisplayRecentSmiles = upstreamRecentSmiles || fallbackRecentSmiles;
     const onRecentSmileClick = upstreamRecentSmileClick || fallbackRecentSmileClick;
-    const PeerAvatar = UpstreamPeerAvatar || (({ className = '', onClick = null }) => fallbackPeerAvatar({ html, className, onClick }));
+    const PeerAvatar = UpstreamPeerAvatar || ((props) => fallbackPeerAvatar({ html, ...props }));
 
     const tr = (typeof window.tr === 'function' ? window.tr : (key) => key);
 
     const AttachmentMenu = createAttachmentMenu({ html, tr });
     const VkInputArea = createInputArea({ html, tr, AttachmentMenu, getReplySnippet, getEmojiHex, MentionAutocomplete });
     const StockInputArea = createStockInputArea({ html, tr, getDisplayRecentSmiles, onRecentSmileClick, getEmojiHex, getReplySnippet, PeerAvatar, MentionAutocomplete });
-    const PeerInfoView = createPeerInfoView({ html, tr });
+    const PeerInfoView = createPeerInfoView({ html, tr, PeerAvatar });
     const PinnedMessageBar = createPinnedMessageBar({ html, tr });
     const VkActionsBar = createActionsBar({ html, tr });
 

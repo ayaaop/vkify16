@@ -154,8 +154,56 @@ export function fallbackRecentSmiles() {
 export function fallbackRecentSmileClick() {
 }
 
-export function fallbackPeerAvatar({ html, className = '', onClick = null }) {
-    return html`<img class="${className}" src="/assets/packages/static/openvk/img/im/chat_default_100.png" loading="lazy" onClick=${onClick} />`;
+// mirrors upstream PeerAvatar (messages/components/common.js): group chats without a
+// custom avatar render as a table mosaic built from peer.getMosaicAvatars()
+export function fallbackPeerAvatar({ html, peer = null, className = '', loading = 'lazy', size = 'mid', onClick = null }) {
+    const defaultAvatar = size === 'min' ? '/assets/packages/static/openvk/img/im/chat_default_50.png'
+        : size === 'big' ? '/assets/packages/static/openvk/img/im/chat_default_200.png'
+        : size === 'max' ? '/assets/packages/static/openvk/img/im/chat_default_400.png'
+        : '/assets/packages/static/openvk/img/im/chat_default_100.png';
+
+    if (!peer) {
+        return html`<img class="${className}" src="${defaultAvatar}" loading="${loading}" onClick=${onClick} />`;
+    }
+
+    if (peer.supposed_type === 'chat' && !peer.has_custom_avatar) {
+        const avatars = (typeof peer.getMosaicAvatars === 'function' ? peer.getMosaicAvatars() : null) || [];
+        const [cell0, cell1, cell2, cell3] = avatars;
+
+        if (avatars.length == 2) {
+            return html`
+            <div class="chat_table_avatar chat_table_avatar_double ${className}" onClick=${onClick}>
+                ${cell0 ? html`<img class="chat_table_avatar_cell pos-left" src="${cell0}" loading="${loading}" />` : ''}
+                ${cell1 ? html`<img class="chat_table_avatar_cell pos-right" src="${cell1}" loading="${loading}" />` : ''}
+            </div>`;
+        }
+
+        if (avatars.length == 3) {
+            return html`
+            <div class="chat_table_avatar chat_table_avatar_third ${className}" onClick=${onClick}>
+                ${cell0 ? html`<img class="chat_table_avatar_cell third_left" src="${cell0}" loading="${loading}" />` : ''}
+                <div class="chat_table_avatar_third_right">
+                    ${cell1 ? html`<img class="chat_table_avatar_cell third_right_cell" src="${cell1}" loading="${loading}" />` : ''}
+                    ${cell2 ? html`<img class="chat_table_avatar_cell third_right_cell" src="${cell2}" loading="${loading}" />` : ''}
+                </div>
+            </div>`;
+        }
+
+        if (avatars.length >= 4) {
+            return html`
+            <div class="chat_table_avatar chat_table_avatar_more3 ${className}" onClick=${onClick}>
+                ${cell0 ? html`<img class="chat_table_avatar_cell quarter" src="${cell0}" loading="${loading}" />` : ''}
+                ${cell1 ? html`<img class="chat_table_avatar_cell quarter" src="${cell1}" loading="${loading}" />` : ''}
+                ${cell2 ? html`<img class="chat_table_avatar_cell quarter" src="${cell2}" loading="${loading}" />` : ''}
+                ${cell3 ? html`<img class="chat_table_avatar_cell quarter" src="${cell3}" loading="${loading}" />` : ''}
+            </div>`;
+        }
+
+        return html`<img class="${className}" src="${defaultAvatar}" loading="${loading}" onClick=${onClick} />`;
+    }
+
+    const src = typeof peer.getAvatar === 'function' ? peer.getAvatar(size) : defaultAvatar;
+    return html`<img class="${className}" src=${src} loading="${loading}" onClick=${onClick} />`;
 }
 
 const VIDEO_PREVIEW_FALLBACK = '/assets/packages/static/openvk/img/camera_200.png';

@@ -1,4 +1,4 @@
-export function createPeerInfoView({ html, tr }) {
+export function createPeerInfoView({ html, tr, PeerAvatar = null }) {
     const blacklistCache = new Map();
     return function PeerInfoView({ convo, page, togglePeerInfo }) {
         if (!convo || !convo.peer) return html``;
@@ -457,7 +457,9 @@ export function createPeerInfoView({ html, tr }) {
                         </div>
                     </div>
                     <a href=${url} class="messenger-app--header--ava" onClick=${onPeerInfoClick}>
-                        <img src=${avatar} class="avatar post-avatar" width="50" alt=${name} />
+                        ${PeerAvatar
+                            ? html`<${PeerAvatar} peer=${peer} className="avatar post-avatar" size="mid" loading="eager" />`
+                            : html`<img src=${avatar} class="avatar post-avatar" width="50" alt=${name} />`}
                         ${isOnline ? html`<div class="messenger-app--header--online online"></div>` : ''}
                     </a>
                 </div>

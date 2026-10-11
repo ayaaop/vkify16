@@ -3210,6 +3210,10 @@
         height: 38px;
         width: 38px;
     }
+    .messenger-app--header--ava .chat_table_avatar {
+        height: 38px;
+        width: 38px;
+    }
     body.body_im .messenger-app--header--info {
         width: auto;
         flex: 1;

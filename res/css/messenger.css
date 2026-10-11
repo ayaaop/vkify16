@@ -356,6 +356,77 @@ body.vkify-force-classic label:has(> input#im\.modern_mode) {
     object-fit: cover;
 }
 
+/* group-chat avatar mosaics: the base .chat_table_avatar layout lives in
+   upstream messages.css, which this theme doesn't load */
+.messenger-app--header--ava .chat_table_avatar {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: stretch;
+    box-sizing: border-box;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #e4e8ec;
+}
+
+.messenger-app--header--ava .chat_table_avatar .chat_table_avatar_cell {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    line-height: 0;
+    font-size: 0;
+    object-fit: cover;
+    object-position: center top;
+    image-rendering: pixelated;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.messenger-app--header--ava .chat_table_avatar.chat_table_avatar_double .chat_table_avatar_cell {
+    width: 50%;
+    height: 100%;
+}
+
+.messenger-app--header--ava .chat_table_avatar .chat_table_avatar_cell.pos-left {
+    object-position: left;
+}
+
+.messenger-app--header--ava .chat_table_avatar .chat_table_avatar_cell.pos-right {
+    object-position: right;
+}
+
+.messenger-app--header--ava .chat_table_avatar.chat_table_avatar_third {
+    flex-wrap: nowrap;
+}
+
+.messenger-app--header--ava .chat_table_avatar.chat_table_avatar_third .chat_table_avatar_cell.third_left {
+    width: 50%;
+    height: 100%;
+    object-position: left;
+}
+
+.messenger-app--header--ava .chat_table_avatar.chat_table_avatar_third .chat_table_avatar_third_right {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.messenger-app--header--ava .chat_table_avatar.chat_table_avatar_third .chat_table_avatar_third_right .chat_table_avatar_cell.third_right_cell {
+    width: 100%;
+    height: 50%;
+}
+
+.messenger-app--header--ava .chat_table_avatar.chat_table_avatar_more3 .chat_table_avatar_cell {
+    width: 50%;
+    height: 50%;
+}
+
 .messenger-app--header--ava .messenger-app--header--online {
     width: 6px;
     height: 6px;
