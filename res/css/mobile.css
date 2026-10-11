@@ -936,7 +936,8 @@
         line-height: 22px;
         margin-left: 0;
     }
-    #login_form, .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"]), .form_field:not(.settings_privacy_row) select, .form_field textarea {
+    #login_form, .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"]), .form_field:not(.settings_privacy_row) select, .form_field textarea,
+    input[type="email"], input[type="number"], input[type="password"], input[type="phone"], input[type="text"], input[type~="date"], input[type~="time"], input[type~="datetime-local"], input[type~="email"], input[type~="password"], input[type~="phone"], input[type~="text"], input[type="url"], input[type~="url"], select, textarea:not(.expanded-textarea), .PE_playlistEditPage textarea[name="description"] {
         width: 100%;
     }
 
@@ -944,7 +945,8 @@
     .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"], [type="file"], [type="image"]),
     #login_form input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"]),
     .form_field select,
-    .form_field textarea, textarea:not(.expanded-textarea) {
+    .form_field textarea, textarea:not(.expanded-textarea),
+    input[type="email"], input[type="number"], input[type="password"], input[type="phone"], input[type="text"], input[type~="date"], input[type~="time"], input[type~="datetime-local"], input[type~="email"], input[type~="password"], input[type~="phone"], input[type~="text"], input[type="url"], input[type~="url"], select, .PE_playlistEditPage textarea[name="description"], .emoji-input-wrap {
         height: 44px;
         padding: 11px 0 8px;
         font-size: 16px;
@@ -964,13 +966,15 @@
     }
     .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"], [type="file"], [type="image"]):focus,
     .form_field select:focus,
-    .form_field textarea:focus, textarea:not(.expanded-textarea):focus {
+    .form_field textarea:focus, textarea:not(.expanded-textarea):focus,
+    input[type="email"]:focus, input[type="number"]:focus, input[type="password"]:focus, input[type="phone"]:focus, input[type="text"]:focus, input[type~="date"]:focus, input[type~="time"]:focus, input[type~="datetime-local"]:focus, input[type~="email"]:focus, input[type~="password"]:focus, input[type~="phone"]:focus, input[type~="text"]:focus, input[type="url"]:focus, input[type~="url"]:focus, select:focus, .PE_playlistEditPage textarea[name="description"]:focus, .emoji-input-wrap:focus-within {
         border-bottom-color: var(--accent-color);
         box-shadow: 0 1px 0 0 var(--accent-color);
     }
     .form_field input:disabled,
     .form_field select:disabled,
-    .form_field textarea:disabled, textarea:disabled {
+    .form_field textarea:disabled, textarea:disabled,
+    input[type="email"]:disabled, input[type="number"]:disabled, input[type="password"]:disabled, input[type="phone"]:disabled, input[type="text"]:disabled, input[type~="date"]:disabled, input[type~="time"]:disabled, input[type~="datetime-local"]:disabled, input[type~="email"]:disabled, input[type~="password"]:disabled, input[type~="phone"]:disabled, input[type~="text"]:disabled, input[type="url"]:disabled, input[type~="url"]:disabled, select:disabled {
         border-bottom-style: dotted;
         opacity: 0.48;
     }
@@ -981,13 +985,29 @@
         resize: none;
     }
     .form_field select[size],
-    .form_field select[multiple] {
+    .form_field select[multiple],
+    select[size],
+    select[multiple] {
         height: auto;
         border: 1px solid color-mix(in srgb, var(--text-color) 38%, transparent);
     }
+    /* the emoji name field renders as one bordered control — keep its inner
+       editor bare so the field styles don't double up */
+    .emoji-input-wrap textarea,
+    .emoji-input-wrap .content-editable-wrap {
+        width: auto !important;
+        height: auto !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        border-bottom: none !important;
+        box-shadow: none !important;
+        resize: none;
+    }
 
     /* selects */
-    .form_field select {
+    .form_field select, select {
         appearance: none;
         -webkit-appearance: none;
         padding-right: 32px;
@@ -999,7 +1019,7 @@
         background-position: right 4px center;
         background-size: 20px 20px;
     }
-    body.dark-mode .form_field select {
+    body.dark-mode .form_field select, body.dark-mode select {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Cpath d='M12 13.698 6.64 9.232a1 1 0 0 0-1.28 1.536l6 5a1 1 0 0 0 1.28 0l6-5a1 1 0 1 0-1.28-1.536L12 13.698Z' fill='%2399a2ad'/%3E%3C/svg%3E");
     }
     .label_end .form_label {
@@ -1714,6 +1734,20 @@
     }
     .ui_tabs_search_opened .ui_tab_search_wrap .ui_search {
         padding: 0;
+    }
+    /* Monaco's hidden focus/measurement textarea must keep its own layout */
+    .monaco-editor .inputarea,
+    .monaco-editor .inputarea:focus {
+        width: auto !important;
+        height: auto !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        font-size: inherit !important;
+        line-height: normal !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
     }
     .ui_tabs_search_opened .ui_search .ui_search_input_block {
         border-radius: 0;

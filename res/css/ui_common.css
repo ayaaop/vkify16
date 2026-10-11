@@ -1144,11 +1144,13 @@ input.ui_search_field {
     background-position: 0;
 }
 input.ui_search_field::placeholder,
-input[type~="text"]::placeholder {
+input[type~="text"]::placeholder,
+textarea::placeholder {
     color: var(--search-placeholder-color);
 }
 input.ui_search_field:focus::placeholder,
-input[type~="text"]:focus::placeholder {
+input[type~="text"]:focus::placeholder,
+textarea:focus::placeholder {
     color: var(--search-placeholder-focus-color);
 }
 .ui_search_reset {
@@ -1387,7 +1389,7 @@ select {
     color: var(--text-color);
     background-color: var(--module-background-color);
 }
-select:focus {
+select:focus,.content-editable:focus {
     border-color: var(--dropdown-border-color);
 }
 
