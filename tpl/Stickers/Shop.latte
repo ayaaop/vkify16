@@ -52,13 +52,20 @@
                                 {var $isBought = in_array($pack->getId(), $boughtPackIds ?? [], true)}
                                 {var $cardUrl = $act === 'author' ? ('/stickers/edit/' . $pack->getId()) : ('/stickers/' . $pack->getSlug())}
                                 <div class="stickers_pack_card">
-                                    <a href="{$cardUrl}" class="stickers_pack_thumb" {if $act !== 'author'}onclick="openStickerPackModal({$pack->getSlug()}, event);"{/if}>
-                                        <img n:if="$pack->getMainSticker()" src="{$pack->getMainSticker()->getImageUrl(512)}" alt="{$pack->getName()}" />
-                                        <div n:if="!$pack->getMainSticker()" class="stickers_modal_cover_placeholder"></div>
+                                    <a href="{$cardUrl}" class="stickers_pack_thumb" {if $act !== 'author'}onclick="openStickerPackModal({$pack->getSlug()}, event); return false;"{/if} data-no-ajax="1">
+                                        {if $pack->getMainSticker()}
+                                            {if $pack->getMainSticker()->getFormat($pack->getId()) === 'lottie'}
+                                                <div class="stickers_pack_thumb_lottie" data-anim-url="{$pack->getMainSticker()->getAnimationUrl($pack->getId())}"></div>
+                                            {else}
+                                                <img src="{$pack->getMainSticker()->getImageUrl(512)}" alt="{$pack->getName()}" />
+                                            {/if}
+                                        {else}
+                                            <div class="stickers_modal_cover_placeholder"></div>
+                                        {/if}
                                     </a>
 
                                     <div class="stickers_pack_name">
-                                        <a href="{$cardUrl}" title="{$pack->getName()}" {if $act !== 'author'}onclick="openStickerPackModal({$pack->getSlug()}, event);"{/if}>{$pack->getName()}</a>
+                                        <a href="{$cardUrl}" title="{$pack->getName()}" {if $act !== 'author'}onclick="openStickerPackModal({$pack->getSlug()}, event); return false;"{/if} data-no-ajax="1">{$pack->getName()}</a>
                                     </div>
 
                                     <div class="stickers_pack_author" n:if="$pack->getAuthor() || $pack->getAuthorUrl()">
@@ -77,7 +84,7 @@
                                     <div class="stickers_pack_footer">
                                         {if $act === 'author'}
                                             <div>
-                                                <a href="{$cardUrl}" class="stickers_pack_price_paid">
+                                                <a href="{$cardUrl}" class="stickers_pack_price_paid" data-no-ajax="1">
                                                     {_edit}
                                                 </a>
                                             </div>
@@ -88,23 +95,25 @@
                                                 {/if}
                                             </div>
                                         {else}
-                                            {if $isInstalled}
-                                                <a href="/stickers/{$pack->getSlug()}" class="stickers_pack_status_purchased" onclick="openStickerPackModal({$pack->getSlug()}, event);">
-                                                    {_stickers_purchased_label}
-                                                </a>
-                                            {elseif $isBought}
-                                                <a href="/stickers/{$pack->getSlug()}" class="stickers_pack_price_free" onclick="openStickerPackModal({$pack->getSlug()}, event);">
-                                                    {_add}
-                                                </a>
-                                            {elseif $pack->getPrice() > 0}
-                                                <a href="/stickers/{$pack->getSlug()}" class="stickers_pack_price_paid" onclick="openStickerPackModal({$pack->getSlug()}, event);">
-                                                    {tr('coins', $pack->getPrice())}
-                                                </a>
-                                            {else}
-                                                <a href="/stickers/{$pack->getSlug()}" class="stickers_pack_price_free" onclick="openStickerPackModal({$pack->getSlug()}, event);">
-                                                    {_stickers_free}
-                                                </a>
-                                            {/if}
+                                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                                                {if $isInstalled}
+                                                    <a href="/stickers/{$pack->getSlug()}" class="stickers_pack_status_purchased" onclick="openStickerPackModal({$pack->getSlug()}, event); return false;" data-no-ajax="1">
+                                                        {_stickers_purchased_label}
+                                                    </a>
+                                                {elseif $isBought}
+                                                    <a href="/stickers/{$pack->getSlug()}" class="stickers_pack_price_free" onclick="openStickerPackModal({$pack->getSlug()}, event); return false;" data-no-ajax="1">
+                                                        {_add}
+                                                    </a>
+                                                {elseif $pack->getPrice() > 0}
+                                                    <a href="/stickers/{$pack->getSlug()}" class="stickers_pack_price_paid" onclick="openStickerPackModal({$pack->getSlug()}, event); return false;" data-no-ajax="1">
+                                                        {tr('coins', $pack->getPrice())}
+                                                    </a>
+                                                {else}
+                                                    <a href="/stickers/{$pack->getSlug()}" class="stickers_pack_price_free" onclick="openStickerPackModal({$pack->getSlug()}, event); return false;" data-no-ajax="1">
+                                                        {_stickers_free}
+                                                    </a>
+                                                {/if}
+                                            </div>
                                         {/if}
 
                                         {if $act === 'settings'}

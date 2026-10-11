@@ -5226,6 +5226,10 @@ body.banned {
     color: var(--text-color);
 }
 
+.stickers_modal_cover_placeholder {
+    background: var(--module-background-color--secondary);
+}
+
 
 @media (min-width: 769px) {
     .appbar,
