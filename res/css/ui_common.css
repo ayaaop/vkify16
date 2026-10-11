@@ -1794,6 +1794,18 @@ select:focus {
     cursor: pointer;
 }
 
+/* dummy wraps copy the trigger's className for state classes — they must not
+   repaint the trigger's background/border/pseudo chrome on top of it */
+.ui_actions_menu_dummy_wrap {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+.ui_actions_menu_dummy_wrap::before,
+.ui_actions_menu_dummy_wrap::after {
+    content: none !important;
+}
+
 .ui_actions_menu {
     position: absolute;
     display: none;
@@ -1988,6 +2000,7 @@ select:focus {
 .ui_actions_menu.dark {
     --module-background-color: #333;
     --border-color-2: #333;
+    --border-color: #555;
     --link-color: #fff;
     --button-background-color: #555;
 }

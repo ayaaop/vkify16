@@ -92,7 +92,7 @@
                             <i class="action_icon"></i>
                             <span class="action_label">{_share}</span>
                         </a>
-                        <div class="ui_actions_menu_wrap" n:if="$canEdit" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+                        <div class="ui_actions_menu_wrap" n:if="$canEdit" onmouseover="{='uiActionsMenu.show(this, null, {appendParentCls: \"body\"});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
                             <a class="action_button post_more" id="playlist_more_actions_trigger">
                                 <i class="action_icon"></i>
                                 <span class="action_label">{_show_more}</span>

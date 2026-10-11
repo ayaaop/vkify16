@@ -105,6 +105,53 @@ vkify.once('uiActionsMenu', function () {
     return false;
   }
 
+  function applyAppendParent(el, options) {
+    let menu = geByClass1('ui_actions_menu', el);
+    if (menu && hasClass(el, 'ui_actions_menu_dummy_wrap')) {
+      // already portaled (e.g. hover re-entry on the dummy itself):
+      // keep el so it only gets repositioned below.
+    } else if (menu) {
+      const appendEl = appendParentEl(options.appendParentCls, menu);
+      if (!appendEl) return el;
+      // A re-render (Preact) can restore the menu inside the source wrap;
+      // drop the previous dummy and dummies of removed sources so they don't pile up.
+      data(el, 'dummyMenu')?.remove();
+      appendEl?.querySelectorAll(':scope > .ui_actions_menu_dummy_wrap').forEach((d) => {
+        const src = data(d, 'origMenu');
+        if (src && !src.isConnected) d.remove();
+      });
+      const menuWrap = domClosest('ui_actions_menu_wrap', el);
+      const newWrap = se(
+        `<div class="${menuWrap ? menuWrap.className : 'ui_actions_menu_wrap'} ui_actions_menu_dummy_wrap"
+              onmouseover="uiActionsMenu.show(this);"
+              onmouseout="uiActionsMenu.hide(this);"></div>`
+      );
+      newWrap.appendChild(menu);
+      appendEl?.appendChild(newWrap);
+
+      data(el, 'dummyMenu', newWrap);
+      data(newWrap, 'origMenu', el);
+      data(newWrap, 'appendParentCls', options.appendParentCls);
+      el = newWrap;
+
+      data(menu, 'top', intval(getStyle(menu, 'top')));
+      data(menu, 'left', intval(getStyle(menu, 'left')));
+      data(menu, 'right', intval(getStyle(menu, 'right')));
+
+      if (options.processHoverCls) {
+        const row = domClosest(options.processHoverCls, menuWrap);
+        if (row) {
+          newWrap.addEventListener('mouseover', () => addClass(row, 'hover'));
+          newWrap.addEventListener('mouseout', () => removeClass(row, 'hover'));
+        }
+      }
+    } else {
+      el = data(el, 'dummyMenu') || el;
+    }
+    positionDummyMenu(el);
+    return el;
+  }
+
   function firstNonMenuChild(wrap) {
     for (const child of wrap.children) {
       if (!child.classList.contains('ui_actions_menu')) return child;
@@ -114,7 +161,9 @@ vkify.once('uiActionsMenu', function () {
 
   function appendParentEl(cls, el) {
     if (cls === 'body') return document.body;
-    return domClosest(cls, el);
+    // Fall back to body when the named ancestor isn't one (e.g. appbar
+    // triggers passing 'page_body') — otherwise the menu stays clipped.
+    return domClosest(cls, el) || document.body;
   }
 
   function ensureMenu(el, menuId) {
@@ -212,7 +261,12 @@ vkify.once('uiActionsMenu', function () {
     dummyWrap.style.position = 'absolute';
     dummyWrap.style.width = origRect.width + 'px';
     dummyWrap.style.height = origRect.height + 'px';
-    dummyWrap.style.zIndex = 'calc(var(--action-menu-z-index, 5) + 1)';
+    // Portals escaping elevated overlays must out-rank them (msgbox dimmers
+    // sit at z-index 200, the mobile sidebar at 201, .ovk-diag-cont at 1024,
+    // miniplayer 10000).
+    dummyWrap.style.zIndex = origEl.closest?.('.ovk-msg-all, .ovk-diag-cont, .ovk-photo-view-dimmer, .sidebar, .appbar')
+      ? '10001'
+      : 'calc(var(--action-menu-z-index, 5) + 1)';
 
     if (appendPos === 'static' || appendPos === '') {
       dummyWrap.style.top = (origRect.top + window.scrollY) + 'px';
@@ -350,10 +404,12 @@ vkify.once('uiActionsMenu', function () {
       const origEl = el;
       if (dummyMenu) el = dummyMenu;
 
-      // clicking inside an open menu should close it
+      // clicking inside an open menu should close it — but only when the
+      // click lands in THIS wrap's menu. A trigger nested inside an open
+      // menu (e.g. appbar-tabs-menu extras) hits a parent menu instead.
       if ((s === undefined || s === null) && window.event?.type === 'click') {
-        const target = window.event.target;
-        if (target?.closest?.('.ui_actions_menu')) s = false;
+        const hitMenu = window.event.target?.closest?.('.ui_actions_menu');
+        if (hitMenu && el.contains(hitMenu)) s = false;
       }
 
       const isShown = hasClass(el, 'shown');
@@ -381,6 +437,10 @@ vkify.once('uiActionsMenu', function () {
         if (menu) removeClass(menu, 'ui_actions_menu_hiding');
         if (options.menuId) {
           ensureMenu(el, options.menuId);
+          menu = geByClass1('ui_actions_menu', el);
+        }
+        if (options.appendParentCls) {
+          el = applyAppendParent(el, options);
           menu = geByClass1('ui_actions_menu', el);
         }
         if (menu) menu.style.display = 'block';
@@ -494,41 +554,7 @@ vkify.once('uiActionsMenu', function () {
 
       // dummy menu (portal-like)
       if (options.appendParentCls) {
-        let menu = geByClass1('ui_actions_menu', el);
-        if (menu && hasClass(el, 'ui_actions_menu_dummy_wrap')) {
-          // already portaled (e.g. hover re-entry on the dummy itself):
-          // keep el so it only gets repositioned below.
-        } else if (menu) {
-          const appendEl = appendParentEl(options.appendParentCls, menu);
-          const menuWrap = domClosest('ui_actions_menu_wrap', el);
-          const newWrap = se(
-            `<div class="${menuWrap ? menuWrap.className : 'ui_actions_menu_wrap'} ui_actions_menu_dummy_wrap"
-                  onmouseover="uiActionsMenu.show(this);"
-                  onmouseout="uiActionsMenu.hide(this);"></div>`
-          );
-          newWrap.appendChild(menu);
-          appendEl?.appendChild(newWrap);
-
-          data(el, 'dummyMenu', newWrap);
-          data(newWrap, 'origMenu', el);
-          data(newWrap, 'appendParentCls', options.appendParentCls);
-          el = newWrap;
-
-          data(menu, 'top', intval(getStyle(menu, 'top')));
-          data(menu, 'left', intval(getStyle(menu, 'left')));
-          data(menu, 'right', intval(getStyle(menu, 'right')));
-
-          if (options.processHoverCls) {
-            const row = domClosest(options.processHoverCls, menuWrap);
-            if (row) {
-              newWrap.addEventListener('mouseover', () => addClass(row, 'hover'));
-              newWrap.addEventListener('mouseout', () => removeClass(row, 'hover'));
-            }
-          }
-        } else {
-          el = data(el, 'dummyMenu') || el;
-        }
-        positionDummyMenu(el);
+        el = applyAppendParent(el, options);
       }
 
       const menu = geByClass1('ui_actions_menu', el);
