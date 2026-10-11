@@ -2027,6 +2027,10 @@ table,
     align-items: center;
     gap: 10px;
 }
+.composer.model_content_textarea.has_emoji_picker .textareas {
+	position: static;
+}
+
 .composer.model_content_textarea.has_emoji_picker .emoji_picker_entrypoint {
 	display: none;
 }
