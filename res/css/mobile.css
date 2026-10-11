@@ -3148,15 +3148,6 @@
         position: relative;
         padding: 16px 8px 13px;
     }
-    .messenger-app--messages---message .time {
-        width: fit-content;
-        position: absolute;
-        right: 8px;
-        top: 16px;
-    }
-    .messenger-app--messages---message ._content > a {
-        width: calc(100% - 80px)
-    }
 
     /* chat header overlays the appbar while a conversation is open */
     body.body_im .messenger-app--header.messages--peers-header-peer-name {

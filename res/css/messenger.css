@@ -1923,48 +1923,59 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
    Quotes, replies & forwards
    ========================================================================== */
 
+/* Reply quote: VK's flat im-mess_fwd model — left strip, avatar,
+   name over date, text flush-left. */
 .messenger-app--messages---message ._content .reply-msg-container {
-    margin: 4px 0;
-    padding: 0 35px 0 7px;
-    border-left: 2px solid var(--accent-color-2);
+    margin: 5px 0 7px 3px;
+    padding-left: 9px;
+    border-left: 2px solid var(--quote-border-color);
     cursor: pointer;
-    border-radius: 0 2px 2px 0;
-    transition: background 0.15s ease;
+    transition: border-color .15s ease;
 }
 
 .messenger-app--messages---message ._content .reply-msg-container:hover {
-    background: color-mix(in srgb, var(--text-color) 2%, var(--transparent));
+    border-left-color: var(--vk-im-reply-hover);
+    background: none;
 }
 
 .messenger-app--messages---message ._content .reply-msg-container .reply-msg-header {
-    font-size: 11px;
-    color: var(--muted-text-color-3);
-    margin: 3px 0 0 0;
-    line-height: 1.25;
+    display: none;
 }
 
+/* Avatar column beside stacked name/date; markup keeps them as siblings. */
 .messenger-app--messages---message ._content .reply-msg-container .reply-msg-head {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-bottom: 2px;
-    line-height: 1.2;
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: 12px;
+    margin-bottom: 4px;
+    line-height: 15px;
+}
+
+.messenger-app--messages---message ._content .reply-msg-container .reply-avatar-link {
+    grid-row: 1 / 3;
+    align-self: center;
 }
 
 .messenger-app--messages---message ._content .reply-msg-container .reply-avatar {
-    width: 16px;
-    height: 16px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     object-fit: cover;
     display: block;
 }
 
 .messenger-app--messages---message ._content .reply-msg-container .reply-author-name {
-    font-size: 11.5px;
+    grid-column: 2;
+    font-size: 12.5px;
     font-weight: 700;
-    color: var(--link-color);
+    color: var(--post-action-color);
     text-decoration: none;
-    line-height: 1.2;
+    line-height: 15px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    justify-self: start;
 }
 
 .messenger-app--messages---message ._content .reply-msg-container .reply-author-name:hover {
@@ -1972,15 +1983,16 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 }
 
 .messenger-app--messages---message ._content .reply-msg-container .reply-date {
-    font-size: 10.5px;
-    color: var(--muted-text-color-3);
-    margin-left: 2px;
+    grid-column: 2;
+    font-size: 12px;
+    color: var(--vk-im-time);
+    line-height: 14px;
 }
 
 .messenger-app--messages---message ._content .reply-msg-container .reply-text {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-color);
-    line-height: 16px;
+    line-height: 18px;
     word-break: break-word;
     margin: 0;
 }
@@ -2010,52 +2022,71 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     background: color-mix(in srgb, var(--text-color) 4%, var(--transparent));
 }
 
-/* Forwarded messages */
+/* Forwarded messages use the same flat im-mess_fwd model as reply quotes. */
 .messenger-app--messages---message .fwd-messages-container,
 .fwd-modal-content .fwd-messages-container {
-    margin-top: 4px;
+    margin-top: 5px;
     margin-bottom: 2px;
-    padding-left: 10px;
+    margin-left: 3px;
+    padding-left: 9px;
     border-left: 2px solid var(--quote-border-color);
+    cursor: default;
 }
 
 .messenger-app--messages---message .fwd-messages-count,
 .fwd-modal-content .fwd-messages-count {
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--link-color);
-    margin-bottom: 4px;
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--muted-text-color);
+    margin-bottom: 6px;
 }
 
 .messenger-app--messages---message .fwd-message-block,
 .fwd-modal-content .fwd-message-block {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.messenger-app--messages---message .fwd-message-block:first-of-type,
+.fwd-modal-content .fwd-message-block:first-of-type {
     margin-top: 4px;
-    margin-bottom: 6px;
 }
 
 .messenger-app--messages---message .fwd-message-head,
 .fwd-modal-content .fwd-message-head {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 2px;
+    gap: 12px;
+    margin-bottom: 4px;
 }
 
 .messenger-app--messages---message .fwd-avatar,
 .fwd-modal-content .fwd-avatar {
-    width: 24px;
-    height: 24px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     object-fit: cover;
     display: block;
 }
 
+.messenger-app--messages---message .fwd-author-info,
+.fwd-modal-content .fwd-author-info {
+    display: block;
+    line-height: 14px;
+    overflow: hidden;
+}
+
 .messenger-app--messages---message .fwd-author-name,
 .fwd-modal-content .fwd-author-name {
-    font-size: 12px;
+    display: block;
+    font-size: 12.5px;
     font-weight: 700;
-    color: var(--link-color);
+    color: var(--post-action-color);
     text-decoration: none;
+    line-height: 15px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .messenger-app--messages---message .fwd-author-name:hover,
@@ -2063,34 +2094,27 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     text-decoration: underline;
 }
 
+/* The date drops to a second line, muted. */
 .messenger-app--messages---message .fwd-date,
 .fwd-modal-content .fwd-date {
-    font-size: 10.5px;
-    color: var(--muted-text-color-3);
-    margin-left: 2px;
+    display: block;
+    font-size: 12px;
+    color: var(--vk-im-time);
+    line-height: 14px;
 }
 
 .messenger-app--messages---message .fwd-text,
 .fwd-modal-content .fwd-text {
-    font-size: 12.5px;
+    font-size: 13px;
     color: var(--text-color);
-    line-height: 17px;
+    line-height: 18px;
     word-break: break-word;
+    margin-top: 4px;
 }
 
-.fwd-open-modal-link {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--link-color);
-    background: color-mix(in srgb, var(--accent-color-2) 8%, var(--transparent));
-    padding: 2px 8px;
-    border-radius: 3px;
-    text-decoration: none;
-}
-
-.fwd-open-modal-link:hover {
-    text-decoration: underline;
-    background: color-mix(in srgb, var(--accent-color-2) 16%, var(--transparent));
+/* VK forwards have no "open message" link */
+.fwd-open-modal-wrap {
+    display: none;
 }
 
 /* Forwarded message modal */
