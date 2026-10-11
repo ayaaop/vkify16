@@ -1183,7 +1183,8 @@ function bindPostEditOnce() {
                     modalNode.find('.ovk-diag-action button').first()?.click();
                 });
                 const ta = modalNode.find('textarea').first();
-                if (ta) window.vkifyTextareaAutosize?.apply?.(ta);
+                // the modal textarea is flex-sized; autosize would shrink it
+                if (ta) ta.setAttribute('data-no-autosize', '');
             } else {
                 if (edit_place.html() === '') {
                     edit_place.html(vkify.editMenuLayout(api_post, type, rawId));

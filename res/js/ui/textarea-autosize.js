@@ -36,6 +36,7 @@ function getMaxTotal(el, isBorderBox, paddingY, borderY) {
 
 function applyAutosize(el) {
     if (!el || el.tagName !== 'TEXTAREA') return;
+    if (el.hasAttribute('data-no-autosize')) return;
 
     const cs = window.getComputedStyle(el);
     if (cs.display === 'none') return;
@@ -66,7 +67,9 @@ function applyAutosize(el) {
         ? neededTotal
         : neededTotal - paddingY - borderY;
 
-    el.style.height = Math.max(newHeight, 0) + 'px';
+    // !important so the inline height beats stylesheet rules like stock's
+    // .expanded-textarea { height: auto !important } that would clamp it.
+    el.style.setProperty('height', Math.max(newHeight, 0) + 'px', 'important');
 
     // If the height could not actually grow (e.g. an !important CSS rule),
     // keep the scrollbar so content remains reachable.
