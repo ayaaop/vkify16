@@ -45,6 +45,50 @@ export function forceClassicModeOnMobile() {
     return true;
 }
 
+let vvWatcherInstalled = false;
+
+// Publishes visual-viewport metrics on :root so mobile IM heights track the
+// on-screen keyboard where only the visual viewport shrinks (Chromium is
+// already covered by interactive-widget=resizes-content).
+export function watchImVisualViewport() {
+    if (vvWatcherInstalled) return;
+    const vv = typeof window !== 'undefined' ? window.visualViewport : null;
+    if (!vv) return;
+    vvWatcherInstalled = true;
+
+    let nearBottom = true;
+    const scrollerOf = (el) => el && el.matches && el.matches('.im_page.page-other:not(.hidden)');
+    document.addEventListener('scroll', (e) => {
+        if (scrollerOf(e.target)) {
+            nearBottom = e.target.scrollTop + e.target.clientHeight >= e.target.scrollHeight - 48;
+        }
+    }, true);
+
+    const apply = () => {
+        const root = document.documentElement;
+        const onIm = Boolean(document.body && document.body.classList.contains('body_im'));
+        if (root && onIm && isMobileViewport()) {
+            const scroller = document.querySelector('.im_page.page-other:not(.hidden)');
+            const stickToBottom = scroller && (nearBottom
+                || scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 48);
+            root.style.setProperty('--ovk-vv-height', vv.height + 'px');
+            root.style.setProperty('--ovk-vv-top', vv.offsetTop + 'px');
+            if (stickToBottom) {
+                requestAnimationFrame(() => { scroller.scrollTop = scroller.scrollHeight; });
+            }
+        } else if (root) {
+            root.style.removeProperty('--ovk-vv-height');
+            root.style.removeProperty('--ovk-vv-top');
+        }
+    };
+
+    vv.addEventListener('resize', apply);
+    vv.addEventListener('scroll', apply);
+    window.vkify?.onPageLifecycle?.('afterPageReady', apply);
+    window.vkify?.onPageLifecycle?.('beforePageLeave', apply);
+    apply();
+}
+
 export function watchModernModeTweak() {
     let observer = null;
     try {

@@ -3936,9 +3936,22 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     .body_im .appbar {
         position: static;
     }
+
+    /* --ovk-vv-* tracks the visual viewport on browsers where only it shrinks
+       for the on-screen keyboard. Set by messenger/mobile-mode.js. */
+    html:has(.body_im), body.body_im, .body_im .layout {
+        height: var(--ovk-vv-height, 100dvh);
+        max-height: var(--ovk-vv-height, 100dvh);
+    }
     body.body_im .page_body {
         margin: 0!important;
-        top: var(--header-height);
+        top: calc(var(--ovk-vv-top, 0px) + var(--header-height));
+        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
+        max-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
+    }
+    body.body_im .messenger-app--header.messages--peers-header-peer-name,
+    body.body_im .messages--actions {
+        top: var(--ovk-vv-top, 0px);
     }
 
     #im_container.at_page:not(.compact) #im_page_tabs {
@@ -3948,6 +3961,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     #im_container.at_page:not(.compact) #im_page_containers {
         width: 100%;
         margin-right: 0;
+        border-radius: 0;
     }
 
     #im_container.at_page:not(.compact) {
@@ -3960,14 +3974,19 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
         padding: 0 12px;
     }
 
+    #im_container.at_page {
+        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
+        max-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
+    }
+
     #im_container.at_page:not(.compact) .im_page.page-conversations,
     #im_container.at_page #im_page_containers,
     #im_container.at_page .im_page:not(.hidden),
     #im_container.at_page .im_page.page-other {
         min-height: calc(100vh - var(--header-height));
-        min-height: calc(100dvh - var(--header-height));
+        min-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
         height: calc(100vh - var(--header-height));
-        height: calc(100dvh - var(--header-height));
+        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
     }
 
     .im_mobile .msg-attachments-container:has(.msg-makima-grid) {

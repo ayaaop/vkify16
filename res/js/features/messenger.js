@@ -1,10 +1,11 @@
 import { installMessengerRenderer } from '../messenger/messenger-page.js';
-import { forceClassicModeOnMobile, watchModernModeTweak } from '../messenger/mobile-mode.js';
+import { forceClassicModeOnMobile, watchModernModeTweak, watchImVisualViewport } from '../messenger/mobile-mode.js';
 import { installAudioNormalizer } from '../messenger/audio-normalizer.js';
 import { patchMonthDayString } from '../messenger/shared.js';
 
 installAudioNormalizer();
 patchMonthDayString();
+watchImVisualViewport();
 
 if (forceClassicModeOnMobile()) {
     watchModernModeTweak();
