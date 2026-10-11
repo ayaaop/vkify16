@@ -14,7 +14,7 @@
         {var $extra = ''}
     {/if}
     <div class="page_block">
-        {include "../components/page_crumb_header.latte", crumbs => [
+        {include "../components/page_crumb_header.latte", class => "nomobile", crumbs => [
             ['href' => $album->getOwner()->getURL(), 'title' => $album->getOwner()->getCanonicalName()],
             ['href' => ($album->getOwner() instanceof openvk\Web\Models\Entities\Club ? "/albums" . ($album->getOwner()->getId() * -1) : "/albums" . $album->getOwner()->getId()), 'title' => tr("albums")],
             ['title' => $album->getName(), 'count' => $album->getPhotosCount()]

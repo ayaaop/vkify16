@@ -4,8 +4,9 @@
   @param crumbs       Array of breadcrumb items with 'title', optional 'href' and 'condition' keys
   @param extra        (optional) HTML content to display on the right side of the header
   @param extra_left   (optional) HTML content to display on the left side of the header
+  @param class        (optional) Additional CSS classes for the h2 element
 *}
-<h2 class="page_block_h2">
+<h2 n:class="page_block_h2, $class ?? null">
   <div class="page_block_header crumb_header">
     {ifset $extra_left}
     <div class="page_block_header_extra_left">
