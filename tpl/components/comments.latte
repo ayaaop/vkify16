@@ -31,7 +31,7 @@
                 {include "paginator.latte", conf => (object) ["page" => $page, "count" => $count, "amount" => sizeof($comments), "perPage" => 10, "fetchUrl" => $commentsFetchUrl]}
             </div>
         {else}
-            {include "../components/content_error.latte", icon => "first_comment.png", description=> tr("comments_tip")}
+            {include "../components/content_error.latte", id => "none_tip", icon => "first_comment.png", description=> tr("comments_tip")}
             <div class='scroll_container' n:attr="data-fetch-url => $commentsFetchUrl"></div>
         {/if}
     </div>

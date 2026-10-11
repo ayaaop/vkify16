@@ -2437,13 +2437,12 @@ table,
 
 
 .post-deleted {
-  padding: 15px 20px;
-  color: var(--muted-text-color);
-  font-size: 13px;
-  text-align: center;
-  opacity: 1;
-  animation-name: post-deleted;
-  animation-duration: 4.5s;
+	padding: 15px 20px;
+	color: var(--muted-text-color);
+	font-size: 13px;
+	text-align: center;
+	opacity: 1;
+	animation: post-deleted 4.5s forwards;
 }
 
 .post-replyto {

@@ -9,6 +9,13 @@
         if (placeholder) placeholder.classList.remove('hidden');
     }
 
+    // ajax_posting restores .placeholder on delete-to-zero; hide it once a
+    // scroll_node lands in the same .scroll_container.
+    function hidePlaceholder(container) {
+        var placeholder = container && container.querySelector(':scope > .placeholder');
+        if (placeholder) placeholder.classList.add('hidden');
+    }
+
     function decrementCounts(delayPlaceholder) {
         var tabCount = document.querySelector('.ui_tab_sel .ui_tab_count');
         var headerCount = document.querySelector('.page_block_header .page_block_header_count');
@@ -57,6 +64,30 @@
                 for (var j = 0; j < added.length; j++) {
                     var node = added[j];
                     if (node.nodeType !== 1) continue;
+                    if (node.classList.contains('scroll_node')) {
+                        hidePlaceholder(node.parentElement);
+                        continue;
+                    }
+
+                    var marker = node.classList.contains('post-deleted') ? node : node.querySelector('.post-deleted');
+                    if (marker) {
+                        // ajax_delete swaps the whole node for a bare .post.post-divider,
+                        // dropping page_block; restore it when the replaced node had it.
+                        var removedNodes = mutations[i].removedNodes;
+                        for (var k = 0; k < removedNodes.length; k++) {
+                            var removedNode = removedNodes[k];
+                            if (removedNode.nodeType === 1 && removedNode.classList.contains('page_block')) {
+                                node.classList.add('page_block');
+                                break;
+                            }
+                        }
+
+                        var collapseEl = marker.parentElement && marker.parentElement.classList.contains('post') ? marker.parentElement : marker;
+                        setTimeout(function () {
+                            $(collapseEl).slideUp(300);
+                        }, 4500);
+                    }
+
                     if (!node.classList.contains('post-deleted')) continue;
                     if (processedDeletions.has(node)) continue;
 

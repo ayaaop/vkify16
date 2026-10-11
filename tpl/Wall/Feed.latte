@@ -54,7 +54,7 @@
                             {include "../components/post.latte", post => $post, commentSection => true}
                         {/foreach}
                     {else}
-                        {include "../components/content_error.latte", description => tr("no_posts_abstract")}
+                        {include "../components/content_error.latte", id => "none_tip", description => tr("no_posts_abstract")}
                     {/if}
                 </div>
 
