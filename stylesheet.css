@@ -131,6 +131,9 @@ body {
     --search-placeholder-focus-color: #c0c8d0;
     --message-warning-background: #ffefe9;
     --message-warning-border: #f2ab99;
+    --gift-message-background: #f4ebd6;
+    --gift-message-background--selected: #f2e7ce;
+    --gift-message-text: #7f7660;
     --gift-limit-background: #e64646;
     --overlay-background: rgba(0, 0, 0, 0.4);
 
