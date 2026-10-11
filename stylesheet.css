@@ -5153,6 +5153,23 @@ body.banned {
     float: none;
 }
 
+.stickers_divider {
+    border-top-color: var(--border-color);
+}
+
+.stickers_section_hint,
+.stickers_draft_counter,
+.existing_sticker_label_gift,
+.stickers_gift_preview_note,
+.stickers_stats_total {
+    color: var(--muted-text-color-2);
+}
+
+.stickers_stats_total b,
+.stickers_gift_preview_slots_title {
+    color: var(--link-color);
+}
+
 .stickers_stats_wrapper {
     border-top-color: var(--border-color);
 }
@@ -5174,6 +5191,24 @@ body.banned {
 .stickers_period_link.active {
     background: var(--accent-color-4);
     color: var(--accent-text-color);
+}
+
+.stickers_gift_preview_block {
+    background: var(--module-header-background-color);
+    border-color: var(--border-color);
+}
+
+.stickers_gift_preview_thumb_wrap {
+    background: var(--module-background-color);
+    border-color: var(--border-color);
+}
+
+.stickers_gift_loader {
+    background: color-mix(in srgb, var(--module-background-color) 80%, transparent);
+}
+
+.stickers_gift_preview_slot_item {
+    color: var(--text-color);
 }
 
 
