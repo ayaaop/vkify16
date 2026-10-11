@@ -3,161 +3,30 @@
 {var $avatarNormal = null}
 {block title}{$user->getCanonicalName()}{/block}
 
-{block appbar_extra}
-{ifset $thisUser}
-<div class="mobileonly" id="profile_appbar_extra">
-    <button class="appbar-extra-btn ui_actions_menu_wrap ui_actions_menu_no_chevron" id="profileAppbarMoreBtn" aria-label="More actions" onclick='{="uiActionsMenu.toggle(this, null, {menuId: \"profile_actions_tooltip\", noAnimate: true});"|noescape}'>
-        <svg viewBox="0 0 12 24" width="22" height="22" fill="currentColor"><use href="#more-vertical-24"></use></svg>
-    </button>
-</div>
-{/ifset}
-{/block}
-
-{define mobileProfile}
-    {include '../components/mobile_profile_hero.latte', entity => $user, name => $user->getFullName(), status => tr('user_is_blocked'), verified => $user->isVerified()}
-    <div class="page_block mobile-actions-info-block mobileonly" n:ifcontent>
-        {include '../components/mobile_profile_actions.latte'}
-    </div>
-    <div class="page_block page_padding mobile-page-info mobileonly">
-        <div class="profile_deleted_text">
-            {tr("user_banned", htmlentities($user->getFirstName()))|noescape}<br/>
-            {_user_banned_comment} <b>{$user->getBanReason()}</b>.<br/>
-            {_user_is_blocked}
-            <span n:if="$user->getUnbanTime() !== NULL">{_before}: <b>{$user->getUnbanTime()}</b></span>
-            <span n:if="$user->getUnbanTime() === NULL"><b>{_forever}</b></span>
-        </div>
-    </div>
-{/define}
+{block appbar_extra}{include '../components/profile_appbar_extra.latte', noAnimate => true}{/block}
 
 {block content}
-    {include #mobileProfile}
-
-    <div class="wide_column_right nomobile">
-        <div class="narrow_column_wrap">
-            <div class="narrow_column">
-                <div class="page_block photo_block">
-                    <div class="avatar_block">
-                        <div class="avatar_block_inner">
-                            {include '../components/avatar.latte', author => $user, size => 'normal', id => 'bigAvatar', width => ($avatarNormal ? $avatarNormal->width : 200), height => ($avatarNormal ? $avatarNormal->height : 200), alt => $user->getCanonicalName(), style => 'width: 100%; image-rendering: -webkit-optimize-contrast', class => ''}
-                        </div>
-                    </div>
-					{include '../components/profile_actions.latte'}
-                </div>
-            </div>
+    {capture $body}
+        {tr("user_banned", htmlentities($user->getFirstName()))|noescape}<br/>
+        {_user_banned_comment} <b>{$user->getBanReason()}</b>.<br/>
+        {_user_is_blocked}
+        <span n:if="$user->getUnbanTime() !== NULL">{_before}: <b>{$user->getUnbanTime()}</b></span>
+        <span n:if="$user->getUnbanTime() === NULL"><b>{_forever}</b></span>
+    {/capture}
+    {capture $extra}
+        <div class="profile_deleted_actions buttons_row" n:if="isset($thisUser) && $thisUser->getChandlerUser()->can('access')->model('admin')->whichBelongsTo(NULL)">
+            <a class="button button_gray" href="javascript:unbanUser()">{_unban_user_action}</a>
+            <a class="button button_gray" n:if="$thisUser->getChandlerUser()->can('write')->model('openvk\Web\Models\Entities\TicketReply')->whichBelongsTo(0)" href="javascript:toggleBanInSupport()">
+                {if $user->isBannedInSupport()}{_unban_in_support_user_action}{else}{_ban_in_support_user_action}{/if}
+            </a>
         </div>
-
-    <div class="wide_column_wrap">
-        <div class="wide_column">
-            <div class="page_block page_info_wrap">
-                <div class="accountInfo clearFix">
-                    <div class="page_top">
-                        <h2 class="page_name">{$user->getFullName()}
-                            <a class="page_verified" n:if="$user->isVerified()" href="/verify"></a>
-                        </h2>
-                        <div class="page_status profile_deleted">{_user_is_blocked}</div>
-                    </div>
-                </div>
-                <div class="profile_deleted_text">
-                    {tr("user_banned", htmlentities($user->getFirstName()))|noescape}<br/>
-                    {_user_banned_comment} <b>{$user->getBanReason()}</b>.<br/>
-                    {_user_is_blocked}
-                    <span n:if="$user->getUnbanTime() !== NULL">{_before}: <b>{$user->getUnbanTime()}</b></span>
-                    <span n:if="$user->getUnbanTime() === NULL"><b>{_forever}</b></span>
-                </div>
-                <div class="profile_deleted_actions buttons_row" n:if="isset($thisUser) && $thisUser->getChandlerUser()->can('access')->model('admin')->whichBelongsTo(NULL)">
-                    <a class="button button_gray" n:if="$thisUser->getChandlerUser()->can('access')->model('admin')->whichBelongsTo(NULL)" href="javascript:unbanUser()">{_unban_user_action}</a>
-                    <a class="button button_gray" n:if="$thisUser->getChandlerUser()->can('write')->model('openvk\Web\Models\Entities\TicketReply')->whichBelongsTo(0)" href="javascript:toggleBanInSupport()">
-                    {if $user->isBannedInSupport()}{_unban_in_support_user_action}{else}{_ban_in_support_user_action}{/if}
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{ifset $thisUser}
-    <script n:if="$thisUser->getChandlerUser()->can('access')->model('admin')->whichBelongsTo(NULL)">
-        function unbanUser() {
-            uUnbanMsgTxt  = "Вы собираетесь разбанить пользователя " + {$user->getCanonicalName()} + ".";
-            uUnbanMsgTxt += "<br/>Сейчас он заблокирован по причине: <strong>" + {$user->getBanReason()} + "</strong>.";
-            MessageBox("Разбанить " + {$user->getFirstName()}, uUnbanMsgTxt, ["Подтвердить", "Отмена"], [
-                (function() {
-                    xhr = new XMLHttpRequest();
-                    xhr.open("GET", "/admin/unban/" + {$user->getId()} + "?hash=" + {rawurlencode($csrfToken)}, true);
-                    xhr.onload = (function() {
-                        if(xhr.responseText.indexOf("success") === -1)
-                            MessageBox("Ошибка", "Не удалось разблокировать пользователя...", ["OK"], [Function.noop]);
-                        else
-                            MessageBox("Операция успешна", "Пользователь разблокирован", ["OK"], [Function.noop]);
-                    });
-                    xhr.send(null);
-                }),
-                Function.noop
-            ]);
-        }
-
-        function warnUser() {
-            uBanMsgTxt  = "Вы собираетесь предупредить пользователя " + {$user->getCanonicalName()} + ".";
-            uBanMsgTxt += "<br/>Мы отправим уведомление пользователю в личные сообщения от имени аккаунта администратора.";
-            uBanMsgTxt += "<br/><br/><b>Текст предупреждения</b>: <input type='text' id='uWarnMsgInput' placeholder='придумайте что-нибудь крутое' />";
-
-            MessageBox("Выдать предупреждение " + {$user->getFirstName()}, uBanMsgTxt, ["Подтвердить", "Отмена"], [
-                (function() {
-                    res = document.querySelector("#uWarnMsgInput").value;
-                    xhr = new XMLHttpRequest();
-                    xhr.open("GET", "/admin/warn/" + {$user->getId()} + "?message=" + res + "&hash=" + {rawurlencode($csrfToken)}, true);
-                    xhr.onload = (function() {
-                        if(xhr.responseText.indexOf("message") === -1)
-                            MessageBox("Ошибка", "Не удалось отправить предупреждение...", ["OK"], [Function.noop]);
-                        else
-                            MessageBox("Операция успешна", "Предупреждение отправлено", ["OK"], [Function.noop]);
-                    });
-                    xhr.send(null);
-                }),
-                Function.noop
-            ]);
-        }
-    </script>
-    <script n:if="$thisUser->getChandlerUser()->can('write')->model('openvk\Web\Models\Entities\TicketReply')->whichBelongsTo(0)">
-        {if $user->isBannedInSupport()}
-            function toggleBanInSupport() {
-                uBanMsgTxt  = "Вы собираетесь разблокировать в поддержке пользователя " + {$user->getCanonicalName()} + ".";
-                uBanMsgTxt += "<br/>Сейчас он заблокирован по причине <strong>" + {$user->getBanInSupportReason()} + "</strong>.";
-                MessageBox("Разблокировать в поддержке " + {$user->getFirstName()}, uBanMsgTxt, ["Подтвердить", "Отмена"], [
-                    (function() {
-                        xhr = new XMLHttpRequest();
-                        xhr.open("GET", "/admin/support/unban/" + {$user->getId()} + "?hash=" + {rawurlencode($csrfToken)}, true);
-                        xhr.onload = (function() {
-                            if(xhr.responseText.indexOf("success") === -1)
-                                MessageBox("Ошибка", "Не удалось разблокировать пользователя в поддержке...", ["OK"], [Function.noop]);
-                            else
-                                MessageBox("Операция успешна", "Пользователь разблокирован в поддержке", ["OK"], [Function.noop]);
-                        });
-                        xhr.send(null);
-                    }),
-                    Function.noop
-                ]);
-            }
-        {else}
-            function toggleBanInSupport() {
-                uBanMsgTxt  = "Вы собираетесь заблокировать в поддержке пользователя " + {$user->getCanonicalName()} + ".";
-                uBanMsgTxt += "<br/><br/><b>Причина бана</b>: <input type='text' id='uBanMsgInput' placeholder='придумайте что-нибудь крутое' />";
-                MessageBox("Заблокировать в поддержке " + {$user->getFirstName()}, uBanMsgTxt, ["Подтвердить", "Отмена"], [
-                    (function() {
-                        res = document.querySelector("#uBanMsgInput").value;
-                        xhr = new XMLHttpRequest();
-                        xhr.open("GET", "/admin/support/ban/" + {$user->getId()} + "?reason=" + res + "&hash=" + {rawurlencode($csrfToken)}, true);
-                        xhr.onload = (function() {
-                            if(xhr.responseText.indexOf("success") === -1)
-                                MessageBox("Ошибка", "Не удалось заблокировать пользователя в поддержке...", ["OK"], [Function.noop]);
-                            else
-                                MessageBox("Операция успешна", "Пользователь заблокирован в поддержке", ["OK"], [Function.noop]);
-                        });
-                        xhr.send(null);
-                    }),
-                    Function.noop
-                ]);
-            }
-        {/if}
-    </script>
-{/ifset}
+    {/capture}
+    {include '../components/profile_unavailable.latte',
+        status => tr('user_is_blocked'),
+        statusClass => 'profile_deleted',
+        body => $body,
+        bodyClassDesktop => 'profile_deleted_text',
+        bodyClassMobile => 'profile_deleted_text',
+        extra => $extra,
+        disablePhotoViewer => false}
 {/block}

@@ -1,61 +1,15 @@
 {extends "../@layout.latte"}
 {var $transparentAppbar = true}
-
 {block title}{$user->getCanonicalName()}{/block}
 
-{block appbar_extra}
-{ifset $thisUser}
-<div class="mobileonly" id="profile_appbar_extra">
-    <button class="appbar-extra-btn ui_actions_menu_wrap ui_actions_menu_no_chevron" id="profileAppbarMoreBtn" aria-label="More actions" onclick='{="uiActionsMenu.toggle(this, null, {menuId: \"profile_actions_tooltip\", noAnimate: true});"|noescape}'>
-        <svg viewBox="0 0 12 24" width="22" height="22" fill="currentColor"><use href="#more-vertical-24"></use></svg>
-    </button>
-</div>
-{/ifset}
-{/block}
-
-{define mobileProfile}
-    {include '../components/mobile_profile_hero.latte', entity => $user, name => $user->getFullName(), status => tr('closed_page'), verified => $user->isVerified(), disablePhotoViewer => true}
-    <div class="page_block mobile-actions-info-block mobileonly" n:ifcontent>
-        {include '../components/mobile_profile_actions.latte'}
-    </div>
-    <div class="page_block page_padding mobile-page-info mobileonly">
-        {tr("you_blacklisted", $user->getMorphedName("genitive", false))}.
-    </div>
-{/define}
+{block appbar_extra}{include '../components/profile_appbar_extra.latte', noAnimate => true}{/block}
 
 {block content}
-    {include #mobileProfile}
-
-    <div class="wide_column_right nomobile">
-        <div class="narrow_column_wrap">
-            <div class="narrow_column">
-                <div class="page_block photo_block">
-                    <div class="avatar_block">
-                        <div class="avatar_block_inner">
-                            {include '../components/avatar.latte', author => $user, size => 'normal', id => 'bigAvatar', width => ($avatarNormal ? $avatarNormal->width : 200), height => ($avatarNormal ? $avatarNormal->height : 200), alt => $user->getCanonicalName(), style => 'width: 100%; image-rendering: -webkit-optimize-contrast', class => ''}
-                        </div>
-                    </div>
-					{include '../components/profile_actions.latte'}
-                </div>
-            </div>
-        </div>
-
-        <div class="wide_column_wrap">
-            <div class="wide_column">
-                <div class="page_block page_info_wrap info_block">
-                    <div class="accountInfo clearFix">
-                        <div class="page_top">
-                            <h2 class="page_name">{$user->getFullName()}
-                                <a class="page_verified" n:if="$user->isVerified()" href="/verify"></a>
-                            </h2>
-                            <div class="page_status" style="color: var(--muted-text-color);">{_closed_page}</div>
-                        </div>
-                    </div>
-                    <div class="msg msg_yellow">
-                        {tr("you_blacklisted", $user->getMorphedName("genitive", false))}.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {capture $body}
+        {tr("you_blacklisted", $user->getMorphedName("genitive", false))}.
+    {/capture}
+    {include '../components/profile_unavailable.latte',
+        status => tr('closed_page'),
+        body => $body,
+        bodyClassDesktop => 'msg msg_yellow'}
 {/block}

@@ -1,0 +1,322 @@
+{define mobileProfile, $hasMoreInfo, $albums, $audios, $topics, $followersCount, $potentialCount, $pinnedPost, $descHtml, $descPlain, $docs}
+    {include '../components/mobile_profile_hero.latte', entity => $club, name => $club->getName(), status => $club->isEvent() ? tr('event_type_open') : tr('group_type_open'), verified => $club->isVerified()}
+
+    <div class="mobileonly mobile-group-content">
+
+        <div class="page_block mobile-actions-info-block">
+            <div class="page_padding mobile-actions-wrap">
+                <div class="mobile_profile_actions">
+                    {ifset $thisUser}
+                        {var $subStatus = $club->getSubscriptionStatus($thisUser)}
+                        {var $isMaybe = $thisUser ? $club->getFollowersQuery()->where(['follower' => $thisUser->getId(), 'flags' => 1])->fetch() : null}
+                        {var $eventFlag = $subStatus ? ($isMaybe ? 1 : 0) : -1}
+                        {if !$canEdit && $club->canWriteMessage($thisUser)}
+                            <div class="mobile_profile_action_primary">
+                                <a class="button mobile_profile_action_btn" href="/im?sel={$club->getRealId()}">{_message}</a>
+                            </div>
+                        {/if}
+                        {if !$subStatus}
+                            <form action="/setSub/club" method="post" class="mobile_profile_action_primary">
+                                <input type="hidden" name="act" value="add" />
+                                <input type="hidden" name="id" value="{$club->getId()}" />
+                                <input type="hidden" name="hash" value="{$csrfToken}" />
+                                <input type="submit" value="{if $club->isEvent()}{_ill_come_to_meeting}{else}{_join_community}{/if}" class="button button_wide mobile_profile_action_btn" />
+                            </form>
+                        {else}
+                            <div class="profile_sub_wrapper ui_actions_menu_wrap" onclick="uiActionsMenu.toggle(this, null);">
+                            <button class="profile_sub_btn button button_wide mobile_profile_action_btn button_gray" id="mobile_profile_sub_btn">
+                                {if $club->isEvent()}{if $eventFlag == 1}{_i_might_come_to_meeting}{else}{_ill_come_to_meeting}{/if}{else}{_leave_community}{/if} <span class="profile_sub_arrow"></span>
+                            </button>
+                            <div id="mobile_profile_sub_tooltip" class="ui_actions_menu" data-club-id="{$club->getId()}" data-current-flag="{$eventFlag}">
+                                <form style="display:none" data-action="going" action="/setSub/club" method="post">
+                                    <input type="hidden" name="act" value="add" />
+                                    <input type="hidden" name="flag" value="0" />
+                                    <input type="hidden" name="id" value="{$club->getId()}" />
+                                    <input type="hidden" name="hash" value="{$csrfToken}" />
+                                </form>
+                                <form style="display:none" data-action="maybe" action="/setSub/club" method="post">
+                                    <input type="hidden" name="act" value="add" />
+                                    <input type="hidden" name="flag" value="1" />
+                                    <input type="hidden" name="id" value="{$club->getId()}" />
+                                    <input type="hidden" name="hash" value="{$csrfToken}" />
+                                </form>
+                                <form style="display:none" data-action="notgoing" action="/setSub/club" method="post">
+                                    <input type="hidden" name="act" value="rem" />
+                                    <input type="hidden" name="id" value="{$club->getId()}" />
+                                    <input type="hidden" name="hash" value="{$csrfToken}" />
+                                </form>
+                                {if $club->isEvent()}
+                                    <a href="javascript:void(0)" data-event-action="going">{_ill_come_to_meeting}</a>
+                                    <a href="javascript:void(0)" data-event-action="maybe">{_i_might_come_to_meeting}</a>
+                                    <a href="javascript:void(0)" data-event-action="notgoing">{_ill_not_come_to_meeting}</a>
+                                {else}
+                                    <a href="javascript:void(0)" data-event-action="notgoing">{_leave_community}</a>
+                                {/if}
+                            </div>
+                            </div>
+                        {/if}
+                    {else}
+                        <div class="guest_actions">
+                            {=vkifyTr('guest_actions_group', $club->getName())|noescape}
+                        </div>
+                    {/ifset}
+                </div>
+            </div>
+
+            <div class="mobile-info-rows">
+                {var $descPlain = $club->getDescription() ?? ''}
+                {if $club->getWebsite()}
+                    <a class="mobile-info-row mir-link" href="{$club->getWebsite()}" rel="ugc" target="_blank">
+                        <svg class="mir-icon" viewBox="0 0 24 24"><use href="#globe-outline-24"></use></svg>
+                        <div class="mir-text">{$club->getWebsite()}</div>
+                    </a>
+                {/if}
+                {if $followersCount > 0 || $potentialCount > 0}
+                    <a class="mobile-info-row" href="/club{$club->getId()}/followers">
+                        <svg class="mir-icon" viewBox="0 0 24 24"><use href="#users-24"></use></svg>
+                        <div class="mir-text">
+                            {if $followersCount > 0}{tr('participants', $followersCount)}{/if}
+                            {if $followersCount > 0 && $potentialCount > 0}<span class="divider"></span>{/if}
+                            {if $potentialCount > 0}{$potentialCount} {_event_potential_comers|lower}{/if}
+                        </div>
+                    </a>
+                {/if}
+                {include #clubEventDate, mobile => true}
+                {if $hasMoreInfo}
+                <div class="mobile-info-row mobile-info-row-more" onclick="__mobileGroupShowMore()">
+                    <svg class="mir-icon" viewBox="0 0 24 24"><use href="#info-24"></use></svg>
+                    <div class="mir-text">{_additional_information}</div>
+                </div>
+                {/if}
+            </div>
+
+        </div>
+
+        {var $canSeeAlbums = $albumsCount > 0}
+        {var $canSeeAudios = $audiosCount > 0}
+        {var $canSeeDocs   = $docsCount   > 0}
+        {var $stripHasContent = $canSeeAlbums || $canSeeAudios || $canSeeDocs}
+
+        {if $canEdit || $club->isEveryoneCanUploadAudios() || $stripHasContent}
+        <div class="page_block mobile-scroll-modules">
+
+            {if $canSeeAlbums}
+                {var $firstAlbum = $albums[0] ?? null}
+                <div class="module clear album_module mobile-scroll-card">
+                    {include '../components/module_header.latte', href => '/albums' . ($club->getId() * -1), label => tr('albums'), count => $albumsCount}
+                    <a href="{if $firstAlbum}/album{$firstAlbum->getPrettyId()}{else}/albums{$club->getId() * -1}{/if}" n:class="module_body, !($firstAlbum && $firstAlbum->getCoverPhoto()) ? msm-placeholder">
+                        {if $firstAlbum && $firstAlbum->getCoverPhoto()}
+                            <img src="{$firstAlbum->getCoverPhoto()->getURLBySizeId('normal')}" class="msm-album-cover" alt="" />
+                        {else}
+                            <svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#camera-28"></use></svg>
+                            <span class="msm-placeholder-label">{_upload_photo}</span>
+                        {/if}
+                    </a>
+                </div>
+            {elseif $canEdit}
+                <div class="module clear album_module mobile-scroll-card">
+                    {include '../components/module_header.latte', href => '/albums' . ($club->getId() * -1), label => tr('albums')}
+                    <a href="/albums{$club->getId() * -1}" class="module_body msm-placeholder">
+                        <svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#camera-28"></use></svg>
+                        <span class="msm-placeholder-label">{_upload_photo}</span>
+                    </a>
+                </div>
+            {/if}
+            {if $canSeeAudios}
+                {var $firstAudio = $audios[0] ?? null}
+                <div class="module clear mobile-scroll-card">
+                    {include '../components/module_header.latte', href => '/audios-' . ($club->getId()), label => tr('audios'), count => $audiosCount}
+                    <a href="/audios-{$club->getId()}" class="module_body msm-placeholder">
+                        <svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#music-28"></use></svg>
+                        {if $firstAudio}
+                            <span class="msm-placeholder-label">{$firstAudio->getTitle()|truncate:40}<br>{$firstAudio->getPerformer()|truncate:40}</span>
+                        {/if}
+                    </a>
+                </div>
+            {elseif $canEdit || $club->isEveryoneCanUploadAudios()}
+                <div class="module clear mobile-scroll-card">
+                    {include '../components/module_header.latte', href => '/audios-' . ($club->getId()), label => tr('audios')}
+                    <a href="/player/upload?gid={$club->getId()}" class="module_body msm-placeholder">
+                        <svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#music-28"></use></svg>
+                        <span class="msm-placeholder-label">{_upload_audio_to_group}</span>
+                    </a>
+                </div>
+            {/if}
+            {if $canSeeDocs}
+                <div class="module clear topics_module notes_module mobile-scroll-card">
+                    {include '../components/module_header.latte', href => '/docs' . ($club->getRealId()), label => tr('documents'), count => $docsCount}
+                    {if sizeof($docs) === 1}
+                        {var $doc = $docs[0]}
+                        {var $docPreview = $doc->hasPreview() ? $doc->getPreview() : null}
+                        <a href="/doc{$doc->getPrettyId()}?key={$doc->getAccessKey()}" class="module_body" title="{$doc->getName()}">
+                            {if $docPreview}
+                                <img src="{$docPreview->getURLBySizeId('normal')}" class="msm-album-cover" alt="" />
+                            {else}
+                                <div class="msm-placeholder"><div class="doc_icon page_doc_icon page_doc_icon_{$doc->getFileExtension()}"></div></div>
+                            {/if}
+                        </a>
+                    {else}
+                        <div class="module_body msm-grid">
+                            {foreach array_slice($docs, 0, 6) as $doc}
+                                {var $docPreview = $doc->hasPreview() ? $doc->getPreview() : null}
+                                <a href="/doc{$doc->getPrettyId()}?key={$doc->getAccessKey()}" class="msm-grid__cell msm-doc-cell" title="{$doc->getName()}">
+                                    {if $docPreview}
+                                        <img class="msm-grid__img" src="{$docPreview->getURLBySizeId('tiny')}" alt="" />
+                                    {else}
+                                        <div class="doc_icon page_doc_icon page_doc_icon_{$doc->getFileExtension()}"></div>
+                                    {/if}
+                                </a>
+                            {/foreach}
+                        </div>
+                    {/if}
+                </div>
+            {elseif $canEdit}
+                <div class="module clear topics_module notes_module mobile-scroll-card">
+                    {include '../components/module_header.latte', href => '/docs' . ($club->getRealId()), label => tr('documents')}
+                    <a href="javascript:showDocumentUploadDialog(null, {$club->getId()})" class="module_body msm-placeholder">
+                        <svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#document-28"></use></svg>
+                        <span class="msm-placeholder-label">{_document_uploading_in_general}</span>
+                    </a>
+                </div>
+            {/if}
+
+        </div>
+        {/if}
+
+        {if $topicsCount > 0}
+        <div class="page_block topics_module mobile-topics-module">
+            {include '../components/module_header.latte', href => '/board' . ($club->getId()), label => tr('discussions'), count => $topicsCount}
+            <div class="module_body">
+                <div class="topic_row" n:foreach="$topics as $topic">
+                    <div class="topic_info_wrap">
+                        <a href="/topic{$topic->getPrettyId()}">
+                            <div class="topic_icon"></div>
+                            <div class="topic_title">{$topic->getTitle()}</div>
+                        </a>
+                        <div class="topic_info">{tr('updated_at', $topic->getUpdateTime())}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {/if}
+
+    </div>
+
+    {if $pinnedPost}
+    <div class="mobileonly page_block">
+		{include "../components/post.latte", post => $pinnedPost, commentSection => true, onWallOf => true}
+    </div>
+    {/if}
+
+    <div id="mobile_group_more_info_content" style="display:none;">
+        {var $moreInfoBlocks = []}
+
+        {if $descPlain !== ''}
+            {capture $moreInfoBlock}
+                <div class="form_group clear_fix">
+                    <div class="form_field">
+                        <div class="form_label">{_information}</div>
+                        <div class="form_data" dir="auto">
+                            {include "../components/truncated_text.latte", html => $descHtml, plain => $descPlain, limit => 500}
+                        </div>
+                    </div>
+                </div>
+            {/capture}
+            {var $moreInfoBlocks = array_merge($moreInfoBlocks, [$moreInfoBlock])}
+        {/if}
+        {if $club->getAdministratorsListDisplay() == 0 || $club->getAdministratorsListDisplay() == 1}
+            {capture $moreInfoBlock}
+                {include #clubAdminModules}
+            {/capture}
+            {var $moreInfoBlocks = array_merge($moreInfoBlocks, [$moreInfoBlock])}
+        {/if}
+
+        {foreach $moreInfoBlocks as $block}
+            {$block}
+            {sep}<hr class="mobile-more-sep">{/sep}
+        {/foreach}
+    </div>
+{/define}
+
+{* Creator / administrators list modules for a club profile. *}
+{define clubAdminModules}
+{if $club->getAdministratorsListDisplay() == 0 || $club->getAdministratorsListDisplay() == 1}
+<div n:if="$club->getAdministratorsListDisplay() == 0" class="module page_list_module">
+	<a href="/club{$club->getId()}/followers?onlyAdmins=1" class="module_header">
+		<h3 class="header_top clear_fix">
+			<span class="header_label fl_l">{_creator}</span>
+		</h3>
+	</a>
+
+	<div class="module_body">
+		<div class="line_cell clear_fix">
+			{var $author = $club->getOwner()}
+			<div class="thumb">
+				<a href="{$author->getURL()}">
+					{include '../components/avatar.latte', author => $author, size => 'miniscule', class => 'cell_img'}
+				</a>
+			</div>
+			<div n:class="empty($club->getOwnerComment()) ? 'info' : 'desc_info'">
+				<a href="{$author->getURL()}" class="people_name">{$author->getCanonicalName()}</a>
+				<div n:ifcontent class="people_desc">{$club->getOwnerComment()}</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div n:if="$club->getAdministratorsListDisplay() == 1" class="module page_list_module">
+	{var $managersCount = $club->getManagersCount(true)}
+	<a href="/club{$club->getId()}/followers?onlyAdmins=1" class="module_header">
+		<h3 class="header_top clear_fix">
+			<span class="header_label fl_l">{_administrators}</span>
+			<span class="header_count fl_l">{$managersCount}</span>
+		</h3>
+	</a>
+
+	<div class="module_body">
+		<div class="line_cell clear_fix" n:if="!$club->isOwnerHidden()">
+			{var $author = $club->getOwner()}
+			<div class="thumb">
+				<a href="{$author->getURL()}">
+					{include '../components/avatar.latte', author => $author, size => 'miniscule', class => 'cell_img'}
+				</a>
+			</div>
+			<div n:class="empty($club->getOwnerComment()) ? 'info' : 'desc_info'">
+				<a href="{$author->getURL()}" class="people_name">{$author->getCanonicalName()}</a>
+				<div n:ifcontent class="people_desc">{$club->getOwnerComment()}</div>
+			</div>
+		</div>
+		<div class="line_cell clear_fix" n:foreach="$club->getManagers(1, true) as $manager">
+			{var $user = $manager->getUser()}
+			<div class="thumb">
+				<a href="{$user->getURL()}">
+					{include '../components/avatar.latte', author => $user, size => 'miniscule', class => 'cell_img'}
+				</a>
+			</div>
+			<div n:class="empty($manager->getComment()) ? 'info' : 'desc_info'">
+				<a href="{$user->getURL()}" class="people_name">{$user->getCanonicalName()}</a>
+				<div n:ifcontent class="people_desc">{$manager->getComment()}</div>
+			</div>
+		</div>
+	</div>
+</div>
+{/if}
+{/define}
+
+{* Event start date row for a club profile. *}
+{define clubEventDate, $mobile}
+{if $club->isEvent() && !is_null($club->getStartDate())}
+	{var $eventStartTs = $club->getStartDate()->timestamp()}
+	{var $eventFinish = $club->getFinishDate()}
+	{var $fmtSameYear = "%e %h " . tr("time_at_sp") . " %R"}
+	{var $fmtWithYear = "%e %B %Y " . tr("time_at_sp") . " %R"}
+	{var $eventDateText = $club->getStartDate()->format(date("Y", $eventStartTs) === date("Y") ? $fmtSameYear : $fmtWithYear) . (!is_null($eventFinish) ? " — " . $eventFinish->format(date("Y", $eventFinish->timestamp()) === date("Y") ? $fmtSameYear : $fmtWithYear) : "")}
+	{if $mobile}
+		<div class="mobile-info-row">
+			<svg class="mir-icon" viewBox="0 0 24 24"><use href="#clock-24"></use></svg>
+			<div class="mir-text">{$eventDateText}</div>
+		</div>
+	{else}
+		<div n:class="group_info_row, $eventStartTs <= strtotime('+2 days') ? soon : time" title="{_event_start_date}">{$eventDateText}</div>
+	{/if}
+{/if}
+{/define}

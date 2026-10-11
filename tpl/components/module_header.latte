@@ -1,0 +1,22 @@
+{*
+  Profile sidebar module header link.
+
+  @param href   URL the header links to
+  @param label  Header text (already translated)
+  @param count  (optional) counter value
+  @param countId (optional) id attribute for the counter span
+  @param tag    (optional) inner tag name, 'h3' by default
+*}
+<a href="{$href}" class="module_header">
+    {if ($tag ?? 'h3') === 'h3'}
+        <h3 class="header_top clear_fix">
+            <span class="header_label fl_l">{$label}</span>
+            <span class="header_count fl_l" n:ifset="$count" n:attr="id => $countId ?? null">{$count}</span>
+        </h3>
+    {else}
+        <div class="header_top clear_fix">
+            <span class="header_label fl_l">{$label}</span>
+            <span class="header_count fl_l" n:ifset="$count" n:attr="id => $countId ?? null">{$count}</span>
+        </div>
+    {/if}
+</a>

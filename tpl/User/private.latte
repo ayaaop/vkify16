@@ -1,26 +1,13 @@
 {extends "../@layout.latte"}
 {var $transparentAppbar = true}
 {var $subStatus = isset($thisUser) ? $user->getSubscriptionStatus($thisUser) : null}
-
 {block title}{$user->getCanonicalName()}{/block}
 
-{block appbar_extra}
-{ifset $thisUser}
-<div class="mobileonly" id="profile_appbar_extra">
-    <button class="appbar-extra-btn ui_actions_menu_wrap ui_actions_menu_no_chevron" id="profileAppbarMoreBtn" aria-label="More actions" onclick='{="uiActionsMenu.toggle(this, null, {menuId: \"profile_actions_tooltip\", noAnimate: true});"|noescape}'>
-        <svg viewBox="0 0 12 24" width="22" height="22" fill="currentColor"><use href="#more-vertical-24"></use></svg>
-    </button>
-</div>
-{/ifset}
-{/block}
+{block appbar_extra}{include '../components/profile_appbar_extra.latte', noAnimate => true}{/block}
 
-{define mobileProfile}
-    {include '../components/mobile_profile_hero.latte', entity => $user, name => $user->getFullName(), status => tr('closed_page'), verified => $user->isVerified(), disablePhotoViewer => true}
-    <div class="page_block mobile-actions-info-block mobileonly" n:ifcontent>
-        {include '../components/mobile_profile_actions.latte'}
-    </div>
-    <div class="page_block page_padding mobile-page-info mobileonly">
-        {var $m = $user->isFemale() ? "f" : "m"}
+{block content}
+    {var $m = $user->isFemale() ? "f" : "m"}
+    {capture $body}
         <p>
             {tr("limited_access_to_page_$m", $user->getFirstName())}
         </p>
@@ -37,58 +24,10 @@
                 {tr("register_to_access_page_$m")}
             </p>
         {/if}
-    </div>
-{/define}
-
-{block content}
-    {include #mobileProfile}
-
-    <div class="wide_column_right">
-        <div class="narrow_column_wrap">
-            <div class="narrow_column">
-				<div class="page_block photo_block nomobile">
-                    <div class="avatar_block">
-						<div class="avatar_block_inner">
-                            {include '../components/avatar.latte', author => $user, size => 'normal', alt => $user->getCanonicalName(), style => 'width: 100%; image-rendering: -webkit-optimize-contrast;'}
-                        </div>
-                    </div>
-					{include '../components/profile_actions.latte'}
-                </div>
-            </div>
-        </div>
-        <div class="wide_column_wrap">
-            <div class="wide_column">
-                <div class="page_block page_info_wrap info_block nomobile">
-						<div class="accountInfo clearFix">
-							<div class="page_top">
-                                <h2 class="page_name">{$user->getFullName()}
-                                    <a class="page_verified" n:if="$user->isVerified()" href="/verify"></a>
-                                </h2>
-                                <div class="page_status" style="color: #AAA;">{_closed_page}</div>
-                            </div>
-                        </div>
-                    <div class="msg msg_yellow">
-                        {var $m = $user->isFemale() ? "f" : "m"}
-                        <p>
-                            {tr("limited_access_to_page_$m", $user->getFirstName())}
-                        </p>
-
-                        {if isset($thisUser)}
-                            {if $subStatus != 2}
-                                <p>
-                                    {_you_can_add}
-                                    <a href="javascript:addToFriends.submit()">{tr("add_to_friends_$m")}</a>
-                                </p>
-                            {/if}
-                        {else}
-                            <p>
-                                {tr("register_to_access_page_$m")}
-                            </p>
-                        {/if}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    {/capture}
+    {include '../components/profile_unavailable.latte',
+        status => tr('closed_page'),
+        statusStyle => 'color: #AAA;',
+        body => $body,
+        bodyClassDesktop => 'msg msg_yellow'}
 {/block}

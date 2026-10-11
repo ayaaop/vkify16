@@ -1,0 +1,13 @@
+{*
+  Mobile appbar "more actions" button that opens the profile actions tooltip.
+
+  @param buttonId  (optional) id attribute for the button
+  @param noAnimate (optional) pass true to open the menu without animation
+*}
+{ifset $thisUser}
+<div class="mobileonly" id="profile_appbar_extra">
+    <button class="appbar-extra-btn ui_actions_menu_wrap ui_actions_menu_no_chevron" id="{$buttonId ?? 'profileAppbarMoreBtn'}" aria-label="More actions" onclick='{="uiActionsMenu.toggle(this, null, {menuId: \"profile_actions_tooltip\"" . (($noAnimate ?? false) ? ", noAnimate: true" : "") . "});"|noescape}'>
+        <svg viewBox="0 0 12 24" width="22" height="22" fill="currentColor"><use href="#more-vertical-24"></use></svg>
+    </button>
+</div>
+{/ifset}

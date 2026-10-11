@@ -1,0 +1,262 @@
+{define mobileProfile, $thatIsThisUser, $hasMoreInfo, $stripHasContent, $canSeeVideos, $canSeeAudios, $canSeeGroups, $canSeeMeetings, $canSeeAlbums, $canSeeGifts, $canSeeNotes, $videos, $audios, $albums, $basicInfoFields, $personalInfoFields}
+    {var $mobileHeroStatus = $user->onlineStatus() == 2 ? tr('deceased_person') : ($user->isOnline() ? tr('online') : ($user->getOnline()->timestamp() + 2505600 > time() ? ($user->isFemale() ? tr('was_online_f') : tr('was_online_m')) . ' ' . $user->getOnline() : ''))}
+    {include '../components/mobile_profile_hero.latte', entity => $user, name => $user->getFullName(), status => $mobileHeroStatus, verified => $user->isVerified()}
+	<div class="mobileonly mobile-profile-content">
+		<div class="page_block mobile-actions-info-block">
+			{include '../components/mobile_profile_actions.latte'}
+			<div class="mobile-info-rows">
+				{if $audioStatus}
+					{if !$thatIsThisUser}
+						<a class="mobile-info-row" href="/audio{$audioStatus->getPrettyIdA()}">
+							<svg class="mir-icon" viewBox="0 0 24 24"><use href="#message-24"></use></svg>
+							<div class="mir-text">{$audioStatus->getName()}</div>
+						</a>
+					{else}
+						<div class="mobile-info-row">
+							<svg class="mir-icon" viewBox="0 0 24 24"><use href="#message-24"></use></svg>
+							<div class="mir-text">{$audioStatus->getName()}</div>
+						</div>
+					{/if}
+				{elseif $user->getStatus()}
+					<div class="mobile-info-row {if $thatIsThisUser}mobile-info-row-editable{/if}" {if $thatIsThisUser}onclick="window.vkify.mobileEditStatus()"{/if}>
+						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#message-24"></use></svg>
+						<div class="mir-text" id="mobile_status_display">{$user->getStatus()}</div>
+					</div>
+				{elseif $thatIsThisUser}
+					<div class="mobile-info-row mobile-info-row-editable" onclick="window.vkify.mobileEditStatus()">
+						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#message-24"></use></svg>
+						<div class="mir-text" id="mobile_status_display">{_change_status}</div>
+					</div>
+				{/if}
+				{if $user->getPrivacyPermission('friends.read', $thisUser ?? NULL) && $user->getFriendsCount() > 0}
+					<a class="mobile-info-row" href="/friends{$user->getId()}">
+						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#users-24"></use></svg>
+						<div class="mir-text">
+							{tr("friends", $user->getFriendsCount())}
+							{if $user->getFriendsOnlineCount() > 0}
+								<span class="divider"></span><span class="mir-muted">{tr("friends_online", $user->getFriendsOnlineCount())}</span>
+							{/if}
+						</div>
+					</a>
+				{/if}
+				{if $user->getFollowersCount() > 0 && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL)}
+					<a class="mobile-info-row" href="/friends{$user->getId()}?act=incoming">
+						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#user-add-outline-24"></use></svg>
+						<div class="mir-text">{tr("followers", $user->getFollowersCount())}</div>
+					</a>
+				{/if}
+				{if $thisUser != NULL && $thisUser->getId() != $user->getId() && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL) && ($commonFriendsCount = $user->getCommonFriendsCount($thisUser)) > 0}
+					<a class="mobile-info-row" href="/friends{$user->getId()}?act=common">
+						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#users-24"></use></svg>
+						<div class="mir-text">{tr("friends_common", $commonFriendsCount)}</div>
+					</a>
+				{/if}
+				{if !is_null($user->getHometown())}
+					<a class="mobile-info-row" href="/search?section=users&q=&hometown={urlencode($user->getHometown())}">
+						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#home-24"></use></svg>
+						<div class="mir-text">{$user->getHometown()}</div>
+					</a>
+				{/if}
+				{if $hasMoreInfo}
+				<div class="mobile-info-row mobile-info-row-more" onclick="__mobileProfileShowMore()">
+					<svg class="mir-icon" viewBox="0 0 24 24"><use href="#info-24"></use></svg>
+					<div class="mir-text">{_additional_information}</div>
+				</div>
+				{/if}
+			</div>
+		</div>
+
+		{if $thatIsThisUser || $stripHasContent}
+		<div class="page_block mobile-scroll-modules">
+			{if $canSeeVideos}
+				{var $firstVideo = $videos[0] ?? null}
+				<div class="module clear video_module mobile-scroll-card">
+					{include '../components/module_header.latte', href => '/videos' . ($user->getId()), label => tr('videos'), count => $videosCount}
+					<div class="module_body">
+						<a href="{if $firstVideo}/video{$firstVideo->getPrettyId()}{else}/videos{$user->getId()}{/if}" id="videoOpen" data-id="{if $firstVideo}{$firstVideo->getPrettyId()}{/if}" class="video">
+							{if $firstVideo}
+								<div class="page_video_thumb" style="background-image: url('{$firstVideo->getThumbnailURL()}');"></div>
+								<div class="page_video_play_icon"></div>
+							{else}
+								<div class="msm-placeholder"><svg width="40" height="40" fill="currentColor" viewBox="0 0 24 24"><use href="#video-24"></use></svg></div>
+							{/if}
+						</a>
+					</div>
+				</div>
+			{elseif $thatIsThisUser}
+				<div class="module clear video_module mobile-scroll-card">
+					{include '../components/module_header.latte', href => '/videos' . ($user->getId()), label => tr('videos')}
+					<a href="/videos{$user->getId()}" class="module_body msm-placeholder">
+						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#video-28"></use></svg>
+						<span class="msm-placeholder-label">{_upload_video}</span>
+					</a>
+				</div>
+			{/if}
+			{if $canSeeAudios}
+				{var $firstAudio = $audios[0] ?? null}
+				<div class="module clear mobile-scroll-card">
+					{include '../components/module_header.latte', href => '/audios' . ($user->getId()), label => tr('audios'), count => $audiosCount}
+					<a href="/audios{$user->getId()}" class="module_body msm-placeholder">
+						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#music-28"></use></svg>
+						{if $firstAudio}
+							<span class="msm-placeholder-label">{$firstAudio->getTitle()|truncate:40}<br>{$firstAudio->getPerformer()|truncate:40}</span>
+						{/if}
+					</a>
+				</div>
+			{elseif $thatIsThisUser}
+				<div class="module clear mobile-scroll-card">
+					{include '../components/module_header.latte', href => '/audios' . ($user->getId()), label => tr('audios')}
+					<a href="/audios{$user->getId()}" class="module_body msm-placeholder">
+						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#music-28"></use></svg>
+						<span class="msm-placeholder-label">{_upload_audio}</span>
+					</a>
+				</div>
+			{/if}
+			{if $canSeeGroups}
+				<div class="module clear page_list_module mobile-scroll-card">
+					{include '../components/module_header.latte', href => '/groups' . ($user->getId()), label => tr('groups'), count => $user->getClubCount()}
+					<div class="module_body msm-grid">
+						{foreach array_slice(iterator_to_array($user->getClubs(1)), 0, 6) as $grp}
+							<a href="/club{$grp->getId()}" class="msm-grid__cell">
+								{include '../components/avatar.latte', author => $grp, size => 'miniscule', width => 50, height => 50, alt => $grp->getCanonicalName(), class => 'msm-grid__img'}
+							</a>
+						{/foreach}
+					</div>
+				</div>
+			{elseif $thatIsThisUser && $user->getPrivacyPermission('groups.read', $thisUser ?? NULL)}
+				<div class="module clear page_list_module mobile-scroll-card">
+					{include '../components/module_header.latte', href => '/groups' . ($user->getId()), label => tr('groups')}
+					<a href="/groups{$user->getId()}" class="module_body msm-placeholder">
+						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#users-28"></use></svg>
+						<span class="msm-placeholder-label">{_groups}</span>
+					</a>
+				</div>
+			{/if}
+			{if $canSeeMeetings}
+				<div class="module clear page_list_module mobile-scroll-card">
+					{include '../components/module_header.latte', href => '/events' . ($user->getId()), label => tr('meetings'), count => $user->getEventsCount()}
+					<div class="module_body msm-grid">
+						{foreach array_slice(iterator_to_array($user->getEvents(1)), 0, 6) as $event}
+							<a href="{$event->getURL()}" class="msm-grid__cell">
+								{include '../components/avatar.latte', author => $event, size => 'miniscule', width => 50, height => 50, alt => $event->getCanonicalName(), class => 'msm-grid__img'}
+							</a>
+						{/foreach}
+					</div>
+				</div>
+			{elseif $thatIsThisUser && $user->getPrivacyPermission('groups.read', $thisUser ?? NULL)}
+				<div class="module clear page_list_module mobile-scroll-card">
+					{include '../components/module_header.latte', href => '/events' . ($user->getId()), label => tr('meetings')}
+					<a href="/events{$user->getId()}" class="module_body msm-placeholder">
+						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#users-28"></use></svg>
+						<span class="msm-placeholder-label">{_meetings}</span>
+					</a>
+				</div>
+			{/if}
+			{if $canSeeAlbums}
+				{var $firstAlbum = $albums[0] ?? null}
+				<div class="module clear album_module mobile-scroll-card">
+					{include '../components/module_header.latte', href => '/albums' . ($user->getId()), label => tr('albums'), count => $albumsCount}
+					<a href="{if $firstAlbum}/album{$firstAlbum->getPrettyId()}{else}/albums{$user->getId()}{/if}" class="module_body {if !$firstAlbum || !$firstAlbum->getCoverPhoto()}msm-placeholder{/if}">
+						{if $firstAlbum && $firstAlbum->getCoverPhoto()}
+							<img src="{$firstAlbum->getCoverPhoto()->getURLBySizeId('normal')}" class="msm-album-cover" alt="" />
+						{else}
+							<svg width="40" height="40" fill="currentColor" viewBox="0 0 24 24"><use href="#picture-24"></use></svg>
+						{/if}
+					</a>
+				</div>
+			{elseif $thatIsThisUser}
+				<div class="module clear album_module mobile-scroll-card">
+					{include '../components/module_header.latte', href => '/albums' . ($user->getId()), label => tr('albums')}
+					<a href="/albums{$user->getId()}" class="module_body msm-placeholder">
+						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#camera-28"></use></svg>
+						<span class="msm-placeholder-label">{_upload_photo}</span>
+					</a>
+				</div>
+			{/if}
+			{if $canSeeGifts}
+				<div class="module clear profile_gifts mobile-scroll-card">
+					{include '../components/module_header.latte', href => '/gifts' . ($user->getId()), label => tr('gifts'), count => $user->getGiftCount()}
+					<a href="/gifts{$user->getId()}" class="module_body msm-grid">
+						{foreach $user->getGifts(1, 6) as $giftDesc}
+							<div class="msm-grid__cell">
+								<img class="msm-grid__img" src="{$giftDesc->gift->getImage(2)}" alt="" />
+							</div>
+						{/foreach}
+					</a>
+				</div>
+			{elseif $thatIsThisUser && \OPENVK_ROOT_CONF['openvk']['preferences']['commerce']}
+				<div class="module clear profile_gifts mobile-scroll-card">
+					{include '../components/module_header.latte', href => '/gifts' . ($user->getId()), label => tr('gifts')}
+					<a href="/gifts?act=pick&user={$user->getId()}" class="module_body msm-placeholder">
+						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#gift-28"></use></svg>
+						<span class="msm-placeholder-label">{_send_gift}</span>
+					</a>
+				</div>
+			{/if}
+		</div>
+		{/if}
+	</div>
+	<div id="mobile_more_info_content" style="display:none;">
+		{var $moreInfoBlocks = []}
+
+		{if $canSeeNotes}
+			{capture $moreInfoBlock}
+				<a class="mobile-info-row" href="/notes{$user->getId()}"><svg class="mir-icon" viewBox="0 0 24 24"><use href="#article-outline-24"></use></svg><div class="mir-text">{tr('notes', $notesCount)}</div></a>
+			{/capture}
+			{var $moreInfoBlocks = array_merge($moreInfoBlocks, [$moreInfoBlock])}
+		{/if}
+
+		{if $user->getPrivacyPermission('page.info.read', $thisUser ?? NULL)}
+			{var $mEmail = $user->getContactEmail()}
+			{var $mTelegram = $user->getTelegram()}
+			{var $mWebsite = $user->getWebsite()}
+			{if $mEmail || $mTelegram || $mWebsite}
+				{capture $moreInfoBlock}
+					{if $mEmail}<a class="mobile-info-row mir-link" href="mailto:{$mEmail}"><svg class="mir-icon" viewBox="0 0 24 24"><use href="#mail-outline-24"></use></svg><div class="mir-text">{$mEmail}</div></a>{/if}
+					{if $mTelegram}<a class="mobile-info-row mir-link" href="https://t.me/{$mTelegram|replace:'@',''}"><svg class="mir-icon" viewBox="0 0 24 24"><use href="#send-24"></use></svg><div class="mir-text">{$mTelegram}</div></a>{/if}
+					{if $mWebsite}<a class="mobile-info-row mir-link" href="{$mWebsite}"><svg class="mir-icon" viewBox="0 0 24 24"><use href="#globe-outline-24"></use></svg><div class="mir-text">{$mWebsite}</div></a>{/if}
+				{/capture}
+				{var $moreInfoBlocks = array_merge($moreInfoBlocks, [$moreInfoBlock])}
+			{/if}
+
+			{var $hasBasicInfo = count(array_filter(array_column($basicInfoFields, 'value'), fn($v) => !is_null($v) && $v !== '')) > 0 || count(($additionalFields['contacts'] ?? [])) > 0}
+			{if $hasBasicInfo}
+				{capture $moreInfoBlock}
+					<div class="form_group clear_fix">
+						{foreach $basicInfoFields as $mif}
+							{if !is_null($mif['value']) && $mif['value'] !== ''}
+								<div class="form_field"><div class="form_label">{$mif['label']}</div><div class="form_data" dir="auto">{$mif['value']}</div></div>
+							{/if}
+						{/foreach}
+						{foreach ($additionalFields['contacts'] ?? []) as $field}
+							<div class="form_field"><div class="form_label">{$field->getName()}</div><div class="form_data" dir="auto">{$field->getContent()}</div></div>
+						{/foreach}
+					</div>
+				{/capture}
+				{var $moreInfoBlocks = array_merge($moreInfoBlocks, [$moreInfoBlock])}
+			{/if}
+
+			{var $hasPersonalInfo = count(array_filter(array_column($personalInfoFields, 'value'), fn($v) => !is_null($v) && $v !== '')) > 0 || count(($additionalFields['interests'] ?? [])) > 0}
+			{if $hasPersonalInfo}
+				{capture $moreInfoBlock}
+					<div class="form_group clear_fix">
+						{foreach $personalInfoFields as $mif}
+							{if !is_null($mif['value']) && $mif['value'] !== ''}
+								<div class="form_field"><div class="form_label">{$mif['label']}</div><div class="form_data" dir="auto">{$mif['value']}</div></div>
+							{/if}
+						{/foreach}
+						{foreach ($additionalFields['interests'] ?? []) as $field}
+							<div class="form_field"><div class="form_label">{$field->getName()}</div><div class="form_data" dir="auto">{$field->getContent()}</div></div>
+						{/foreach}
+					</div>
+				{/capture}
+				{var $moreInfoBlocks = array_merge($moreInfoBlocks, [$moreInfoBlock])}
+			{/if}
+		{/if}
+
+		{foreach $moreInfoBlocks as $block}
+			{$block}
+			{sep}<hr class="mobile-more-sep">{/sep}
+		{/foreach}
+	</div>
+{/define}

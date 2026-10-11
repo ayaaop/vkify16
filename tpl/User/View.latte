@@ -1,6 +1,6 @@
 {php if (!function_exists('vkifyFormatCount')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
 {extends "../@layout.latte"}
-{php if (!function_exists('vkifyFormatCount')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
+{import "mobile_profile.latte"}
 
 {var $backdrops = $user->getBackDropPictureURLs()}
 
@@ -34,349 +34,8 @@
     {/if}
 {/block}
 
-{var $transparentAppbar = true}
+{block appbar_extra}{include '../components/profile_appbar_extra.latte', noAnimate => true}{/block}
 
-{block appbar_extra}
-{ifset $thisUser}
-<div class="mobileonly" id="profile_appbar_extra">
-    <button class="appbar-extra-btn ui_actions_menu_wrap ui_actions_menu_no_chevron" id="profileAppbarMoreBtn" aria-label="More actions" onclick='{="uiActionsMenu.toggle(this, null, {menuId: \"profile_actions_tooltip\", noAnimate: true});"|noescape}'>
-        <svg viewBox="0 0 12 24" width="22" height="22" fill="currentColor"><use href="#more-vertical-24"></use></svg>
-    </button>
-</div>
-{/ifset}
-{/block}
-
-{define mobileProfile}
-    {var $mobileHeroStatus = $user->onlineStatus() == 2 ? tr('deceased_person') : ($user->isOnline() ? tr('online') : ($user->getOnline()->timestamp() + 2505600 > time() ? ($user->isFemale() ? tr('was_online_f') : tr('was_online_m')) . ' ' . $user->getOnline() : ''))}
-    {include '../components/mobile_profile_hero.latte', entity => $user, name => $user->getFullName(), status => $mobileHeroStatus, verified => $user->isVerified()}
-	<div class="mobileonly mobile-profile-content">
-		<div class="page_block mobile-actions-info-block">
-			{include '../components/mobile_profile_actions.latte'}
-			<div class="mobile-info-rows">
-				{if $audioStatus}
-					{if !$thatIsThisUser}
-						<a class="mobile-info-row" href="/audio{$audioStatus->getPrettyIdA()}">
-					{else}
-						<div class="mobile-info-row">
-					{/if}
-						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#message-24"></use></svg>
-						<div class="mir-text">{$audioStatus->getName()}</div>
-					{if !$thatIsThisUser}</a>{else}</div>{/if}
-				{elseif $user->getStatus()}
-					<div class="mobile-info-row {if $thatIsThisUser}mobile-info-row-editable{/if}" {if $thatIsThisUser}onclick="window.vkify.mobileEditStatus()"{/if}>
-						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#message-24"></use></svg>
-						<div class="mir-text" id="mobile_status_display">{$user->getStatus()}</div>
-					</div>
-				{elseif $thatIsThisUser}
-					<div class="mobile-info-row mobile-info-row-editable" onclick="window.vkify.mobileEditStatus()">
-						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#message-24"></use></svg>
-						<div class="mir-text" id="mobile_status_display">{_change_status}</div>
-					</div>
-				{/if}
-				{if $user->getPrivacyPermission('friends.read', $thisUser ?? NULL) && $user->getFriendsCount() > 0}
-					<a class="mobile-info-row" href="/friends{$user->getId()}">
-						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#users-24"></use></svg>
-						<div class="mir-text">
-							{tr("friends", $user->getFriendsCount())}
-							{if $user->getFriendsOnlineCount() > 0}
-								<span class="divider"></span><span class="mir-muted">{tr("friends_online", $user->getFriendsOnlineCount())}</span>
-							{/if}
-						</div>
-					</a>
-				{/if}
-				{if $user->getFollowersCount() > 0 && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL)}
-					<a class="mobile-info-row" href="/friends{$user->getId()}?act=incoming">
-						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#user-add-outline-24"></use></svg>
-						<div class="mir-text">{tr("followers", $user->getFollowersCount())}</div>
-					</a>
-				{/if}
-				{if $thisUser != NULL && $thisUser->getId() != $user->getId() && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL) && ($commonFriendsCount = $user->getCommonFriendsCount($thisUser)) > 0}
-					<a class="mobile-info-row" href="/friends{$user->getId()}?act=common">
-						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#users-24"></use></svg>
-						<div class="mir-text">{tr("friends_common", $commonFriendsCount)}</div>
-					</a>
-				{/if}
-				{if !is_null($user->getHometown())}
-					<a class="mobile-info-row" href="/search?section=users&q=&hometown={urlencode($user->getHometown())}">
-						<svg class="mir-icon" viewBox="0 0 24 24"><use href="#home-24"></use></svg>
-						<div class="mir-text">{$user->getHometown()}</div>
-					</a>
-				{/if}
-				{if $hasMoreInfo}
-				<div class="mobile-info-row mobile-info-row-more" onclick="__mobileProfileShowMore()">
-					<svg class="mir-icon" viewBox="0 0 24 24"><use href="#info-24"></use></svg>
-					<div class="mir-text">{_additional_information}</div>
-				</div>
-				{/if}
-			</div>
-		</div>
-
-		{if $thatIsThisUser || $stripHasContent}
-		<div class="page_block mobile-scroll-modules">
-			{if $canSeeVideos}
-				{var $firstVideo = $videos[0] ?? null}
-				<div class="module clear video_module mobile-scroll-card">
-					<a href="/videos{$user->getId()}" class="module_header">
-						<h3 class="header_top clear_fix">
-							<span class="header_label fl_l">{_videos}</span>
-							<span class="header_count fl_l">{$videosCount}</span>
-						</h3>
-					</a>
-					<div class="module_body">
-						<a href="{if $firstVideo}/video{$firstVideo->getPrettyId()}{else}/videos{$user->getId()}{/if}" id="videoOpen" data-id="{if $firstVideo}{$firstVideo->getPrettyId()}{/if}" class="video">
-							{if $firstVideo}
-								<div class="page_video_thumb" style="background-image: url('{$firstVideo->getThumbnailURL()}');"></div>
-								<div class="page_video_play_icon"></div>
-							{else}
-								<div class="msm-placeholder"><svg width="40" height="40" fill="currentColor" viewBox="0 0 24 24"><use href="#video-24"></use></svg></div>
-							{/if}
-						</a>
-					</div>
-				</div>
-			{elseif $thatIsThisUser}
-				<div class="module clear video_module mobile-scroll-card">
-					<a href="/videos{$user->getId()}" class="module_header">
-						<h3 class="header_top clear_fix">
-							<span class="header_label fl_l">{_videos}</span>
-						</h3>
-					</a>
-					<a href="/videos{$user->getId()}" class="module_body msm-placeholder">
-						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#video-28"></use></svg>
-						<span class="msm-placeholder-label">{_upload_video}</span>
-					</a>
-				</div>
-			{/if}
-			{if $canSeeAudios}
-				{var $firstAudio = $audios[0] ?? null}
-				<div class="module clear mobile-scroll-card">
-					<a href="/audios{$user->getId()}" class="module_header">
-						<h3 class="header_top clear_fix">
-							<span class="header_label fl_l">{_audios}</span>
-							<span class="header_count fl_l">{$audiosCount}</span>
-						</h3>
-					</a>
-					<a href="/audios{$user->getId()}" class="module_body msm-placeholder">
-						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#music-28"></use></svg>
-						{if $firstAudio}
-							<span class="msm-placeholder-label">{$firstAudio->getTitle()|truncate:40}<br>{$firstAudio->getPerformer()|truncate:40}</span>
-						{/if}
-					</a>
-				</div>
-			{elseif $thatIsThisUser}
-				<div class="module clear mobile-scroll-card">
-					<a href="/audios{$user->getId()}" class="module_header">
-						<h3 class="header_top clear_fix">
-							<span class="header_label fl_l">{_audios}</span>
-						</h3>
-					</a>
-					<a href="/audios{$user->getId()}" class="module_body msm-placeholder">
-						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#music-28"></use></svg>
-						<span class="msm-placeholder-label">{_upload_audio}</span>
-					</a>
-				</div>
-			{/if}
-			{if $canSeeGroups}
-				<div class="module clear page_list_module mobile-scroll-card">
-					<a href="/groups{$user->getId()}" class="module_header">
-						<h3 class="header_top clear_fix">
-							<span class="header_label fl_l">{_groups}</span>
-							<span class="header_count fl_l">{$user->getClubCount()}</span>
-						</h3>
-					</a>
-					<div class="module_body msm-grid">
-						{foreach array_slice(iterator_to_array($user->getClubs(1)), 0, 6) as $grp}
-							<a href="/club{$grp->getId()}" class="msm-grid__cell">
-								{include '../components/avatar.latte', author => $grp, size => 'miniscule', width => 50, height => 50, alt => $grp->getCanonicalName(), class => 'msm-grid__img'}
-							</a>
-						{/foreach}
-					</div>
-				</div>
-			{elseif $thatIsThisUser && $user->getPrivacyPermission('groups.read', $thisUser ?? NULL)}
-				<div class="module clear page_list_module mobile-scroll-card">
-					<a href="/groups{$user->getId()}" class="module_header">
-						<h3 class="header_top clear_fix">
-							<span class="header_label fl_l">{_groups}</span>
-						</h3>
-					</a>
-					<a href="/groups{$user->getId()}" class="module_body msm-placeholder">
-						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#users-28"></use></svg>
-						<span class="msm-placeholder-label">{_groups}</span>
-					</a>
-				</div>
-			{/if}
-			{if $user->getEventsCount() > 0 && $user->getPrivacyPermission('groups.read', $thisUser ?? NULL)}
-				<div class="module clear page_list_module mobile-scroll-card">
-					<a href="/events{$user->getId()}" class="module_header">
-						<h3 class="header_top clear_fix">
-							<span class="header_label fl_l">{_meetings}</span>
-							<span class="header_count fl_l">{$user->getEventsCount()}</span>
-						</h3>
-					</a>
-					<div class="module_body msm-grid">
-						{foreach array_slice(iterator_to_array($user->getEvents(1)), 0, 6) as $event}
-							<a href="{$event->getURL()}" class="msm-grid__cell">
-								{include '../components/avatar.latte', author => $event, size => 'miniscule', width => 50, height => 50, alt => $event->getCanonicalName(), class => 'msm-grid__img'}
-							</a>
-						{/foreach}
-					</div>
-				</div>
-			{elseif $thatIsThisUser && $user->getPrivacyPermission('groups.read', $thisUser ?? NULL)}
-				<div class="module clear page_list_module mobile-scroll-card">
-					<a href="/events{$user->getId()}" class="module_header">
-						<h3 class="header_top clear_fix">
-							<span class="header_label fl_l">{_meetings}</span>
-						</h3>
-					</a>
-					<a href="/events{$user->getId()}" class="module_body msm-placeholder">
-						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#users-28"></use></svg>
-						<span class="msm-placeholder-label">{_meetings}</span>
-					</a>
-				</div>
-			{/if}
-			{if $canSeeAlbums}
-				{var $firstAlbum = $albums[0] ?? null}
-				<div class="module clear album_module mobile-scroll-card">
-					<a href="/albums{$user->getId()}" class="module_header">
-						<h3 class="header_top clear_fix">
-							<span class="header_label fl_l">{_albums}</span>
-							<span class="header_count fl_l">{$albumsCount}</span>
-						</h3>
-					</a>
-					<a href="{if $firstAlbum}/album{$firstAlbum->getPrettyId()}{else}/albums{$user->getId()}{/if}" class="module_body {if !$firstAlbum || !$firstAlbum->getCoverPhoto()}msm-placeholder{/if}">
-						{if $firstAlbum && $firstAlbum->getCoverPhoto()}
-							<img src="{$firstAlbum->getCoverPhoto()->getURLBySizeId('normal')}" class="msm-album-cover" alt="" />
-						{else}
-							<svg width="40" height="40" fill="currentColor" viewBox="0 0 24 24"><use href="#picture-24"></use></svg>
-						{/if}
-					</a>
-				</div>
-			{elseif $thatIsThisUser}
-				<div class="module clear album_module mobile-scroll-card">
-					<a href="/albums{$user->getId()}" class="module_header">
-						<h3 class="header_top clear_fix">
-							<span class="header_label fl_l">{_albums}</span>
-						</h3>
-					</a>
-					<a href="/albums{$user->getId()}" class="module_body msm-placeholder">
-						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#camera-28"></use></svg>
-						<span class="msm-placeholder-label">{_upload_photo}</span>
-					</a>
-				</div>
-			{/if}
-			{if $canSeeGifts}
-				<div class="module clear profile_gifts mobile-scroll-card">
-					<a class="module_header" href="/gifts{$user->getId()}">
-						<h3 class="header_top clear_fix">
-							<span class="header_label fl_l">{_gifts}</span>
-							<span class="header_count fl_l">{$user->getGiftCount()}</span>
-						</h3>
-					</a>
-					<a href="/gifts{$user->getId()}" class="module_body msm-grid">
-						{foreach $user->getGifts(1, 6) as $giftDesc}
-							<div class="msm-grid__cell">
-								<img class="msm-grid__img" src="{$giftDesc->gift->getImage(2)}" alt="" />
-							</div>
-						{/foreach}
-					</a>
-				</div>
-			{elseif $thatIsThisUser && \OPENVK_ROOT_CONF['openvk']['preferences']['commerce']}
-				<div class="module clear profile_gifts mobile-scroll-card">
-					<a class="module_header" href="/gifts{$user->getId()}">
-						<h3 class="header_top clear_fix">
-							<span class="header_label fl_l">{_gifts}</span>
-						</h3>
-					</a>
-					<a href="/gifts?act=pick&user={$user->getId()}" class="module_body msm-placeholder">
-						<svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#gift-28"></use></svg>
-						<span class="msm-placeholder-label">{_send_gift}</span>
-					</a>
-				</div>
-			{/if}
-		</div>
-		{/if}
-	</div>
-	<div id="mobile_more_info_content" style="display:none;">
-		{var $moreInfoBlocks = []}
-
-		{if $notesCount > 0 && $user->getPrivacyPermission('notes.read', $thisUser ?? NULL)}
-			{capture $moreInfoBlock}
-				<a class="mobile-info-row" href="/notes{$user->getId()}"><svg class="mir-icon" viewBox="0 0 24 24"><use href="#article-outline-24"></use></svg><div class="mir-text">{tr('notes', $notesCount)}</div></a>
-			{/capture}
-			{var $moreInfoBlocks = array_merge($moreInfoBlocks, [$moreInfoBlock])}
-		{/if}
-
-		{if $user->getPrivacyPermission('page.info.read', $thisUser ?? NULL)}
-			{var $mEmail = $user->getContactEmail()}
-			{var $mTelegram = $user->getTelegram()}
-			{var $mWebsite = $user->getWebsite()}
-			{if $mEmail || $mTelegram || $mWebsite}
-				{capture $moreInfoBlock}
-					{if $mEmail}<a class="mobile-info-row mir-link" href="mailto:{$mEmail}"><svg class="mir-icon" viewBox="0 0 24 24"><use href="#mail-outline-24"></use></svg><div class="mir-text">{$mEmail}</div></a>{/if}
-					{if $mTelegram}<a class="mobile-info-row mir-link" href="https://t.me/{$mTelegram|replace:'@',''}"><svg class="mir-icon" viewBox="0 0 24 24"><use href="#send-24"></use></svg><div class="mir-text">{$mTelegram}</div></a>{/if}
-					{if $mWebsite}<a class="mobile-info-row mir-link" href="{$mWebsite}"><svg class="mir-icon" viewBox="0 0 24 24"><use href="#globe-outline-24"></use></svg><div class="mir-text">{$mWebsite}</div></a>{/if}
-				{/capture}
-				{var $moreInfoBlocks = array_merge($moreInfoBlocks, [$moreInfoBlock])}
-			{/if}
-
-			{var $basicInfoFields = [
-				['label' => tr('pronouns'), 'value' => ($user->isFemale() ? tr('female') : ($user->isNeutral() ? tr('neutral') : tr('male')))],
-				['label' => tr('relationship'), 'value' => $user->getLocalizedMaritalStatus()],
-				['label' => tr('registration_date'), 'value' => (string)$user->getRegistrationTime()],
-				['label' => tr('hometown'), 'value' => $user->getHometown()],
-				['label' => tr('politViews'), 'value' => tr('politViews_' . $user->getPoliticalViews())],
-				['label' => tr('city'), 'value' => $user->getCity()],
-			]}
-			{var $hasBasicInfo = count(array_filter(array_column($basicInfoFields, 'value'), fn($v) => !is_null($v) && $v !== '')) > 0 || count(($additionalFields['contacts'] ?? [])) > 0}
-			{if $hasBasicInfo}
-				{capture $moreInfoBlock}
-					<div class="form_group clear_fix">
-						{foreach $basicInfoFields as $mif}
-							{if !is_null($mif['value']) && $mif['value'] !== ''}
-								<div class="form_field"><div class="form_label">{$mif['label']}</div><div class="form_data" dir="auto">{$mif['value']}</div></div>
-							{/if}
-						{/foreach}
-						{foreach ($additionalFields['contacts'] ?? []) as $field}
-							<div class="form_field"><div class="form_label">{$field->getName()}</div><div class="form_data" dir="auto">{$field->getContent()}</div></div>
-						{/foreach}
-					</div>
-				{/capture}
-				{var $moreInfoBlocks = array_merge($moreInfoBlocks, [$moreInfoBlock])}
-			{/if}
-
-			{var $personalInfoFields = [
-				['label' => tr('interests'), 'value' => $user->getInterests()],
-				['label' => tr('favorite_music'), 'value' => $user->getFavoriteMusic()],
-				['label' => tr('favorite_films'), 'value' => $user->getFavoriteFilms()],
-				['label' => tr('favorite_shows'), 'value' => $user->getFavoriteShows()],
-				['label' => tr('favorite_books'), 'value' => $user->getFavoriteBooks()],
-				['label' => tr('favorite_quotes'), 'value' => $user->getFavoriteQuote()],
-				['label' => tr('favorite_games'), 'value' => $user->getFavoriteGames()],
-				['label' => tr('information_about'), 'value' => $user->getDescription()],
-			]}
-			{var $hasPersonalInfo = count(array_filter(array_column($personalInfoFields, 'value'), fn($v) => !is_null($v) && $v !== '')) > 0 || count(($additionalFields['interests'] ?? [])) > 0}
-			{if $hasPersonalInfo}
-				{capture $moreInfoBlock}
-					<div class="form_group clear_fix">
-						{foreach $personalInfoFields as $mif}
-							{if !is_null($mif['value']) && $mif['value'] !== ''}
-								<div class="form_field"><div class="form_label">{$mif['label']}</div><div class="form_data" dir="auto">{$mif['value']}</div></div>
-							{/if}
-						{/foreach}
-						{foreach ($additionalFields['interests'] ?? []) as $field}
-							<div class="form_field"><div class="form_label">{$field->getName()}</div><div class="form_data" dir="auto">{$field->getContent()}</div></div>
-						{/foreach}
-					</div>
-				{/capture}
-				{var $moreInfoBlocks = array_merge($moreInfoBlocks, [$moreInfoBlock])}
-			{/if}
-		{/if}
-
-		{foreach $moreInfoBlocks as $block}
-			{$block}
-			{sep}<hr class="mobile-more-sep">{/sep}
-		{/foreach}
-	</div>
-{/define}
 
 {block content}
 	{var $thatIsThisUser = isset($thisUser) && $user->getId() == $thisUser->getId()}
@@ -384,43 +43,39 @@
     {var $audios = iterator_to_array((new \openvk\Web\Models\Repositories\Audios())->getByEntityID($user->getId(), 0, 3))}
     {var $albums = iterator_to_array($albums)}
     {var $photoCount = (new \openvk\Web\Models\Repositories\Photos())->getUserPhotosCount($user)}
-    {var $canSeeVideos  = $videosCount  > 0 && $user->getPrivacyPermission('videos.read',  $thisUser ?? NULL)}
-    {var $canSeeAudios  = $audiosCount  > 0 && $user->getPrivacyPermission('audios.read',  $thisUser ?? NULL)}
-    {var $canSeeGroups  = $user->getClubCount() > 0 && $user->getPrivacyPermission('groups.read', $thisUser ?? NULL)}
-    {var $canSeeAlbums  = $albumsCount  > 0 && $user->getPrivacyPermission('photos.read',  $thisUser ?? NULL)}
-    {var $canSeeGifts   = \OPENVK_ROOT_CONF['openvk']['preferences']['commerce'] && $user->getGiftCount() > 0}
-    {var $stripHasContent = $canSeeVideos || $canSeeAudios || $canSeeGroups || $canSeeAlbums || $canSeeGifts}
-    {var $hasMoreInfo = false}
-    {if $notesCount > 0 && $user->getPrivacyPermission('notes.read', $thisUser ?? NULL)}
-        {var $hasMoreInfo = true}
-    {/if}
-    {if $user->getPrivacyPermission('page.info.read', $thisUser ?? NULL)}
-        {if $user->getContactEmail() || $user->getTelegram() || $user->getWebsite()}
-            {var $hasMoreInfo = true}
-        {/if}
-        {var $infoFields = [
-            ['label' => tr('pronouns'), 'value' => ($user->isFemale() ? tr('female') : ($user->isNeutral() ? tr('neutral') : tr('male')))],
-            ['label' => tr('relationship'), 'value' => $user->getLocalizedMaritalStatus()],
-            ['label' => tr('registration_date'), 'value' => (string)$user->getRegistrationTime()],
-            ['label' => tr('hometown'), 'value' => $user->getHometown()],
-            ['label' => tr('politViews'), 'value' => tr('politViews_' . $user->getPoliticalViews())],
-            ['label' => tr('city'), 'value' => $user->getCity()],
-            ['label' => tr('interests'), 'value' => $user->getInterests()],
-            ['label' => tr('favorite_music'), 'value' => $user->getFavoriteMusic()],
-            ['label' => tr('favorite_films'), 'value' => $user->getFavoriteFilms()],
-            ['label' => tr('favorite_shows'), 'value' => $user->getFavoriteShows()],
-            ['label' => tr('favorite_books'), 'value' => $user->getFavoriteBooks()],
-            ['label' => tr('favorite_quotes'), 'value' => $user->getFavoriteQuote()],
-            ['label' => tr('favorite_games'), 'value' => $user->getFavoriteGames()],
-            ['label' => tr('information_about'), 'value' => $user->getDescription()],
-        ]}
-        {if count(array_filter(array_column($infoFields, 'value'), fn($v) => !is_null($v) && $v !== '')) > 0}
-            {var $hasMoreInfo = true}
-        {/if}
-        {if $additionalFields && (count($additionalFields['contacts'] ?? []) > 0 || count($additionalFields['interests'] ?? []) > 0)}
-            {var $hasMoreInfo = true}
-        {/if}
-    {/if}
+    {var $canSeeVideos   = $videosCount  > 0 && $user->getPrivacyPermission('videos.read',  $thisUser ?? NULL)}
+    {var $canSeeAudios   = $audiosCount  > 0 && $user->getPrivacyPermission('audios.read',  $thisUser ?? NULL)}
+    {var $canSeeGroups   = $user->getClubCount() > 0 && $user->getPrivacyPermission('groups.read', $thisUser ?? NULL)}
+    {var $canSeeMeetings = $user->getMeetingsCount() > 0 && $user->getPrivacyPermission('groups.read', $thisUser ?? NULL)}
+    {var $canSeeNotes    = $notesCount   > 0 && $user->getPrivacyPermission('notes.read',   $thisUser ?? NULL)}
+    {var $canSeeAlbums   = $albumsCount  > 0 && $user->getPrivacyPermission('photos.read',  $thisUser ?? NULL)}
+    {var $giftCount      = $user->getGiftCount()}
+    {var $canSeeGifts    = \OPENVK_ROOT_CONF['openvk']['preferences']['commerce'] && $giftCount > 0}
+    {var $stripHasContent = $canSeeVideos || $canSeeAudios || $canSeeGroups || $canSeeMeetings || $canSeeAlbums || $canSeeGifts}
+    {var $basicInfoFields = [
+        ['label' => tr('pronouns'), 'value' => ($user->isFemale() ? tr('female') : ($user->isNeutral() ? tr('neutral') : tr('male')))],
+        ['label' => tr('relationship'), 'value' => $user->getLocalizedMaritalStatus()],
+        ['label' => tr('registration_date'), 'value' => (string)$user->getRegistrationTime()],
+        ['label' => tr('hometown'), 'value' => $user->getHometown()],
+        ['label' => tr('politViews'), 'value' => tr('politViews_' . $user->getPoliticalViews())],
+        ['label' => tr('city'), 'value' => $user->getCity()],
+    ]}
+    {var $personalInfoFields = [
+        ['label' => tr('interests'), 'value' => $user->getInterests()],
+        ['label' => tr('favorite_music'), 'value' => $user->getFavoriteMusic()],
+        ['label' => tr('favorite_films'), 'value' => $user->getFavoriteFilms()],
+        ['label' => tr('favorite_shows'), 'value' => $user->getFavoriteShows()],
+        ['label' => tr('favorite_books'), 'value' => $user->getFavoriteBooks()],
+        ['label' => tr('favorite_quotes'), 'value' => $user->getFavoriteQuote()],
+        ['label' => tr('favorite_games'), 'value' => $user->getFavoriteGames()],
+        ['label' => tr('information_about'), 'value' => $user->getDescription()],
+    ]}
+    {var $canReadInfo = $user->getPrivacyPermission('page.info.read', $thisUser ?? NULL)}
+    {var $hasMoreInfo = $canSeeNotes || ($canReadInfo && (
+        $user->getContactEmail() || $user->getTelegram() || $user->getWebsite()
+        || count(array_filter(array_column(array_merge($basicInfoFields, $personalInfoFields), 'value'), fn($v) => !is_null($v) && $v !== '')) > 0
+        || ($additionalFields && (count($additionalFields['contacts'] ?? []) > 0 || count($additionalFields['interests'] ?? []) > 0))
+    ))}
 
     {if !$user->getPrivacyPermission('page.read', $thisUser ?? NULL)}
         <div class="msg msg_err">
@@ -430,7 +85,7 @@
     {else}
     
 
-	{include #mobileProfile}
+	{include #mobileProfile, $thatIsThisUser, $hasMoreInfo, $stripHasContent, $canSeeVideos, $canSeeAudios, $canSeeGroups, $canSeeMeetings, $canSeeAlbums, $canSeeGifts, $canSeeNotes, $videos, $audios, $albums, $basicInfoFields, $personalInfoFields}
 
 	{if $hasMoreInfo}
 	<script>
@@ -517,16 +172,7 @@
 				<div class="leftDataBlock">
 					<div class="page_block" n:if="$thisUser != NULL && $thisUser->getId() != $user->getId() && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL) && ($commonFriendsCount = $user->getCommonFriendsCount($thisUser)) > 0">
 						<div class="module clear people_module">
-							<a href="/friends{$user->getId()}?act=common" class="module_header">
-								<h3 class="header_top clear_fix">
-									<span class="header_label fl_l">
-										{_friends_common}
-									</span>
-									<span class="header_count fl_l">
-										{$commonFriendsCount}
-									</span>
-								</h3>
-							</a>
+							{include '../components/module_header.latte', href => '/friends' . ($user->getId()) . '?act=common', label => tr('friends_common'), count => $commonFriendsCount}
 							<div class="module_body clear_fix">
 								<div class="search_row" n:foreach="array_chunk(array_slice(iterator_to_array($user->getCommonFriends($thisUser, 1, 6, 'RAND()')), 0, 6), 3) as $friendRow">
 									{foreach $friendRow as $friend}
@@ -538,16 +184,7 @@
 					</div>
 					<div class="page_block" n:if="$user->getFriendsCount() > 0 && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL)">
 						<div class="module clear people_module">
-							<a href="/friends{$user->getId()}" class="module_header">
-								<h3 class="header_top clear_fix">
-									<span class="header_label fl_l">
-										{_friends}
-									</span>
-									<span class="header_count fl_l">
-										{$user->getFriendsCount()}
-									</span>
-								</h3>
-							</a>
+							{include '../components/module_header.latte', href => '/friends' . ($user->getId()), label => tr('friends'), count => $user->getFriendsCount()}
 							<div class="module_body clear_fix">
 								<div class="search_row" n:foreach="array_chunk(array_slice(iterator_to_array($user->getFriends(1)), 0, 6), 3) as $friendRow">
 									{foreach $friendRow as $friend}
@@ -557,16 +194,7 @@
 							</div>
 						</div>
 						<div class="module clear people_module" n:if="$user->getFriendsOnlineCount() > 0 && $thisUser != NULL && $thisUser->getId() == $user->getId()">
-							<a href="/friends{$user->getId()}?act=online" class="module_header">
-								<h3 class="header_top clear_fix">
-									<span class="header_label fl_l">
-										{_friends_online}
-									</span>
-									<span class="header_count fl_l">
-										{$user->getFriendsOnlineCount()}
-									</span>
-								</h3>
-							</a>
+							{include '../components/module_header.latte', href => '/friends' . ($user->getId()) . '?act=online', label => tr('friends_online'), count => $user->getFriendsOnlineCount()}
 							<div class="module_body clear_fix">
 								<div class="search_row" n:foreach="array_chunk(array_slice(iterator_to_array($user->getFriendsOnline(1)), 0, 6), 3) as $friendRow">
 									{foreach $friendRow as $friend}
@@ -578,12 +206,7 @@
 					</div>
 					<div class="page_block" id="gifts_block" n:if="$canSeeGifts">
 						<div class="module clear profile_gifts">
-							<a class="module_header" href="/gifts{$user->getId()}">
-								<h3 class="header_top clear_fix">
-									<span class="header_label fl_l">{_gifts}</span>
-									<span class="header_count fl_l" id="gifts_module_count">{$giftCount}</span>
-								</h3>
-							</a>
+							{include '../components/module_header.latte', href => '/gifts' . ($user->getId()), label => tr('gifts'), count => $giftCount, countId => 'gifts_module_count'}
 							<div class="module_body clear_fix">
 								<a class="profile_gifts_cont" href="/gifts{$user->getId()}">
 									<img width="64" height="64" class="profile_gift_img" n:foreach="$user->getGifts(1, 3) as $giftDescriptor" 
@@ -593,18 +216,9 @@
 							</div>
 						</div>
 					</div>
-					<div class="page_block" n:if="$canSeeAlbums || $canSeeVideos">
+					<div class="page_block" n:if="$canSeeGroups || $canSeeMeetings || $canSeeNotes || $canSeeAlbums || $canSeeVideos || $canSeeAudios">
 						<div class="module clear page_list_module" n:if="$canSeeGroups">
-							<a href="/groups{$user->getId()}" class="module_header">
-								<h3 class="header_top clear_fix">
-									<span class="header_label fl_l">
-										{_groups}
-									</span>
-									<span class="header_count fl_l">
-										{$user->getClubCount()}
-									</span>
-								</h3>
-							</a>
+							{include '../components/module_header.latte', href => '/groups' . ($user->getId()), label => tr('groups'), count => $user->getClubCount()}
 							<div class="module_body clear_fix">
 								<div class="line_cell clear_fix" n:foreach="array_slice(iterator_to_array($user->getClubs(1)), 0, 5) as $club">
 									<div class="thumb">
@@ -621,17 +235,8 @@
 								</div>
 							</div>
 						</div>
-						<div class="module clear page_list_module" n:if="$user->getMeetingsCount() > 0 && $user->getPrivacyPermission('groups.read', $thisUser ?? NULL)">
-							<a href="/events{$user->getId()}" class="module_header">
-								<h3 class="header_top clear_fix">
-									<span class="header_label fl_l">
-										{_meetings}
-									</span>
-									<span class="header_count fl_l">
-										{$user->getMeetingsCount()}
-									</span>
-								</h3>
-							</a>
+						<div class="module clear page_list_module" n:if="$canSeeMeetings">
+							{include '../components/module_header.latte', href => '/events' . ($user->getId()), label => tr('meetings'), count => $user->getMeetingsCount()}
 							<div class="module_body clear_fix">
 								<div class="line_cell clear_fix" n:foreach="array_slice(iterator_to_array($user->getMeetings(1)), 0, 5) as $meeting">
 									<div class="thumb">
@@ -648,17 +253,8 @@
 								</div>
 							</div>
 						</div>
-						<div class="module topics_module notes_module page_list_module" n:if="$notesCount > 0 && $user->getPrivacyPermission('notes.read', $thisUser ?? NULL)">
-							<a href="/notes{$user->getId()}" class="module_header">
-								<h3 class="header_top clear_fix">
-									<span class="header_label fl_l">
-										{_notes}
-									</span>
-									<span class="header_count fl_l">
-										{$notesCount}
-									</span>
-								</h3>
-							</a>
+						<div class="module topics_module notes_module page_list_module" n:if="$canSeeNotes">
+							{include '../components/module_header.latte', href => '/notes' . ($user->getId()), label => tr('notes'), count => $notesCount}
 							<div class="module_body" style="padding-block: 10px;">
 								<div class="topic_row clear_fix" n:foreach="$notes as $note" style="padding-top: 0;">
 									<div class="topic_info_wrap">
@@ -676,16 +272,7 @@
 							</div>
 						</div>
 						<div class="module album_module" n:if="$canSeeAlbums">
-							<a href="/albums{$user->getId()}" class="module_header">
-								<h3 class="header_top clear_fix">
-									<span class="header_label fl_l">
-										{_albums}
-									</span>
-									<span class="header_count fl_l">
-										{$albumsCount}
-									</span>
-								</h3>
-							</a>
+							{include '../components/module_header.latte', href => '/albums' . ($user->getId()), label => tr('albums'), count => $albumsCount}
 							<div class="module_body clear_fix">
 								<div class="clear_fix clear page_album_row" n:foreach="array_slice(iterator_to_array($albums), 0, 3) as $album">
 									<a href="/album{$album->getPrettyId()}" class="page_album_link {if is_null($album->getCoverPhoto())}page_album_nocover{/if}">
@@ -704,16 +291,7 @@
 							</div>
 						</div>
 						<div class="module video_module" n:if="$canSeeVideos">
-							<a href="/videos{$user->getId()}" class="module_header">
-								<h3 class="header_top clear_fix">
-									<span class="header_label fl_l">
-										{_videos}
-									</span>
-									<span class="header_count fl_l">
-										{$videosCount}
-									</span>
-								</h3>
-							</a>
+							{include '../components/module_header.latte', href => '/videos' . ($user->getId()), label => tr('videos'), count => $videosCount}
 							<div class="module_body clear_fix">
 								<div class="video_row" n:foreach="$videos as $video">
 									<a id="videoOpen" data-id="{$video->getPrettyId()}" class="video fl_l" href="/video{$video->getPrettyId()}">
@@ -740,16 +318,7 @@
 							</div>
 						</div>
 						<div class="module audio_module" n:if="$canSeeAudios">
-							<a href="/audios{$user->getId()}" class="module_header">
-								<h3 class="header_top clear_fix">
-									<span class="header_label fl_l">
-										{_audios}
-									</span>
-									<span class="header_count fl_l">
-										{$audiosCount}
-									</span>
-								</h3>
-							</a>
+							{include '../components/module_header.latte', href => '/audios' . ($user->getId()), label => tr('audios'), count => $audiosCount}
 							<div class="module_body clear_fix">
 								<div class="content_list long">
 									<div class="audio_row" n:foreach="$audios as $audio">
@@ -990,7 +559,7 @@
 							<div class="count" id="profile_photos_counter_val">{=vkifyFormatCount((new \openvk\Web\Models\Repositories\Photos())->getUserPhotosCount($user))}</div>
 							<div class="label">{tr("mobile_photos")}</div>
 						</a>
-						<a class="page_counter" n:if="\OPENVK_ROOT_CONF['openvk']['preferences']['commerce'] && ($giftCount = $user->getGiftCount()) > 0" href="/gifts{$user->getId()}">
+						<a class="page_counter" n:if="\OPENVK_ROOT_CONF['openvk']['preferences']['commerce'] && $giftCount > 0" href="/gifts{$user->getId()}">
 							<div class="count">{=vkifyFormatCount($giftCount)}</div>
 							<div class="label">{tr("gifts", $giftCount)|replaceRE: '/^[^\s]+\s+/', ''}</div>
 						</a>
@@ -1091,101 +660,6 @@
 		})();
 	</script>
 
-	<script n:if="isset($thisUser) && $thisUser->getChandlerUser()->can('access')->model('admin')->whichBelongsTo(NULL)" data-vkify-route-script="user-view-2">
-		function banUser() {
-			uBanMsgTxt  = "Вы собираетесь забанить пользователя " + {$user->getCanonicalName()} + ".";
-			uBanMsgTxt += "<br/><b>Предупреждение</b>: Это действие удалит все подписки пользователя и отпишет всех от него.";
-			uBanMsgTxt += "<br/><br/><b>Причина бана</b>: <input type='text' id='uBanMsgInput' placeholder='придумайте что-нибудь крутое' />"
-			uBanMsgTxt += "<br/><br/><b>Заблокировать до</b>: <input type='date' id='uBanMsgDate' />";
-			uBanMsgTxt += "<br/><br/><label class='checkbox'><input id='uBanMsgIncr' type='checkbox' checked='1'/><span>Автоматически <b>(до " + {date('d.m.Y H\h', time() + $user->getNewBanTime())} + ")</b></span></label>";
-
-			MessageBox("Забанить " + {$user->getFirstName()}, uBanMsgTxt, ["Подтвердить", "Отмена"], [
-				(function() {
-					res = document.querySelector("#uBanMsgInput").value;
-					date = document.querySelector("#uBanMsgDate").value;
-					incr = document.querySelector("#uBanMsgIncr").checked ? '1' : '0';
-					xhr = new XMLHttpRequest();
-					xhr.open("GET", "/admin/ban/" + {$user->getId()} + "?reason=" + res + "&incr=" + incr + "&date=" + date + "&hash=" + {rawurlencode($csrfToken)}, true);
-					xhr.onload = (function() {
-						if(xhr.responseText.indexOf("success") === -1)
-							MessageBox("Ошибка", "Не удалось забанить пользователя...", ["OK"], [Function.noop]);
-						else
-							MessageBox("Операция успешна", "Пользователь заблокирован", ["OK"], [Function.noop]);
-					});
-					xhr.send(null);
-				}),
-				Function.noop
-			]);
-		}
-		
-		function warnUser() {
-			uBanMsgTxt  = "Вы собираетесь предупредить пользователя " + {$user->getCanonicalName()} + ".";
-			uBanMsgTxt += "<br/>Мы отправим уведомление пользователю в личные сообщения от имени аккаунта администратора.";
-			uBanMsgTxt += "<br/><br/><b>Текст предупреждения</b>: <input type='text' id='uWarnMsgInput' placeholder='придумайте что-нибудь крутое' />";
-			
-			MessageBox("Выдать предупреждение " + {$user->getFirstName()}, uBanMsgTxt, ["Подтвердить", "Отмена"], [
-				(function() {
-					res = document.querySelector("#uWarnMsgInput").value;
-					xhr = new XMLHttpRequest();
-					xhr.open("GET", "/admin/warn/" + {$user->getId()} + "?message=" + res + "&hash=" + {rawurlencode($csrfToken)}, true);
-					xhr.onload = (function() {
-						if(xhr.responseText.indexOf("message") === -1)
-							MessageBox("Ошибка", "Не удалось отправить предупреждение...", ["OK"], [Function.noop]);
-						else
-							MessageBox("Операция успешна", "Предупреждение отправлено", ["OK"], [Function.noop]);
-					});
-					xhr.send(null);
-				}),
-				Function.noop
-			]);
-		}
-	</script>
-
-	<script n:if="isset($thisUser) && $thisUser->getChandlerUser()->can('write')->model('openvk\Web\Models\Entities\TicketReply')->whichBelongsTo(0)" data-vkify-route-script="user-view-3">
-		{if $user->isBannedInSupport()}
-			function toggleBanInSupport() {
-				uBanMsgTxt  = "Вы собираетесь разблокировать в поддержке пользователя " + {$user->getCanonicalName()} + ".";
-				uBanMsgTxt += "<br/>Сейчас он заблокирован по причине <strong>" + {$user->getBanInSupportReason()} + "</strong>.";
-
-				MessageBox("Разблокировать в поддержке " + {$user->getFirstName()}, uBanMsgTxt, ["Подтвердить", "Отмена"], [
-					(function() {
-						xhr = new XMLHttpRequest();
-						xhr.open("GET", "/admin/support/unban/" + {$user->getId()} + "?hash=" + {rawurlencode($csrfToken)}, true);
-						xhr.onload = (function() {
-							if(xhr.responseText.indexOf("success") === -1)
-								MessageBox("Ошибка", "Не удалось разблокировать пользователя в поддержке...", ["OK"], [Function.noop]);
-							else
-								MessageBox("Операция успешна", "Пользователь разблокирован в поддержке", ["OK"], [Function.noop]);
-						});
-						xhr.send(null);
-					}),
-					Function.noop
-				]);
-			}
-		{else}
-			function toggleBanInSupport() {
-				uBanMsgTxt  = "Вы собираетесь заблокировать в поддержке пользователя " + {$user->getCanonicalName()} + ".";
-				uBanMsgTxt += "<br/><br/><b>Причина бана</b>: <input type='text' id='uBanMsgInput' placeholder='придумайте что-нибудь крутое' />";
-				uBanMsgTxt += "<br/><br/><label class='checkbox'><input type='checkbox' id='uBanClsTicketsInput' /><span>Закрыть все обращения пользователя</span></label>";
-
-				MessageBox("Заблокировать в поддержке " + {$user->getFirstName()}, uBanMsgTxt, ["Подтвердить", "Отмена"], [
-					(function() {
-						res = document.querySelector("#uBanMsgInput").value;
-						cls = document.querySelector("#uBanClsTicketsInput").value;
-						xhr = new XMLHttpRequest();
-						xhr.open("GET", "/admin/support/ban/" + {$user->getId()} + "?reason=" + res + "&close_tickets=" + cls + "&hash=" + {rawurlencode($csrfToken)}, true);
-						xhr.onload = (function() {
-							if(xhr.responseText.indexOf("success") === -1)
-								MessageBox("Ошибка", "Не удалось заблокировать пользователя в поддержке...", ["OK"], [Function.noop]);
-							else
-								MessageBox("Операция успешна", "Пользователь заблокирован в поддержке", ["OK"], [Function.noop]);
-						});
-						xhr.send(null);
-					}),
-					Function.noop
-				]);
-			}
-		{/if}
-	</script>
+	{include '../components/user_admin_scripts.latte'}
     {/if}
 {/block}

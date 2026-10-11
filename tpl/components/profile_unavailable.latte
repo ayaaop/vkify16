@@ -1,0 +1,67 @@
+{*
+  Scaffold for "profile unavailable" pages (banned, deactivated, private,
+  blacklisted). Renders the mobile hero + info card and the desktop
+  avatar + info columns.
+
+  @param status             Status line text (already translated)
+  @param statusClass        (optional) class on .page_status, e.g. 'profile_deleted';
+                            without it the status is rendered in muted color
+  @param statusStyle        (optional) inline style for .page_status, default
+                            'color: var(--muted-text-color);'
+  @param body               Message markup, rendered unescaped
+  @param bodyClassDesktop   Wrapper class for the desktop message
+                            (e.g. 'msg msg_yellow', 'profile_deleted_text')
+  @param bodyClassMobile    (optional) wrapper class for the mobile message;
+                            omit to render it bare inside the info card
+  @param disablePhotoViewer (optional) disable hero avatar PhotoViewer, default true
+  @param infoBlock          (optional) add the info_block class, default true
+  @param extra              (optional) extra markup appended after the desktop
+                            message (e.g. admin actions), rendered unescaped
+*}
+{include '../components/mobile_profile_hero.latte', entity => $user, name => $user->getFullName(), status => $status, verified => $user->isVerified(), disablePhotoViewer => ($disablePhotoViewer ?? true)}
+<div class="page_block mobile-actions-info-block mobileonly" n:ifcontent>
+    {include '../components/mobile_profile_actions.latte'}
+</div>
+<div class="page_block page_padding mobile-page-info mobileonly">
+    {if ($bodyClassMobile ?? '') !== ''}
+        <div class="{$bodyClassMobile}">{$body|noescape}</div>
+    {else}
+        {$body|noescape}
+    {/if}
+</div>
+
+<div class="wide_column_right nomobile">
+    <div class="narrow_column_wrap">
+        <div class="narrow_column">
+            <div class="page_block photo_block">
+                <div class="avatar_block">
+                    <div class="avatar_block_inner">
+                        {include '../components/avatar.latte', author => $user, size => 'normal', id => 'bigAvatar', width => 200, height => 200, alt => $user->getCanonicalName(), style => 'width: 100%; image-rendering: -webkit-optimize-contrast', class => ''}
+                    </div>
+                </div>
+                {include '../components/profile_actions.latte'}
+            </div>
+        </div>
+    </div>
+    <div class="wide_column_wrap">
+        <div class="wide_column">
+            <div n:class="page_block, page_info_wrap, ($infoBlock ?? true) ? info_block : ''">
+                <div class="accountInfo clearFix">
+                    <div class="page_top">
+                        <h2 class="page_name">{$user->getFullName()}
+                            <a class="page_verified" n:if="$user->isVerified()" href="/verify"></a>
+                        </h2>
+                        {ifset $statusClass}
+                            <div class="page_status {$statusClass}">{$status}</div>
+                        {else}
+                            <div class="page_status" style="{$statusStyle ?? 'color: var(--muted-text-color);'}">{$status}</div>
+                        {/ifset}
+                    </div>
+                </div>
+                <div class="{$bodyClassDesktop}">{$body|noescape}</div>
+                {ifset $extra}{$extra|noescape}{/ifset}
+            </div>
+        </div>
+    </div>
+</div>
+{include '../components/user_admin_scripts.latte'}
