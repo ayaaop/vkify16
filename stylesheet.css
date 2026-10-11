@@ -102,6 +102,7 @@ body {
     --success-color--hover: #68b35d;
     --success-color--active: #4e9e45;
     --success-text-color: var(--white);
+    --danger-color: #c33;
 
     /* Audio player colors */
     --audio-background-color: #edeff1;
@@ -5191,6 +5192,20 @@ body.banned {
 .stickers_period_link.active {
     background: var(--accent-color-4);
     color: var(--accent-text-color);
+}
+
+.existing_sticker_card.sticker_card_deleted {
+    background-color: var(--message-warning-background);
+}
+
+.existing_sticker_label_delete,
+.draft_sticker_delete_btn {
+    color: var(--danger-color);
+}
+
+.stickers_lottie_badge {
+    color: var(--accent-color-2);
+    background: color-mix(in srgb, var(--accent-color-2) 10%, var(--module-background-color));
 }
 
 .stickers_gift_preview_block {

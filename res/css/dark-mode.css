@@ -68,6 +68,7 @@ body.dark-mode {
 	--success-color--hover: #5fc45f;
 	--success-color--active: #45a845;
 	--success-text-color: var(--white);
+	--danger-color: #ff5c5c;
 
 	/* Audio player colors */
 	--audio-background-color: #2c2d2e;
