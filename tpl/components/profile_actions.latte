@@ -6,7 +6,7 @@
 			{var $canAddFriend = !$user->isBanned() && !$user->isDeactivated() && !$user->isBlacklistedBy($thisUser) && !$thisUser->isBlacklistedBy($user)}
 			{if !$isRestricted}
 				{if \OPENVK_ROOT_CONF['openvk']['preferences']['commerce']}
-					{if $user->getPrivacyPermission('messages.write', $thisUser)}
+					{if $user->getPrivacyPermission('messages.write', $thisUser) || ($thisUser && $user->hasActiveDialogueWith($thisUser))}
 						<div class="profile_msg_split">
 							<div class="cut_left">
 								<a class="button button_blue profile_btn_cut_left profile_action_btn button_wide" onclick="showUserDialog(event, {$user->getRealId()})" href="/im?sel={$user->getId()}">
@@ -25,7 +25,7 @@
 						</a>
 					{/if}
 				{else}
-					<a class="button button_blue button_wide" n:if="$user->getPrivacyPermission('messages.write', $thisUser)" href="/im?sel={$user->getId()}">
+					<a class="button button_blue button_wide" n:if="$user->getPrivacyPermission('messages.write', $thisUser) || ($thisUser && $user->hasActiveDialogueWith($thisUser))" href="/im?sel={$user->getId()}">
 						{_send_message}
 					</a>
 				{/if}
