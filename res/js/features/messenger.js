@@ -37,6 +37,7 @@ vkify.once('imHeader', async function () {
         await installMessengerRenderer();
     } finally {
         window.vkifyImReady = true;
+        window.dispatchEvent(new Event('vkify:im-ready'));
     }
 
     let attempts = 0;

@@ -214,6 +214,9 @@ body.body_im .page_body {
 .im_page_loader .loader_text {
     margin-top: 10px;
 }
+.im_load_container:not(.page_block) .pr {
+    display: none;
+}
 
 body.body_im .page_header {
     z-index: 100;
@@ -2823,16 +2826,39 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 /* ==========================================================================
    History loader, app end & "go to end" pill
    ========================================================================== */
-
-.im_top_loader {
+@keyframes round_spinner {
+    0% {
+        transform: rotate(0deg)
+    }
+    to {
+        transform: rotate(360deg)
+    }
+}
+.im_top_loader,
+#load_skeleton:before, .im_page_loader:before {
     display: flex;
     justify-content: center;
-    padding: 8px 0;
+    padding: 0;
+    margin: 15px auto;
+    display: block;
+    width: 16px;
+    height: 16px;
+    animation-name: round_spinner;
+    animation-duration: 700ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    background-image: url(../icons/round_spinner.png)
 }
 
-.im_top_loader img {
-    width: 24px;
-    height: 24px;
+.im_top_loader img,#load_skeleton img, .im_page_loader img {
+    display: none!important;
+}
+#load_skeleton:before, .im_page_loader:before {
+    content: '';
+}
+
+#load_skeleton, .im_page_loader {
+    background-color: var(--module-background-color)
 }
 
 .messenger-app-end {

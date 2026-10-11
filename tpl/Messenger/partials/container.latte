@@ -1,9 +1,4 @@
 <div id="load_skeleton" class="im_page_loader">
-    <div class="pr pr_medium">
-        <div class="pr_bt"></div>
-        <div class="pr_bt"></div>
-        <div class="pr_bt"></div>
-    </div>
     <div class="loader_text">
         <p id="loader_text_part1">{=vkifyTr("loading_messenger")}</p>
         <p class="hidden" id="loader_text_part2">{=vkifyTr("loading_messenger_part2")|noescape}</p>
@@ -14,12 +9,11 @@
         const n_url = new URL(location.href);
 
         if (window.im_class == null || window.vkifyImReady !== true) {
-            const o_url = new URL(location.href);
-            return setTimeout(() => {
-                if (o_url.href == n_url.href) {
-                    this.loadPage();
-                }
-            }, 200);
+            return window.addEventListener('vkify:im-ready', loadPage, { once: true });
+        }
+
+        if (!document.getElementById('load_skeleton')) {
+            return;
         }
 
         if (!document.querySelector('.page_content #im_container')) {
