@@ -103,7 +103,14 @@ body.body_im .page_body {
     min-width: 0;
     max-height: calc(100vh - var(--header-height) - 15px);
     max-height: calc(100dvh - var(--header-height) - 15px);
-    scrollbar-width: thin;
+    overflow-y: auto;
+    scrollbar-width: none;
+    box-sizing: border-box;
+    padding: 1px;
+}
+
+#im_container.at_page:not(.compact) #im_page_tabs::-webkit-scrollbar {
+    display: none;
 }
 
 #im_container.at_page:not(.compact) #im_page_containers {
@@ -302,14 +309,18 @@ body.vkify-force-classic label:has(> input#im\.modern_mode) {
     width: 100%;
     height: 19px;
     background-color: var(--transparent);
-    color: var(--muted-text-color);
+    color: var(--vk-im-back);
     font-size: 14px;
     line-height: 19px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 14px 20px 15px 31px;
+    padding: 14px 20px 15px 36px;
     text-decoration: none !important;
+}
+
+.messenger-app--header--back a:hover {
+    color: var(--vk-im-back-hover);
 }
 
 .messenger-app--header--info {
@@ -911,7 +922,7 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-tabs {
 }
 
 body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wrap {
-    width: 230px;
+    width: auto;
     position: static;
     order: 2;
 }
@@ -983,10 +994,6 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
 
 .messages--peers-tabs .messages--peers-tab-close .cross {
     background: url(../icons/cross.png) center no-repeat;
-}
-
-.peer-window .peer-back {
-    display: block;
 }
 
 /* ==========================================================================
@@ -1298,6 +1305,10 @@ body #im_container .crp-list {
             height: 16px;
             border-radius: 2px;
         }
+        
+        span {
+            vertical-align: center;
+        }
     }
 
     .crp-entry:hover .crp-entry--message---text,
@@ -1490,6 +1501,12 @@ body #im_container.compact .crp-list .crp-entry--message---av {
     max-width: 100%;
 }
 
+/* Text shrinks to content so edited/pinned/sending flags can sit inline. */
+.messenger-app--messages---message ._content>.text,
+.messenger-app--messages---message ._content>.msg-modificators {
+    flex: 0 1 auto;
+}
+
 /* Lazy-load renders a bare loading_mini.gif; keep it at natural size. */
 .messenger-app--messages---message ._content>img[src$="loading_mini.gif"] {
     flex: 0 0 auto;
@@ -1512,11 +1529,22 @@ body #im_container.compact .crp-list .crp-entry--message---av {
         width: 430px !important;
     }
 
-    /* Back-link arrow; mobile uses a sprite instead. */
+    /* Back-link arrow; mobile uses a sprite instead. Masking the anchor
+       itself would clip the label, so the chevron goes on a pseudo. */
     .messenger-app--header--back a {
-        background-color: var(--muted-text-color-3);
-        -webkit-mask: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgOSAxNiI+PHBhdGggZmlsbD0iYmxhY2siIGQ9Ik04IDE1LjljLS4yIDAtLjQtLjEtLjYtLjNsLTctN2MtLjMtLjMtLjMtLjkgMC0xLjJsNy03Yy4zLS4zLjktLjMgMS4yIDAgLjMuMy4zLjkgMCAxLjJsLTYuNCA2LjQgNi40IDYuNGMuMy4zLjMuOSAwIDEuMi0uMi4yLS40LjMtLjYuM3oiIG9wYWNpdHk9Ii43Ii8+PC9zdmc+") 13px 16px no-repeat;
-        mask: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgOSAxNiI+PHBhdGggZmlsbD0iYmxhY2siIGQ9Ik04IDE1LjljLS4yIDAtLjQtLjEtLjYtLjNsLTctN2MtLjMtLjMtLjMtLjkgMC0xLjJsNy03Yy4zLS4zLjktLjMgMS4yIDAgLjMuMy4zLjkgMCAxLjJsLTYuNCA2LjQgNi40IDYuNGMuMy4zLjMuOSAwIDEuMi0uMi4yLS40LjMtLjYuM3oiIG9wYWNpdHk9Ii43Ii8+PC9zdmc+") 13px 16px no-repeat;
+        position: relative;
+    }
+
+    .messenger-app--header--back a::before {
+        content: '';
+        position: absolute;
+        top: 16px;
+        left: 15px;
+        width: 9px;
+        height: 16px;
+        background-color: #828A99;
+        -webkit-mask: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgOSAxNiI+PHBhdGggZmlsbD0iYmxhY2siIGQ9Ik04IDE1LjljLS4yIDAtLjQtLjEtLjYtLjNsLTctN2MtLjMtLjMtLjMtLjkgMC0xLjJsNy03Yy4zLS4zLjktLjMgMS4yIDAgLjMuMy4zLjkgMCAxLjJsLTYuNCA2LjQgNi40IDYuNGMuMy4zLjMuOSAwIDEuMi0uMi4yLS40LjMtLjYuM3oiIG9wYWNpdHk9Ii43Ii8+PC9zdmc+") no-repeat;
+        mask: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgOSAxNiI+PHBhdGggZmlsbD0iYmxhY2siIGQ9Ik04IDE1LjljLS4yIDAtLjQtLjEtLjYtLjNsLTctN2MtLjMtLjMtLjMtLjkgMC0xLjJsNy03Yy4zLS4zLjktLjMgMS4yIDAgLjMuMy4zLjkgMCAxLjJsLTYuNCA2LjQgNi40IDYuNGMuMy4zLjMuOSAwIDEuMi0uMi4yLS40LjMtLjYuM3oiIG9wYWNpdHk9Ii43Ii8+PC9zdmc+") no-repeat;
     }
 }
 
@@ -2341,7 +2369,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 /* Undo stock's IM re-skin of the site player; markup is normalized by audio-normalizer.js. */
 .messenger-app--messages---message .audioEmbed.msg-attach-audio-player,
 .ovk-attachments-modal-content .audioEmbed.msg-attach-audio-player {
-    margin: 5px 0;
+    margin: 0;
     border-radius: 4px;
     background: var(--transparent);
     border: 0;
@@ -2540,23 +2568,6 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     margin-bottom: 2px;
 }
 
-/* Stickers */
-.msg-attach-w-sticker {
-    display: inline-block;
-    max-width: 180px;
-    max-height: 180px;
-    margin: 2px 0;
-    cursor: pointer;
-}
-
-.msg-sticker-img {
-    max-width: 180px;
-    max-height: 180px;
-    width: auto;
-    height: auto;
-    display: block;
-}
-
 /* Shared materials page (#materials-page-im) */
 #materials-page-im .materials-photo-cell,
 #materials-page-im .materials-video-cell,
@@ -2709,7 +2720,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 }
 
 .messenger-app .messenger-app-status .write-bar {
-	padding: 0 0 0 58px;
+	padding: 0 0 0 37px;
 	color: var(--muted-text-color-3);
 	font-size: 12px;
 	min-height: unset;
@@ -3518,11 +3529,9 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 }
 
 /* "Can't write" bars */
-/* Styled after VK's .im-chat-input_error state. */
 .im-cant-write-container {
     position: relative;
     background: var(--module-header-background-color);
-    border-top: 1px solid var(--border-color);
 }
 
 .messenger-app--cant-write {
@@ -3659,6 +3668,10 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 #im_container.compact .crp-list {
     border-top: 1px solid var(--border-color);
     max-height: unset;
+}
+
+#im_container.compact .crp-list .crp-entry--message---text {
+    height: auto;
 }
 
 /* ==========================================================================
@@ -4254,7 +4267,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     }
 
     #im_container.at_page .messenger-app--messages---message>.messenger-app--messages---message--wrap {
-        padding: 0 12px;
+        padding: 0 12px!important;
     }
 
     #im_container.at_page {
@@ -4280,6 +4293,15 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     }
     .im_mobile .msg-media-tile, .msg-attach-j-photo {
         height: 100% !important;
+    }
+
+    .messenger-app--messages---message .audioEmbed.msg-attach-audio-player,
+    .ovk-attachments-modal-content .audioEmbed.msg-attach-audio-player {
+        margin: 0 0 10px;
+    }
+
+    .messenger-app .messenger-app-status .write-bar {
+        padding: 0 0 0 19px;
     }
 }
 

@@ -2320,6 +2320,7 @@ table,
     flex: 1;
     align-items: center;
     clear: unset;
+    width: 100%;
 }
 .docListViewItem .doc_icon {
     width: 30px;
@@ -2330,6 +2331,12 @@ table,
 }
 .docListViewItem a {
     width: fit-content;
+    max-width: 90%;
+}
+.docListViewItem .doc_name {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .docListViewItem .doc_content b {
     color: var(--link-color);
@@ -2514,7 +2521,8 @@ table,
     border-radius: var(--module-border-radius) var(--module-border-radius) 0 0;
 }
 
-.archive_banner {
+.page_block.archive_banner {
+    border-radius: 0 0 var(--module-border-radius) var(--module-border-radius);
     padding: 14px 16px;
     line-height: 1.462;
     width: 100%;
@@ -2529,6 +2537,9 @@ table,
 .archive_banner_title {
     display: block;
     margin-bottom: 4px;
+}
+.archive_banner_text {
+    color: var(--text-color)
 }
 .archive_banner_description {
     margin-top: 5px;
@@ -2906,7 +2917,8 @@ body:not(.mode-2018) .post_full_like .side_button:hover {
 .post-content .attachments .attachment {
     width: 100%;
 }
-.post-content .really_text + .attachments {
+.post-content .really_text + .attachments,
+.post-content .attachments_b + .attachments_m {
     padding-top: 10px;
 }
 .post-content .really_text + .attachments_m .attachment:not(:first-child,.audios_attachment,.notes_attachment) {
@@ -3319,6 +3331,8 @@ h4.gifts_section_header {
 
 /* album photos */
 .photos_album_intro h1 {
+    margin: 0;
+    padding:25px 0 5px;
     text-align: center;
 }
 .photos_album_intro .photos_album_intro_desc {
@@ -3991,7 +4005,7 @@ h4.gifts_section_header {
     border-bottom: 1px solid var(--border-color);
 }
 
-.chat_topic_wrap {
+#chat-topic.chat_topic_wrap {
     margin-top: -15px;
 }
 
