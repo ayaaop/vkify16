@@ -912,6 +912,10 @@
         background: transparent;
     }
 
+    .peer-title-edit-wrap {
+        width: 100%;
+    }
+
     /* forms */
     .form_group .form_field,.game_edit {
         flex-direction: column;
