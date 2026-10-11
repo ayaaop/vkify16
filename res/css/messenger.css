@@ -375,6 +375,39 @@ body.vkify-force-classic label:has(> input#im\.modern_mode) {
     cursor: pointer;
 }
 
+/* VK im-action menu icons (im_actions.png sprite, same layout as upstream) */
+#profile_actions_tooltip .im-action {
+    padding-left: 0;
+    vertical-align: middle;
+}
+
+#profile_actions_tooltip .im-action::before {
+    content: "";
+    width: 20px;
+    height: 15px;
+    background: url(../icons/im_actions.png) no-repeat 5px -184px;
+    display: inline-block;
+    padding-left: 15px;
+    opacity: .7;
+    vertical-align: middle;
+}
+
+#profile_actions_tooltip .im-action.im-action_invite::before { background-position: 5px -114px; margin-top: -2px; }
+#profile_actions_tooltip .im-action.im-action_media::before { background-position: 5px -165px; }
+#profile_actions_tooltip .im-action.im-action_search::before { background-position: 5px -184px; }
+#profile_actions_tooltip .im-action.im-action_mute::before { background-position: 5px -203px; }
+#profile_actions_tooltip .im-action.im-action_unmute::before { background-position: 5px -220px; }
+#profile_actions_tooltip .im-action.im-action_clear::before { background-position: 5px -253px; margin-top: -4px; }
+#profile_actions_tooltip .im-action.im-action_leave::before { background-position: 5px -360px; margin-top: -2px; }
+#profile_actions_tooltip .im-action.im-action_return::before { background-position: 5px -343px; margin-top: -3px; }
+#profile_actions_tooltip .im-action.im-action_block::before { background-position: 5px -306px; }
+#profile_actions_tooltip .im-action.im-action_unblock::before { background-position: 5px -405px; margin-top: -3px; }
+#profile_actions_tooltip .im-action.im-action_none::before { background: none; }
+
+#profile_actions_tooltip .im-action:hover::before {
+    opacity: 1;
+}
+
 #im_container.compact .messenger-app--header.messages--peers-header-peer-name,
 .messenger-app--header.messages--peers-header-peer-name {
     position: relative;

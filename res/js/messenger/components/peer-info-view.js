@@ -3,7 +3,9 @@ export function createPeerInfoView({ html, tr }) {
     return function PeerInfoView({ convo, page, togglePeerInfo }) {
         if (!convo || !convo.peer) return html``;
 
-        const peer = convo.peer;
+        // upstream rename handlers mutate the conversations-list peer, so
+        // resolve through it when the open chat wraps a different instance
+        const peer = window.im?.conversations?._findConv?.(convo.peer?.id)?.peer || convo.peer;
         const name = typeof peer.getName === 'function' ? peer.getName() : '';
         const url = typeof peer.getPageUrl === 'function' ? peer.getPageUrl() : '';
         const subtitle = typeof peer.getOnlineStatusString === 'function' ? peer.getOnlineStatusString() : '';
@@ -91,6 +93,178 @@ export function createPeerInfoView({ html, tr }) {
             } catch (err) {
                 console.error(err);
             }
+        };
+
+        const onInviteClick = (e) => {
+            e.preventDefault();
+            window.im.openTabByName('friends', true, { referrer: 'add_new', convo_id: peer.id });
+        };
+
+        const onMediaClick = (e) => {
+            e.preventDefault();
+            window.im.openTabByName('materials', true, { peer, initialType: 'photo' });
+        };
+
+        const onMuteClick = (e) => {
+            e.preventDefault();
+            try { window.openChatMuteModal?.(peer); } catch (err) { console.error(err); }
+        };
+
+        const onClearClick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            new CMessageBox({
+                title: tr('clear_history'),
+                body: tr('clear_history_confirm'),
+                buttons: [tr('yes'), tr('no')],
+                callbacks: [async () => {
+                    try {
+                        await window.OVKAPI.call('messages.deleteConversation', { peer_id: peer.id });
+                        if (peer._chunks) {
+                            peer._chunks.chunks = [];
+                            peer._chunks._map = new Map();
+                            peer._chunks._messagesInited = true;
+                            peer._chunks._invalidateCache();
+                        }
+                        if (convo) {
+                            convo.last_message = null;
+                            convo._last_message = null;
+                        }
+                        window.im.openTabByName('messenger');
+                        window.im.messenger.update();
+                        window.im.conversations?.update?.();
+                        window.im?.event_handler?.updateGlobalUnreadCounter?.();
+                    } catch (err) {
+                        fastError(String(err));
+                    }
+                }, () => { }],
+            });
+        };
+
+        const onReturnClick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            (async () => {
+                try {
+                    await window.OVKAPI.call('messages.addChatUser', {
+                        peer_id: peer.id,
+                        user_id: window.im?.state?.getId?.(),
+                    });
+                    peer.data.left = 0;
+                    peer.data.kicked = 0;
+                    peer.data.chat_settings = peer.data.chat_settings || {};
+                    peer.data.chat_settings.state = 'in';
+                    peer.data.state = 'in';
+                    peer.data.can_write = { allowed: true };
+
+                    try {
+                        const convById = await window.OVKAPI.call('messages.getConversationsById', { peer_ids: peer.id });
+                        const cConv = convById?.items?.[0]?.conversation || convById?.items?.[0] || null;
+                        const s = cConv?.chat_settings;
+                        if (s) {
+                            peer.data.photo_50 = s.photo_50 || s.photo?.photo_50 || '';
+                            peer.data.photo_100 = s.photo_100 || s.photo?.photo_100 || '';
+                            peer.data.photo_200 = s.photo_200 || s.photo?.photo_200 || '';
+                            peer.data.avatar_max = s.avatar_max || '';
+                            peer.data.photo_id = s.photo_id || null;
+                        }
+                    } catch (_) { }
+
+                    const conv = window.im.conversations?._findConv?.(peer.id);
+                    if (conv) {
+                        if (conv._conversation) {
+                            conv._conversation.can_write = { allowed: true };
+                            if (conv._conversation.chat_settings) {
+                                conv._conversation.chat_settings.state = 'in';
+                            }
+                        }
+                        if (conv.peer && conv.peer !== peer) {
+                            Object.assign(conv.peer.data, {
+                                left: 0, kicked: 0,
+                                can_write: { allowed: true },
+                                photo_50: peer.data.photo_50, photo_100: peer.data.photo_100,
+                                photo_200: peer.data.photo_200, avatar_max: peer.data.avatar_max,
+                                photo_id: peer.data.photo_id,
+                            });
+                        }
+                    }
+
+                    try {
+                        const fc = window.im?.fastChats?.openedChats?.find((c) => Number(c.peerId) === Number(peer.id));
+                        if (fc) {
+                            fc.canWrite = true;
+                            fc.cantWriteReason = null;
+                            fc.cantWriteText = null;
+                            fc.photo = peer.getAvatar ? peer.getAvatar() : '';
+                            window.im.fastChats.render();
+                        }
+                    } catch (_) { }
+
+                    window.im.openTabByName('messenger');
+                    window.im.messenger.update();
+                    window.im.conversations?.update?.();
+                } catch (err) {
+                    fastError(String(err));
+                }
+            })();
+        };
+
+        const onLeaveClick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            new CMessageBox({
+                title: tr('leave_chat'),
+                body: tr('leave_chat_confirm'),
+                buttons: [tr('yes'), tr('no')],
+                callbacks: [async () => {
+                    try {
+                        await window.OVKAPI.call('messages.removeChatUser', {
+                            peer_id: peer.id,
+                            user_id: window.im?.state?.getId?.(),
+                        });
+                        const leftData = {
+                            left: 1, kicked: 0,
+                            photo_50: '', photo_100: '', photo_200: '', avatar_max: '',
+                            photo_id: null,
+                            can_write: { allowed: false, reason: 916 },
+                        };
+                        Object.assign(peer.data, leftData);
+                        peer.data.chat_settings = peer.data.chat_settings || {};
+                        peer.data.chat_settings.state = 'left';
+                        peer.data.state = 'left';
+
+                        const conv = window.im.conversations?._findConv?.(peer.id);
+                        if (conv) {
+                            if (conv._conversation) {
+                                conv._conversation.can_write = { allowed: false, reason: 916 };
+                                if (conv._conversation.chat_settings) {
+                                    conv._conversation.chat_settings.state = 'left';
+                                }
+                            }
+                            if (conv.peer && conv.peer !== peer) {
+                                Object.assign(conv.peer.data, leftData);
+                            }
+                        }
+
+                        try {
+                            const fc = window.im?.fastChats?.openedChats?.find((c) => Number(c.peerId) === Number(peer.id));
+                            if (fc) {
+                                fc.canWrite = false;
+                                fc.cantWriteReason = 916;
+                                fc.cantWriteText = window.im.fastChats.getCantWriteText(fc);
+                                fc.photo = '';
+                                window.im.fastChats.render();
+                            }
+                        } catch (_) { }
+
+                        window.im.openTabByName('messenger');
+                        window.im.messenger.update();
+                        window.im.conversations?.update?.();
+                    } catch (err) {
+                        fastError(String(err));
+                    }
+                }, () => { }],
+            });
         };
 
         const applyBlacklistState = (blockedByMe, canWritePrivate, blockedByThem) => {
@@ -222,6 +396,14 @@ export function createPeerInfoView({ html, tr }) {
         }
 
         const isBlacklistedByMe = isUser && Number(peer.data?.blacklisted_by_me) === 1;
+        const isChat = peer.supposed_type === 'chat';
+        const isILeft = typeof peer.isILeft === 'function' && peer.isILeft();
+        const peerCan = (perm) => typeof peer.can !== 'function' || peer.can(perm);
+        const canInvite = isChat && !isILeft && peerCan('invite_new');
+        const canLeave = isChat && !isILeft && peerCan('leave_chat');
+        const canReturn = isChat && isILeft && peerCan('return_to_chat');
+        const isMuted = typeof peer.isMuted === 'function' && peer.isMuted();
+        const menuItem = 'ui_actions_menu_item im-action';
 
         return html`
             <div class="messenger-app--header messages--peers-header-peer-name">
@@ -238,14 +420,37 @@ export function createPeerInfoView({ html, tr }) {
                     <div class="messenger-app-header--more-actions ui_actions_menu_wrap ui_actions_menu_left_align" onClick=${onActionsClick} onMouseEnter=${onActionsMouseEnter} onMouseLeave=${onActionsMouseLeave}>
                         <div id="profile_more_btn" class="messenger-app-header--more-actions--trigger"></div>
                         <div id="profile_actions_tooltip" class="ui_actions_menu">
-                            <a onClick=${onSearchClick}>
+                            ${canInvite ? html`
+                            <a class="${menuItem} im-action_invite" onClick=${onInviteClick}>
+                                ${tr('chat_add_members_ext')}
+                            </a>` : ''}
+                            <a class="${menuItem} im-action_media" onClick=${onMediaClick}>
+                                ${tr('conversation_materials')}
+                            </a>
+                            <a class="${menuItem} im-action_search" onClick=${onSearchClick}>
                                 ${tr('convo_search_messages')}
                             </a>
+                            <div class="ui_actions_menu_sep"></div>
+                            <a class="${menuItem} ${isMuted ? 'im-action_unmute' : 'im-action_mute'}" onClick=${onMuteClick}>
+                                ${isMuted ? tr('chat_unmute_notifications') : tr('chat_mute_notifications')}
+                            </a>
+                            <a class="${menuItem} im-action_clear" onClick=${onClearClick}>
+                                ${tr('clear_history')}
+                            </a>
+                            ${(canLeave || canReturn || (isUser && !isSelfSaved)) ? html`<div class="ui_actions_menu_sep"></div>` : ''}
+                            ${canReturn ? html`
+                            <a class="${menuItem} im-action_return" onClick=${onReturnClick}>
+                                ${tr('return_to_chat')}
+                            </a>` : ''}
+                            ${canLeave ? html`
+                            <a class="${menuItem} im-action_leave" onClick=${onLeaveClick}>
+                                ${tr('leave_chat')}
+                            </a>` : ''}
                             ${isUser && !isSelfSaved ? html`
-                            <a data-name=${firstName} data-val=${isBlacklistedByMe ? 0 : 1} data-id=${userId} onClick=${onBlacklistClick}>
+                            <a class="${menuItem} ${isBlacklistedByMe ? 'im-action_unblock' : 'im-action_block'}" data-name=${firstName} data-val=${isBlacklistedByMe ? 0 : 1} data-id=${userId} onClick=${onBlacklistClick}>
                                 ${isBlacklistedByMe ? tr('bl_remove') : tr('bl_add')}
                             </a>
-                            <a onClick=${onReportClick}>
+                            <a class="${menuItem} im-action_none" onClick=${onReportClick}>
                                 ${tr('report')}
                             </a>
                             ` : ''}
