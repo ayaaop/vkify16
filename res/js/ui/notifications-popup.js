@@ -14,11 +14,39 @@ function parseNotifyCount(text) {
 }
 
 vkify.ready(() => {
-    const customSoundId = "vkify_notification";
-    createjs.Sound.registerSound(vkify.resourceUrl("bb1.mp3"), customSoundId);
+    /* upstream al_notifs.js calls __actualPlayNotifSound(type) with
+       "newmsg" for incoming messages and "notification" for everything else */
+    const soundFiles = {
+        newmsg: "bb2.mp3",
+        notification: "bb1.mp3",
+    };
+    const soundIds = {};
+    const soundUrls = {};
+
+    if (window.createjs && createjs.Sound && typeof createjs.Sound.registerSound === 'function') {
+        for (const [type, file] of Object.entries(soundFiles)) {
+            soundIds[type] = "vkify_" + type;
+            createjs.Sound.registerSound(vkify.resourceUrl(file), soundIds[type]);
+        }
+    }
 
     function actualPlayNotifSound(type = 'notification') {
-        createjs.Sound.play(customSoundId);
+        const file = soundFiles[type] || soundFiles.notification;
+        const url = soundUrls[file] || (soundUrls[file] = vkify.resourceUrl(file));
+        try {
+            const id = soundIds[type] || soundIds.notification;
+            if (id && window.createjs && createjs.Sound && createjs.Sound.activePlugin) {
+                /* A WebAudio context created before the first user gesture stays
+                   suspended (notably on Firefox) and SoundJS never resumes it. */
+                const ctx = createjs.Sound.activePlugin.context;
+                if (ctx && ctx.state === 'suspended') {
+                    ctx.resume().catch(() => {});
+                }
+                createjs.Sound.play(id);
+                return;
+            }
+        } catch (e) { /* fall back to a plain <audio> element */ }
+        new Audio(url).play().catch(() => {});
     }
 
     vkify.actualPlayNotifSound = actualPlayNotifSound;
