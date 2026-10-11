@@ -2155,6 +2155,21 @@
         width: 100%;
         display: block;
     }
+
+    /* bsdn player */
+    .bsdn-player .bsdn_controls {
+        height: 52px;
+    }
+    .bsdn-player .bsdn_soundControl {
+        display: none;
+    }
+    .bsdn-player .bsdn_terebilkaBrick {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .bsdn-player .bsdn_contextMenuElement {
+        padding: 12px 20px;
+    }
     .video_info {
         padding-top: 12px;
     }
@@ -2182,7 +2197,10 @@
     .audiosDiv {
         padding: 16px!important;
     }
-    .audioEntry .audioEntryWrapper {
+    .audioEntry .audioEntryWrapper,
+    .messenger-app--messages---message .audioEmbed.msg-attach-audio-player .audioEntryWrapper,
+    .ovk-attachments-modal-content .audioEmbed.msg-attach-audio-player .audioEntryWrapper,
+    .fwd-modal-content .audioEmbed.msg-attach-audio-player .audioEntryWrapper {
         grid-template-columns: auto minmax(0, 1fr) auto;
         padding: 0;
     }
@@ -2193,7 +2211,9 @@
     }
     .audioEntry:hover,
     .vertical-attachment .audioEntry:hover,
-    .audioEntry:hover, .vertical-attachment .audioEntry:hover, .audioEntry.nowPlaying, .audioEntry.nowPlaying:hover, .vertical-attachment .audioEntry.nowPlaying:hover {
+    .audioEntry.nowPlaying,
+    .audioEntry.nowPlaying:hover,
+    .vertical-attachment .audioEntry.nowPlaying:hover {
         background-color: transparent !important;
     }
     .audioEntry .playerButton,
@@ -2214,72 +2234,7 @@
         gap: .25rem;
     }
     .audioEntry .status .mediaInfo .info {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        min-width: 0;
-        line-height: 1.2;
-    }
-    .audioEntry .info .performer,
-    .audioEntry .info .title {
-        display: block;
-        max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    .audioEntry .info .title {
-        order: -1;
-        font-weight: 600;
-    }
-    .audioEntry .info .title,
-    .audioEntry .info .title a {
-        color: var(--text-color)!important;
-    }
-    .audioEntry .info .performer,
-    .audioEntry .info .performer a {
-        font-weight: 400;
-        color: var(--muted-text-color-2);
-    }
-    .audioEntry .tire {
-        display: none;
-    }
-    .audioEntry .explicitMark {
-        flex-shrink: 0;
-    }
-    .audioEntry .audioEntryWrapper {
-        grid-template-columns: auto minmax(0, 1fr) auto;
-        padding: 0;
-    }
-    .module_body .audioEntry,
-    .attachments_m .audioEntry {
-        margin: 0;
-        width: 100%;
-    }
-    .audioEntry:hover,
-    .vertical-attachment .audioEntry:hover,
-    .audioEntry:hover, .vertical-attachment .audioEntry:hover, .audioEntry.nowPlaying, .audioEntry.nowPlaying:hover, .vertical-attachment .audioEntry.nowPlaying:hover {
-        background-color: transparent !important;
-    }
-    .audioEntry .playerButton,
-    .audioEntry .playerButton .playIcon {
-        width: 2.25rem;
-        height: 2.25rem;
-    }
-    .audioEntry .playerButton .playIcon svg {
-        width: 1.5rem;
-        height: 1.5rem;
-    }
-    .audioEntry .status {
-        min-width: 0;
-    }
-    .audioEntry .status .mediaInfo {
-        display: flex;
-        align-items: center;
-        gap: .25rem;
-    }
-    .audioEntry .status .mediaInfo .info {
-        display: flex;
+        display: flex!important;
         flex-direction: column;
         flex: 1;
         min-width: 0;
@@ -2357,7 +2312,9 @@
         background-position: 0px -68px;
     }
 
-    .audiosSideContainer .scroll_node:not(:last-child) .audioEmbed,.AudioPlaylistSnippet__audioRow:not(:last-child),.AudioPlaylistSnippet .ActionButton--shuffle {
+    .audiosSideContainer .scroll_node:not(:last-child) .audioEmbed,
+    .AudioPlaylistSnippet__audioRow:not(:last-child),.AudioPlaylistSnippet .ActionButton--shuffle,
+     .ovk-msg-sheet .audio_attachment_header {
         margin-bottom: 10px;
     }
     .musfooter {
@@ -2406,6 +2363,9 @@
         margin: 12px 0 0 0 !important;
     }
     .AudioPlaylistSnippet__actions {
+        overflow: unset;
+    }
+    .AudioPlaylistSnippet__actions .post_full_like {
         flex-wrap: wrap;
         gap: 4px;
     }

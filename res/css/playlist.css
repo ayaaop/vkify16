@@ -227,6 +227,7 @@
 }
 .AudioPlaylistSnippet__actions .action_button {
 	color: var(--link-color);
+	overflow: hidden;
 }
 .AudioPlaylistSnippet__actions .action_button .action_label {
 	vertical-align: middle;
