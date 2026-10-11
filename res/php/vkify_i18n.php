@@ -86,14 +86,14 @@ if (!function_exists('vkifyGetStrings')) {
                     'shuffle_all' => 'Shuffle all',
                     'sidebar_note' => 'You might have to reload the page for the changes to apply',
                     'something_not_right' => 'Something isn\'t right.',
-                    'support_bug_theme_notice' => 'Seeing a bug? Check whether it also happens with the default theme — if it only happens in VKify16, please <a href="https://github.com/ayaaop/vkify16" target="_blank">report it on GitHub</a> instead.',
+                    'support_bug_theme_notice' => 'Seeing a bug? Check whether it also happens with the default theme — if it only happens in VKify16, please <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">report it on GitHub</a> instead.',
                     'themepack_warn' => 'Please set "VKify16" in the <a href="/settings?act=interface">styles settings</a> again, or <a href="#" onclick="location.reload(); return false;">reload the page</a> if you just switched to it.',
                     'users_posts' => 'Posts from user',
                     'vkify_settings' => 'VKify16 settings',
                     'other_results' => 'Other results...',
                     'document_preview_unavailable' => 'The preview for this document is not available.',
                     'loading_messenger' => 'Loading messenger...',
-                    'loading_messenger_part2' => 'This load time is abnormal. PLease try switching back to the default theme — if the messenger loads fine there, send a bugreport to <a href="https://github.com/ayaaop/vkify16" target="_blank">GitHub</a>.'
+                    'loading_messenger_part2' => 'This load time is abnormal. PLease try switching back to the default theme — if the messenger loads fine there, send a bugreport to <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">GitHub</a>.'
                 ],
                 'ru' => [
                     'add_tracks' => 'Добавить аудиозаписи',
@@ -173,14 +173,14 @@ if (!function_exists('vkifyGetStrings')) {
                     'shuffle_all' => 'Перемешать все',
                     'sidebar_note' => 'Возможно, вам придется перезагрузить страницу, чтобы изменения вступили в силу.',
                     'something_not_right' => 'Что-то не то.',
-                    'support_bug_theme_notice' => 'Заметили ошибку? Проверьте, воспроизводится ли она на стандартной теме — если проблема есть только в VKify16, пожалуйста, <a href="https://github.com/ayaaop/vkify16" target="_blank">сообщите о ней на GitHub</a>.',
+                    'support_bug_theme_notice' => 'Заметили ошибку? Проверьте, воспроизводится ли она на стандартной теме — если проблема есть только в VKify16, пожалуйста, <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">сообщите о ней на GitHub</a>.',
                     'themepack_warn' => 'Пожалуйста, выберите тему «VKify16» в <a href="/settings?act=interface">настройках оформления</a> заново или <a href="#" onclick="location.reload(); return false;">обновите страницу</a>, если вы только что переключились на нее.',
                     'users_posts' => 'Записи от пользователя',
                     'vkify_settings' => 'Настройки VKify16',
                     'other_results' => 'Другие результаты...',
                     'document_preview_unavailable' => 'Предпросмотр этого документа недоступен.',
                     'loading_messenger' => 'Загрузка мессенджера...',
-                    'loading_messenger_part2' => 'Мессенджер загружается слишком долго. Попробуйте переключиться обратно на стандартную тему — если там все нормально, отправьте багрепорт на <a href="https://github.com/ayaaop/vkify16" target="_blank">GitHub</a>.'
+                    'loading_messenger_part2' => 'Мессенджер загружается слишком долго. Попробуйте переключиться обратно на стандартную тему — если там все нормально, отправьте багрепорт на <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">GitHub</a>.'
                 ],
                 'uk' => [
                     'add_tracks' => 'Додати аудіозаписи',
@@ -259,14 +259,14 @@ if (!function_exists('vkifyGetStrings')) {
                     'shuffle_all' => 'Перемішати все',
                     'sidebar_note' => 'Можливо, вам потрібно перезавантажити сторінку, щоб зміни вступили в силу.',
                     'something_not_right' => 'Щось не так.',
-                    'support_bug_theme_notice' => 'Помітили помилку? Перевірте, чи відтворюється вона зі стандартною темою — якщо проблема стосується лише VKify16, будь ласка, <a href="https://github.com/ayaaop/vkify16" target="_blank">повідомте про неї на GitHub</a>.',
+                    'support_bug_theme_notice' => 'Помітили помилку? Перевірте, чи відтворюється вона зі стандартною темою — якщо проблема стосується лише VKify16, будь ласка, <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">повідомте про неї на GitHub</a>.',
                     'themepack_warn' => 'Будь ласка, оберіть тему «VKify16» в <a href="/settings?act=interface">налаштуваннях оформлення</a> заново або <a href="#" onclick="location.reload(); return false;">оновіть сторінку</a>, якщо ви щойно переключилися на неї.',
                     'users_posts' => 'Дописи користувача',
                     'vkify_settings' => 'Налаштування VKify16',
                     'other_results' => 'Інші результати...',
                     'document_preview_unavailable' => 'Попередній перегляд цього документа недоступний.',
                     'loading_messenger' => 'Завантаження месенджера...',
-                    'loading_messenger_part2' => 'Месенджер завантажується занадто довго. Спробуйте переключитися назад на стандартну тему — якщо там все нормально, надішліть багрепорт на <a href="https://github.com/ayaaop/vkify16" target="_blank">GitHub</a>.'
+                    'loading_messenger_part2' => 'Месенджер завантажується занадто довго. Спробуйте переключитися назад на стандартну тему — якщо там все нормально, надішліть багрепорт на <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">GitHub</a>.'
                 ],
                 'kk' => [
                     'add_tracks' => 'Әндерді қосу',
@@ -346,14 +346,14 @@ if (!function_exists('vkifyGetStrings')) {
                     'shuffle_all' => 'Барлығын араластыру',
                     'sidebar_note' => 'Өзгерістер іске қосылуы үшін бетті қайта жүктеуіңіз қажет болуы мүмкін.',
                     'something_not_right' => 'Бірдеңе дұрыс емес.',
-                    'support_bug_theme_notice' => 'Қате байқадыңыз ба? Оның стандартты стильде де қайталанатынын тексеріп көріңіз — егер мәселе тек VKify16-да ғана болса, оны <a href="https://github.com/ayaaop/vkify16" target="_blank">GitHub-та хабарлаңыз</a>.',
+                    'support_bug_theme_notice' => 'Қате байқадыңыз ба? Оның стандартты стильде де қайталанатынын тексеріп көріңіз — егер мәселе тек VKify16-да ғана болса, оны <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">GitHub-та хабарлаңыз</a>.',
                     'themepack_warn' => '<a href="/settings?act=interface">Баптау бетінде</a> «VKify16» стилін қайта таңдаңыз, немесе, стильді енді ғана ауыстырған болсаңыз, <a href="#" onclick="location.reload(); return false;">бетті қайта жүктеңіз</a>.',
                     'users_posts' => 'Пайдаланушы жазбалары',
                     'vkify_settings' => 'VKify16 баптаулары',
                     'other_results' => 'Басқа нәтижелер...',
                     'document_preview_unavailable' => 'Бұл құжатты алдын ала қарау мүмкін емес.',
                     'loading_messenger' => 'Мессенджер жүктелуде...',
-                    'loading_messenger_part2' => 'Мессенджер тым ұзақ жүктелуде. Стандартты стильге оралып көріңіз — ол жерде бәрі жақсы істеп тұрса, <a href="https://github.com/ayaaop/vkify16" target="_blank">GitHub-та</a> қате туралы есеп жіберіңіз.'
+                    'loading_messenger_part2' => 'Мессенджер тым ұзақ жүктелуде. Стандартты стильге оралып көріңіз — ол жерде бәрі жақсы істеп тұрса, <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">GitHub-та</a> қате туралы есеп жіберіңіз.'
                 ],
             ];
         }
