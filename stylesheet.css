@@ -4970,6 +4970,11 @@ body.banned {
     color: var(--link-color);
 }
 
+.stickers_modal_grid_wrap {
+	max-height: unset;
+	overflow-y: unset;
+}
+
 .stickers_modal_cover_wrap,
 .stickers_modal_item:hover {
     border: 1px solid var(--border-color);
@@ -5051,11 +5056,13 @@ body.banned {
 .emoji-picker-wrap {
     background: var(--module-background-color);
     width: 258px;
+    font-family: var(--font-family);
+    font-size: 12.5px;
 }
 
 .emoji-picker-scroll {
     height: 242px;
-    padding: 0 4px 2px;
+    padding: 0 0 2px;
     scrollbar-color: var(--border-color-2) var(--transparent);
 }
 
@@ -5063,7 +5070,7 @@ body.banned {
     background-color: var(--border-color-2);
 }
 
-.emoji-picker-group .group-title {
+.emoji-picker-group .group-title, .sticker-picker-groups .group-title {
     margin: 0;
     padding: 10px 5px 6px;
     border-bottom: 0;
@@ -5072,7 +5079,13 @@ body.banned {
     font-weight: 400;
     line-height: 14px;
     letter-spacing: .2px;
-    color: var(--muted-text-color);
+    color: var(--muted-text-color-2);
+    position: sticky;
+    top: 0;
+}
+
+.emoji-picker-group-items {
+    padding: 0 4px;
 }
 
 .emoji-picker-item:hover {
@@ -5093,7 +5106,7 @@ body.banned {
 }
 
 .emoji-tabs-divider {
-    display: none;
+    display: none!important;
 }
 
 .emoji-main-tab,

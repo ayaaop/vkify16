@@ -3367,7 +3367,7 @@
     }
 
     /* fastchats hidden, sticker shop/modal fit */
-    #fastchats_container {
+    #fastchats_container,.ovk-diag-cont.stickers_pack_modal_cont .ovk-diag-head {
         display: none !important;
     }
     .stickers_packs_grid {
@@ -3377,8 +3377,16 @@
     .stickers_pack_card {
         max-width: 100%;
     }
-    .ovk-diag-cont:has(.stickers_pack_modal), .stickers_pack_modal_cont {
+    .ovk-diag-cont.stickers_pack_modal_cont.ovk-msg-sheet, .stickers_pack_modal_cont {
         max-width: 100% !important;
+    }
+
+    .stickers_pack_modal_cont.ovk-msg-sheet .ovk-diag-body {
+        padding: 20px 16px!important;
+    }
+
+    .emoji-tabs-divider {
+        border-radius: 0;
     }
 
     /* notes */
