@@ -1,0 +1,542 @@
+/* iOS platform adaptations */
+@media (max-width: 768px) {
+    html.platform-ios body {
+        -webkit-tap-highlight-color: transparent;
+        --header-height: 44px;
+        --module-border-radius: 10px !important;
+        --button-border-radius: 10px !important;
+        --tooltip-border-radius: 12px !important;
+    }
+    /* iOS has no ripples */
+    .platform-ios .button:active, .platform-ios .action_button:active,
+    .platform-ios .ui_actions_menu a:active, .platform-ios .ui_actions_menu button:active,
+    .platform-ios .tions_menu_item:active,
+    .platform-ios .ui_tab:active, .platform-ios .ui_tab_plain:active,
+    .platform-ios .sidebar_inner .link:active, .platform-ios .mobile-info-row:active,
+    .platform-ios .mobile-scroll-card:active, .platform-ios .profile_link:active,
+    .platform-ios .msg-dropdown-item:active, .platform-ios .appbar .hamburger:active,
+    .platform-ios .appbar-extra-btn:active, .platform-ios .ovk-diag-head-close:active,
+    .platform-ios .ovk-diag-head-apply:active,
+    .platform-ios .ovk-modal-video-window .video_top_button:active,
+    .platform-ios .messenger-app--header--back a:active,
+    .platform-ios .messenger-app--header--ava:active,
+    .platform-ios .messenger-app-header--more-actions--trigger:active {
+        opacity: .72;
+    }
+    /* status bar + home indicator insets */
+    .platform-ios .appbar {
+        height: calc(var(--header-height) + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+    }
+    .platform-ios #xhead {
+        height: var(--header-height);
+        background-color: var(--module-background-color);
+        position: absolute;
+        width: 100%;
+        left: 0;
+        top: 0;
+    }
+    /* iOS bars are translucent + blurred system material; scrolling shows
+       a hairline separator, never an elevation shadow */
+    .platform-ios .appbar:not(.appbar--transparent) {
+        -webkit-backdrop-filter: blur(20px) saturate(1.8);
+        backdrop-filter: blur(20px) saturate(1.8);
+    }
+    .platform-ios .appbar:not(.appbar--transparent):not(.appbar--scrolled):not(.appbar--elevated),
+    .platform-ios .appbar--scrolled,
+    .platform-ios .appbar--elevated {
+        background-color: color-mix(in srgb, var(--module-background-color) 80%, transparent) !important;
+    }
+    .platform-ios .appbar--scrolled,
+    .platform-ios .appbar--elevated {
+        box-shadow: inset 0 -0.5px 0 var(--border-color) !important;
+    }
+    .platform-ios .appbar:not(.appbar--transparent) {
+        color: var(--text-color);
+    }
+    .platform-ios .appbar:not(.appbar--transparent) .hamburger svg,
+    .platform-ios .appbar:not(.appbar--transparent) .appbar-extra-btn,
+    .platform-ios .appbar:not(.appbar--transparent) .appbar-extra-btn svg {
+        color: var(--accent-color-2);
+        fill: var(--accent-color-2);
+    }
+    /* same iOS bar material on modal headers and the chat header */
+    .platform-ios .ovk-modal-video-window #video_top_controls,
+    .platform-ios .ovk-msg-fullscreen .ovk-diag-head,
+    .platform-ios .body_im .messenger-app--header.messages--peers-header-peer-name {
+        background-color: color-mix(in srgb, var(--module-background-color) 80%, transparent);
+        -webkit-backdrop-filter: blur(20px) saturate(1.8);
+        backdrop-filter: blur(20px) saturate(1.8);
+        color: var(--text-color);
+        box-shadow: inset 0 -0.5px 0 var(--border-color);
+    }
+    .platform-ios .ovk-modal-video-window #video_top_controls .video_top_button,
+    .platform-ios .ovk-msg-fullscreen .ovk-diag-head-close,
+    .platform-ios .ovk-msg-fullscreen .ovk-diag-head-apply,
+    .platform-ios .body_im .messenger-app--header--back a {
+        color: var(--accent-color-2);
+    }
+    .platform-ios .body_im .messenger-app--header--name a {
+        color: var(--text-color);
+    }
+    .platform-ios .body_im .messenger-app--header--info .messenger-app--header--online {
+        color: var(--muted-text-color);
+        opacity: 1;
+    }
+    .platform-ios .body_im .messenger-app--header--ava .messenger-app--header--online {
+        border-color: var(--module-background-color);
+    }
+    .platform-ios body.body_im:not(.dark-mode) .messenger-app-header--more-actions--trigger {
+        filter: brightness(0);
+    }
+    .platform-ios .ovk-modal-video-window.ovk-appbar-scrolled #video_top_controls {
+        box-shadow: inset 0 -0.5px 0 var(--border-color);
+    }
+    .platform-ios .page_body {
+        margin-top: calc(var(--header-height) + env(safe-area-inset-top));
+    }
+    .platform-ios .sidebar {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .platform-ios .ovk-modal-video-window #video_top_controls {
+        height: calc(var(--header-height) + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+        box-sizing: border-box;
+    }
+    .platform-ios .ovk-modal-player-window #player-video-queue {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .platform-ios .messenger-app-status .write-bar {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    /* iOS headers center their title — center the whole tabs-menu wrap
+       (title + chevron), anchored below the status-bar inset */
+    .platform-ios .appbar > .appbar-title,
+    .platform-ios .appbar .appbar-tabs-menu-wrap {
+        position: absolute;
+        left: 50%;
+        top: env(safe-area-inset-top);
+        bottom: 0;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: calc(100% - 132px);
+        box-sizing: border-box;
+    }
+    .platform-ios .ui_actions_menu_wrap.shown .ui_actions_menu.appbar-tabs-menu {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+    }
+    .platform-ios .appbar > .appbar-title {
+        width: auto;
+        text-align: center;
+        font-size: 21px;
+        font-weight: 600;
+    }
+    .platform-ios .appbar .appbar-extra {
+        margin-left: auto;
+    }
+    .platform-ios .ovk-modal-video-window .video_viewer_title,
+    .platform-ios .ovk-msg-fullscreen .ovk-diag-head-title {
+        position: absolute;
+        left: 50%;
+        top: env(safe-area-inset-top);
+        bottom: 0;
+        transform: translateX(-50%);
+        display: flex!important;
+        align-items: center;
+        justify-content: center;
+        max-width: calc(100% - 120px);
+        text-align: center;
+        pointer-events: none;
+    }
+    .platform-ios .ovk-msg-sheet .ovk-diag-head-title {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: auto;
+        max-width: calc(100% - 120px);
+        text-align: center;
+        pointer-events: none;
+    }
+    .platform-ios .ovk-msg-fullscreen .ovk-diag-head,
+    .platform-ios .ovk-msg-sheet .ovk-diag-head {
+        position: relative;
+    }
+    .platform-ios .ovk-msg-fullscreen .ovk-diag-head {
+        height: calc(var(--header-height) + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+        box-sizing: border-box;
+    }
+    /* iOS modal sheets span edge-to-edge with rounded top corners and a
+       grabber; the detached floating card look is only for ActionSheets
+       (compact action menus), not content sheets */
+    .platform-ios .ovk-diag-cont.ovk-msg-sheet:not(.ovk-msg-sheet--expanded) .ovk-diag {
+        width: 100% !important;
+        margin: 0;
+        border-radius: 12px 12px 0 0;
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .platform-ios .ovk-diag-cont.ovk-msg-sheet:not(.ovk-msg-sheet--expanded) .ovk-diag-head {
+        border-radius: 12px 12px 0 0;
+        background: none;
+    }
+    .platform-ios .ovk-msg-sheet .ovk-diag::before {
+        content: '';
+        flex: none;
+        align-self: center;
+        width: 36px;
+        height: 5px;
+        margin: 6px 0 4px;
+        border-radius: 2.5px;
+        background: color-mix(in srgb, var(--text-color) 18%, transparent);
+    }
+    /* iOS dialogs are translucent alert cards: centered title, hairline
+       separators, stacked full-width actions in accent blue */
+    .platform-ios .ovk-msg-dialog .ovk-diag {
+        border-radius: 14px;
+        overflow: hidden;
+        background: color-mix(in srgb, var(--module-background-color) 80%, transparent);
+        -webkit-backdrop-filter: blur(20px) saturate(1.8);
+        backdrop-filter: blur(20px) saturate(1.8);
+        box-shadow: 0 0 0 0.5px rgba(0,0,0,.12), 0 20px 60px rgba(0,0,0,.25);
+        --ios-separator-color: color-mix(in srgb, var(--text-color) 20%, transparent);
+    }
+    .platform-ios .ovk-msg-dialog .ovk-diag-head {
+        font-size: 17px;
+        line-height: 22px;
+        font-weight: 600;
+        padding: 16px 16px 12px !important;
+        text-align: center;
+    }
+    .platform-ios .ovk-msg-dialog .ovk-diag-body {
+        padding: 0 16px 16px !important;
+    }
+    .platform-ios .ovk-msg-dialog .ovk-diag-action {
+        padding: 0;
+        border-top: 0.5px solid var(--ios-separator-color, var(--border-color));
+    }
+    .platform-ios .ovk-msg-dialog .ovk-diag-action > .ovk-msg-btn {
+        flex: 1;
+        min-width: 0;
+        height: 44px;
+        min-height: 44px;
+        margin: 0;
+        padding: 0 8px !important;
+        font-size: 17px;
+        font-weight: 400;
+        text-transform: none;
+        border-radius: 0;
+        color: var(--accent-color-2) !important;
+    }
+    .platform-ios .ovk-msg-dialog .ovk-diag-action > .ovk-msg-btn:first-child {
+        font-weight: 600;
+    }
+    .platform-ios .ovk-msg-dialog .ovk-diag-action > .ovk-msg-btn + .ovk-msg-btn {
+        border-left: 0.5px solid var(--ios-separator-color, var(--border-color)) !important;
+    }
+    .platform-ios .ovk-msg-dialog.ovk-diag-stacked .ovk-diag-action {
+        row-gap: 0;
+    }
+    .platform-ios .ovk-msg-dialog.ovk-diag-stacked .ovk-diag-action > .ovk-msg-btn {
+        height: 44px;
+        min-height: 44px;
+        border-left: 0 !important;
+        border-top: 0.5px solid var(--ios-separator-color, var(--border-color)) !important;
+        justify-content: center;
+    }
+     .platform-ios .ovk-msg-dialog .ovk-diag-action > .ovk-msg-btn:hover,
+     .platform-ios .ovk-msg-dialog .ovk-diag-action > .ovk-msg-btn:active {
+        background-color: color-mix(in srgb, var(--text-color) 8%, transparent) !important;
+        color: var(--accent-color-2) !important;
+    }
+    /* iOS menus are translucent blurred cards with hairline separators */
+    .platform-ios .ui_actions_menu,
+    .platform-ios .msg-dropdown-menu {
+        padding: 0;
+        background: color-mix(in srgb, var(--module-background-color) 88%, transparent);
+        -webkit-backdrop-filter: blur(20px) saturate(1.8);
+        backdrop-filter: blur(20px) saturate(1.8);
+        border: none;
+        border-radius: 13px;
+        overflow: hidden;
+        box-shadow: 0 0 0 0.5px rgba(0,0,0,.12), 0 4px 16px rgba(0,0,0,.12), 0 16px 48px rgba(0,0,0,.22);
+    }
+    .platform-ios .ui_actions_menu a,
+    .platform-ios .ui_actions_menu .ui_actions_menu_item,
+    .platform-ios .ui_actions_menu form button,
+    .platform-ios .ui_actions_menu label,
+    .platform-ios .msg-dropdown-item {
+        height: auto;
+        min-height: 44px;
+        padding: 11px 16px;
+        font-size: 17px;
+        line-height: 22px;
+    }
+    .platform-ios .ui_actions_menu > * + *:not(.separator):not(.ui_actions_menu_sep),
+    .platform-ios .msg-dropdown-menu > * + * {
+        border-top: 0.5px solid var(--border-color);
+    }
+    .platform-ios .ui_actions_menu .separator,
+    .platform-ios .ui_actions_menu .ui_actions_menu_sep {
+        border-top-width: 0.5px;
+    }
+    /* iOS menus scale open from the trigger's anchor edge — `scale`, not
+       `transform`, since the positioner writes `transform: none` inline */
+    .platform-ios .ui_actions_menu {
+        scale: 0.75;
+        transform-origin: calc(100% - 30px) top;
+        transition:
+        opacity 160ms linear,
+        visibility 160ms linear,
+        scale 180ms cubic-bezier(.32,.72,0,1);
+    }
+    .platform-ios .ui_actions_menu_wrap.shown .ui_actions_menu {
+        scale: 1;
+    }
+    .platform-ios .ui_actions_menu_left_align .ui_actions_menu,
+    .platform-ios .ui_actions_menu_left .ui_actions_menu {
+        transform-origin: 30px top;
+    }
+    .platform-ios .ui_actions_menu_center_align .ui_actions_menu {
+        transform-origin: center top;
+    }
+    .platform-ios .ui_actions_menu_top .ui_actions_menu {
+        transform-origin: calc(100% - 30px) bottom;
+    }
+    .platform-ios .ui_actions_menu_left_align.ui_actions_menu_top .ui_actions_menu,
+    .platform-ios .ui_actions_menu_left.ui_actions_menu_top .ui_actions_menu {
+        transform-origin: 30px bottom;
+    }
+    .platform-ios .ui_actions_menu_center_align.ui_actions_menu_top .ui_actions_menu {
+        transform-origin: center bottom;
+    }
+    /* close fades and shrinks slightly toward the same origin */
+    .platform-ios .ui_actions_menu_wrap.shown .ui_actions_menu.ui_actions_menu_hiding,
+    .platform-ios .ui_actions_menu_wrap.ui_actions_menu_top.shown .ui_actions_menu.ui_actions_menu_hiding {
+        scale: 0.9;
+        transition:
+        opacity 120ms linear,
+        visibility 120ms linear,
+        scale 120ms ease-in;
+    }
+    /* iOS rows highlight on press instead of fading */
+    .platform-ios .ui_actions_menu a:active,
+    .platform-ios .ui_actions_menu .ui_actions_menu_item:active,
+    .platform-ios .ui_actions_menu form button:active,
+    .platform-ios .ui_actions_menu label:active,
+    .platform-ios .msg-dropdown-item:active {
+        opacity: 1;
+        background-color: color-mix(in srgb, currentColor 8%, transparent);
+    }
+    /* iOS buttons */
+    .platform-ios .button,
+    .platform-ios input[class="button"],
+    .platform-ios .profile_link {
+        font-size: 15px;
+        font-weight: 600;
+    }
+    /* iOS fields are filled rounded rects; 16px+ prevents focus zoom.
+       Applies to every text-like control, not just .form_field. */
+    .platform-ios .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"], [type="file"], [type="image"]),
+    .platform-ios #login_form input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"]),
+    .platform-ios .form_field select,
+    .platform-ios .form_field textarea:not(.small-textarea),
+    .platform-ios textarea:not(.expanded-textarea):not(.small-textarea),
+    .platform-ios input[type="email"], .platform-ios input[type="number"], .platform-ios input[type="password"], .platform-ios input[type="phone"], .platform-ios input[type="text"], .platform-ios input[type~="date"], .platform-ios input[type~="time"], .platform-ios input[type~="datetime-local"], .platform-ios input[type~="email"], .platform-ios input[type~="password"], .platform-ios input[type~="phone"], .platform-ios input[type~="text"], .platform-ios input[type="url"], .platform-ios input[type~="url"], .platform-ios select, .platform-ios .PE_playlistEditPage textarea[name="description"], .platform-ios .emoji-input-wrap {
+        height: 44px;
+        padding: 10px 12px;
+        font-size: 16px;
+        line-height: 22px;
+        background-color: color-mix(in srgb, var(--text-color) 5%, transparent);
+        border: none;
+        border-radius: 10px;
+        box-shadow: none;
+    }
+    .platform-ios .form_field textarea:not(.small-textarea),
+    .platform-ios textarea:not(.expanded-textarea):not(.small-textarea) {
+        height: auto;
+        min-height: 88px;
+    }
+    .platform-ios .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"], [type="file"], [type="image"]):focus,
+    .platform-ios .form_field select:focus,
+    .platform-ios .form_field textarea:not(.small-textarea):focus,
+    .platform-ios textarea:not(.expanded-textarea):not(.small-textarea):focus,
+    .platform-ios input[type="email"]:focus, .platform-ios input[type="number"]:focus, .platform-ios input[type="password"]:focus, .platform-ios input[type="phone"]:focus, .platform-ios input[type="text"]:focus, .platform-ios input[type~="date"]:focus, .platform-ios input[type~="time"]:focus, .platform-ios input[type~="datetime-local"]:focus, .platform-ios input[type~="email"]:focus, .platform-ios input[type~="password"]:focus, .platform-ios input[type~="phone"]:focus, .platform-ios input[type~="text"]:focus, .platform-ios input[type="url"]:focus, .platform-ios input[type~="url"]:focus, .platform-ios select:focus, .platform-ios .PE_playlistEditPage textarea[name="description"]:focus, .platform-ios .emoji-input-wrap:focus-within {
+        border-bottom-color: transparent;
+        box-shadow: inset 0 0 0 1px var(--accent-color-2);
+    }
+    .platform-ios input[type="checkbox"],
+    .platform-ios input[type="radio"] {
+        accent-color: var(--accent-color-2);
+    }
+    /* iOS search is a fully rounded filled pill */
+    .platform-ios .ui_search input.ui_search_field {
+        height: 36px;
+        padding: 8px 40px 8px 38px;
+        line-height: 20px;
+        border-radius: 10px;
+        background-color: color-mix(in srgb, var(--text-color) 5%, transparent);
+    }
+    .platform-ios .ui_search input.ui_search_field:focus {
+        box-shadow: inset 0 0 0 1px var(--accent-color-2);
+    }
+    .platform-ios .ui_tab_search_wrap .ui_search input.ui_search_field,
+    .platform-ios .ui_tab_search_wrap .ui_search input.ui_search_field:focus {
+        height: 100%;
+        padding: 14px 44px 13px 28px;
+        font-size: inherit;
+        line-height: 18px;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        background-color: transparent;
+    }
+    .platform-ios .audios_search_container .audio_search_type {
+        height: 36px;
+        padding: 8px 32px 8px 12px;
+        font-size: 16px;
+        border-radius: 10px;
+        flex: none;
+    }
+    .platform-ios .ui_search_new .ui_search_button_search,
+    .platform-ios .ui_search_new.ui_search_field_empty .ui_search_button_search,
+    .platform-ios .ui_search_new .ui_search_button_search:hover {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background-color: color-mix(in srgb, var(--text-color) 5%, transparent);
+    }
+    /* iOS navigation bars are 44pt; shrink the 48px hit targets to match */
+    .platform-ios .appbar .hamburger,
+    .platform-ios .appbar-extra-btn,
+    .platform-ios .ovk-msg-fullscreen .ovk-diag-head-close,
+    .platform-ios .ovk-msg-fullscreen .ovk-diag-head-apply,
+    .platform-ios .ovk-msg-sheet .ovk-diag-head-close,
+    .platform-ios .ovk-msg-sheet .ovk-diag-head-apply,
+    .platform-ios .ovk-modal-video-window .video_top_button {
+        width: 44px;
+        height: 44px;
+    }
+    .platform-ios .appbar-extra-btn {
+        padding: 0;
+    }
+    .platform-ios .ovk-msg-sheet .ovk-diag-head {
+        height: var(--header-height);
+    }
+    /* iOS messenger */
+    .platform-ios .body_im .messenger-app--header.messages--peers-header-peer-name {
+        height: calc(var(--header-height) + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+    }
+    .platform-ios .body_im .messenger-app--header--info {
+        position: absolute;
+        left: 50%;
+        top: env(safe-area-inset-top);
+        bottom: 0;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+        max-width: calc(100% - 150px);
+    }
+    .platform-ios .body_im .messenger-app--header--name {
+        font-size: 17px;
+        font-weight: 600;
+    }
+    .platform-ios .body_im .messenger-app--header--back,
+    .platform-ios .body_im .messenger-app-header--actions {
+        height: 44px;
+    }
+    .platform-ios .body_im .messenger-app--header--back a {
+        width: 44px;
+        height: 44px;
+    }
+    .platform-ios .body_im .messages--actions {
+        height: calc(var(--header-height) + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+        box-sizing: border-box;
+    }
+    /* iOS write bar */
+    .platform-ios .body_im .messenger-app .im-chat-input {
+        box-shadow: none;
+        border-top: 0.5px solid var(--border-color);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .platform-ios .body_im .messenger-app .im-chat-input--textarea {
+        margin: 5px 96px 5px 48px;
+    }
+    .platform-ios .body_im .messenger-app .im-chat-input--txt-wrap {
+        border-radius: 18px;
+        background: color-mix(in srgb, var(--text-color) 5%, transparent);
+    }
+    /* body.body_im (element+class) is required to beat the #write.expanded-textarea
+       rules that restore the MD bar once the field expands */
+    .platform-ios body.body_im .messenger-app .im-chat-input--text,
+    .platform-ios body.body_im .messenger-app .im-chat-input--textarea textarea,
+    .platform-ios body.body_im #write.expanded-textarea .messenger-app--input---messagebox .content-editable,
+    .platform-ios body.body_im #write.expanded-textarea .messenger-app--input---messagebox .content-editable[contenteditable="true"] {
+        min-height: 36px !important;
+        padding: 8px 12px;
+        border-radius: 18px;
+        background: transparent;
+    }
+    /* icons hang off the pill's edges and sit bottom-anchored like iOS;
+       -4px centers the 44px hit target on the 36px field */
+    .platform-ios .body_im .messenger-app .im-chat-input--smile-wrap {
+        bottom: -4px;
+    }
+    .platform-ios .body_im .messenger-app .im-chat-input--selector {
+        bottom: -4px;
+    }
+    .platform-ios .body_im .messenger-app .im-chat-input--send {
+        bottom: -4px;
+    }
+    .platform-ios .body_im .messenger-app .im-chat-input--smile-wrap .emoji_picker_entrypoint,
+    .platform-ios .body_im .messenger-app .post-attach-menu:not(.post-attach-menu--inline) .post-attach-menu__trigger,
+    .platform-ios .body_im .messenger-app .im-send-btn {
+        height: 44px;
+    }
+    .platform-ios .body_im .messenger-app .im-send-btn {
+        color: var(--accent-color-2);
+    }
+    /* iPad-style sidebar */
+    .platform-ios .sidebar {
+        background-color: color-mix(in srgb, var(--module-background-color) 80%, transparent);
+        -webkit-backdrop-filter: blur(20px) saturate(1.8);
+        backdrop-filter: blur(20px) saturate(1.8);
+    }
+    .platform-ios .sidebar_inner .link {
+        height: 44px;
+        line-height: 44px;
+        margin: 0 8px;
+        padding: 0 8px;
+        border-radius: 10px;
+        font-weight: 400;
+    }
+    .platform-ios .sidebar_inner .link:hover {
+        border-top: 0;
+        background-color: color-mix(in srgb, var(--text-color) 6%, transparent);
+    }
+    .platform-ios .sidebar_inner .link:active {
+        opacity: 1;
+        background-color: color-mix(in srgb, var(--text-color) 8%, transparent);
+    }
+    .platform-ios .sidebar_inner .link .link_icon {
+        color: var(--accent-color-2);
+    }
+    .platform-ios body.dark-mode .sidebar_inner .link .link_icon {
+        color: var(--accent-color-2);
+    }
+    .platform-ios .sidebar .home_button {
+        background-color: transparent;
+        color: var(--accent-color-2);
+    }
+}

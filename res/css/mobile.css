@@ -4,6 +4,7 @@
         --layout-width: 100%;
         --page-width: 100%;
         --body-background-color: #ebedf0;
+        --button-border-radius: 2px;
         font-size: 14px;
     }
     body.mode-2018 {
@@ -831,13 +832,14 @@
         height: 36px;
         min-height: 36px;
         padding: 0 16px;
-        border-radius: 2px;
+        border-radius: var(--button-border-radius);
         font-size: 14px;
         line-height: 20px;
         font-weight: 500;
         letter-spacing: normal;
         text-transform: none;
         box-shadow: none;
+        overflow: hidden;
         transition: background-color 0.15s ease-out, color 0.15s ease-out, box-shadow 0.15s ease-out;
     }
     .button:not(.button_light):not(.profile_link):not(:disabled):not([disabled]):active,

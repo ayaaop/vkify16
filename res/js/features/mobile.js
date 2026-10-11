@@ -1,5 +1,24 @@
 (function() {
     vkify.musicPopup = vkify.musicPopup || {};
+
+    // iPadOS reports as MacIntel + touch.
+    const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent)
+        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (IS_IOS) {
+        document.documentElement.classList.add('platform-ios');
+        // ios.css ships separately so non-iOS devices never download it.
+        const mobileCss = document.querySelector('link[href*="/resource/css/mobile.css"]');
+        if (mobileCss) {
+            const iosCss = document.createElement('link');
+            iosCss.id = 'ios-css';
+            iosCss.rel = 'stylesheet';
+            iosCss.href = mobileCss.href.replace('mobile.css', 'ios.css');
+            mobileCss.after(iosCss);
+        }
+        // iOS only fires :active while a touch listener exists on the page.
+        document.addEventListener('touchstart', () => {}, { passive: true });
+    }
+
     let profileAppbarScrollHandler = null;
     let appbarElevationScrollHandler = null;
 
@@ -526,7 +545,8 @@
         + ', .messenger-app--header--ava, .messenger-app-header--more-actions--trigger';
 
     function rippleEnabled() {
-        return window.matchMedia('(max-width: 768px)').matches
+        return !IS_IOS
+            && window.matchMedia('(max-width: 768px)').matches
             && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     }
 
