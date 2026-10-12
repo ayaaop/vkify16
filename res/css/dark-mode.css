@@ -119,6 +119,7 @@ body.dark-mode {
 	--vk-im-bubble: var(--button-background-color);
 	--vk-im-bubble-hover: var(--border-color);
 	--vk-im-unread-bg: var(--button-background-color--light);
+	--vk-im-input-bg: var(--module-background-color);
 	--vk-im-badge-muted: var(--border-color-2);
 	--vk-im-date: var(--muted-text-color-2);
 	--vk-im-who: var(--muted-text-color-3);

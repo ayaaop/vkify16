@@ -201,7 +201,8 @@ body {
         0.5s box-shadow;
 }
 
-.layout {
+.layout,
+body:has(#im_container.compact) .layout, body:has(#im_container.compact) #page_layout {
     width: var(--layout-width);
     transition: .2s width;
 }
