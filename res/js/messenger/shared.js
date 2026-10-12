@@ -50,10 +50,13 @@ export const BANNER_HIDE_FLAG = 'tw.im.hide_new_interface_banner';
 // dropped this); idempotent, safe to call from any render path.
 export function syncBodyNoScroll() {
     try {
+        // window.im survives AJAX swaps; stray renders mustn't pin no-scroll off-IM.
+        const onImPage = Boolean(document.querySelector('#im_container'))
+            || /^\/im(?:\/|$)/.test(window.location.pathname);
         const im = (typeof window !== 'undefined') ? window.im : null;
         const messenger = im && im.messenger;
         let inChat = false;
-        if (messenger && im && typeof im.getSelectedTab === 'function') {
+        if (onImPage && messenger && im && typeof im.getSelectedTab === 'function') {
             const tab = im.getSelectedTab();
             const tabId = tab && typeof tab.getPageId === 'function' ? tab.getPageId() : '';
             inChat = tabId === 'messenger'
