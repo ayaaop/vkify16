@@ -1048,7 +1048,6 @@ h2.page_block_h2 {
     height: auto;
 }
 
-
 .page_block_header:hover {
     text-decoration: none;
 }
@@ -1451,7 +1450,6 @@ select:focus,.content-editable:focus {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    position: relative;
     height: 30px;
     line-height: 30px;
     padding: 0 13px;
@@ -1786,18 +1784,15 @@ select:focus,.content-editable:focus {
 /* Progress bar */
 .progress {
     width: 250px;
-    height: 18px;
     margin: auto;
     background: #fff;
     border: 1px solid #ccc;
 }
 .progress .progress-bar {
-    height: 18px;
     background: #597da3 url(../progress_grad.gif) repeat;
     border: 1px solid #45688e;
     margin: -1px;
 }
-
 
 .ui_actions_menu_wrap {
     --ui-actions-menu-chevron-inset: 0px;

@@ -20,7 +20,6 @@
   color: var(--muted-text-color-2);
 }
 
-
 .edit_link {
   color: var(--muted-text-color) !important;
 }
@@ -127,8 +126,6 @@
   margin: -1px 0 0 5px;
 }
 
-
-
 .page_album_nocover {
   background: var(--album-background-color)
     url(../camera_big.png) no-repeat 50% 45%;
@@ -198,7 +195,6 @@
   height: 132px;
 }
 
-
 .video_module .video {
   position: relative;
   display: block;
@@ -233,7 +229,6 @@
 .video_module .video div.page_video_play_icon:hover {
   background-color: var(--video-overlay-background-hover);
 }
-
 
 .video_module .video .page_video_thumb {
   width: 100%;
@@ -440,7 +435,6 @@ table.ugc-table * {
 .page_status {
   padding: 3px 0 1px;
   line-height: 16px;
-  overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-color);
 }
@@ -468,9 +462,6 @@ table.ugc-table * {
 .ugc-table tr > td:nth-of-type(1) {
   width: 165px !important;
 }
-
-
-
 
 .counts_module {
   text-align: center;
@@ -528,7 +519,6 @@ table.ugc-table * {
 }
 
 .avatar_controls .avatar_variants {
-	width: 100%;
 	margin-bottom: 0;
 	transform: translateY(100%);
   transition: all 200ms ease-in-out
@@ -568,11 +558,8 @@ div.avatar_block:hover .avatar_variants {
 }
 
 .avatar_block .add_image_text {
-  position: absolute;
   bottom: 0;
   padding: 18px 0 24px;
-  text-align: center;
-  width: 100%;
 }
 
 .avatar_controls .avatar_variants a {
@@ -589,12 +576,10 @@ div.avatar_block:hover .avatar_variants {
   margin-top: 10px;
 }
 
-
 .page_status_popup {
   border: 1px solid var(--border-color);
   background-color: var(--module-header-background-color);
   box-shadow: 0 1px 3px var(--border-color);
-  padding: 10px;
   width: 510px;
   margin: 15px 0px 0 -10px;
 }
@@ -668,7 +653,6 @@ div.avatar_block:hover .avatar_variants {
   -webkit-filter: none;
   filter: none;
 }
-
 
 .profile_warning_label {
   overflow: hidden;

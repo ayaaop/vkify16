@@ -451,7 +451,6 @@
 
 .ovk-modal-player-window #ovk-player-part {
   height: unset;
-	background: black;
 	padding: 0;
   flex: 0 1 auto;
   min-height: 0;
@@ -582,7 +581,6 @@
 .ovk-photo-view-dimmer.ovk-msg-minimized {
   pointer-events: auto;
   width: 400px;
-  min-width: 200px;
   height: 300px;
   min-height: 160px;
   right: auto;
@@ -632,20 +630,13 @@
 }
 
 .ovk-photo-view-dimmer.ovk-msg-minimized .top-part {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 5px 3px;
-  user-select: none;
 }
 
 .ovk-photo-view-dimmer.ovk-msg-minimized .top-part b {
   color: var(--cinema, #fff);
   font-size: 12px;
   max-width: 250px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .ovk-photo-view-dimmer.ovk-msg-minimized .ovk-modal-video-window .center-part {
@@ -670,11 +661,6 @@
   height: 100% !important;
   position: relative !important;
   object-fit: contain;
-}
-
-.ovk-photo-view-dimmer.ovk-msg-minimized #ovk-player-info,
-.ovk-photo-view-dimmer.ovk-msg-minimized .bottom-part {
-  display: none;
 }
 
 .ovk-photo-view-dimmer.ovk-msg-minimized .ui-resizable-e,
@@ -1290,7 +1276,6 @@ body:not(.dark-mode) {
   width: 100%;
   min-height: 200px;
 }
-
 
 .ovk-msg-sheet #repost_signs {
   display: none !important;

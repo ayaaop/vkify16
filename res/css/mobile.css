@@ -919,10 +919,6 @@
         background: transparent;
     }
 
-    .peer-title-edit-wrap {
-        width: 100%;
-    }
-
     /* forms */
     .form_group .form_field,.game_edit {
         flex-direction: column;
@@ -1058,11 +1054,7 @@
         min-width: min(280px, calc(100vw - 80px));
         padding: 0 !important;
         height: auto!important;
-        top: 50%;
         bottom: auto;
-        left: 50%;
-        margin-right: -50%;
-        transform: translate(-50%, -50%);
         animation: mdDialogIn 0.2s ease-out;
         background-color: transparent !important;
     }
@@ -2282,7 +2274,6 @@
     .bigPlayer .bigPlayerWrapper {
         grid-template-columns: auto 1fr auto;
         padding: 0 10px;
-        align-items: center;
     }
     .bigPlayer,
     .bigPlayer .bigPlayerWrapper {
@@ -3120,7 +3111,6 @@
 
     /* messages */
     .messenger-app--messages---message {
-        position: relative;
         padding: 16px 8px 13px;
     }
 
@@ -3379,9 +3369,6 @@
         border-bottom-color: transparent;
         box-shadow: none;
     }
-    .stickers_gift_selector_box.is-empty .stickers_gift_input {
-        padding-left: 18px;
-    }
     .stickers_gift_token {
         min-height: 28px;
         font-size: 13px;
@@ -3584,7 +3571,6 @@
         border-top: 1px solid var(--border-color);
         margin: 0;
     }
-
 
     /* touch ripples */
 
