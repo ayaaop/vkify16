@@ -1762,7 +1762,9 @@ body:not(.im_mobile) #im_container.compact .messenger-app--messages---message>.m
     padding-left: 43px;
 }
 
+/* Upstream hides the selection gutter in compact; VK keeps it. */
 body:not(.im_mobile) #im_container.compact .messenger-app--messages---message .click-territory {
+    display: flex !important;
     width: 43px;
 }
 
@@ -3702,6 +3704,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 #im_container.compact .im_page.page-other {
     margin-left: 0;
     margin-top: 0;
+    position: static;
     width: var(--messenger-width);
     height: calc(100vh - var(--header-height) - 15px);
     height: calc(100dvh - var(--header-height) - 15px);

@@ -72,10 +72,6 @@ export async function installConversationsRenderer({ html, render, h, Fragment, 
             convs = orig_convs;
         }
 
-        if (convs.length === 0 && window.im?.conversations && !window.im.conversations.isLoadingMore && !window.im.conversations._hasNoMore && window.im.conversations.all_convs.length === 0) {
-            window.im.conversations.loadNext().then(() => this.update()).catch(console.error);
-        }
-
         const showBanner = shouldShowBanner(this) && !isCompactMode();
         const handleDismissBanner = (e) => {
             if (e && e.preventDefault) {
@@ -90,6 +86,8 @@ export async function installConversationsRenderer({ html, render, h, Fragment, 
                 conversations=${convs}
                 hasMore=${window.im.conversations.has_more_items}
                 isLoadingMore=${window.im.conversations.isLoadingMore}
+                hasError=${window.im.conversations.hasError}
+                onRetry=${() => this.retryLoad()}
                 onLoadMore=${(e) => this.loadNext(e)}
                 onCreateChat=${() => this._chatCreationModal()}
                 onSearch=${(e) => this._onMessagesSearch(e)}

@@ -211,6 +211,13 @@ export async function installMessengerRenderer() {
 
         this.getNode().addClass('page-other');
 
+        // While forwarding, upstream shows the empty-state hint in the chat pane.
+        const convTab = window.im?.tabs?.find(t => t.getPageId() === 'conversations');
+        if (convTab?.options?.forward?.length > 0) {
+            render(html`<${ErrorConversation} isForward=${true} />`, container);
+            return;
+        }
+
         const currentConv = orig_messenger.getCurrentChat();
         if (!currentConv) {
             render(html`<${ErrorConversation} />`, container);
