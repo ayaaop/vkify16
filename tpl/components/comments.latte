@@ -1,3 +1,4 @@
+{php if (!function_exists('vkifyTr')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_i18n.php';}
 {var $canComment = $thisUser && $parent->canBeCommentedBy($thisUser)}
 {var $parentPrefix = match($model ?? '') {
     'photos' => '/photo',
@@ -8,7 +9,7 @@
     default => null
 }}
 {var $commentsFetchUrl = $parentPrefix && isset($parent) ? ($parentPrefix . $parent->getPrettyId() . (isset($sort) && $sort ? ('?sort=' . $sort) : '')) : null}
-{if sizeof($comments) > 0 || $canComment}
+{if sizeof($comments) > 0 || $thisUser}
     <div id="replies" class="page_block comments">
         {if isset($sort) && !is_null($sort) && $count > 5}
             <div class="post_replies_header">
@@ -30,10 +31,11 @@
                 {/foreach}
                 {include "paginator.latte", conf => (object) ["page" => $page, "count" => $count, "amount" => sizeof($comments), "perPage" => 10, "fetchUrl" => $commentsFetchUrl]}
             </div>
-        {else}
+        {elseif $canComment}
             {include "../components/content_error.latte", id => "none_tip", icon => "first_comment.png", description=> tr("comments_tip")}
             <div class='scroll_container' n:attr="data-fetch-url => $commentsFetchUrl"></div>
         {/if}
+        <div class="wl_post_reply_form_forbidden" n:if="$thisUser && !$canComment">{=vkifyTr('comments_restricted')}</div>
     </div>
 {/if}
 <div n:if="$canComment" id="standaloneCommentBox">

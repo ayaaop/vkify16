@@ -2418,6 +2418,16 @@ table,
     border-top-right-radius: 0;
 }
 
+.wl_post_reply_form_forbidden {
+    background: var(--vk-im-input-bg);
+    color: var(--muted-text-color);
+    font-size: 12.5px;
+    font-weight: 500;
+    border-top: 1px solid var(--border-color);
+    padding: 16px 25px;
+    border-radius: 0 0 4px 4px;
+}
+
 .sort_link_icon {
     background: url("data:image/svg+xml;charset=utf-8,%3Csvg%20height%3D%224%22%20viewBox%3D%22944%201152%208%204%22%20width%3D%228%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22m945.2%201152.2c-.3-.2-.7-.2-.9.1s-.2.7.1.9l3.2%202.6c.2.2.6.2.8%200l3.2-2.6c.3-.2.3-.6.1-.9s-.6-.3-.9-.1l-2.8%202.3z%22%20fill%3D%22%2392a0b1%22%2F%3E%3C%2Fsvg%3E")
         no-repeat right 6px;

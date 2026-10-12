@@ -93,7 +93,8 @@ if (!function_exists('vkifyGetStrings')) {
                     'other_results' => 'Other results...',
                     'document_preview_unavailable' => 'The preview for this document is not available.',
                     'loading_messenger' => 'Loading messenger...',
-                    'loading_messenger_part2' => 'This load time is abnormal. PLease try switching back to the default theme — if the messenger loads fine there, send a bugreport to <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">GitHub</a>.'
+                    'loading_messenger_part2' => 'This load time is abnormal. PLease try switching back to the default theme — if the messenger loads fine there, send a bugreport to <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">GitHub</a>.',
+                    'comments_restricted' => 'Commenting on this post has been restricted'
                 ],
                 'ru' => [
                     'add_tracks' => 'Добавить аудиозаписи',
@@ -180,7 +181,8 @@ if (!function_exists('vkifyGetStrings')) {
                     'other_results' => 'Другие результаты...',
                     'document_preview_unavailable' => 'Предпросмотр этого документа недоступен.',
                     'loading_messenger' => 'Загрузка мессенджера...',
-                    'loading_messenger_part2' => 'Мессенджер загружается слишком долго. Попробуйте переключиться обратно на стандартную тему — если там все нормально, отправьте багрепорт на <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">GitHub</a>.'
+                    'loading_messenger_part2' => 'Мессенджер загружается слишком долго. Попробуйте переключиться обратно на стандартную тему — если там все нормально, отправьте багрепорт на <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">GitHub</a>.',
+                    'comments_restricted' => 'Комментирование записи ограничено'
                 ],
                 'uk' => [
                     'add_tracks' => 'Додати аудіозаписи',
