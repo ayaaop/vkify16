@@ -89,6 +89,10 @@
                     {if $post->canBeEditedBy($thisUser) && !($forceNoEditLink ?? false)}
                         <a class="edit" id="editPost" onclick="onPostEditButtonClick(event)">{_edit}</a>
                     {/if}
+                    {if $post->canCloseComments($thisUser)}
+                        <a n:if="!$post->isCommentsClosed()" onclick="onCloseCommentsClick(event, true, {$post->getPrettyId()}, 'wall')">{_close_post_comments}</a>
+                        <a n:if="$post->isCommentsClosed()" onclick="onCloseCommentsClick(event, false, {$post->getPrettyId()}, 'wall')">{_open_post_comments}</a>
+                    {/if}
                     <a n:if="$canBeDeleted && !($forceNoDeleteLink ?? false)" class="delete" n:attr="id => $postPage ? '_ajaxDelete' : '_wallDelete', data => $postPage ? null : $post->getPrettyId()" href="/wall{$post->getPrettyId()}/delete">{_delete}</a>
                     {if $canBeArchived && !($forceNoDeleteLink ?? false)}
                     <a n:attr="data-post-page => $postPage ? '1' : null" class="archive_post" onclick="onArchivePostButtonClick(event)" href="/wall{$post->getPrettyId()}/archive?hash={rawurlencode($csrfToken)}">
@@ -212,7 +216,7 @@
                 {include "comment.latte", comment => $comment, compact => true}
             {/foreach}
         </div>
-        <div n:ifset="$thisUser" class="commentsTextFieldWrap">
+        <div n:if="$thisUser && $post->canBeCommentedBy($thisUser)" class="commentsTextFieldWrap">
             {var $commentsURL = "/al_comments/create/posts/" . $post->getId()}
             {var $club = is_null($club) ? ($post->getTargetWall() < 0 ? (new openvk\Web\Models\Repositories\Clubs)->get(abs($post->getTargetWall())) : NULL) : $club}
             {include "textArea.latte", route => $commentsURL, postOpts => false, graffiti => (bool) ovkGetQuirk("comments.allow-graffiti"), post => $post, club => $club}

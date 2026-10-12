@@ -1,4 +1,4 @@
-{var $canComment = isset($thisUser)}
+{var $canComment = $thisUser && $parent->canBeCommentedBy($thisUser)}
 {var $parentPrefix = match($model ?? '') {
     'photos' => '/photo',
     'videos' => '/video',

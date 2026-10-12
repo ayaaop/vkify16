@@ -56,6 +56,10 @@
                                 <a n:if="$canEdit ?? false" href="/video{$video->getPrettyId()}/remove">
                                     {tr('delete')}
                                 </a>
+                                {if $video->canCloseComments($thisUser)}
+                                    <a n:if="!$video->isCommentsClosed()" onclick="onCloseCommentsClick(event, true, {$video->getPrettyId()}, 'video')">{_close_post_comments}</a>
+                                    <a n:if="$video->isCommentsClosed()" onclick="onCloseCommentsClick(event, false, {$video->getPrettyId()}, 'video')">{_open_post_comments}</a>
+                                {/if}
                                 <a n:if="$canReport ?? false" href="javascript:reportVideo({$video->getId()})">
                                     {tr('report')}
                                 </a>
