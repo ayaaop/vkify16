@@ -54,6 +54,7 @@ body {
     --vk-im-icon-green: #4bb34b;
     --vk-im-icon-red: #e64646;
     --vk-im-danger: #cb4f4f;
+    --vk-im-empty: #929eb0;
 }
 
 html:has(.body_im),body.body_im,.body_im .layout {
@@ -2744,6 +2745,27 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 #im_floating_date_text:hover {
     color: var(--text-color);
     border-color: var(--border-color-2);
+}
+
+/* VK empty state: icon over a muted hint in a 180px column. */
+.im-empty-conversation--content {
+    max-width: 180px;
+}
+
+.im-empty-conversation--image {
+    width: 69px;
+    height: 66px;
+    margin-bottom: 20px;
+}
+
+.im-empty-conversation--text {
+    color: var(--vk-im-empty);
+    font-size: 13px;
+    line-height: 22px;
+}
+
+.im-empty-conversation .im-page--cancel-fwd {
+    margin-top: 8px;
 }
 
 /* Unread divider */

@@ -136,6 +136,7 @@ body.dark-mode {
 	--vk-im-icon: var(--muted-text-color-2);
 	--vk-im-icon-blue: var(--accent-color-2);
 	--vk-im-danger: var(--message-warning-border);
+	--vk-im-empty: var(--muted-text-color-2);
 }
 
 body.dark-mode .home_navigation .top_nav_btn_icon,

@@ -112,6 +112,19 @@ export async function installMessengerRenderer() {
     const PinnedMessageBar = createPinnedMessageBar({ html, tr });
     const VkActionsBar = createActionsBar({ html, tr });
 
+    // VK empty state: icon over a muted hint, plus a cancel button when forwarding.
+    const VkEmptyConversation = ({ isForward = false, onCancel = null }) => html`
+        <div class="im-empty-conversation ${isForward ? 'is-forward' : ''}">
+            <div class="im-empty-conversation--content">
+                <img src=${isForward
+                    ? '/assets/packages/static/openvk/img/im/reply_diag.png'
+                    : '/assets/packages/static/openvk/img/im/empty_diag.png'} class="im-empty-conversation--image" alt="" />
+                <div class="im-empty-conversation--text">${tr(isForward ? 'im_forward_dialog_hint' : 'im_empty_dialog_hint')}</div>
+                ${isForward ? html`<button type="button" class="flat_button secondary im-page--cancel-fwd" onClick=${onCancel}>${tr('cancel')}</button>` : ''}
+            </div>
+        </div>
+    `;
+
     const use2018 = window.vkify ? window.vkify.getSetting('mode2018') : false;
     const InputAreaComponent = (use2018 || isMobileViewport()) ? VkInputArea : StockInputArea;
 
@@ -214,13 +227,14 @@ export async function installMessengerRenderer() {
         // While forwarding, upstream shows the empty-state hint in the chat pane.
         const convTab = window.im?.tabs?.find(t => t.getPageId() === 'conversations');
         if (convTab?.options?.forward?.length > 0) {
-            render(html`<${ErrorConversation} isForward=${true} />`, container);
+            const onCancel = () => convTab.render_class?.onCancelForward?.();
+            render(html`<${VkEmptyConversation} isForward=${true} onCancel=${onCancel} />`, container);
             return;
         }
 
         const currentConv = orig_messenger.getCurrentChat();
         if (!currentConv) {
-            render(html`<${ErrorConversation} />`, container);
+            render(html`<${VkEmptyConversation} />`, container);
             return;
         }
 
