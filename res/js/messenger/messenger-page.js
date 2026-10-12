@@ -116,9 +116,7 @@ export async function installMessengerRenderer() {
     const VkEmptyConversation = ({ isForward = false, onCancel = null }) => html`
         <div class="im-empty-conversation ${isForward ? 'is-forward' : ''}">
             <div class="im-empty-conversation--content">
-                <img src=${isForward
-                    ? '/assets/packages/static/openvk/img/im/reply_diag.png'
-                    : '/assets/packages/static/openvk/img/im/empty_diag.png'} class="im-empty-conversation--image" alt="" />
+                <div class="im-empty-conversation--image"></div>
                 <div class="im-empty-conversation--text">${tr(isForward ? 'im_forward_dialog_hint' : 'im_empty_dialog_hint')}</div>
                 ${isForward ? html`<button type="button" class="flat_button secondary im-page--cancel-fwd" onClick=${onCancel}>${tr('cancel')}</button>` : ''}
             </div>

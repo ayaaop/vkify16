@@ -2756,6 +2756,14 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     width: 69px;
     height: 66px;
     margin-bottom: 20px;
+    background: url(../icons/empty_icon.png) no-repeat top;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .im-empty-conversation--image {
+        background-image: url(../icons/empty_icon_2x.png);
+        background-size: 69px 66px;
+    }
 }
 
 .im-empty-conversation--text {
