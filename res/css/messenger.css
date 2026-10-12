@@ -1712,22 +1712,6 @@ body #im_container.compact .crp-list .crp-entry--message---av {
     border-bottom-right-radius: 4px;
 }
 
-body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---message.unread:not(.msg-selected):not(.msg-editing-this) {
-    margin-left: 23px;
-    margin-right: 23px;
-    border-radius: 0;
-}
-
-#im_container:not(.compact) .messenger-app--messages---message.unread:not(.msg-selected):not(.msg-editing-this)>.messenger-app--messages---message--wrap {
-    padding-left: 7px;
-    padding-right: 7px;
-}
-
-#im_container:not(.compact) .messenger-app--messages---message.unread:not(.msg-selected):not(.msg-editing-this) .click-territory {
-    left: -23px;
-    width: 23px;
-}
-
 #im_container:not(.compact) .messenger-app--messages---message:not(.unread)+.messenger-app--messages---message.unread:not(.msg-selected),
 #im_container:not(.compact) .messenger-app--messages---message.unread:first-child:not(.msg-selected) {
     border-top-left-radius: 3px;
