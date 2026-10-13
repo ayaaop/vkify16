@@ -31,7 +31,7 @@ const contracts = [
     // present in the bundle, not DOM selectors)
     'updateMountainButton',
     'isLoadingMore',
-    'all_convs',
+    'conversations.convs',
 ];
 
 let src;

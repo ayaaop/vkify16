@@ -258,7 +258,7 @@
   position: absolute;
   top: 0;
   height: 100%;
-  width: 100px;
+  width: 150px;
 }
 .pv_photo .pv_nav_left .pv_nav_btn {
   left: 0;
@@ -276,8 +276,6 @@
   position: absolute;
   top: 50%;
   margin-top: var(--nav_btn_icon_margin);
-  opacity: 0.5;
-  transition: opacity 300ms ease;
 }
 .pv_photo .pv_nav_left .pv_nav_arrow {
   left: 30px;
@@ -287,7 +285,7 @@
   background-position: 0 -63px;
 }
 .pv_photo :is(.pv_nav_left, .pv_nav_right):hover {
-  opacity: 0.75;
+  opacity: 0.5;
 }
 
 .pv_photo :is(.pv_nav_left, .pv_nav_right):has(.pv_nav_btn:hover) {
@@ -296,11 +294,68 @@
 
 .pv_right:empty {
   width: 0;
+  border-left: none;
   transition: 0.2s;
 }
 .pv_left:has(+ .pv_right:empty) {
   width: 100%;
   transition: 0.2s;
+}
+
+/* telegram photo viewer */
+.ovk-photo-view-dimmer.mode-tg .ovk-photo-view-window {
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  transform: none;
+}
+.ovk-photo-view-dimmer.mode-tg .photo_top_button {
+  padding: 20px;
+}
+.ovk-photo-view-dimmer.mode-tg .pv_wrapper:not(.mobile-photo-modal) {
+  min-width: 0;
+  min-height: 0;
+  max-height: none;
+  height: 100%;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  flex-direction: row;
+}
+.ovk-photo-view-dimmer.mode-tg .pv_wrapper:not(.mobile-photo-modal) .pv_left {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  float: none;
+}
+.ovk-photo-view-dimmer.mode-tg .pv_wrapper:not(.mobile-photo-modal) .pv_photo {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ovk-photo-view-dimmer.mode-tg .pv_wrapper:not(.mobile-photo-modal) .pv_photo img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+.ovk-photo-view-dimmer.mode-tg .pv_wrapper .pv_right {
+  display: none;
+}
+.ovk-photo-view-dimmer.mode-tg #photo_top_controls {
+  right: 0;
+  z-index: 1000;
+}
+.ovk-photo-view-dimmer.mode-tg .pv_album_name,
+.ovk-photo-view-dimmer.mode-tg .pv_counter {
+  color: #cccccc;
 }
 .private .pv_bottom_info {
   min-height: 0;

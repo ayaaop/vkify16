@@ -618,9 +618,8 @@ vkify.once('mediaModals', function () {
         }
 
         if (this.context.type == "chat" || this.mode == "tg" || this.context.type == null || (this.context.not_load_comments || false) == true) {
-            if (window.im && window.im.state.is_debug) {
-                this._getCurrentEntryCacheNode().last().innerHTML = itemId;
-            }
+            const cacheNode = this._getCurrentEntryCacheNode().last();
+            cacheNode.innerHTML = (window.im && window.im.state.is_debug) ? itemId : '';
             if (isMobileModal) {
                 clearMobilePhotoFooter(this);
             }
