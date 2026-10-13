@@ -460,6 +460,10 @@
   right: -64px;
   z-index: 100;
   height: 100%;
+  pointer-events: none;
+}
+#video_top_controls_wrapper #video_top_controls {
+  pointer-events: all;
 }
 #video_top_controls {
   position: sticky;
@@ -900,6 +904,49 @@
 }
 .post_popup_modal .pr {
   padding: 40px 0;
+}
+
+.post_popup_modal .post_nav {
+  display: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 70px;
+  cursor: pointer;
+  z-index: 4;
+}
+.post_popup_modal .post_nav.shown {
+  display: block;
+}
+.post_popup_modal .post_nav_btn {
+  display: none !important;
+}
+.post_popup_modal .post_nav_left {
+  left: max(0px, calc((100vw - (var(--page-width) - 245px)) / 2 - 70px));
+}
+.post_popup_modal .post_nav_right {
+  right: max(0px, calc((100vw - (var(--page-width) - 245px)) / 2 - 70px));
+}
+.post_popup_modal .post_nav_arrow {
+  position: absolute;
+  top: 50%;
+  margin-top: -15px;
+  width: 20px;
+  height: 30px;
+  background: url(../icons/pv_layer_controls.png) no-repeat;
+  opacity: 0.4;
+  transition: opacity 0.15s ease-in-out;
+}
+.post_popup_modal .post_nav_left .post_nav_arrow {
+  left: 25px;
+  background-position: 0 -25px;
+}
+.post_popup_modal .post_nav_right .post_nav_arrow {
+  right: 25px;
+  background-position: 0 -63px;
+}
+.post_popup_modal .post_nav:hover .post_nav_arrow {
+  opacity: 1;
 }
 
 /* attach shenanigans */

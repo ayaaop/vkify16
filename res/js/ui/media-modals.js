@@ -64,6 +64,16 @@ vkify.once('mediaModals', function () {
         PostViewer.openById(e, postId);
     }, true);
 
+    document.addEventListener('keydown', (e) => {
+        if (e.keyCode !== 37 && e.keyCode !== 39) return;
+        const target = e.target;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+        const stack = window.messagebox_stack || [];
+        const top = stack[stack.length - 1];
+        if (!top || top.hidden || !(top._viewer instanceof PostViewer)) return;
+        top._viewer.slide(e.keyCode === 37 ? -1 : 1);
+    });
+
     PhotoViewer.openById = async function (ids, event = null) {
         if (ids && (typeof ids.preventDefault === 'function' || ids.target || ids instanceof Event)) {
             const t = ids;
@@ -906,6 +916,12 @@ vkify.once('mediaModals', function () {
                             <svg class="video_top_svg mobileonly" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><use href="#cancel-24"></use></svg>
                         </div>
                         <span class="video_viewer_title mobileonly">${tr('post')}</span>
+                        <div class="video_top_button post_nav_btn post_nav_back" role="button" tabindex="0" aria-label="${tr('paginator_back')}">
+                            <svg class="video_top_svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><use href="#chevron-left-outline-24"></use></svg>
+                        </div>
+                        <div class="video_top_button post_nav_btn post_nav_next" role="button" tabindex="0" aria-label="${tr('paginator_next')}">
+                            <svg class="video_top_svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><use href="#chevron-right-outline-24"></use></svg>
+                        </div>
                     </div>
                 </div>
                 <div class="page_block post_viewer_page">
@@ -917,6 +933,8 @@ vkify.once('mediaModals', function () {
                     </div>
                 </div>
             </div>
+            <div id="move_back" class="post_nav post_nav_left post_nav_back"><div class="post_nav_arrow"></div></div>
+            <div id="move_next" class="post_nav post_nav_right post_nav_next"><div class="post_nav_arrow"></div></div>
         </div>
         `);
 
@@ -931,8 +949,8 @@ vkify.once('mediaModals', function () {
             .attr('data-id', this.modal.id);
 
         this.modal.getNode().find('#ovk-photo-close, .ovk-photo-view-overlay').on('click', () => this.close());
-        this.modal.getNode().find('#move_back').on('click', () => this.slide(-1));
-        this.modal.getNode().find('#move_next').on('click', () => this.slide(1));
+        this.modal.getNode().find('.post_nav_back').on('click', (e) => { e.preventDefault(); this.slide(-1); });
+        this.modal.getNode().find('.post_nav_next').on('click', (e) => { e.preventDefault(); this.slide(1); });
 
         this.modal.getNode().on('click', (e) => {
             const link = e.target && typeof e.target.closest === 'function' ? e.target.closest('.sort_link') : null;
@@ -968,6 +986,14 @@ vkify.once('mediaModals', function () {
         if (details_only || item != null) {
             this.modal.getNode().find('#itemContentComments').html(item.cached);
         }
+
+        const idx = item && item.id ? this.itemsOrder.indexOf(item.id) : this.currentIndex;
+        const loadable = this._isLoadable();
+        const canPrev = idx > 0 || (loadable && this.context.offset > 0);
+        const canNext = (idx > -1 && idx < this.count - 1)
+            || (loadable && this.context.offset + this.context.perPage < (this.totalItemsCount || 0));
+        this.modal.getNode().find('.post_nav_back').nodes.forEach((el) => el.classList.toggle('shown', canPrev));
+        this.modal.getNode().find('.post_nav_next').nodes.forEach((el) => el.classList.toggle('shown', canNext));
 
         if (item && (this.currentId != item.id)) {
             this.modal.getNode().find('#itemContent').html(item.html);
