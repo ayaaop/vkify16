@@ -958,7 +958,8 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     color: var(--muted-text-color);
 }
 
-.messages--peers-tabs .messages--peers-tab.unread .messages--peers-tab-counter {
+.messages--peers-tabs .messages--peers-tab.unread .messages--peers-tab-counter,
+.unread-in-list {
     margin: 0;
     min-width: 6px;
     height: 18px;
@@ -973,11 +974,11 @@ body[data-themepack="vkify16"] .at_page:not(.compact) .messages--peers-header-wr
     text-align: center;
     -webkit-font-smoothing: subpixel-antialiased;
     -moz-osx-font-smoothing: auto;
+}
 
-    /* Stock renders "+N"; VK shows a bare number. */
-    &::first-letter {
-        font-size: 0;
-    }
+/* Stock renders "+N"; VK shows a bare number. */
+.messages--peers-tabs .messages--peers-tab.unread .messages--peers-tab-counter::first-letter {
+    font-size: 0;
 }
 
 .messages--peers-tabs .messages--peers-tab-close .cross {
