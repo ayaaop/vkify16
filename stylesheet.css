@@ -2894,6 +2894,27 @@ body:not(.mode-2018) .post_full_like .side_button:hover {
     background: none;
 }
 
+.post_full_like .post_views {
+    order: 4;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    color: var(--post-meta-color);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: default;
+}
+body:not(.mode-2018) .post_full_like .side_button ~ .post_views {
+    margin-left: 6px;
+}
+.post_full_like .post_views_icon {
+    width: 14px;
+    height: 10px;
+    opacity: 0.5;
+    margin-right: 7px;
+}
+
 .suggestionControls {
     margin: 0 auto;
 }

@@ -203,6 +203,11 @@
                 <span class="action_label">{tr('share')}</span>
                 <span class="action_count" id="repostsCount{$post->getPrettyId()}" data-count="{$repostsCount}">{if $repostsCount > 0}{=vkifyFormatCount($repostsCount)}{/if}</span>
             </a>
+            {var $viewsCount = $post->getViews()}
+            <div n:if="$viewsCount" class="post_views" title="{tr('x_views', $viewsCount)}">
+                <svg class="post_views_icon"><use href="#view-14"/></svg>
+                <span class="post_views_count">{=vkifyFormatCount($viewsCount)}</span>
+            </div>
         </div>
         <div n:if="$suggestion && $canBePinned" class="suggestionControls buttons_row">
             <button class="button" id="publish_post" data-id="{$post->getId()}">{_publish_suggested}</button>
