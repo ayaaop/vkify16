@@ -294,6 +294,17 @@
                                     </div>
                                 </div>
                                 <div class="form_field settings_privacy_row">
+                                    <div class="form_label">{_privacy_setting_see_online}</div>
+                                    <div class="form_data">
+                                        <select name="page.online.read">
+                                            <option value="3" {if $user->getPrivacySetting('page.online.read') == 3}selected{/if}>{_privacy_value_anybody_short}</option>
+                                            <option value="2" {if $user->getPrivacySetting('page.online.read') == 2}selected{/if}>{_privacy_value_users_nominative}</option>
+                                            <option value="1" {if $user->getPrivacySetting('page.online.read') == 1}selected{/if}>{_privacy_value_friends}</option>
+                                            <option value="0" {if $user->getPrivacySetting('page.online.read') == 0}selected{/if}>{_privacy_value_nobody}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_see_groups}</div>
                                     <div class="form_data">
                                         <select name="groups.read">
@@ -360,6 +371,17 @@
                                     </div>
                                 </div>
                                 <div class="form_field settings_privacy_row">
+                                    <div class="form_label">{_privacy_setting_view_gifts}</div>
+                                    <div class="form_data">
+                                        <select name="gifts.read">
+                                            <option value="3" {if $user->getPrivacySetting('gifts.read') == 3}selected{/if}>{_privacy_value_anybody_dative}</option>
+                                            <option value="2" {if $user->getPrivacySetting('gifts.read') == 2}selected{/if}>{_privacy_value_users}</option>
+                                            <option value="1" {if $user->getPrivacySetting('gifts.read') == 1}selected{/if}>{_privacy_value_friends_dative}</option>
+                                            <option value="0" {if $user->getPrivacySetting('gifts.read') == 0}selected{/if}>{_privacy_value_only_me_dative}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_add_to_friends}</div>
                                     <div class="form_data">
                                         <select name="friends.add">
@@ -386,7 +408,7 @@
                                             <option value="1" {if $user->getPrivacySetting('messages.write') == 1}selected{/if}>{_privacy_value_friends}</option>
                                             <option value="0" {if $user->getPrivacySetting('messages.write') == 0}selected{/if}>{_privacy_value_nobody}</option>
                                         </select>
-                                        <p class="privacy_setting_tip">{_privacy_setting_write_messages_tip}</p>
+                                        <p class="nobold">{_privacy_setting_write_messages_tip}</p>
                                     </div>
                                 </div>
                                 <div class="form_field settings_privacy_row">
@@ -504,8 +526,17 @@
                         {include "../components/page_block_header.latte", title => "interface"}
                         <div class="form_group clear_fix settings_padding">
                             <form action="/settings?act=interface" method="POST" enctype="multipart/form-data" data-autosave="true">
-                                <input type="hidden" name="style_avatar" value="{$user->getStyleAvatar()}" />
                                 <input type="hidden" name="microblog" value="{if $user->hasMicroblogEnabled()}1{else}0{/if}" />
+                                <div class="form_field">
+                                    <div class="form_label">{_avatars_style}</div>
+                                    <div class="form_data">
+                                        <select name="style_avatar">
+                                            <option value="0" {if $user->getStyleAvatar() == 0}selected{/if}>{_arbitrary_avatars} ({_default})</option>
+                                            <option value="1" {if $user->getStyleAvatar() == 1}selected{/if}>{_cut}</option>
+                                            <option value="2" {if $user->getStyleAvatar() == 2}selected{/if}>{_round_avatars}</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="form_field">
                                     <div class="form_label">{_style}</div>
                                     <div class="form_data">
@@ -547,15 +578,15 @@
                                     <div class="form_label">{_ui_settings_window}</div>
                                     <div class="form_data">
                                         <label class="checkbox">
-                                            <input type='checkbox' data-act='localstorage_item' data-inverse="1" name='ux.disable_ajax_routing' id="ux.disable_ajax_routing">
+                                            <input type='checkbox' onchange="tweakChange(event)" data-act='localstorage_item' data-inverse="1" name='ux.disable_ajax_routing' id="ux.disable_ajax_routing">
                                             <span>{_ajax_routing}</span>
                                         </label>
                                         <label class="checkbox">
-                                            <input type='checkbox' data-act='localstorage_item' name='ux.auto_scroll' id="ux.auto_scroll">
+                                            <input type='checkbox' onchange="tweakChange(event)" data-act='localstorage_item' name='ux.auto_scroll' id="ux.auto_scroll">
                                             <span>{_auto_scroll}</span>
                                         </label>
                                         <label class="checkbox">
-                                            <input type='checkbox' data-act='localstorage_item' name='ux.gif_autoplay' id="ux.gif_autoplay">
+                                            <input type='checkbox' onchange="tweakChange(event)" data-act='localstorage_item' name='ux.gif_autoplay' id="ux.gif_autoplay">
                                             <span>{=vkifyTr('gif_autoplay')|noescape}</span>
                                         </label>
                                         <label class="checkbox">
@@ -611,6 +642,12 @@
                             <div class="form_field">
                                 <div class="form_label"></div>
                                 <div class="form_data">
+                                    <label class="checkbox"><input onchange="tweakChange(event)" data-act='localstorage_item' name='tw.im.24h' id="tw.im.24h" type="checkbox"><span>{tr("im_option_24h_format")}</span></label>
+                                </div>
+                            </div>
+                            <div class="form_field">
+                                <div class="form_label"></div>
+                                <div class="form_data">
                                     <a onClick="saveTimezoneSettings()" class="button">{_save}</a>
                                 </div>
                             </div>
@@ -630,8 +667,10 @@
                                         <label class="checkbox"><input type="checkbox" name="menu_mesagoj" n:attr="checked => $user->getLeftMenuItemStatus('messages')"><span>{_my_messages}</span></label>
                                         <label class="checkbox"><input type="checkbox" name="menu_notatoj" n:attr="checked => $user->getLeftMenuItemStatus('notes')"><span>{_my_notes}</span></label>
                                         <label class="checkbox"><input type="checkbox" name="menu_grupoj" n:attr="checked => $user->getLeftMenuItemStatus('groups')"><span>{_my_groups}</span></label>
+                                        <label class="checkbox"><input type="checkbox" name="menu_eventoj" n:attr="checked => $user->getLeftMenuItemStatus('events')"><span>{_my_events}</span></label>
                                         <label class="checkbox"><input type="checkbox" name="menu_novajoj" n:attr="checked => $user->getLeftMenuItemStatus('news')"><span>{_my_feed}</span></label>
                                         <label class="checkbox"><input type="checkbox" name="menu_aplikoj" n:attr="checked => $user->getLeftMenuItemStatus('apps')"><span>{_my_apps}</span></label>
+                                        <label class="checkbox"><input type="checkbox" name="menu_stickers" n:attr="checked => $user->getLeftMenuItemStatus('stickers')"><span>{_stickers_store}</span></label>
                                         <label class="checkbox"><input type="checkbox" name="menu_doxc" n:attr="checked => $user->getLeftMenuItemStatus('docs')"><span>{_my_documents}</span></label>
                                         <label class="checkbox"><input type="checkbox" name="menu_feva" n:attr="checked => $user->getLeftMenuItemStatus('fave')"><span>{_bookmarks_tab}</span></label>
                                         <label n:if="sizeof(\OPENVK_ROOT_CONF['openvk']['preferences']['menu']['links']) > 0" class="checkbox"><input type="checkbox" name="menu_ligiloj" n:attr="checked => $user->getLeftMenuItemStatus('links')"><span>{_additional_links}</span></label>
