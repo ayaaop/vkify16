@@ -156,8 +156,7 @@ body.body_im .page_body {
     min-height: 0;
 }
 
-#im_container.at_page #chat-page,
-#im_container.at_page .messenger-app.messenger-layer {
+#im_container.at_page #chat-page {
     flex: 1 1 auto;
     min-height: 0;
     display: flex;
@@ -358,75 +357,12 @@ body.vkify-force-classic label:has(> input#im\.modern_mode) {
     object-fit: cover;
 }
 
-/* group-chat avatar mosaics: the base .chat_table_avatar layout lives in
-   upstream messages.css, which this theme doesn't load */
+/* group-chat avatar mosaics: the layout comes from stock messages.css;
+   only the header size is themed. */
 .messenger-app--header--ava .chat_table_avatar {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: stretch;
-    box-sizing: border-box;
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    overflow: hidden;
-    background: #e4e8ec;
-}
-
-.messenger-app--header--ava .chat_table_avatar .chat_table_avatar_cell {
-    width: 100%;
-    height: 100%;
-    border-radius: 0;
-    margin: 0;
-    padding: 0;
-    border: none;
-    line-height: 0;
-    font-size: 0;
-    object-fit: cover;
-    object-position: center top;
-    image-rendering: pixelated;
-    overflow: hidden;
-    box-sizing: border-box;
-}
-
-.messenger-app--header--ava .chat_table_avatar.chat_table_avatar_double .chat_table_avatar_cell {
-    width: 50%;
-    height: 100%;
-}
-
-.messenger-app--header--ava .chat_table_avatar .chat_table_avatar_cell.pos-left {
-    object-position: left;
-}
-
-.messenger-app--header--ava .chat_table_avatar .chat_table_avatar_cell.pos-right {
-    object-position: right;
-}
-
-.messenger-app--header--ava .chat_table_avatar.chat_table_avatar_third {
-    flex-wrap: nowrap;
-}
-
-.messenger-app--header--ava .chat_table_avatar.chat_table_avatar_third .chat_table_avatar_cell.third_left {
-    width: 50%;
-    height: 100%;
-    object-position: left;
-}
-
-.messenger-app--header--ava .chat_table_avatar.chat_table_avatar_third .chat_table_avatar_third_right {
-    width: 50%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.messenger-app--header--ava .chat_table_avatar.chat_table_avatar_third .chat_table_avatar_third_right .chat_table_avatar_cell.third_right_cell {
-    width: 100%;
-    height: 50%;
-}
-
-.messenger-app--header--ava .chat_table_avatar.chat_table_avatar_more3 .chat_table_avatar_cell {
-    width: 50%;
-    height: 50%;
 }
 
 .messenger-app--header--ava .messenger-app--header--online {
@@ -647,18 +583,12 @@ body:not(.im_mobile) #im_container.compact .messages--actions .message-tab.messa
 /* Message selection actions */
 .messages--actions,
 #im_container.compact .messages--actions {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
     z-index: 11;
-    width: 100%;
     align-items: center;
     height: 50px;
     background: var(--module-background-color);
     border-bottom: 1px solid var(--border-color);
     padding: 8px;
-    box-sizing: border-box;
     line-height: 0;
 }
 
@@ -1743,10 +1673,6 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     width: 36px;
 }
 
-.messenger-app--messages---message.msg-hoverable:hover .click-territory {
-    opacity: 0.7;
-}
-
 .messenger-app--messages---message.msg-selected .click-territory {
     opacity: 1 !important;
 }
@@ -1784,11 +1710,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 }
 
 .messenger-app--messages---message .actions-2 .edit-icon:hover,
-.messenger-app--messages---message .actions-2 .pin-icon:hover,
 .messenger-app--messages---message .actions-2 .report-icon:hover,
-.messenger-app--messages---message .actions-2 .viewers-icon:hover,
-.messenger-app--messages---message .actions-2 .reply-icon:hover,
-.messenger-app--messages---message .actions-2 .delete-icon:hover {
+.messenger-app--messages---message .actions-2 .reply-icon:hover {
     opacity: 1;
 }
 
@@ -1866,9 +1789,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     margin: 0;
 }
 
-.messenger-app--messages---message.msg-sending .msg-modificators .modificator-sending,
-.messenger-app--messages---message.msg-edited .msg-modificators .modificator-edited,
-.messenger-app--messages---message.msg-pinned .msg-modificators .modificator-pinned {
+.messenger-app--messages---message.msg-sending .msg-modificators .modificator-sending {
     display: inline;
 }
 
@@ -2187,21 +2108,18 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 }
 
 .compact_video {
-    position: relative;
     border-radius: 4px;
     overflow: hidden;
     display: block;
-    width: 100%;
 }
 
 .compact_video img {
     width: 100%;
     height: auto;
     display: block;
-    object-fit: cover;
 }
 
-/* Play-button visuals come from stock main.css, which this theme doesn't load. */
+/* Stock main.css styles a 30px square button; VK's is a larger circular overlay. */
 .compact_video .play-button,
 .msg-attach-w-gif .docGalleryItem .play-button {
     width: 44px;
@@ -2209,10 +2127,6 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     border-radius: 50%;
     background: var(--video-overlay-background);
     backdrop-filter: blur(2px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -2595,17 +2509,6 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 }
 
 /* Floating sticky date pill */
-.messenger-app.messenger-layer .im_floating_date_wrap {
-    position: absolute;
-    top: 10px;
-    left: 0;
-    right: 0;
-    z-index: 5;
-    display: flex;
-    justify-content: center;
-    pointer-events: none;
-}
-
 #im_container.compact .im_floating_date_wrap {
     top: 15px;
 }
@@ -2620,9 +2523,6 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     background: var(--module-background-color);
     border: 1px solid var(--border-color-3);
     box-shadow: 0 1px 3px 0 color-mix(in srgb, var(--text-color) 10%, var(--transparent));
-    cursor: pointer;
-    pointer-events: auto;
-    user-select: none;
     transition: all 0.15s ease;
 }
 
@@ -2799,7 +2699,6 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     border-radius: 50%;
     background: transparent;
     opacity: .75;
-    padding: 0;
 }
 
 #search-page-im .im-search-calendar-btn:hover {
@@ -2828,7 +2727,6 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 #search-page-im .im-search-results {
     background: var(--bg-page);
-    min-height: 200px;
 }
 
 #search-page-im .im-search-section {
@@ -2932,11 +2830,6 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     color: var(--link-color);
 }
 
-#search-page-im .im-search-author:hover,
-#search-page-im .im-search-chat-link:hover {
-    text-decoration: underline;
-}
-
 #search-page-im .im-search-date {
     font-size: 13px;
     color: var(--muted-text-color);
@@ -2970,7 +2863,6 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 #search-page-im .im-search-empty {
     padding: 40px;
-    font-size: 13px;
     line-height: 18px;
     color: var(--muted-text-color);
 }
@@ -4355,7 +4247,6 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 /* footer */
 #user-send-dialog .modal-footer-actions {
-    display: flex;
     justify-content: flex-end;
     gap: 8px;
     margin-top: 14px;
