@@ -50,6 +50,7 @@
     vkify.registerSetting('mode2018', false, 'vkify16_2018mode');
     vkify.registerSetting('vkGraffiti', false, 'vkify16_graffiti');
     vkify.registerSetting('ovkHat', true, 'ovkhat');
+    vkify.registerSetting('postViews', true, 'vkify16_postviews');
 
     window.toggleDarkMode = function (enabled) {
         toggleTheme(enabled, 'dark-mode', 'dark-mode-css', 'dark-mode.css');
@@ -71,6 +72,11 @@
     if (vkify.getSetting('ovkHat')) window.toggleOvkHat(true);
     else window.toggleOvkHat(false);
 
+    window.togglePostViews = function (enabled) {
+        body.classList.toggle('no-post-views', !enabled);
+    };
+    window.togglePostViews(vkify.getSetting('postViews'));
+
     function bindSettingsToggles() {
         const bindToggle = (name, settingKey, applyFn) => {
             const cb = document.querySelector(`#vkifySettings input[name="${name}"]`);
@@ -87,6 +93,7 @@
         bindToggle('mode_2018', 'mode2018', window.toggle2018Mode);
         bindToggle('vkgraffiti', 'vkGraffiti', null);
         bindToggle('ovkhat', 'ovkHat', window.toggleOvkHat);
+        bindToggle('post_views', 'postViews', window.togglePostViews);
     }
 
     vkify.onPageLifecycle('afterPageReady', bindSettingsToggles, 'after');

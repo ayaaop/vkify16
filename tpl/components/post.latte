@@ -203,7 +203,7 @@
                 <span class="action_label">{tr('share')}</span>
                 <span class="action_count" id="repostsCount{$post->getPrettyId()}" data-count="{$repostsCount}">{if $repostsCount > 0}{=vkifyFormatCountSpaced($repostsCount)}{/if}</span>
             </a>
-            {var $viewsCount = $post->getViews()}
+            {var $viewsCount = ($_COOKIE['vkify16_postviews'] ?? '1') === '1' ? $post->getViews() : null}
             <div n:if="$viewsCount" class="post_views" title="{tr('x_views', $viewsCount)}">
                 <svg class="post_views_icon"><use href="#view-14"/></svg>
                 <span class="post_views_count">{=vkifyFormatCountSpaced($viewsCount)}</span>

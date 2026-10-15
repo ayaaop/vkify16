@@ -2880,16 +2880,16 @@ body:not(.body_im) .post-upload::before {
     width: 14px;
 }
 
-body:not(.mode-2018) .post_full_like .side_button {
+body:not(.mode-2018).no-post-views .post_full_like .side_button {
 	order: 3;
 	margin: 0 0 0 auto;
     padding-inline: 0;
 }
-body:not(.mode-2018) .post_full_like .side_button .action_icon,
-body:not(.mode-2018) .post_full_like .side_button .action_count {
+body:not(.mode-2018).no-post-views .post_full_like .side_button .action_icon,
+body:not(.mode-2018).no-post-views .post_full_like .side_button .action_count {
     display: none;
 }
-body:not(.mode-2018) .post_full_like .side_button:hover {
+body:not(.mode-2018).no-post-views .post_full_like .side_button:hover {
     text-decoration: underline!important;
     background: none;
 }
@@ -2906,13 +2906,19 @@ body:not(.mode-2018) .post_full_like .side_button:hover {
     cursor: default;
 }
 body:not(.mode-2018) .post_full_like .side_button ~ .post_views {
-    margin-left: 6px;
+	margin-left: 6px;
+	flex: 1 1 0;
+	justify-content: end;
 }
 .post_full_like .post_views_icon {
     width: 14px;
     height: 10px;
     opacity: 0.5;
     margin-right: 7px;
+}
+body.no-post-views .post_views,
+body:not(.no-post-views) .post .post_full_like .action_label {
+    display: none;
 }
 
 .suggestionControls {
