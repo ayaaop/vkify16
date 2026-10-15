@@ -2741,7 +2741,8 @@ body:not(.body_im) .post-upload::before {
 }
 
 .reply:not(:first-child) .reply_wrap,
-.post-menu-s {
+.post-menu-s,
+.reply + .commentsTextFieldWrap {
     border-top: 1px solid var(--border-color);
 }
 .post-menu-s .comments {

@@ -612,6 +612,19 @@ function bindAjaxPostCleanup() {
             const wrapper = post.parentElement;
             if (wrapper.childElementCount === 1) wrapper.replaceWith(post);
         });
+
+        // ajax_posting inserts comments before .commentsTextFieldWrap, but
+        // vkify16 groups them inside .comments.
+        document.querySelectorAll('.post-menu-s > .post.comment').forEach(comment => {
+            const menu = comment.parentElement;
+            let list = menu.querySelector(':scope > .comments');
+            if (!list) {
+                list = document.createElement('div');
+                list.className = 'comments';
+                menu.insertBefore(list, menu.querySelector(':scope > .commentsTextFieldWrap'));
+            }
+            list.appendChild(comment);
+        });
     });
 }
 
