@@ -691,11 +691,9 @@ body.dimmed > .dimmer #clickable {
     display: none!important;
 }
 
-/* я забыл для чего это нужно было
 .ovk-diag table td[width="120"] {
-    text-align: start;
+    line-height: 17px;
 }
-*/
 
 .ovk-diag table {
 	width: 100%;

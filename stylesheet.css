@@ -1856,6 +1856,10 @@ table,
     text-decoration: none !important;
 }
 
+#pageSelect {
+    width: auto;
+}
+
 .composer.model_content_textarea {
     font-size: 13px;
     position: relative;
