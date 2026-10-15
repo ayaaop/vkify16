@@ -221,7 +221,7 @@ body.dark-mode .button:not(.post_like, .button_light) i {
 	vertical-align: middle;
 	margin-left: 0;
 }
-.mode-2018 .post_add .action_icon,
+/*.mode-2018 .post_add .action_icon,
 .mode-2018 .post_share .action_icon {
 	display: inline-block;
 	vertical-align: middle;
@@ -233,7 +233,7 @@ body.dark-mode .button:not(.post_like, .button_light) i {
 .mode-2018 .post_add:hover .action_icon,
 .mode-2018 .post_share:hover .action_icon {
 	opacity: 1;
-}
+}*/
 .mode-2018 .AudioPlaylistSnippet__actions .action_button .action_icon {
 	background-size: auto!important;
 }

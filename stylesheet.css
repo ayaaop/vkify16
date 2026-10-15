@@ -2904,7 +2904,7 @@ body:not(.mode-2018).no-post-views .post_full_like .side_button:hover {
     display: flex;
     align-items: center;
     margin-left: auto;
-    color: var(--post-meta-color);
+    color: var(--muted-text-color-2);
     font-size: 13px;
     white-space: nowrap;
     overflow: hidden;

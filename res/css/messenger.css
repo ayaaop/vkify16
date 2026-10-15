@@ -3528,6 +3528,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     z-index: 10;
     margin: 0;
     width: 100%;
+    height: unset;
+    border-radius: 0;
     text-align: left;
 
     &:hover {
@@ -3535,6 +3537,9 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
             linear-gradient(to right, var(--module-background-color--secondary), var(--bg-page)) left / 148px 100% no-repeat
             var(--bg-page)!important;
         color: var(--vk-im-back-hover);
+    }
+    &:active {
+        box-shadow: none;
     }
 }
 #im_container:not(.compact) .peer-back.button {

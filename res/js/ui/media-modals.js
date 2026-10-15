@@ -931,9 +931,9 @@ vkify.once('mediaModals', function () {
                         <div id="itemContentComments" class="ovk-modal-details"></div>
                     </div>
                 </div>
+                <div id="move_back" class="post_nav post_nav_left post_nav_back"><div class="post_nav_arrow"></div></div>
+                <div id="move_next" class="post_nav post_nav_right post_nav_next"><div class="post_nav_arrow"></div></div>
             </div>
-            <div id="move_back" class="post_nav post_nav_left post_nav_back"><div class="post_nav_arrow"></div></div>
-            <div id="move_next" class="post_nav post_nav_right post_nav_next"><div class="post_nav_arrow"></div></div>
         </div>
         `);
 
