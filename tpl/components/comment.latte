@@ -56,7 +56,7 @@
                     {var $isLiked = $comment->hasLikeFrom($thisUser)}
                     <a class="post_like like_wrap {if $isLiked}my_like{/if}" href="/comment{$comment->getId()}/like?hash={rawurlencode($csrfToken)}" data-likes='{$likesCount}' data-id="1_{$comment->getPrettyId()}" data-type='comment'>
                         <i class="action_icon" id="{if $isLiked}liked{/if}"></i>
-                        <span class="action_count">{if $likesCount > 0}{=vkifyFormatCount($likesCount)}{/if}</span>
+                        <span class="action_count">{if $likesCount > 0}{=vkifyFormatCountSpaced($likesCount)}{/if}</span>
                     </a>
                 {/if}
                 <div class="reply_date">

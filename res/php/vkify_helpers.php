@@ -15,6 +15,19 @@ if (!function_exists('vkifyFormatCount')) {
     }
 }
 
+if (!function_exists('vkifyFormatCountSpaced')) {
+    function vkifyFormatCountSpaced(int|float $n): string
+    {
+        if ($n >= 1000000) {
+            return round($n / 1000000, 1) . 'M';
+        }
+        if ($n >= 1000) {
+            return number_format($n, 0, '', "\u{00A0}");
+        }
+        return (string) $n;
+    }
+}
+
 if (!function_exists('vkifyGetPostLikeFaces')) {
     function vkifyGetPostLikeFaces(\openvk\Web\Models\Entities\Postable $post, ?\openvk\Web\Models\Entities\User $viewer): array
     {
