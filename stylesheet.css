@@ -2330,11 +2330,14 @@ body:not(.body_im) .post-upload::before {
     color: var(--link-color);
 }
 .docListViewItem .doc_icon.page_doc_icon {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 30px;
     height: 30px;
     border-radius: 3px;
-    background: url(../resource/icons/doc_icons.png) no-repeat;
+    background-color: #77a5d6;
+    color: #fff;
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2342,23 +2345,23 @@ body:not(.body_im) .post-upload::before {
 }
 .docListViewItem .doc_icon.page_doc_icon_mp3,
 .docListViewItem .doc_icon.page_doc_icon_flac {
-    background-position: left -90px;
+    background-color: #ba68c8;
 }
 .docListViewItem .doc_icon.page_doc_icon_zip,
 .docListViewItem .doc_icon.page_doc_icon_7z,
 .docListViewItem .doc_icon.page_doc_icon_rar {
-    background-position: left -30px;
+    background-color: #76b979;
 }
 .docListViewItem .doc_icon.page_doc_icon_webm,
 .docListViewItem .doc_icon.page_doc_icon_mp4,
 .docListViewItem .doc_icon.page_doc_icon_avi {
-    background-position: left -120px;
+    background-color: #e57373;
 }
 .docListViewItem .doc_icon.page_doc_icon_djvu,
 .docListViewItem .doc_icon.page_doc_icon_ps,
 .docListViewItem .doc_icon.page_doc_icon_pdf,
 .docListViewItem .doc_icon.page_doc_icon_fb2 {
-    background-position: left -150px;
+    background-color: #ffae38;
 }
 
 .attachment .video_item .video_thumb_play {

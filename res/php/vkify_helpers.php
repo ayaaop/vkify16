@@ -35,3 +35,17 @@ if (!function_exists('vkifyGetPostLikeFaces')) {
         return ['faces' => $faces, 'liked' => $liked];
     }
 }
+
+if (!function_exists('vkifyDocGlyph')) {
+    function vkifyDocGlyph(string $ext): array
+    {
+        return match (strtolower($ext)) {
+            'mp3', 'flac'                  => ['attach-doctype-audio', 16, 18],
+            'zip', '7z', 'rar'             => ['attach-doctype-archive', 6, 30],
+            'webm', 'mp4', 'avi'           => ['attach-doctype-video', 20, 14],
+            'djvu', 'ps', 'pdf', 'fb2'     => ['attach-doctype-book', 20, 17],
+            'sketch'                       => ['attach-doctype-sketch', 24, 20],
+            default                        => ['attach-doctype-doc', 18, 18],
+        };
+    }
+}

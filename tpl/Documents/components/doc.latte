@@ -1,3 +1,4 @@
+{php if (!function_exists('vkifyDocGlyph')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
 {var $preview = $doc->hasPreview() ? $doc->getPreview() : NULL}
 {var $tags = $doc->getTags()}
 {var $copied = !isset($club) ? $doc->isCopiedBy($thisUser) : $doc->isCopiedBy($club)}
@@ -10,7 +11,9 @@
         {if $preview}
             <img class="doc_icon" alt="document_preview" src="{$preview->getURLBySizeId('tiny')}">
         {else}
+            {var $docGlyph = vkifyDocGlyph($doc->getFileExtension())}
             <div class="doc_icon page_doc_icon page_doc_icon_{$doc->getFileExtension()}">
+                <svg width="{$docGlyph[1]}" height="{$docGlyph[2]}" viewBox="0 0 {$docGlyph[1]} {$docGlyph[2]}"><use href="#{$docGlyph[0]}"/></svg>
             </div>
         {/if}
     </a>
@@ -31,7 +34,7 @@
     </div>
     <div class="doc_volume" n:if="!$hideButtons && $thisUser">
         <div class="doc_action" n:if="!$modifiable" id="report_icon" data-tip="simple-black" data-tiptitle="{_report}"></div>
-        <div class="doc_action" n:if="$modifiable" id="edit_icon" data-tip="simple-black" data-tiptitle="{_edit}"></div>
+        <div class="doc_action" n:if="$modifiable" id="edit_icon" data-tip="simple-black" data-tiptitle="{_edit}" onclick="window.vkifyDocEdit(event)"></div>
         <div class="doc_action" n:if="!$copied" id="add_icon" data-tip="simple-black" data-tiptitle="{_add}"></div>
         <div class="doc_action" n:if="$copied" id="remove_icon" data-tip="simple-black" data-tiptitle="{_remove}"></div>
     </div>

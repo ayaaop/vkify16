@@ -57,6 +57,7 @@ const modules = [
     'features/album-photos-loader.js',
     'features/audio-upload.js',
     'features/avatar-upload.js',
+    'features/doc-edit.js',
     "features/video-audio-coord.js",
     'features/video-delete.js',
     'features/messenger.js',

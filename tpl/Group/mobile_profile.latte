@@ -1,4 +1,5 @@
 {define mobileProfile, $hasMoreInfo, $albums, $audios, $topics, $followersCount, $potentialCount, $pinnedPost, $descHtml, $descPlain, $docs}
+    {php if (!function_exists('vkifyDocGlyph')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
     {include '../components/mobile_profile_hero.latte', entity => $club, name => $club->getName(), status => $club->isEvent() ? tr('event_type_open') : tr('group_type_open'), verified => $club->isVerified()}
 
     <div class="mobileonly mobile-group-content">
@@ -152,7 +153,8 @@
                             {if $docPreview}
                                 <img src="{$docPreview->getURLBySizeId('normal')}" class="msm-album-cover" alt="" />
                             {else}
-                                <div class="msm-placeholder"><div class="doc_icon page_doc_icon page_doc_icon_{$doc->getFileExtension()}"></div></div>
+                                {var $docGlyph = vkifyDocGlyph($doc->getFileExtension())}
+                                <div class="msm-placeholder"><div class="doc_icon page_doc_icon page_doc_icon_{$doc->getFileExtension()}"><svg width="{$docGlyph[1]}" height="{$docGlyph[2]}" viewBox="0 0 {$docGlyph[1]} {$docGlyph[2]}"><use href="#{$docGlyph[0]}"/></svg></div></div>
                             {/if}
                         </a>
                     {else}
@@ -163,7 +165,8 @@
                                     {if $docPreview}
                                         <img class="msm-grid__img" src="{$docPreview->getURLBySizeId('tiny')}" alt="" />
                                     {else}
-                                        <div class="doc_icon page_doc_icon page_doc_icon_{$doc->getFileExtension()}"></div>
+                                        {var $docGlyph = vkifyDocGlyph($doc->getFileExtension())}
+                                        <div class="doc_icon page_doc_icon page_doc_icon_{$doc->getFileExtension()}"><svg width="{$docGlyph[1]}" height="{$docGlyph[2]}" viewBox="0 0 {$docGlyph[1]} {$docGlyph[2]}"><use href="#{$docGlyph[0]}"/></svg></div>
                                     {/if}
                                 </a>
                             {/foreach}
