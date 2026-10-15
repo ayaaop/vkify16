@@ -93,6 +93,7 @@ body.dark-mode {
 	--post-action-color: #aaaeb3;
 	--post-action-active-color: #aaaeb3;
 	--post-meta-color: #909499;
+	--post-attach-icon-color: var(--post-meta-color);
 	--quote-border-color: #454647;
 	--search-placeholder-color: #aaaeb3;
 	--search-placeholder-focus-color: #c4c8cc;
@@ -175,12 +176,9 @@ body.dark-mode.mode-2018 .action_icon {
 body.dark-mode .video_info_actions .video_like_button .action_icon {
 	filter: invert(1);
 }
-body.dark-mode .action_button.side_button,
-body.dark-mode .side_button .action_count {
+body.dark-mode:not(.mode-2018) .action_button.side_button,
+body.dark-mode:not(.mode-2018) .side_button .action_count {
 	color: var(--link-color);
-}
-body.dark-mode a:not(.video_like_button) #liked ~ .action_count {
-	color: var(--post-action-active-color);
 }
 
 body.dark-mode .ovk-diag-head a,body.dark-mode .ovk-diag-head .divider::before {

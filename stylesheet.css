@@ -128,6 +128,7 @@ body {
     --post-action-color: #42648b;
     --post-action-active-color: #6983a0;
     --post-meta-color: #7996b5;
+    --post-attach-icon-color: #7293b6;
     --quote-border-color: #dee6ee;
     --search-placeholder-color: #929eb0;
     --search-placeholder-focus-color: #c0c8d0;
@@ -2165,20 +2166,52 @@ table,
     border-top: 1px solid var(--border-color);
     border-radius: 0 0 var(--module-border-radius) var(--module-border-radius);
 }
-.post-attach-menu__icon,
-.post-upload::before,
-.post-has-poll::before,
-.post-has-note::before,
-.attachment_note::before,
-.post-has-geo.appended-geo::before,
-.post-geo::before {
+.post-attach-menu__icon {
     width: 22px;
     height: 22px;
-    background: url(../resource/icons/post_icon.png) no-repeat;
+    opacity: 0.7;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 4px;
+    color: var(--post-attach-icon-color);
+}
+.post-attach-menu__icon svg {
+    display: block;
+}
+body:not(.body_im) .post-upload::before,
+body:not(.body_im) .post-has-poll::before,
+body:not(.body_im) .post-has-note::before,
+body:not(.body_im) .attachment_note::before,
+body:not(.body_im) .post-has-geo.appended-geo::before,
+body:not(.body_im) .post-geo::before {
+    width: 22px;
+    height: 22px;
     opacity: 0.7;
     content: "";
     display: inline-block;
     margin-right: 4px;
+    background-color: var(--post-attach-icon-color);
+    -webkit-mask-image: var(--post-icon-mask);
+    mask-image: var(--post-icon-mask);
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+body:not(.body_im) .post-has-note::before,
+body:not(.body_im) .attachment_note::before {
+    --post-icon-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2214%22%20viewBox%3D%220%200%2012%2014%22%3E%3Cpath%20transform%3D%22translate(-6%20-5)%22%20%20fill-rule%3D%22nonzero%22%20d%3D%22M8%205%20v%203.999024%20l%201.5%20-2%20l%201.5%202%20v%20-3.999024%20h%205.504455%20c%200.825967%200%201.495545%200.675249%201.495545%201.498246%20v%2010.501754%20H%207.500347%20c%20-0.271347%200%20-0.500347%200.223858%20-0.500347%200.5%20c%200%200.268067%200.224013%200.5%200.500347%200.5%20H%2018%20v%200.501733%20c%200%200.275185%20-0.229001%200.498267%20-0.500347%200.498267%20H%207.495545%20C%206.669578%2019%206%2018.324751%206%2017.501755%20v%20-11.003509%20c%200%20-0.827458%200.679554%20-1.498246%201.495545%20-1.498246%20H%208%22%2F%3E%3C%2Fsvg%3E");
+}
+body:not(.body_im) .post-has-poll::before {
+    --post-icon-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2213%22%20height%3D%2213%22%20viewBox%3D%220%200%2013%2013%22%3E%3Cpath%20transform%3D%22translate(-5.5%20-5.5)%22%20%20fill-rule%3D%22nonzero%22%20d%3D%22M11.461457%205.5%20h%201.077086%20c%200.33432%200%200.455552%200.03481%200.577774%200.100175%20c%200.122222%200.065365%200.218143%200.161286%200.283508%200.283508%20c%200.065365%200.122222%200.100175%200.243454%200.100175%200.577774%20v%2011.077086%20c%200%200.33432%20-0.03481%200.455552%20-0.100175%200.577774%20c%20-0.065365%200.122222%20-0.161286%200.218143%20-0.283508%200.283508%20c%20-0.122222%200.065365%20-0.243454%200.100175%20-0.577774%200.100175%20H%2011.461457%20c%20-0.33432%200%20-0.455552%20-0.03481%20-0.577774%20-0.100175%20c%20-0.122222%20-0.065365%20-0.218143%20-0.161286%20-0.283508%20-0.283508%20C%2010.53481%2017.994095%2010.5%2017.872863%2010.5%2017.538543%20v%20-11.077086%20c%200%20-0.33432%200.03481%20-0.455552%200.100175%20-0.577774%20s%200.161286%20-0.218143%200.283508%20-0.283508%20C%2011.005905%205.53481%2011.127137%205.5%2011.461457%205.5%20m-5%206.98435%20h%201.077086%20c%200.33432%200%200.455552%200.03481%200.577774%200.100175%20c%200.122222%200.065365%200.218143%200.161286%200.283508%200.283508%20C%208.46519%2012.990255%208.5%2013.111488%208.5%2013.445807%20v%204.077086%20c%200%200.33432%20-0.03481%200.455552%20-0.100175%200.577774%20s%20-0.161286%200.218143%20-0.283508%200.283508%20c%20-0.122222%200.065365%20-0.243455%200.100175%20-0.577774%200.100175%20h%20-1.077086%20c%20-0.33432%200%20-0.455552%20-0.03481%20-0.577774%20-0.100175%20c%20-0.122222%20-0.065365%20-0.218143%20-0.161286%20-0.283508%20-0.283508%20C%205.53481%2017.978445%205.5%2017.857213%205.5%2017.522893%20v%20-4.077086%20c%200%20-0.334319%200.03481%20-0.455552%200.100175%20-0.577774%20s%200.161286%20-0.218143%200.283508%20-0.283508%20c%200.122222%20-0.065365%200.243455%20-0.100175%200.577774%20-0.100175%20M16.461457%208.5%20h%201.077086%20c%200.33432%200%200.455552%200.03481%200.577774%200.100175%20c%200.122222%200.065365%200.218143%200.161286%200.283508%200.283508%20c%200.065365%200.122222%200.100175%200.243454%200.100175%200.577774%20v%208.077086%20c%200%200.33432%20-0.03481%200.455552%20-0.100175%200.577774%20c%20-0.065365%200.122222%20-0.161286%200.218143%20-0.283508%200.283508%20c%20-0.122222%200.065365%20-0.243454%200.100175%20-0.577774%200.100175%20h%20-1.077086%20c%20-0.334319%200%20-0.455552%20-0.03481%20-0.577774%20-0.100175%20c%20-0.122222%20-0.065365%20-0.218143%20-0.161286%20-0.283508%20-0.283508%20C%2015.53481%2017.994095%2015.5%2017.872863%2015.5%2017.538543%20v%20-8.077086%20c%200%20-0.33432%200.03481%20-0.455552%200.100175%20-0.577774%20c%200.065365%20-0.122222%200.161286%20-0.218143%200.283508%20-0.283508%20c%200.122222%20-0.065365%200.243455%20-0.100175%200.577774%20-0.100175%22%2F%3E%3C%2Fsvg%3E");
+}
+body:not(.body_im) .post-has-geo.appended-geo::before,
+body:not(.body_im) .post-geo::before {
+    --post-icon-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2213%22%20height%3D%2217%22%20viewBox%3D%220%200%2013%2017%22%3E%3Cpath%20%20fill-rule%3D%22evenodd%22%20d%3D%22M15%2C18.08%20C15%2C20.8%2018.1603687%2C24.8%2020.0917051%2C27.04%20C21.3207374%2C28.32%2021.6718895%2C28.32%2022.9009218%2C27.04%20C24.8322582%2C24.8%2027.9926269%2C20.64%2027.9926269%2C18.08%20C28.1682029%2C14.4%2025.925415%2C11%2021.6718895%2C11%20C17.050293%2C11%2015%2C14.4%2015%2C18.08%20Z%20M21.5%2C20%20C20.0294118%2C20%2019%2C18.8235294%2019%2C17.5%20C19%2C16.0294118%2020.1764706%2C15%2021.5%2C15%20C22.8235294%2C15%2024%2C16.1764706%2024%2C17.5%20C24%2C18.8235294%2022.8235294%2C20%2021.5%2C20%20L21.5%2C20%20Z%22%20transform%3D%22translate(-15%20-11)%22%2F%3E%3C%2Fsvg%3E");
+}
+body:not(.body_im) .post-upload::before {
+    --post-icon-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2215%22%20viewBox%3D%220%200%2012%2015%22%3E%3Cpath%20transform%3D%22translate(-3%20-949)%22%20%20fill-rule%3D%22nonzero%22%20d%3D%22M5%20953c0-2.209139%201.790861-4%204-4s4%201.790861%204%204h.7180574c.4457594%200%20.6074025.04641281.7703655.13356635.1629629.08715355.2908572.21504784.3780107.3780108.0871536.16296296.1335664.32460608.1335664.77036545v8.4361148c0%20.4457594-.0464128.6074025-.1335664.7703655-.0871535.1629629-.2150478.2908572-.3780107.3780107-.162963.0871536-.3246061.1335664-.7703655.1335664H4.2819426c-.44575937%200-.60740249-.0464128-.77036545-.1335664-.16296297-.0871535-.29085725-.2150478-.3780108-.3780107C3.04641281%20963.3254599%203%20963.1638168%203%20962.7180574v-8.4361148c0-.44575937.0464128-.60740249.13356635-.77036545s.21504783-.29085725.3780108-.3780108C3.6745401%20953.04641281%203.83618323%20953%204.2819426%20953H5zM6.25%20953h5.5c0-1.51878306-1.23121694-2.75-2.75-2.75s-2.75%201.23121694-2.75%202.75z%22%2F%3E%3C%2Fsvg%3E");
 }
 .ui_actions_menu .post-attach-menu__icon {
     vertical-align: middle;
@@ -2187,40 +2220,6 @@ table,
 .post_settings:hover,
 .post_settings.shown {
     opacity: 1;
-}
-
-.attach_photo .post-attach-menu__icon {
-    background-position: 0% -65px;
-}
-.attach_video .post-attach-menu__icon {
-    background-position: 0% -87px;
-}
-.attach_audio .post-attach-menu__icon {
-    background-position: 0% -109px;
-}
-.attach_document .post-attach-menu__icon {
-    background-position: 0% -131px;
-}
-.attach_note .post-attach-menu__icon,
-.post-has-note::before,
-.attachment_note::before {
-    background-position: 0% -241px;
-}
-.attach_graffiti .post-attach-menu__icon {
-    background-position: 0% -175px;
-}
-.attach_poll .post-attach-menu__icon,
-.post-has-poll::before {
-    background-position: 00% -197px;
-}
-.attach_geo .post-attach-menu__icon,
-.post-has-geo.appended-geo::before,
-.post-geo::before {
-    background-position: 0% -153px;
-}
-.attach_source .post-attach-menu__icon,
-.post-upload::before {
-    background-position: 0% -327px;
 }
 
 .post-upload,

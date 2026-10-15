@@ -38,15 +38,15 @@
 
                                 <div class="ui_actions_menu" id="moreAttachTooltip">
                                     <a class="attach_photo" href="javascript:void(document.querySelector('#post-buttons1 input[name=_pic_attachment]').click());">
-                                        <div class="post-attach-menu__icon"></div>
+                                        <div class="post-attach-menu__icon"><svg width="16" height="13" viewBox="0 0 16 13"><use href="#menu-my-photos"/></svg></div>
                                         {_attach_photo}
                                     </a>
                                     <a class="attach_video" n:if="!\OPENVK_ROOT_CONF['openvk']['preferences']['videos']['disableUploading']" href="javascript:void(document.querySelector('#post-buttons1 input[name=_vid_attachment]').click());">
-                                        <div class="post-attach-menu__icon"></div>
+                                        <div class="post-attach-menu__icon"><svg width="14" height="14" viewBox="0 0 14 14"><use href="#menu-my-videos"/></svg></div>
                                         {_attach_video}
                                     </a>
                                     <a class="attach_graffiti" n:if="$graffiti ?? false" href="javascript:initGraffiti(1);">
-                                        <div class="post-attach-menu__icon"></div>
+                                        <div class="post-attach-menu__icon"><svg width="18" height="18" viewBox="0 0 32 32"><use href="#graffiti-32"/></svg></div>
                                         {_draw_graffiti}
                                     </a>
                                 </div>

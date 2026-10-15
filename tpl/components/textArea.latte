@@ -103,36 +103,36 @@
                             ></span>
                             <div class="ui_actions_menu" id="moreAttachTooltip{$textAreaId}">
                             <a id="__photoAttachment" class="attach_photo" n:attr="data-club => $clubDataId">
-                                <div class="post-attach-menu__icon"></div>
+                                <div class="post-attach-menu__icon"><svg width="16" height="13" viewBox="0 0 16 13"><use href="#menu-my-photos"/></svg></div>
                                 {_photo}
                             </a>
                             <a id="__videoAttachment" class="attach_video">
-                                <div class="post-attach-menu__icon"></div>
+                                <div class="post-attach-menu__icon"><svg width="14" height="14" viewBox="0 0 14 14"><use href="#menu-my-videos"/></svg></div>
                                 {_video}
                             </a>
                             <a id="__audioAttachment" class="attach_audio" n:attr="data-club => $clubDataId">
-                                <div class="post-attach-menu__icon"></div>
+                                <div class="post-attach-menu__icon"><svg width="13" height="16" viewBox="0 0 13 16"><use href="#menu-my-audios"/></svg></div>
                                 {_audio}
                             </a>
                             <a n:if="$docsEnabled" id="__documentAttachment" class="attach_document" n:attr="data-club => $clubDataRealId">
-                                <div class="post-attach-menu__icon"></div>
+                                <div class="post-attach-menu__icon"><svg width="12" height="14" viewBox="0 0 12 14"><use href="#menu-my-docs"/></svg></div>
                                 {_document}
                             </a>
                             {if $isPostComposer}
                                 <a n:if="$notesEnabled" id="__notesAttachment" class="attach_note">
-                                    <div class="post-attach-menu__icon"></div>
+                                    <div class="post-attach-menu__icon"><svg width="12" height="14" viewBox="0 0 12 14"><use href="#menu-my-notes"/></svg></div>
                                     {_note}
                                 </a>
                                 <a n:if="$graffitiEnabled" class="attach_graffiti" onclick="window.vkifyGraffiti(event);">
-                                    <div class="post-attach-menu__icon"></div>
+                                    <div class="post-attach-menu__icon"><svg width="18" height="18" viewBox="0 0 32 32"><use href="#graffiti-32"/></svg></div>
                                     {_graffiti}
                                 </a>
                                 <a n:if="$pollsEnabled" class="attach_poll" onclick="initPoll(event);">
-                                    <div class="post-attach-menu__icon"></div>
+                                    <div class="post-attach-menu__icon"><svg width="13" height="13" viewBox="0 0 13 13"><use href="#menu-poll"/></svg></div>
                                     {_poll}
                                 </a>
                                 <a n:if="$geoEnabled" id="__geoAttacher" class="attach_geo">
-                                    <div class="post-attach-menu__icon"></div>
+                                    <div class="post-attach-menu__icon"><svg width="13" height="17" viewBox="0 0 13 17"><use href="#attach-geo"/></svg></div>
                                     {_geo_place}
                                 </a>
                             {/if}
@@ -142,16 +142,16 @@
                         <a id="__photoAttachment" class="attach_photo"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_photo}"
                            n:attr="data-club => $clubDataId">
-                            <div class="post-attach-menu__icon"></div>
+                            <div class="post-attach-menu__icon"><svg width="16" height="13" viewBox="0 0 16 13"><use href="#menu-my-photos"/></svg></div>
                         </a>
                         <a id="__videoAttachment" class="attach_video"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_video}">
-                            <div class="post-attach-menu__icon"></div>
+                            <div class="post-attach-menu__icon"><svg width="14" height="14" viewBox="0 0 14 14"><use href="#menu-my-videos"/></svg></div>
                         </a>
                         <a id="__audioAttachment" class="attach_audio"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_audio}"
                            n:attr="data-club => $clubDataId">
-                            <div class="post-attach-menu__icon"></div>
+                            <div class="post-attach-menu__icon"><svg width="13" height="16" viewBox="0 0 13 16"><use href="#menu-my-audios"/></svg></div>
                         </a>
                         <div class="ui_actions_menu_wrap" onmouseover="{='uiActionsMenu.show(this, null, {align: "center"});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
                             <a class="post-attach-menu__trigger" id="moreAttachTrigger{$textAreaId}">
@@ -159,23 +159,23 @@
                             </a>
                             <div class="ui_actions_menu" id="moreAttachTooltip{$textAreaId}">
                                 <a n:if="$docsEnabled" id="__documentAttachment" class="attach_document" n:attr="data-club => $clubDataRealId">
-                                    <div class="post-attach-menu__icon"></div>
+                                    <div class="post-attach-menu__icon"><svg width="12" height="14" viewBox="0 0 12 14"><use href="#menu-my-docs"/></svg></div>
                                     {_document}
                                 </a>
                                 <a n:if="$notesEnabled" id="__notesAttachment" class="attach_note">
-                                    <div class="post-attach-menu__icon"></div>
+                                    <div class="post-attach-menu__icon"><svg width="12" height="14" viewBox="0 0 12 14"><use href="#menu-my-notes"/></svg></div>
                                     {_note}
                                 </a>
                                 <a n:if="$graffitiEnabled" class="attach_graffiti" onclick="window.vkifyGraffiti(event);">
-                                    <div class="post-attach-menu__icon"></div>
+                                    <div class="post-attach-menu__icon"><svg width="18" height="18" viewBox="0 0 32 32"><use href="#graffiti-32"/></svg></div>
                                     {_graffiti}
                                 </a>
                                 <a n:if="$pollsEnabled" class="attach_poll" onclick="initPoll(event);">
-                                    <div class="post-attach-menu__icon"></div>
+                                    <div class="post-attach-menu__icon"><svg width="13" height="13" viewBox="0 0 13 13"><use href="#menu-poll"/></svg></div>
                                     {_poll}
                                 </a>
                                 <a n:if="$geoEnabled" id="__geoAttacher" class="attach_geo">
-                                    <div class="post-attach-menu__icon"></div>
+                                    <div class="post-attach-menu__icon"><svg width="13" height="17" viewBox="0 0 13 17"><use href="#attach-geo"/></svg></div>
                                     {_geo_place}
                                 </a>
                             </div>
@@ -184,21 +184,21 @@
                         <a id="__photoAttachment" class="attach_photo"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_photo}"
                            n:attr="data-club => $clubDataId">
-                            <div class="post-attach-menu__icon"></div>
+                            <div class="post-attach-menu__icon"><svg width="16" height="13" viewBox="0 0 16 13"><use href="#menu-my-photos"/></svg></div>
                         </a>
                         <a id="__videoAttachment" class="attach_video"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_video}">
-                            <div class="post-attach-menu__icon"></div>
+                            <div class="post-attach-menu__icon"><svg width="14" height="14" viewBox="0 0 14 14"><use href="#menu-my-videos"/></svg></div>
                         </a>
                         <a id="__audioAttachment" class="attach_audio"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_audio}"
                            n:attr="data-club => $clubDataId">
-                            <div class="post-attach-menu__icon"></div>
+                            <div class="post-attach-menu__icon"><svg width="13" height="16" viewBox="0 0 13 16"><use href="#menu-my-audios"/></svg></div>
                         </a>
                         <a n:if="$docsEnabled" id="__documentAttachment" class="attach_document"
                            data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_document}"
                            n:attr="data-club => $clubDataRealId">
-                            <div class="post-attach-menu__icon"></div>
+                            <div class="post-attach-menu__icon"><svg width="12" height="14" viewBox="0 0 12 14"><use href="#menu-my-docs"/></svg></div>
                         </a>
                     {/if}
                     {if $showCommentAsGroup}
@@ -249,7 +249,7 @@
                             {if $sourceEnabled}
                                 <div class="separator"></div>
                                 <a id="__sourceAttacher" class="attach_source">
-                                    <div class="post-attach-menu__icon"></div>
+                                    <div class="post-attach-menu__icon"><svg width="12" height="15" viewBox="0 0 12 15"><use href="#menu-stickers"/></svg></div>
                                     {_set_source}
                                 </a>
                             {/if}

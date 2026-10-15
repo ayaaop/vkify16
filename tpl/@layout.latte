@@ -225,29 +225,29 @@
                         </div>
                         {if !$thisUser->isBanned() XOR !$thisUser->isActivated() XOR $thisUser->isDeactivated()}
                             <a href="{$thisUser->getURL()}" class="link my_page nomobile" title="{_my_page} [Alt+Shift+.]" accesskey=".">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-page"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-page" x="4" y="5.05" width="16" height="14"/></svg>
                                 <span>{_my_page}</span>
                             </a>
                             <a n:if="$thisUser->getLeftMenuItemStatus('news')" href="/feed" class="link my_feed" title="{_news} [Alt+Shift+,]" accesskey=",">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-feed"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-feed" x="4.5" y="5" width="15" height="14"/></svg>
                                 <span>{_feed}</span>
                             </a>
                             <a href="/notifications" class="link my_feedback mobileonly" title="{_my_feedback} [Alt+Shift+N]" accesskey="n">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-feedback"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-feedback" x="4.98" y="4.5" width="14.03" height="15"/></svg>
                                 <span>{_my_feedback}</span>
                                 <object type="internal/link" n:if="$thisUser->getNotificationsCount() > 0">
                                     <b>{$thisUser->getNotificationsCount() > 99 ? '99+' : $thisUser->getNotificationsCount()}</b>
                                 </object>
                             </a>
                             <a n:if="$thisUser->getLeftMenuItemStatus('messages')" href="/im" class="link my_messages">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-messages"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-messages" x="4" y="5.99" width="16" height="12.02"/></svg>
                                 <span>{_mobile_messages}</span>
                                 <object type="internal/link" n:if="$thisUser->getUnreadMessagesCount() > 0">
                                     <b>{$thisUser->getUnreadMessagesCount()}</b>
                                 </object>
                             </a>
                             <a href="/friends{$thisUser->getId()}" class="link my_friends">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-friends"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-friends" x="6" y="5.5" width="12" height="13"/></svg>
                                 <span>{_mobile_friends}</span>
                                 <object type="internal/link" n:if="$thisUser->getRequestsCount() > 0">
                                     <a href="/friends{$thisUser->getId()}?act=incoming">
@@ -256,46 +256,54 @@
                                 </object>
                             </a>
                             <a n:if="$thisUser->getLeftMenuItemStatus('groups')" href="/groups{$thisUser->getId()}" class="link my_groups">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-groups"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-groups" x="4" y="6.5" width="16" height="11"/></svg>
                                 <span>{_mobile_groups}</span>
                             </a>
+                            <a n:if="$thisUser->getLeftMenuItemStatus('events')" href="/events{$thisUser->getId()}" class="link my_events">
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-groups" x="4" y="6.5" width="16" height="11"/></svg>
+                                <span>{_my_events}</span>
+                            </a>
                             <a n:if="$thisUser->getLeftMenuItemStatus('photos')" href="/albums{$thisUser->getId()}" class="link my_photos">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-photos"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-photos" x="3.95" y="5.5" width="16" height="13"/></svg>
                                 <span>{_mobile_photos}</span>
                             </a>
                             <a n:if="$thisUser->getLeftMenuItemStatus('audios')" href="/audios{$thisUser->getId()}" class="link my_audios">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-audios"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-audios" x="5.67" y="3.85" width="12.94" height="16.02"/></svg>
                                 <span>{_mobile_audios}</span>
                             </a>
                             <a n:if="$thisUser->getLeftMenuItemStatus('videos')" href="/videos{$thisUser->getId()}" class="link my_videos">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-videos"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-videos" x="5" y="5" width="14" height="14"/></svg>
                                 <span>{_mobile_videos}</span>
                             </a>
                             <a n:if="$thisUser->getLeftMenuItemStatus('apps')" href="/apps?act=installed" class="link my_apps">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-apps"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-apps" x="4" y="6.45" width="16" height="11"/></svg>
                                 <span>{_apps}</span>
                             </a>
+                            <a n:if="$thisUser->getLeftMenuItemStatus('stickers')" href="/stickers" class="link my_stickers">
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-stickers" x="6" y="4.5" width="12" height="15"/></svg>
+                                <span>{_stickers_store}</span>
+                            </a>
                             <a n:if="$thisUser->getLeftMenuItemStatus('notes')" href="/notes{$thisUser->getId()}" class="link my_notes">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-notes"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-notes" x="6" y="5" width="12" height="14"/></svg>
                                 <span>{_mobile_notes}</span>
                             </a>
                             <a href="/settings" class="link my_settings mobileonly">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-settings"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-settings" x="4.5" y="4.5" width="15" height="15"/></svg>
                                 <span>{_mobile_settings}</span>
                             </a>
                             
                             {if $thisUser->getLeftMenuItemStatus('docs') || $thisUser->getLeftMenuItemStatus('fave')}
                                 <div class="menu_divider"></div>
                                 <a n:if="$thisUser->getLeftMenuItemStatus('docs')" href="/docs" class="link my_docs">
-                                    <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-docs"/></svg>
+                                    <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-docs" x="6" y="5" width="12" height="14"/></svg>
                                     <span>{_my_documents}</span>
                                 </a>
                                 <a n:if="$thisUser->getLeftMenuItemStatus('fave')" href="/fave" class="link my_fave">
-                                    <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-fave"/></svg>
+                                    <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-fave" x="5.33" y="5.16" width="13.42" height="13.68"/></svg>
                                     <span>{_bookmarks_tab}</span>
                                 </a>
                                 <a href="/support" class="link my_helpdesk">
-                                    <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-helpdesk"/></svg>
+                                    <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-helpdesk" x="4" y="4" width="16" height="16"/></svg>
                                     <span>{_header_help|firstUpper}</span>
                                     <object type="internal/link" n:if="$ticketAnsweredCount > 0">
                                         {var $answeredTicketId = null}
@@ -315,7 +323,7 @@
                                 <div n:if="$thisUser->getPinnedClubCount() > 0" class="menu_divider"></div>
 
                                 <a n:foreach="$thisUser->getPinnedClubs() as $pinnedClub" href="{$pinnedClub->getURL()}" class="link group_link">
-                                    <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-groups"/></svg>
+                                    <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-groups" x="4" y="6.5" width="16" height="11"/></svg>
                                     <span>{ovk_proc_strtr($pinnedClub->getName(), 28)}</span>
 
                                     <object type="internal/link" style="white-space: normal;" id="sug{$pinnedClub->getId()}" n:if="$pinnedClub->getSuggestedPostsCount($thisUser) > 0 && $pinnedClub->getWallType() == 2">
@@ -331,11 +339,11 @@
                             {var $menuLinksAvaiable   = sizeof(\OPENVK_ROOT_CONF['openvk']['preferences']['menu']['links']) > 0 && $thisUser->getLeftMenuItemStatus('links')}
                             <div n:if="$canAccessAdminPanel || $canAccessHelpdesk || $menuLinksAvaiable" class="menu_divider"></div>
                             <a href="/admin" class="link my_admin" n:if="$canAccessAdminPanel" title="{_admin} [Alt+Shift+A]" accesskey="a" rel="nofollow">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-default"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-default" x="4.5" y="5.5" width="15" height="13"/></svg>
                                 <span>{_admin}</span>
                             </a>
                             <a href="/support/tickets" class="link my_helpdesk" n:if="$canAccessHelpdesk" rel="nofollow">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-helpdesk"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-my-helpdesk" x="4" y="4" width="16" height="16"/></svg>
                                 <span>{_helpdesk}</span>
                                 {if $helpdeskTicketNotAnsweredCount > 0}
 									<object type="internal/link">
@@ -344,7 +352,7 @@
                                 {/if}
                             </a>
                             <a n:if="$canAccessHelpdesk" href="/scumfeed" class="link reports" rel="nofollow">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-reports"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-reports" x="5" y="5.53" width="14" height="12.88"/></svg>
                                 <span>{tr("reports")}</span>
                                 {if $reportNotAnsweredCount > 0}
 									<object type="internal/link">
@@ -353,7 +361,7 @@
                                 {/if}
                             </a>
                             <a n:if="$canAccessHelpdesk" href="/noSpam" class="link nospam" rel="nofollow">
-                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-nospam"/></svg>
+                                <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-nospam" x="5.5" y="5.5" width="13" height="13"/></svg>
                                 <span>noSpam</span>
                             </a>
                         <a
@@ -362,7 +370,7 @@
                           href="{$menuItem['url']}"
                           target="_blank"
                           class="link custom_link">
-                            <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-default"/></svg>
+                            <svg class="link_icon" viewBox="0 0 24 24"><use href="#menu-default" x="4.5" y="5.5" width="15" height="13"/></svg>
                             <span>{strpos($menuItem["name"], "@") === 0 ? tr(substr($menuItem["name"], 1)) : $menuItem["name"]}</span>
                         </a>
 

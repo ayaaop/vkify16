@@ -1,12 +1,12 @@
 import { isCompactMode } from '../shared.js';
 
 const ATTACHMENTS = {
-    photo:    { id: '__photoAttachment',    cls: 'attach_photo' },
-    video:    { id: '__videoAttachment',    cls: 'attach_video' },
-    audio:    { id: '__audioAttachment',    cls: 'attach_audio' },
-    document: { id: '__documentAttachment', cls: 'attach_document' },
-    note:     { id: '__notesAttachment',    cls: 'attach_note' },
-    graffiti: { cls: 'attach_graffiti' },
+    photo:    { id: '__photoAttachment',    cls: 'attach_photo',    icon: ['menu-my-photos', 16, 13] },
+    video:    { id: '__videoAttachment',    cls: 'attach_video',    icon: ['menu-my-videos', 14, 14] },
+    audio:    { id: '__audioAttachment',    cls: 'attach_audio',    icon: ['menu-my-audios', 13, 16] },
+    document: { id: '__documentAttachment', cls: 'attach_document', icon: ['menu-my-docs', 12, 14] },
+    note:     { id: '__notesAttachment',    cls: 'attach_note',     icon: ['menu-my-notes', 12, 14] },
+    graffiti: { cls: 'attach_graffiti', icon: ['graffiti-32', 18, 18, '0 0 32 32'] },
 };
 
 const onGraffitiClick = (e) => typeof initGraffiti !== 'undefined' && initGraffiti(e);
@@ -23,19 +23,26 @@ const handleMenuHide = (e) => {
     }
 };
 
+function attachIcon(html, key) {
+    const icon = ATTACHMENTS[key].icon;
+    if (!icon) return html`<div class="post-attach-menu__icon"></div>`;
+    const [sym, w, h, vb = `0 0 ${w} ${h}`] = icon;
+    return html`<div class="post-attach-menu__icon"><svg width=${w} height=${h} viewBox=${vb}><use href="#${sym}"/></svg></div>`;
+}
+
 function menuEntry(html, tr, key) {
     const { id, cls } = ATTACHMENTS[key];
     if (key === 'graffiti') {
         return html`
             <a class=${cls} onClick=${onGraffitiClick}>
-                <div class="post-attach-menu__icon"></div>
+                ${attachIcon(html, key)}
                 ${tr(key)}
             </a>
         `;
     }
     return html`
         <a id=${id} class=${cls}>
-            <div class="post-attach-menu__icon"></div>
+            ${attachIcon(html, key)}
             ${tr(key)}
         </a>
     `;
@@ -45,7 +52,7 @@ function inlineEntry(html, tr, key) {
     const { id, cls } = ATTACHMENTS[key];
     return html`
         <a id=${id} class=${cls} data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr(key)}">
-            <div class="post-attach-menu__icon"></div>
+            ${attachIcon(html, key)}
         </a>
     `;
 }

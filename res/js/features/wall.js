@@ -9,6 +9,21 @@ u(document).off('input');
 
 const WALL_CHECKBOX_NAMES = ['as_group', 'force_sign', 'anon', 'nsfw'];
 
+const ATTACH_ICONS = {
+    photo:    ['menu-my-photos', 16, 13],
+    video:    ['menu-my-videos', 14, 14],
+    audio:    ['menu-my-audios', 13, 16],
+    document: ['menu-my-docs', 12, 14],
+    note:     ['menu-my-notes', 12, 14],
+    source:   ['menu-stickers', 12, 15],
+    graffiti: ['graffiti-32', 16, 16, '0 0 32 32'],
+};
+
+function attachIcon(key) {
+    const [id, w, h, vb = `0 0 ${w} ${h}`] = ATTACH_ICONS[key];
+    return `<div class="post-attach-menu__icon"><svg width="${w}" height="${h}" viewBox="${vb}"><use href="#${id}"/></svg></div>`;
+}
+
 function resolveWallFormContext(el) {
     if (el?.form) return el.form;
     return el?.closest?.('form') || document.querySelector('#write form') || null;
@@ -46,13 +61,13 @@ function renderEditMenuLayout(apiPost, type, postId) {
     const inlineAttachButtons = type === 'post'
         ? `
             <a class="attach_photo" id="__photoAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('photo')}">
-                <div class="post-attach-menu__icon"></div>
+                ${attachIcon('photo')}
             </a>
             <a class="attach_video" id="__videoAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('video')}">
-                <div class="post-attach-menu__icon"></div>
+                ${attachIcon('video')}
             </a>
             <a class="attach_audio" id="__audioAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('audio')}">
-                <div class="post-attach-menu__icon"></div>
+                ${attachIcon('audio')}
             </a>
         `
         : '';
@@ -66,33 +81,33 @@ function renderEditMenuLayout(apiPost, type, postId) {
     const dropdownItems = type === 'post'
         ? `
             <a class="attach_document" id="__documentAttachment" data-club="${clubId}">
-                <div class="post-attach-menu__icon"></div>
+                ${attachIcon('document')}
                 ${tr('document')}
             </a>
             <a class="attach_note" id="__notesAttachment">
-                <div class="post-attach-menu__icon"></div>
+                ${attachIcon('note')}
                 ${tr('note')}
             </a>
             <a class="attach_source" id="__sourceAttacher">
-                <div class="post-attach-menu__icon"></div>
+                ${attachIcon('source')}
                 ${tr('source')}
             </a>
         `
         : `
             <a class="attach_photo" id="__photoAttachment" data-club="${clubId}">
-                <div class="post-attach-menu__icon"></div>
+                ${attachIcon('photo')}
                 ${tr('photo')}
             </a>
             <a class="attach_video" id="__videoAttachment" data-club="${clubId}">
-                <div class="post-attach-menu__icon"></div>
+                ${attachIcon('video')}
                 ${tr('video')}
             </a>
             <a class="attach_audio" id="__audioAttachment" data-club="${clubId}">
-                <div class="post-attach-menu__icon"></div>
+                ${attachIcon('audio')}
                 ${tr('audio')}
             </a>
             <a class="attach_document" id="__documentAttachment" data-club="${clubId}">
-                <div class="post-attach-menu__icon"></div>
+                ${attachIcon('document')}
                 ${tr('document')}
             </a>
         `;
@@ -143,16 +158,16 @@ function renderRepostBottomLayout() {
                 <div class="post-attach-menu">
                     <div id="wallAttachmentMenu">
                         <a id="__photoAttachment" class="attach_photo" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('photo')}" data-club="0">
-                            <div class="post-attach-menu__icon"></div>
+                            ${attachIcon('photo')}
                         </a>
                         <a id="__videoAttachment" class="attach_video" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('video')}" data-club="0">
-                            <div class="post-attach-menu__icon"></div>
+                            ${attachIcon('video')}
                         </a>
                         <a id="__audioAttachment" class="attach_audio" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('audio')}" data-club="0">
-                            <div class="post-attach-menu__icon"></div>
+                            ${attachIcon('audio')}
                         </a>
                         <a id="__documentAttachment" class="attach_document" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('document')}" data-club="0">
-                            <div class="post-attach-menu__icon"></div>
+                            ${attachIcon('document')}
                         </a>
                     </div>
                 </div>
