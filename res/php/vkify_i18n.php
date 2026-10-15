@@ -208,7 +208,8 @@ if (!function_exists('vkifyGetStrings')) {
                     'feed_club_ignored' => 'Спільноту приховано з стрічки.',
                     'feed_unignore' => 'Скасувати',
                     'feed_user_ignored' => 'Користувача приховано з стрічки.',
-                    'gifts_left' => '$1 осталось',
+                    'gif_autoplay' => 'Автоматично відтворювати GIF-документи',
+                    'gifts_left' => '$1 залишилося',
                     'going_to_report_note' => 'Ви збираєтеся поскаржитися на цю нотатку.',
                     'graffiti_clear' => 'Почати спочатку',
                     'graffiti_clear_confirm' => 'Ви дійсно хочете стерти це графіті?',
@@ -271,7 +272,8 @@ if (!function_exists('vkifyGetStrings')) {
                     'other_results' => 'Інші результати...',
                     'document_preview_unavailable' => 'Попередній перегляд цього документа недоступний.',
                     'loading_messenger' => 'Завантаження месенджера...',
-                    'loading_messenger_part2' => 'Месенджер завантажується занадто довго. Спробуйте переключитися назад на стандартну тему — якщо там все нормально, надішліть багрепорт на <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">GitHub</a>.'
+                    'loading_messenger_part2' => 'Месенджер завантажується занадто довго. Спробуйте переключитися назад на стандартну тему — якщо там все нормально, надішліть багрепорт на <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">GitHub</a>.',
+                    'comments_restricted' => 'Коментування запису обмежено'
                 ],
                 'kk' => [
                     'add_tracks' => 'Әндерді қосу',
@@ -359,7 +361,8 @@ if (!function_exists('vkifyGetStrings')) {
                     'other_results' => 'Басқа нәтижелер...',
                     'document_preview_unavailable' => 'Бұл құжатты алдын ала қарау мүмкін емес.',
                     'loading_messenger' => 'Мессенджер жүктелуде...',
-                    'loading_messenger_part2' => 'Мессенджер тым ұзақ жүктелуде. Стандартты стильге оралып көріңіз — ол жерде бәрі жақсы істеп тұрса, <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">GitHub-та</a> қате туралы есеп жіберіңіз.'
+                    'loading_messenger_part2' => 'Мессенджер тым ұзақ жүктелуде. Стандартты стильге оралып көріңіз — ол жерде бәрі жақсы істеп тұрса, <a href="https://github.com/ayaaop/vkify16/issues" target="_blank">GitHub-та</a> қате туралы есеп жіберіңіз.',
+                    'comments_restricted' => 'Жазбаға пікір қалдыру шектелген'
                 ],
             ];
         }
