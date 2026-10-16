@@ -65,7 +65,7 @@ vkify.once('simpleTooltips', () => {
             const theme = getTheme(element);
             const offset = getOffset(element);
             const boundary = getBoundary(element);
-            const zIndex = element.closest('.ovk-msg-all') ? 9999 : 99;
+            const zIndex = element.closest('#fastchats_container') ? 10050 : (element.closest('.ovk-msg-all') ? 9999 : 99);
 
             element.dataset.vkifySimpleTipInit = '1';
             tippy(element, {

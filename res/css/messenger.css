@@ -4276,3 +4276,1065 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     background: none;
     text-decoration: underline;
 }
+
+/* ==========================================================================
+   FastChat (VK 2016 notifier.css style)
+   ========================================================================== */
+
+#fastchats_container {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 9999;
+    display: block;
+    font-family: var(--font-family);
+    font-size: 12.5px;
+    pointer-events: none;
+}
+
+#fastchats_container .vkify_fc_root > * {
+    pointer-events: auto;
+}
+
+/* Right-bottom dock (#chat_onl_wrap) */
+#fastchats_container .chat_onl_wrap {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    right: 10px;
+    text-align: center;
+    z-index: 1500;
+}
+
+#fastchats_container .chat_onl_inner {
+    position: relative;
+    background-color: var(--elevator-bg-color);
+    border-radius: 3px 3px 0 0;
+    overflow: hidden;
+}
+
+#fastchats_container .chat_tab_wrap,
+#fastchats_container .chat_tab_wrap.fc_online_tab_pinned {
+    display: block;
+    position: relative;
+    bottom: auto;
+    right: auto;
+    overflow: hidden;
+    cursor: pointer;
+    width: 52px;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    padding: 6px;
+    box-sizing: border-box;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    font-family: var(--font-family);
+    animation: none;
+    text-decoration: none;
+}
+
+#fastchats_container .chat_tab_wrap:hover,
+#fastchats_container .chat_tab_wrap.fc_online_tab_pinned:hover {
+    background-color: var(--sidebar-count-color);
+    box-shadow: none;
+    text-decoration: none;
+}
+
+#fastchats_container .chat_onl_cont {
+    padding: 6px 0;
+}
+
+#fastchats_container .chat_onl,
+#fastchats_container .chat_onl.fc_online_tab_label {
+    color: var(--post-meta-color);
+    font-size: 11px;
+    font-weight: 700;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    height: 14px;
+    line-height: 14px;
+    display: block;
+    text-align: center;
+}
+
+#fastchats_container .chat_onl::after {
+    display: inline-block;
+    content: ' ';
+    width: 9px;
+    height: 11px;
+    background: url(../icons/chats.png) no-repeat 0 -116px;
+    margin-bottom: -1px;
+    margin-left: 4px;
+}
+
+#fastchats_container .chat_cont_scrolling {
+    position: relative;
+    scrollbar-width: none;
+}
+
+#fastchats_container .chat_cont_scrolling::-webkit-scrollbar {
+    display: none;
+}
+
+#fastchats_container .chat_tab_imgcont {
+    position: relative;
+    height: 40px;
+    width: 40px;
+    transition: height 100ms ease-in-out, opacity 100ms ease-in-out;
+}
+
+#fastchats_container .chat_tab_img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+#fastchats_container .chat_tab_imgcont.online::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    border: 2px solid var(--elevator-bg-color);
+    background-color: var(--success-color);
+    border-radius: 50%;
+    height: 7px;
+    width: 7px;
+    box-sizing: content-box;
+}
+
+#fastchats_container .chat_tab_wrap:hover .chat_tab_imgcont.online::after {
+    border-color: var(--sidebar-count-color);
+}
+
+#fastchats_container .chat_tab_close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, .65);
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    z-index: 2;
+}
+
+#fastchats_container .chat_tab_close::after {
+    display: block;
+    content: ' ';
+    width: 14px;
+    height: 14px;
+    background: url(../icons/chats.png) no-repeat 3px -43px;
+    opacity: 0.7;
+}
+
+#fastchats_container .chat_tab_wrap:hover .chat_tab_close,
+#fastchats_container .chat_tab_close:hover::after {
+    opacity: 1;
+}
+
+#fastchats_container .chat_tab_counter {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    height: 17px;
+    line-height: 13px;
+    min-width: 17px;
+    border-radius: 8px;
+    padding: 2px 4px;
+    background-color: var(--gift-limit-background);
+    color: var(--white);
+    font-weight: 500;
+    font-size: 11px;
+    box-sizing: border-box;
+    z-index: 2;
+}
+
+#fastchats_container .chat_tab_typing_wrap {
+    display: none;
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    padding: 3px;
+    border-radius: 3px 0 0 0;
+    background-color: var(--elevator-bg-color);
+}
+
+#fastchats_container .chat_tab_wrap:hover .chat_tab_typing_wrap {
+    background-color: var(--sidebar-count-color);
+}
+
+#fastchats_container .chat_tab_typing_icon {
+    height: 7px;
+    width: 7px;
+    background-position: 0 -143px;
+}
+
+/* Sprite & Window Box Chrome */
+#fastchats_container .chats_sp {
+    background: url(../icons/chats.png) no-repeat;
+}
+
+#fastchats_container .rb_box_wrap.fc_friends_window,
+#fastchats_container .rb_box_wrap.fc_chat_box {
+    width: auto;
+    height: auto;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none !important;
+    padding: 0;
+    overflow: visible;
+    display: block;
+    animation: none;
+}
+
+#fastchats_container .fc_tab_wrap {
+    position: relative;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1);
+    border-radius: 3px;
+    font-size: 12.5px;
+    background: transparent;
+}
+
+#fastchats_container .fc_tab_wrap.fc_tobottom {
+    border-radius: 3px 3px 0 0;
+}
+
+#fastchats_container .fc_tab_head,
+#fastchats_container .fc_tab_head.fc_head {
+    cursor: move;
+    background-color: var(--header-background-color);
+    border: 1px solid var(--header-background-color--hover);
+    border-radius: 3px 3px 0 0;
+    padding: 0 7px 0 8px;
+    height: 32px;
+    line-height: 30px;
+    display: block;
+    box-sizing: border-box;
+}
+
+#fastchats_container .rb_inactive .fc_tab_head {
+    background-color: var(--accent-color-3);
+    border-color: var(--accent-color);
+}
+
+body.dark-mode #fastchats_container .rb_inactive .fc_tab_head {
+    background-color: var(--module-header-background-color);
+    border-color: var(--border-color);
+}
+
+#fastchats_container .rb_minimized .fc_tab_wrap {
+    width: 180px !important;
+}
+
+#fastchats_container .fc_tab_close_wrap,
+#fastchats_container .fc_tab_max_wrap,
+#fastchats_container .fc_tab_pin_wrap,
+#fastchats_container .fc_tab_close_wrap.fc_head_close,
+#fastchats_container .fc_tab_max_wrap.fc_head_openfull {
+    display: block;
+    float: right;
+    padding: 4px;
+    margin-top: 5px;
+    width: auto;
+    height: auto;
+    background: none;
+    opacity: 1;
+    cursor: pointer;
+}
+
+#fastchats_container .fc_tab_close_wrap.fc_head_close::before {
+    content: none;
+}
+
+#fastchats_container .fc_tab_pin_wrap {
+    display: none;
+}
+
+#fastchats_container .fc_fixed .fc_tab_pin_wrap {
+    display: block;
+}
+
+#fastchats_container .fc_tab_close,
+#fastchats_container .fc_tab_max,
+#fastchats_container .fc_tab_pin {
+    display: block;
+    height: 12px;
+    width: 12px;
+    opacity: 0.6;
+}
+
+#fastchats_container .fc_tab_wrap .fc_tab_close {
+    background-position: 2px -31px;
+}
+
+#fastchats_container .fc_tab_wrap .fc_tab_max {
+    background-position: 1px -16px;
+}
+
+#fastchats_container .fc_tab_wrap .fc_tab_pin {
+    background-position: 0 -1px;
+}
+
+#fastchats_container .fc_tab_close_wrap:hover .fc_tab_close,
+#fastchats_container .fc_tab_max_wrap:hover .fc_tab_max,
+#fastchats_container .fc_tab_pin_wrap:hover .fc_tab_pin {
+    opacity: 1;
+}
+
+#fastchats_container .fc_tab_title,
+#fastchats_container .fc_tab_title.fc_head_title {
+    padding: 0 3px;
+    font-size: 12px;
+    font-weight: 700;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--header-text-color);
+    height: 30px;
+    line-height: 30px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* Friends Contact List (#fc_clist) */
+#fastchats_container #fc_ctabs_cont {
+    border: 1px solid var(--border-color-2);
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+    background: var(--module-background-color);
+}
+
+#fastchats_container .fc_tobottom #fc_ctabs_cont {
+    border-bottom: none;
+    border-radius: 0;
+}
+
+#fastchats_container .fc_ctab {
+    display: none;
+}
+
+#fastchats_container .fc_ctab.fc_ctab_active {
+    display: block;
+}
+
+#fastchats_container .fc_contacts_wrap {
+    overflow: hidden;
+}
+
+#fastchats_container #fc_contacts,
+#fastchats_container #fc_contacts.fc_friends_list {
+    position: relative;
+    height: 299px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: var(--module-background-color);
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    scrollbar-width: thin;
+}
+
+#fastchats_container .fc_clist_empty,
+#fastchats_container .fc_log_empty {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    padding: 0 16px;
+    text-align: center;
+    color: var(--muted-text-color);
+    font-size: 12.5px;
+    line-height: 17px;
+}
+
+#fastchats_container .fc_contact,
+#fastchats_container .fc_contact.fc_friend_row {
+    display: block;
+    padding: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    border-bottom: none;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#fastchats_container .fc_contact:hover {
+    background-color: var(--module-background-color--secondary);
+    text-decoration: none;
+}
+
+#fastchats_container img.fc_contact_photo,
+#fastchats_container img.fc_contact_photo.fc_avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+#fastchats_container span.fc_contact_photo {
+    float: left;
+    display: block;
+    position: relative;
+    height: 34px;
+    width: 34px;
+}
+
+#fastchats_container span.fc_contact_photo.online::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    border: 2px solid var(--module-background-color);
+    background-color: var(--vk-im-online);
+    border-radius: 50%;
+    height: 6px;
+    width: 6px;
+    box-sizing: content-box;
+}
+
+#fastchats_container .fc_contact:hover span.fc_contact_photo.online::after {
+    border-color: var(--module-background-color--secondary);
+}
+
+#fastchats_container .fc_contact_status {
+    float: right;
+    display: none;
+    margin-left: 4px;
+}
+
+#fastchats_container .fc_contact:hover .fc_contact_status {
+    display: block;
+    background: url(../icons/chats.png) no-repeat 0 -153px;
+    margin-top: 11px;
+    margin-right: 3px;
+    height: 13px;
+    width: 12px;
+    opacity: 0.7;
+}
+
+#fastchats_container .fc_contact_name,
+#fastchats_container .fc_contact_name.fc_name {
+    line-height: 34px;
+    padding-left: 9px;
+    white-space: nowrap;
+    display: block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-weight: 700;
+    font-size: 12.5px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--post-action-color);
+}
+
+#fastchats_container .fc_contact_unread {
+    font-size: 11px;
+    color: var(--post-action-color);
+}
+
+#fastchats_container em.fc_clist_hl {
+    font-style: normal;
+    background: var(--vk-im-hl-bg);
+    padding: 0;
+    margin: 0;
+}
+
+/* Bottom search filter in friends window */
+#fastchats_container div.fc_clist_filter_wrap,
+#fastchats_container div.fc_clist_filter_wrap.fc_search_wrap {
+    cursor: text;
+    padding: 3px 8px 4px;
+    border: none;
+    border-top: 1px solid var(--quote-border-color);
+    background: var(--module-background-color);
+    border-radius: 0 0 3px 3px;
+}
+
+#fastchats_container .chats_sp.fc_clist_search_icon {
+    float: left;
+    background-position: 0 -100px;
+    height: 12px;
+    width: 12px;
+    margin: 10px 0 0 5px;
+}
+
+#fastchats_container div.fc_clist_filter {
+    overflow: hidden;
+    font-size: 12.5px;
+}
+
+#fastchats_container #fc_clist_filter,
+#fastchats_container #fc_clist_filter.fc_search_input {
+    width: 100%;
+    border: 0 !important;
+    padding: 5px 20px 7px 7px;
+    font-size: 12.5px;
+    font-family: var(--font-family);
+    background: transparent !important;
+    color: var(--text-color);
+    outline: none;
+    box-shadow: none;
+}
+
+#fastchats_container #fc_clist_filter::placeholder {
+    color: var(--search-placeholder-color);
+}
+
+#fastchats_container #fc_clist_filter:focus::placeholder {
+    color: var(--search-placeholder-focus-color);
+}
+
+#fastchats_container .fc_clist_online_wrap {
+    position: relative;
+    float: right;
+}
+
+#fastchats_container .fc_clist_online,
+#fastchats_container .fc_clist_online.fc_toggle_offline_btn {
+    cursor: pointer;
+    position: absolute;
+    margin: 8px 0 0 -15px;
+    padding: 4px;
+    width: auto;
+    height: auto;
+    line-height: 0;
+    background: transparent;
+    border: none;
+}
+
+#fastchats_container .fc_clist_online::before {
+    display: block;
+    content: ' ';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--vk-im-online);
+    opacity: 0.45;
+}
+
+#fastchats_container .fc_clist_online.fc_clist_online_active::before {
+    opacity: 1;
+}
+
+/* Active Peer Chat Tab (.fc_tab) */
+#fastchats_container .fc_tab {
+    border: 1px solid var(--border-color-2);
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+    background-color: var(--button-background-color--light);
+}
+
+#fastchats_container .fc_fixed .fc_tab,
+#fastchats_container .fc_tobottom .fc_tab {
+    border-bottom: none;
+    border-radius: 0;
+}
+
+#fastchats_container .fc_tab_log_wrap {
+    overflow: hidden;
+    position: relative;
+}
+
+#fastchats_container .fc_tab_log,
+#fastchats_container .fc_tab_log.fc_messages_list {
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    padding: 4px 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    display: block;
+    scrollbar-width: thin;
+}
+
+#fastchats_container .fc_load_more {
+    margin: 0 0 4px 0;
+    padding: 6px;
+    font-size: 12px;
+    background: var(--module-background-color);
+    border-bottom: 1px solid var(--quote-border-color);
+    color: var(--link-color);
+}
+
+#fastchats_container .fc_msgs_wrap {
+    padding: 4px 12px 4px 8px;
+    position: relative;
+}
+
+#fastchats_container .fc_msgs_wrap::after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+#fastchats_container .fc_msgs_unread {
+    background-color: var(--vk-im-unread-bg);
+}
+
+#fastchats_container .fc_msgs_inner {
+    position: relative;
+    display: inline-block;
+}
+
+#fastchats_container .fc_msgs_out_inner {
+    float: right;
+}
+
+#fastchats_container div.fc_msgs_author {
+    display: table-cell;
+    vertical-align: bottom;
+}
+
+#fastchats_container a.fc_msgs_img {
+    display: block;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: 50%;
+    margin-right: 5px;
+}
+
+#fastchats_container .fc_msgs {
+    display: table-cell;
+    vertical-align: bottom;
+    background-color: var(--module-background-color);
+    border: 1px solid var(--fc-in-bubble-border);
+    padding: 4px 6px 3px;
+    border-radius: 6px;
+    box-sizing: border-box;
+    max-width: 200px;
+}
+
+#fastchats_container .fc_msgs_out .fc_msgs {
+    background-color: var(--fc-out-bubble-background);
+    border: 1px solid var(--fc-out-bubble-border);
+}
+
+#fastchats_container .fc_msg_sticker .fc_msgs {
+    background: none;
+    padding: 0;
+    border: 0;
+}
+
+/* Gift messages inside FastChat */
+#fastchats_container .fc_msgs_wrap.msg-gift .fc_msgs {
+    background-color: var(--gift-message-background) !important;
+    border-color: color-mix(in srgb, var(--gift-message-text) 25%, var(--transparent)) !important;
+    padding: 8px 10px 6px;
+    text-align: center;
+}
+
+#fastchats_container .fc_msgs_wrap.msg-gift .fc_msg,
+#fastchats_container .fc_msgs_wrap.msg-gift .fc_msg.fc_msg_row {
+    background: transparent !important;
+    padding: 2px 0;
+    margin: 0;
+}
+
+#fastchats_container .fc_msgs_wrap.msg-gift .fc_msg_postfix {
+    color: var(--gift-message-text);
+    font-size: 11.5px;
+    font-style: normal;
+    margin: 0 0 6px;
+    text-align: center;
+}
+
+#fastchats_container .fc_msgs_wrap.msg-gift .fc_msg_text {
+    color: var(--gift-message-text);
+    font-size: 12px;
+    text-align: center;
+    transform: none;
+    margin-top: 6px;
+}
+
+#fastchats_container .fc_msgs_wrap.msg-gift .msg-attach-w-gift {
+    display: block;
+    width: fit-content;
+    margin: 4px auto;
+    transform: none;
+}
+
+#fastchats_container .fc_msgs_wrap.msg-gift .msg-attach-w-gift img {
+    max-width: 96px !important;
+    max-height: 96px !important;
+    width: auto !important;
+    height: auto !important;
+    border-radius: 6px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    box-shadow: 0 2px 5px 1px rgba(0, 0, 0, .06), 0 1px 2px 0 rgba(0, 0, 0, .06);
+}
+
+#fastchats_container .fc_msgs_wrap.msg-gift .fc_msgs_date {
+    color: var(--gift-message-text);
+    opacity: 0.75;
+}
+
+#fastchats_container .fc_msg,
+#fastchats_container .fc_msg.fc_msg_row {
+    display: block;
+    padding: 4px 2px 2px;
+    line-height: 17px;
+    border: none;
+}
+
+#fastchats_container .fc_msg:first-child {
+    padding-top: 0;
+}
+
+#fastchats_container .fc_msg .fc_msg_text {
+    font-size: 12.5px;
+    line-height: 17px;
+    word-break: break-word;
+    color: var(--text-color);
+}
+
+#fastchats_container .fc_msgs_date {
+    color: var(--muted-text-color);
+    font-size: 11px;
+    padding: 4px 0 3px;
+    opacity: 0.8;
+    text-align: center;
+}
+
+/* Replied & forwarded messages inside FastChat (VK flat left-strip style) */
+#fastchats_container .fc_chat_box .reply-msg-container {
+    margin: 3px 0 5px 1px;
+    padding: 0 0 0 7px;
+    border: none;
+    border-left: 2px solid var(--quote-border-color);
+    background: transparent;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 15px;
+    transition: border-color 0.15s ease;
+}
+
+#fastchats_container .fc_chat_box .fc_msgs_out .reply-msg-container,
+#fastchats_container .fc_chat_box .fc_msgs_out .fwd-messages-container {
+    border-left-color: color-mix(in srgb, var(--post-action-color) 35%, var(--transparent));
+}
+
+#fastchats_container .fc_chat_box .reply-msg-container:hover {
+    border-left-color: var(--vk-im-reply-hover);
+    background: transparent;
+}
+
+#fastchats_container .fc_chat_box .reply-msg-container .reply-msg-head {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: 7px;
+    margin-bottom: 3px;
+    line-height: 13px;
+    align-items: center;
+}
+
+#fastchats_container .fc_chat_box .reply-msg-container .reply-avatar-link {
+    grid-row: 1 / 3;
+    align-self: center;
+    line-height: 0;
+}
+
+#fastchats_container .fc_chat_box .reply-msg-container .reply-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+#fastchats_container .fc_chat_box .reply-msg-container .reply-author-name {
+    grid-column: 2;
+    font-size: 12px;
+    font-weight: 700;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--post-action-color);
+    line-height: 13px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    justify-self: start;
+    text-decoration: none;
+}
+
+#fastchats_container .fc_chat_box .reply-msg-container .reply-author-name:hover {
+    text-decoration: underline;
+}
+
+#fastchats_container .fc_chat_box .reply-msg-container .reply-date {
+    grid-column: 2;
+    font-size: 11px;
+    color: var(--vk-im-time);
+    line-height: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#fastchats_container .fc_chat_box .reply-msg-container .reply-text {
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--text-color);
+    white-space: normal;
+    word-break: break-word;
+}
+
+#fastchats_container .fc_chat_box .fwd-messages-container {
+    margin: 4px 0 2px 1px;
+    padding: 0 0 0 7px;
+    border: none;
+    border-left: 2px solid var(--quote-border-color);
+    background: transparent;
+    display: block;
+}
+
+#fastchats_container .fc_chat_box .fwd-message-block {
+    margin: 6px 0;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+#fastchats_container .fc_chat_box .fwd-message-block:first-of-type {
+    margin-top: 2px;
+}
+
+#fastchats_container .fc_chat_box .fwd-message-block:last-of-type {
+    margin-bottom: 2px;
+}
+
+#fastchats_container .fc_chat_box .fwd-message-head {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 3px;
+}
+
+#fastchats_container .fc_chat_box .fwd-avatar-link {
+    line-height: 0;
+    flex-shrink: 0;
+}
+
+#fastchats_container .fc_chat_box .fwd-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+#fastchats_container .fc_chat_box .fwd-author-info {
+    display: block;
+    line-height: 13px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+#fastchats_container .fc_chat_box .fwd-author-name {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--post-action-color);
+    line-height: 13px;
+    text-decoration: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#fastchats_container .fc_chat_box .fwd-author-name:hover {
+    text-decoration: underline;
+}
+
+#fastchats_container .fc_chat_box .fwd-date {
+    display: block;
+    font-size: 11px;
+    color: var(--vk-im-time);
+    line-height: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#fastchats_container .fc_chat_box .fwd-text {
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--text-color);
+    word-break: break-word;
+    margin-top: 2px;
+}
+
+/* Typing indicator inside FastChat log */
+#fastchats_container .fc_tab_typing {
+    color: var(--muted-text-color);
+    opacity: 0;
+    min-height: 1.2em;
+    max-height: 2.4em;
+    line-height: 120%;
+    padding: 3px 4px 7px 39px;
+    vertical-align: middle;
+    pointer-events: none;
+    transition: opacity 200ms ease-in-out;
+}
+
+#fastchats_container .fc_tab_typing_icon {
+    display: none;
+    float: left;
+    opacity: 1;
+    line-height: inherit;
+    margin: 0 0 0 -27px;
+}
+
+#fastchats_container .fc_tab_typing_icon .pr_bt {
+    margin-right: 3px;
+    background-color: var(--muted-text-color);
+    vertical-align: middle;
+    margin-top: -2px;
+}
+
+#fastchats_container .fc_tab_typing_icon .pr_bt:last-child {
+    margin-right: 0;
+}
+
+/* Fastchat input area (.fc_tab_txt) */
+#fastchats_container .fc_tab_txt_wrap.fc_input_bar:not(.fc_cant_write_bar) {
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    display: block;
+}
+
+#fastchats_container div.fc_tab_txt {
+    background: var(--module-background-color);
+    padding: 6px 3px 4px 10px;
+    border-top: 1px solid var(--quote-border-color);
+}
+
+#fastchats_container .emoji_cont {
+    position: relative;
+}
+
+#fastchats_container .fc_tab_txt .emoji_smile_wrap {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0 2px 0 0;
+}
+
+#fastchats_container .fc_tab_txt .emoji_smile {
+    position: relative;
+    cursor: pointer;
+    opacity: 0.7;
+    z-index: 4;
+    transition: opacity 200ms ease-in-out;
+}
+
+#fastchats_container .fc_tab_txt .emoji_smile:hover {
+    opacity: 1;
+}
+
+#fastchats_container .fc_editable,
+#fastchats_container .fc_editable.fc_textarea {
+    width: 100%;
+    min-height: 28px;
+    max-height: 80px;
+    padding: 2px 26px 2px 0;
+    border: 0;
+    resize: none;
+    outline: none;
+    background: transparent;
+    font-family: var(--font-family);
+    font-size: 12.5px;
+    line-height: 17px;
+    color: var(--text-color);
+    box-sizing: border-box;
+    display: block;
+}
+
+#fastchats_container .fc_editable::placeholder {
+    color: var(--search-placeholder-color);
+}
+
+#fastchats_container .fc_editable:focus::placeholder {
+    color: var(--search-placeholder-focus-color);
+}
+
+/* Pointer arrow towards the right dock */
+#fastchats_container .fc_pointer_offset {
+    position: absolute;
+    right: 1px;
+    bottom: 28px;
+}
+
+#fastchats_container .fc_tab_pointer {
+    display: none;
+    position: relative;
+}
+
+#fastchats_container .fc_fixed .fc_tab_pointer {
+    display: block;
+}
+
+#fastchats_container .fc_tab_pointer::before,
+#fastchats_container .fc_tab_pointer::after {
+    position: absolute;
+    pointer-events: none;
+    border: solid transparent;
+    content: '';
+    height: 0;
+    width: 0;
+    left: 100%;
+    top: 9px;
+}
+
+#fastchats_container .fc_tab_pointer::before {
+    border-width: 6px;
+    margin: -6px 0;
+    border-left-color: var(--border-color-2);
+}
+
+#fastchats_container .fc_tab_pointer::after {
+    border-width: 5px;
+    margin: -5px 0;
+    border-left-color: var(--module-background-color);
+}
+
+#fastchats_container .fc_tab_pointer.fc_tab_pointer_peer::after {
+    border-left-color: var(--button-background-color--light);
+}
+
+/* Resize handle for unpinned boxes */
+#fastchats_container .rb_resize_wrap {
+    position: relative;
+}
+
+#fastchats_container .chats_sp.rb_resize {
+    cursor: se-resize;
+    position: absolute;
+    top: -12px;
+    right: 3px;
+    height: 10px;
+    width: 10px;
+    background-position: 2px -130px;
+}
+
+#fastchats_container .fc_fixed .chats_sp.rb_resize {
+    display: none;
+}
+

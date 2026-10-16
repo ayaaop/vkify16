@@ -139,6 +139,9 @@ body {
     --gift-message-text: #7f7660;
     --gift-limit-background: #e64646;
     --overlay-background: rgba(0, 0, 0, 0.4);
+    --fc-out-bubble-background: #d4e7fa;
+    --fc-out-bubble-border: #cad8e6;
+    --fc-in-bubble-border: #e1e4e8;
 
     /* Profile page colors */
     --album-background-color: #ecf1f5;

@@ -31,8 +31,20 @@ function resetScrollIfEnteredIm() {
     wasImPage = isImPage;
 }
 
+function syncFastChatsVisibility() {
+    const isImPage = Boolean(document.querySelector('#im_container')) || /^\/im(?:\/|$)/.test(window.location.pathname);
+    const fc = window.im?.fastChats;
+    if (!fc) return;
+    if (isImPage) {
+        if (typeof fc.hide === 'function') fc.hide();
+    } else if (typeof fc.show === 'function') {
+        fc.show();
+    }
+}
+
 window.vkify?.onPageLifecycle?.('afterPageReady', resetScrollIfEnteredIm);
 window.vkify?.onPageLifecycle?.('afterPageReady', () => syncBodyPeerWindow());
+window.vkify?.onPageLifecycle?.('afterPageReady', syncFastChatsVisibility);
 window.vkify?.onPageLifecycle?.('beforePageLeave', () => {
     document.body?.classList.remove('peer-window-open');
 });

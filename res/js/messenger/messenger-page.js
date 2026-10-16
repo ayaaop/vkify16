@@ -9,6 +9,7 @@ import { createActionsBar } from './components/actions-bar.js';
 import { installPeerWindow } from './components/peer-window.js';
 import { installClassicTabBar } from './components/classic-tab-bar.js';
 import { installConversationsRenderer } from './components/conversations-page.js';
+import { installFastChatsRenderer } from './components/fastchats.js';
 
 let installed = false;
 
@@ -129,6 +130,7 @@ export async function installMessengerRenderer() {
     installPeerWindow({ h, preactMod, commonMod });
     await installClassicTabBar({ html, render, commonMod });
     await installConversationsRenderer({ html, render, h, Fragment, commonMod });
+    await installFastChatsRenderer({ html, render, commonMod, messageMod });
 
     // Upstream selectTab() logs a TypeError on the first tab selection because
     // getSelectedTab() is null until selectedTabId is set a few lines below.

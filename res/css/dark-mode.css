@@ -104,6 +104,9 @@ body.dark-mode {
 	--gift-message-text: #c4b48a;
 	--gift-limit-background: #c94040;
 	--overlay-background: rgba(0, 0, 0, 0.85);
+	--fc-out-bubble-background: #2b394a;
+	--fc-out-bubble-border: #35475c;
+	--fc-in-bubble-border: var(--border-color);
 
 	--elevator-bg-color: #232324;
 	--elevator-text-color: #909499;
