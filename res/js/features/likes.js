@@ -126,7 +126,7 @@ async function refreshLikeFaces(btn, liked, likesCount) {
             ? (likesCount > 1
                 ? (lang.post_likes_summary_you || 'You and $1 people liked this').replace('$1', likesCount - 1)
                 : (lang.post_likes_summary_only_you || 'You liked this'))
-            : (lang.post_likes_summary || '$1 people liked this').replace('$1', likesCount);
+            : tr('liked_by_x_people', likesCount);
         bar.hidden = false;
     } catch (e) { }
 }

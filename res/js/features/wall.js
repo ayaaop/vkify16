@@ -20,6 +20,9 @@ const ATTACH_ICONS = {
 };
 
 function attachIcon(key) {
+    if (key === 'source') {
+        return `<div class="post-attach-menu__icon"></div>`;
+    }
     const [id, w, h, vb = `0 0 ${w} ${h}`] = ATTACH_ICONS[key];
     return `<div class="post-attach-menu__icon"><svg width="${w}" height="${h}" viewBox="${vb}"><use href="#${id}"/></svg></div>`;
 }
@@ -451,6 +454,7 @@ function bumpSelectedTabCountOnNewPost(form) {
         for (const n of nodes) {
             const id = n.getAttribute('data-id');
             if (id && !existingIds.has(id)) {
+                finalize();
                 const current = parseInt((countEl.textContent || '').trim(), 10);
                 if (!Number.isNaN(current)) {
                     countEl.textContent = String(current + 1);
@@ -458,7 +462,6 @@ function bumpSelectedTabCountOnNewPost(form) {
                 if (form && typeof window.resetVkifyComposer === 'function') {
                     window.resetVkifyComposer(form);
                 }
-                finalize();
                 return;
             }
         }

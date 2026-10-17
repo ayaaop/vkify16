@@ -931,9 +931,9 @@ vkify.once('mediaModals', function () {
                         <div id="itemContentComments" class="ovk-modal-details"></div>
                     </div>
                 </div>
-                <div id="move_back" class="post_nav post_nav_left post_nav_back"><div class="post_nav_arrow"></div></div>
-                <div id="move_next" class="post_nav post_nav_right post_nav_next"><div class="post_nav_arrow"></div></div>
             </div>
+            <div id="move_back" class="post_nav post_nav_left post_nav_back"><div class="post_nav_arrow"></div></div>
+            <div id="move_next" class="post_nav post_nav_right post_nav_next"><div class="post_nav_arrow"></div></div>
         </div>
         `);
 
@@ -1029,6 +1029,52 @@ vkify.once('mediaModals', function () {
         }
 
         setClickableHeightForEls(this.modal.getNode(), this.modal.getNode().find('.ovk-photo-view-overlay').nodes, '.photo_viewer_wrapper', -50);
+    };
+
+    PostViewer.openById = async function (event, id) {
+        if (event != null) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        CMessageBox.toggleLoader(true);
+
+        try {
+            const msg = new PostViewer();
+            msg.setContext({
+                type: 'wall',
+                offset: 0,
+                id: id,
+            });
+            const offset = await msg._resolveOffset(id.split('_')[0], id.split('_')[1], 'wall.get');
+            msg.context.offset = offset;
+
+            const [htmls] = await Promise.all([
+                msg._downloadPage(id),
+                msg.loadWallContext(),
+            ]);
+
+            CMessageBox.toggleLoader(false);
+
+            msg.open();
+
+            const it = msg.items[id];
+            if (it == null) {
+                msg._updFrame({
+                    id: id,
+                    html: htmls[0],
+                    cached: htmls[1],
+                });
+                makeError(tr('post_display_error_switching_unavailable'));
+            } else {
+                it.html = htmls[0];
+                it.cached = htmls[1];
+                await msg.selectItemByApiId(id);
+            }
+        } catch (e) {
+            CMessageBox.toggleLoader(false);
+            console.error(e);
+        }
     };
 
     if (typeof Viewer !== 'undefined' && Viewer.prototype && typeof Viewer.prototype._removeDetails === 'function') {

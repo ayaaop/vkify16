@@ -147,7 +147,9 @@ const buildDualContainers = (activeKey, hasClub, itemsHTML, emptyHTML, container
         ${hasClub ? `<div class="${containerClass} ${containerClass}--group ${activeKey === 'group' ? `${containerClass}--active` : ''}">${groupContent}</div>` : ''}`;
 };
 
-const renderAlbumHTML = (album) => `
+const renderAlbumHTML = (album) => {
+    window.vkify?.ensureStyle?.('profile');
+    return `
     <div class="clear_fix clear page_album_row">
         <a href="javascript:void(0)" class="page_album_link picker-album photos_choose_album_row ${!album.thumb_src ? 'page_album_nocover' : ''}" data-album-id="${album.id}">
             <div class="page_album_thumb_wrap">${album.thumb_src ? `<img loading="lazy" src="${album.thumb_src}" class="page_album_thumb" />` : ''}</div>
@@ -158,6 +160,7 @@ const renderAlbumHTML = (album) => `
             </div>
         </a>
     </div>`;
+};
 
 class AttachmentPickerBase {
     constructor(options) {
@@ -1473,6 +1476,7 @@ function setupVideoTitleAutofill(container, fileSelector, linkSelector, nameSele
 }
 
 vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
+    window.vkify?.ensureStyle?.('settings');
     let current_tab = 'file';
     const is_from_messenger = formNode && formNode.closest('.messenger-layer').length > 0;
     const msg = new CMessageBox({

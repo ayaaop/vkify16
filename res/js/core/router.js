@@ -277,7 +277,12 @@ window.router = new class Router {
             return new Promise(resolve => {
                 managedLink.addEventListener('load', resolve, { once: true });
                 managedLink.addEventListener('error', resolve, { once: true });
-                document.head.appendChild(managedLink);
+                const anchor = document.getElementById('dark-mode-css') || document.getElementById('2018-mode-css') || document.querySelector('link[href*="/resource/css/mobile.css"]');
+                if (anchor && anchor.parentNode === document.head) {
+                    document.head.insertBefore(managedLink, anchor);
+                } else {
+                    document.head.appendChild(managedLink);
+                }
             });
         }));
     }
@@ -527,20 +532,34 @@ u(document).on('click', 'a', async (e) => {
 });
 
 function resetVkifyComposer(form) {
-    const formEl = u(form);
-    formEl.find('input[name="horizontal_attachments"], input[name="vertical_attachments"], input[name="geo"]').forEach(el => el.value = '');
-    formEl.find('.post-horizontal, .post-vertical, .post-source, .post-has-poll, .post-has-geo').forEach(el => { el.innerHTML = ''; });
+    const formNode = form?.nodes ? form.nodes[0] : form;
+    if (!formNode || typeof formNode.querySelectorAll !== 'function') return;
 
-    const textarea = formEl.find('textarea[name="text"]').nodes[0];
-    if (textarea) textarea.value = '';
+    formNode.querySelectorAll('input[name="horizontal_attachments"], input[name="vertical_attachments"], input[name="geo"], input[name="poll"], input[name="source"], input[name="reply_to_comment"]').forEach(el => {
+        el.value = el.name === 'poll' || el.name === 'source' ? 'none' : '';
+    });
+    formNode.querySelectorAll('.post-horizontal, .post-vertical, .post-source, .post-has-geo, .post-replyto').forEach(el => {
+        el.innerHTML = '';
+        el.classList.remove('appended-geo');
+    });
+    formNode.querySelectorAll('.post-has-poll').forEach(el => {
+        el.style.display = 'none';
+    });
 
-    const container = formEl.closest('.model_content_textarea');
-    if (container.length) container.removeClass('shown');
+    const textarea = formNode.querySelector('textarea[name="text"]');
+    if (textarea) {
+        textarea.value = '';
+        textarea.classList.remove('expanded-textarea');
+        window.vkifyTextareaAutosize?.apply?.(textarea);
+    }
 
-    const root = formEl.closest('#write');
-    if (root.length) {
-        root.find('.post-opts input[type="checkbox"]:not([name="as_group"])').forEach(el => { el.checked = false; });
-        root.find('input[type="hidden"][name="nsfw"], input[type="hidden"][name="force_sign"], input[type="hidden"][name="anon"], input[type="hidden"][name="as_group"]').forEach(el => el.remove());
+    const container = formNode.closest('.model_content_textarea');
+    if (container) container.classList.remove('shown');
+
+    const root = formNode.closest('#write');
+    if (root) {
+        root.querySelectorAll('.post-opts input[type="checkbox"]:not([name="as_group"])').forEach(el => { el.checked = false; });
+        root.querySelectorAll('input[type="hidden"][name="nsfw"], input[type="hidden"][name="force_sign"], input[type="hidden"][name="anon"], input[type="hidden"][name="as_group"]').forEach(el => el.remove());
     }
 }
 

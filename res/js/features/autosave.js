@@ -177,6 +177,7 @@
 
     function flashFormData(formDataEl) {
         if (!formDataEl) return;
+        window.vkify?.ensureStyle?.('settings');
         formDataEl.classList.remove('flash-error');
         void formDataEl.offsetWidth;
         formDataEl.classList.add('flash-error');

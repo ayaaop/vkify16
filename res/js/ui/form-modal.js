@@ -62,6 +62,7 @@ window.showFormModal = vkify.once('showFormModal', () => async (url, opts = {}) 
 
     let doc, formGroup, loadError;
     try {
+        vkify.ensureStyle?.('settings');
         const res = await window.ContentFetcher.request(url, {
             responseType: 'response',
             showLoader: true,

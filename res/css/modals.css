@@ -963,7 +963,7 @@
 
 .post_popup_modal .post_nav {
   display: none;
-  position: absolute;
+  position: fixed;
   top: 0;
   bottom: 0;
   width: 70px;
@@ -977,10 +977,10 @@
   display: none !important;
 }
 .post_popup_modal .post_nav_left {
-  left: max(-70px, calc((100% - 100vw) / 2));
+  left: max(0px, calc((100vw - (var(--page-width) - 245px)) / 2 - 70px));
 }
 .post_popup_modal .post_nav_right {
-  right: max(-70px, calc((100% - 100vw) / 2));
+  right: max(0px, calc((100vw - (var(--page-width) - 245px)) / 2 - 70px));
 }
 .post_popup_modal .post_nav_arrow {
   position: absolute;

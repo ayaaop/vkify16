@@ -4,6 +4,10 @@
 
 {block title}{_albums} {$owner->getCanonicalName()}{/block}
 
+{block headIncludes}
+    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/profile.css" data-vkify-route-style="profile" />
+{/block}
+
 {block bodyScripts}
     <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/ui/masonry.js"></script>
 {/block}

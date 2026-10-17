@@ -8,6 +8,8 @@
     window.geByClass1 = function (el) { return document.querySelectorAll('.' + el); };
 
     const loadedStyles = {};
+    const pendingStyles = {};
+    const pendingScripts = {};
     const hookedFunctions = {};
     const onceRegistry = {};
     let resourceBase = null;
@@ -85,17 +87,37 @@
         }
     }
 
+    function insertHeadNodeBeforeOverrides(node) {
+        if (node.id === 'dark-mode-css' || node.id === '2018-mode-css') {
+            document.head.appendChild(node);
+            return;
+        }
+        const anchor = ge('dark-mode-css') || ge('2018-mode-css') || document.querySelector('link[href*="/resource/css/mobile.css"]');
+        if (anchor && anchor.parentNode === document.head) {
+            document.head.insertBefore(node, anchor);
+        } else {
+            document.head.appendChild(node);
+        }
+    }
+
     function loadStyle(style, id, remoteUrl) {
         if (!id) {
             id = 'vkify_stl_' + genHash(style || remoteUrl || '');
         }
         if (!ge(id)) {
             if (!style && remoteUrl) {
-                document.head.insertAdjacentHTML('beforeend',
-                    '<link rel="stylesheet" class="vkify_style" id="' + id + '" href="' + remoteUrl + '">');
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.className = 'vkify_style';
+                link.id = id;
+                link.href = remoteUrl;
+                insertHeadNodeBeforeOverrides(link);
             } else if (style) {
-                document.head.insertAdjacentHTML('beforeend',
-                    '<style class="vkify_style" id="' + id + '">' + style + '</style>');
+                const styleEl = document.createElement('style');
+                styleEl.className = 'vkify_style';
+                styleEl.id = id;
+                styleEl.textContent = style;
+                insertHeadNodeBeforeOverrides(styleEl);
             }
         }
         loadedStyles[id] = style || remoteUrl;
@@ -107,9 +129,72 @@
             const el = ge(id);
             if (el) el.remove();
             delete loadedStyles[id];
+            delete pendingStyles[id];
             return true;
         }
         return false;
+    }
+
+    function ensureStyle(nameOrUrl, id) {
+        const isPath = /[/.]/.test(nameOrUrl);
+        const rel = isPath ? nameOrUrl : ('css/' + nameOrUrl + '.css');
+        const key = String(nameOrUrl).replace(/^.*\/|\.css(?:\?.*)?$/g, '');
+        const styleId = id || ('vkify-style-' + key);
+
+        const existingRoute = document.querySelector('link[rel="stylesheet"][data-vkify-route-style="' + key + '"]');
+        if (existingRoute || ge(styleId)) {
+            return Promise.resolve(existingRoute || ge(styleId));
+        }
+        if (pendingStyles[styleId]) {
+            return pendingStyles[styleId];
+        }
+
+        const href = /^https?:\/\/|^\//.test(rel) && rel.includes('/themepack/')
+            ? rel
+            : getResourceUrl(rel);
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.className = 'vkify_style';
+        link.id = styleId;
+        link.href = href;
+        loadedStyles[styleId] = href;
+
+        const promise = new Promise((resolve) => {
+            const done = () => {
+                delete pendingStyles[styleId];
+                resolve(link);
+            };
+            link.addEventListener('load', done, { once: true });
+            link.addEventListener('error', done, { once: true });
+            insertHeadNodeBeforeOverrides(link);
+        });
+        pendingStyles[styleId] = promise;
+        return promise;
+    }
+
+    function ensureScript(pathOrUrl, opts) {
+        opts = opts || {};
+        const href = /^https?:\/\/|^\//.test(pathOrUrl) && (pathOrUrl.includes('/themepack/') || pathOrUrl.includes('/assets/'))
+            ? pathOrUrl
+            : getResourceUrl(pathOrUrl.startsWith('js/') || pathOrUrl.startsWith('/js/') ? pathOrUrl : ('js/' + pathOrUrl));
+
+        if (window.router && typeof window.router.loadScriptOnce === 'function') {
+            return window.router.loadScriptOnce(href, opts);
+        }
+        if (pendingScripts[href]) {
+            return pendingScripts[href];
+        }
+        const promise = new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            if (opts.id) s.id = opts.id;
+            s.src = href;
+            s.async = true;
+            s.onload = () => resolve(s);
+            s.onerror = reject;
+            document.head.appendChild(s);
+        });
+        pendingScripts[href] = promise;
+        return promise;
     }
 
     const settingsCookieDays = 365;
@@ -370,6 +455,8 @@
 
         loadStyle: loadStyle,
         unloadStyle: unloadStyle,
+        ensureStyle: ensureStyle,
+        ensureScript: ensureScript,
         get loadedStyles() { return Object.assign({}, loadedStyles); },
 
         get settings() { return settings; },

@@ -1,6 +1,10 @@
 {extends "../@layout.latte"}
 {block title}{_about_this_instance}{/block}
 
+{block headIncludes}
+    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/profile.css" data-vkify-route-style="profile" />
+{/block}
+
 {block content}
     <div class="wide_column_left">
         <div class="narrow_column_wrap">

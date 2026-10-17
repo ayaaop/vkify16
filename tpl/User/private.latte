@@ -3,6 +3,10 @@
 {var $subStatus = isset($thisUser) ? $user->getSubscriptionStatus($thisUser) : null}
 {block title}{$user->getCanonicalName()}{/block}
 
+{block headIncludes}
+    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/profile.css" data-vkify-route-style="profile" />
+{/block}
+
 {block appbar_extra}{include '../components/profile_appbar_extra.latte', noAnimate => true}{/block}
 
 {block content}

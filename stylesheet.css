@@ -2186,6 +2186,9 @@ table,
 .post-attach-menu__icon svg {
     display: block;
 }
+.attach_source .post-attach-menu__icon {
+    background: url(../resource/icons/post_icon.png) no-repeat 0% -327px;
+}
 body:not(.body_im) .post-upload::before,
 body:not(.body_im) .post-has-poll::before,
 body:not(.body_im) .post-has-note::before,

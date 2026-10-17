@@ -8,6 +8,10 @@
     {/if}
 {/block}
 
+{block headIncludes}
+    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/settings.css" data-vkify-route-style="settings" />
+{/block}
+
 {block content}
     {var $tabs = [
         [
