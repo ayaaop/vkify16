@@ -219,8 +219,7 @@ async function updateCurrentlyPlayingInfo(container) {
             }
 
             const [, ownerId, playlistId] = matches.map(Number);
-            const albumsData = await window.OVKAPI.call("audio.getAlbums", { owner_id: ownerId });
-            const playlist = albumsData?.items?.find(item => item?.id === playlistId);
+            const playlist = await window.OVKAPI.call("audio.getPlaylistById", { owner_id: ownerId, playlist_id: playlistId });
 
             if (playlist?.title) {
                 container.innerHTML = `${currentlyPlayingText}<a onclick="tippy.hideAll();" href="${escapeHtml(playingNowLnk)}">${tr('playlist')} <b>${escapeHtml(playlist.title)}</b></a>`;
@@ -411,9 +410,41 @@ function patchPlayerInitEventsOnce() {
     }
 }
 
-function initTopPlayerOnce() {
-    if (!vkify.bindOnce('musicPopupTopPlayer', initTopPlayerOnce)) return;
+const topPlayerAudioPlayers = new WeakSet();
 
+function updateTopPlayer() {
+    const topPlayer = document.querySelector('#top_audio_player');
+    const headerMusicBtn = document.querySelector('#headerMusicBtn');
+    const topPlayerTitle = topPlayer?.querySelector('.top_audio_player_title');
+    if (!topPlayer || !headerMusicBtn || !topPlayerTitle) {
+        return;
+    }
+
+    if (window.player && window.player.currentTrack) {
+        const currentTrackId = String(window.player.currentTrack.id);
+        topPlayer.classList.add('top_audio_player_enabled');
+        headerMusicBtn.style.display = 'none';
+
+        if (topPlayer.dataset.currentTrackId !== currentTrackId) {
+            topPlayer.dataset.currentTrackId = currentTrackId;
+            topPlayerTitle.style.opacity = '0';
+            setTimeout(() => {
+                if (!topPlayer.isConnected) return;
+                topPlayerTitle.textContent = `${window.player.currentTrack?.performer || ''} — ${window.player.currentTrack?.name || ''}`;
+                topPlayerTitle.style.opacity = '1';
+            }, 60);
+        }
+
+        topPlayer.classList.toggle('top_audio_player_playing', !window.player.audioPlayer.paused);
+    } else {
+        topPlayer.classList.remove('top_audio_player_enabled');
+        delete topPlayer.dataset.currentTrackId;
+        topPlayerTitle.textContent = '';
+        headerMusicBtn.removeAttribute('style');
+    }
+}
+
+function initTopPlayerOnce() {
     const topPlayer = document.querySelector('#top_audio_player');
     const headerMusicBtn = document.querySelector('#headerMusicBtn');
     if (!topPlayer || !headerMusicBtn) {
@@ -429,61 +460,38 @@ function initTopPlayerOnce() {
         return;
     }
 
-    let currentTrackId = null;
-
-    function updateTopPlayer() {
-        if (window.player && window.player.currentTrack) {
-            topPlayer.classList.add('top_audio_player_enabled');
-            headerMusicBtn.style.display = 'none';
-
-            if (currentTrackId !== window.player.currentTrack.id) {
-                currentTrackId = window.player.currentTrack.id;
-                topPlayerTitle.style.opacity = '0';
-                setTimeout(() => {
-                    topPlayerTitle.textContent = `${window.player.currentTrack.performer} — ${window.player.currentTrack.name}`;
-                    topPlayerTitle.style.opacity = '1';
-                }, 60);
+    if (topPlayer.dataset.vkifyTopPlayerInit !== '1') {
+        topPlayer.dataset.vkifyTopPlayerInit = '1';
+        topPlayerPlay.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!window.player?.audioPlayer) {
+                return;
             }
+            if (window.player.audioPlayer.paused) {
+                window.player.play();
+            } else {
+                window.player.pause();
+            }
+            updateTopPlayer();
+        });
 
-            topPlayer.classList.toggle('top_audio_player_playing', !window.player.audioPlayer.paused);
-        } else {
-            topPlayer.classList.remove('top_audio_player_enabled');
-            topPlayerTitle.textContent = '';
-            headerMusicBtn.removeAttribute('style');
-            currentTrackId = null;
-        }
+        topPlayerPrev.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.player?.currentTrack) {
+                window.player.playPreviousTrack();
+            }
+        });
+
+        topPlayerNext.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.player?.currentTrack) {
+                window.player.playNextTrack();
+            }
+        });
     }
 
-    vkify.musicPopup.updateTopPlayer = updateTopPlayer;
-
-    topPlayerPlay.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (!window.player?.audioPlayer) {
-            return;
-        }
-        if (window.player.audioPlayer.paused) {
-            window.player.play();
-        } else {
-            window.player.pause();
-        }
-        updateTopPlayer();
-    });
-
-    topPlayerPrev.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (window.player?.currentTrack) {
-            window.player.playPreviousTrack();
-        }
-    });
-
-    topPlayerNext.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (window.player?.currentTrack) {
-            window.player.playNextTrack();
-        }
-    });
-
-    if (window.player?.audioPlayer) {
+    if (window.player?.audioPlayer && !topPlayerAudioPlayers.has(window.player.audioPlayer)) {
+        topPlayerAudioPlayers.add(window.player.audioPlayer);
         window.player.audioPlayer.addEventListener('play', updateTopPlayer);
         window.player.audioPlayer.addEventListener('pause', updateTopPlayer);
     }
@@ -501,10 +509,10 @@ function initTopPlayerOnce() {
         return true;
     };
 
+    vkify.musicPopup.updateTopPlayer = updateTopPlayer;
+    vkify.musicPopup.tryWrapUpdateFace = tryWrapUpdateFace;
     tryWrapUpdateFace();
     updateTopPlayer();
-
-    vkify.musicPopup.tryWrapUpdateFace = tryWrapUpdateFace;
 }
 
 
@@ -520,7 +528,7 @@ async function getFriendsHtml() {
     }
 
     friendsHtmlPromise = (async () => {
-        if (!window.OVKAPI?.call) {
+        if (!vkify.isLoggedIn() || !window.OVKAPI?.call) {
             friendsHtmlCache = '';
             return friendsHtmlCache;
         }
