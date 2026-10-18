@@ -59,7 +59,7 @@
             <link id="2018-mode-css" rel="stylesheet" href="/themepack/vkify16/{$theme->getVersion()|noescape}/resource/css/2018.css">
         {/if}
     </head>
-    <body data-themepack="{$theme->getId()}" n:class="$hideSidebar ? no-sidebar, isset($thisUser) && $thisUser->isBanned() ? banned, $darkModeEnabled ? dark-mode, $ovkHatEnabled ? ovkhat, $isMessenger ? body_im">
+    <body data-themepack="{$theme->getId()}" n:class="$hideSidebar ? no-sidebar, !isset($thisUser) ? logged-out, isset($thisUser) && $thisUser->isBanned() ? banned, $darkModeEnabled ? dark-mode, $ovkHatEnabled ? ovkhat, $isMessenger ? body_im">
         {include "_icons.latte"}
         <div n:if="\OPENVK_ROOT_CONF['openvk']['preferences']['bellsAndWhistles']['testLabel']" id="test-label">FOR TESTING PURPOSES ONLY</div>
 

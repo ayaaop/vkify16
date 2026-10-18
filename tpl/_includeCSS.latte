@@ -25,19 +25,14 @@
 {/if}
 {ifset $thisUser}
     {if $thisUser->getStyleAvatar() == 1}
-        {css "css/avatar.1.css"}
+        <link id="vkify-style-square_avatars" rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/square_avatars.css" />
     {/if}
-
-    {if $thisUser->getStyleAvatar() == 2}
-        {css "css/avatar.2.css"}
-    {/if}
-
     {else}
     <style>
-        .post-content {
+        .logged-out .post-content {
             padding-bottom: 15px;
         }
-        .reply .post-content {
+        .logged-out .reply .post-content {
             padding-bottom: 0;
         }
     </style>

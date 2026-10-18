@@ -84,7 +84,8 @@ window.router = new class Router {
         const backdrop = document.querySelector('#backdrop');
         const runtimeConfig = document.getElementById('_js_ep_script')?.outerHTML || '';
         const title = document.title.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-        const bodyClass = document.body.classList.contains('no-sidebar') ? ' class="no-sidebar"' : '';
+        const bodyClasses = ['no-sidebar', 'logged-out'].filter(cls => document.body.classList.contains(cls));
+        const bodyClass = bodyClasses.length ? ` class="${bodyClasses.join(' ')}"` : '';
         const html = `<!doctype html><html><head><title>${title}</title><meta name="vkify-router" content="vkify16"><meta name="csrf" content="${this.csrf}">${styles}</head>` +
             `<body data-themepack="vkify16"${bodyClass}>${pageBody.outerHTML}${sidebar ? sidebar.outerHTML : ''}${header.outerHTML}${appbar.outerHTML}${backdrop ? backdrop.outerHTML : ''}${runtimeConfig}</body></html>`;
         this._pageCacheSet(url, html);
@@ -375,6 +376,7 @@ window.router = new class Router {
             currentSidebarNode?.remove();
         }
         document.body.classList.toggle('no-sidebar', Boolean(parsed_content.body?.classList.contains('no-sidebar') || !nextSidebarNode));
+        document.body.classList.toggle('logged-out', Boolean(parsed_content.body?.classList.contains('logged-out')));
 
         u('.appbar').html(appbar.html());
         // Inner-HTML swaps keep the live element's class list, so propagate

@@ -218,10 +218,15 @@ body.body_im .page_body {
 body.body_im .page_header {
     z-index: 100;
 }
-
 body.body_im .sidebar {
     top: 0;
     z-index: 10;
+}
+body:has(#im_container.at_page) .sidebar {
+    scrollbar-width: none;
+}
+body:has(#im_container.at_page) .sidebar::-webkit-scrollbar {
+    display: none;
 }
 
 /* Back-to-top never activates on IM pages (no window scroll). */
@@ -2181,8 +2186,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     display: block;
 }
 
-/* Stock main.css styles a 30px square button; VK's is a larger circular overlay. */
-.compact_video .play-button,
+.msg-media-tile-video .compact_video .play-button,
+.messenger-app--messages---message .msg-attach-wall-card .attachments_b .compact_video .play-button,
 .msg-attach-w-gif .docGalleryItem .play-button {
     width: 44px;
     height: 44px;
@@ -2196,12 +2201,14 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     pointer-events: none;
 }
 
-.compact_video:hover .play-button,
+.msg-media-tile-video .compact_video:hover .play-button,
+.messenger-app--messages---message .msg-attach-wall-card .attachments_b .compact_video:hover .play-button,
 .msg-attach-w-gif .docGalleryItem:hover .play-button {
     background: var(--video-overlay-background-hover);
 }
 
-.compact_video .play-button-ico,
+.msg-media-tile-video .compact_video .play-button .play-button-ico
+.messenger-app--messages---message .msg-attach-wall-card .attachments_b .compact_video .play-button .play-button-ico,
 .msg-attach-w-gif .docGalleryItem .play-button-ico {
     width: 0;
     height: 0;
@@ -2211,7 +2218,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     margin-left: 3px;
 }
 
-.compact_video .length {
+.msg-media-tile-video .compact_video .length,
+.messenger-app--messages---message .msg-attach-wall-card .attachments_b .compact_video .length {
     position: absolute;
     right: 6px;
     bottom: 6px;

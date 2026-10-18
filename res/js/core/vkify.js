@@ -125,14 +125,13 @@
     }
 
     function unloadStyle(id) {
-        if (loadedStyles[id]) {
-            const el = ge(id);
-            if (el) el.remove();
-            delete loadedStyles[id];
-            delete pendingStyles[id];
-            return true;
-        }
-        return false;
+        const el = ge(id);
+        if (el) el.remove();
+        if (!loadedStyles[id]) return false;
+
+        delete loadedStyles[id];
+        delete pendingStyles[id];
+        return true;
     }
 
     function ensureStyle(nameOrUrl, id) {

@@ -1,0 +1,36 @@
+.avatar,
+.object_fit_ava,
+.search_row .img,
+.page_list_module .thumb,
+.page_list_module .cell_img,
+#fastchats_container .chat_tab_img,
+#fastchats_container img.fc_contact_photo,
+#fastchats_container img.fc_contact_photo.fc_avatar,
+#fastchats_container a.fc_msgs_img,
+#fastchats_container .fc_chat_box .fwd-avatar,
+#fastchats_container .fc_chat_box .reply-msg-container .reply-avatar,
+body #im_container .crp-list .crp-entry--image,
+body #im_container .crp-list .crp-entry--image img,
+body #im_container .crp-list .crp-entry--message---av,
+body #im_container .crp-list .crp-entry--message---av img,
+.crp-entry--image > .chat_table_avatar,
+.chat-invite-member-ava, .chat-invite-avatar,
+.messenger-app--messages---message .ava,
+.messenger-app--messages---message .msg-attach-wall-card .wall-card-avatar,
+.messenger-app--messages---message .fwd-avatar,
+.fwd-modal-content .fwd-avatar,
+.pinned-message-ava,
+.peer-window .peer-side .peer-info .peer-avatar,
+.peer-window .peer-side .peer-info .peer-avatar > img {
+    border-radius: 0 !important;
+}
+
+.post_image.online::after,
+#fastchats_container .chat_tab_imgcont.online::after,
+#fastchats_container span.fc_contact_photo.online::after,
+.messenger-app--header--ava .messenger-app--header--online,
+#fastchats_container .fc_clist_online::before {
+    border-radius: 0 !important;
+    bottom: -2px;
+    right: -2px;
+}
