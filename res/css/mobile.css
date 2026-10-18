@@ -1210,12 +1210,14 @@
         height: 56px;
         line-height: normal;
         padding: 0 4px;
-        background-color: var(--module-background-color);
         color: var(--muted-text-color-2);
         font-size: 16px;
         font-weight: 400;
         border-radius: 0;
         border-bottom: 1px solid var(--border-color);
+    }
+    body .ovk-diag-cont.ovk-msg-sheet .ovk-diag-head {
+        background-color: var(--module-background-color);
     }
     .ovk-diag-cont.ovk-diag-no-title.ovk-msg-sheet .ovk-diag-head {
         display: none;
@@ -1708,7 +1710,7 @@
         padding: 0 16px;
     }
     .vertical-attachment .audioEntry .audioEntryWrapper {
-        padding: 0;
+        padding: 8px 0;
     }
     .post-horizontal.vkify_makima_composer .ui_thumb_x_button,
     .post-horizontal.vkify_makima_composer .photo_thumb_btns_container {

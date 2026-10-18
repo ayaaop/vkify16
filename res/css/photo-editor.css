@@ -920,7 +920,8 @@
 }
 
 .pe_editor .pe_bottom_actions .button_baw_inverted .pr_baw .pr_bt,
-.dark-mode .pe_editor .pe_bottom_actions .button .pr_baw .pr_bt {
+.dark-mode .pe_editor .pe_bottom_actions .button .pr_baw .pr_bt,
+.dark-mode .vkify-pe-dialog .ovk-diag-action .button .pr_baw .pr_bt {
   background-color: #111;
 }
 
