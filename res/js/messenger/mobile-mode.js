@@ -37,6 +37,9 @@ export function forceClassicModeOnMobile() {
     }
     try {
         localStorage.setItem(COMPACT_FLAG, '0');
+        if (Array.isArray(window.tweaks)) {
+            window.tweaks = window.tweaks.filter((tweak) => !tweak || tweak.name !== MODERN_TWEAK_NAME);
+        }
     } catch (e) {
         unmarkForced();
         return false;
@@ -87,57 +90,4 @@ export function watchImVisualViewport() {
     window.vkify?.onPageLifecycle?.('afterPageReady', apply);
     window.vkify?.onPageLifecycle?.('beforePageLeave', apply);
     apply();
-}
-
-export function watchModernModeTweak() {
-    let observer = null;
-    try {
-        if (typeof MutationObserver === 'undefined') {
-            return null;
-        }
-        observer = new MutationObserver(() => hideModernModeTweakRow());
-        const root = (typeof document !== 'undefined' && document.documentElement) ? document.documentElement : null;
-        if (!root) {
-            return null;
-        }
-        observer.observe(root, { childList: true, subtree: true });
-    } catch (e) {
-        return null;
-    }
-    try {
-        hideModernModeTweakRow();
-    } catch (e) {
-    }
-    return observer;
-}
-
-export function hideModernModeTweakRow(scope) {
-    try {
-        const root = scope || (typeof document !== 'undefined' ? document : null);
-        if (!root || !root.getElementById) {
-            return false;
-        }
-        const body = root.body || (typeof document !== 'undefined' ? document.body : null);
-        if (!body || !body.classList || !body.classList.contains(FORCE_CLASSIC_BODY_CLASS)) {
-            return false;
-        }
-        const slot = root.getElementById('plugin_settings');
-        if (!slot || typeof slot.querySelectorAll !== 'function') {
-            return false;
-        }
-        let hidden = false;
-        slot.querySelectorAll('label').forEach((label) => {
-            try {
-                const name = label.querySelector('span');
-                if (name && name.textContent === MODERN_TWEAK_NAME) {
-                    label.style.display = 'none';
-                    hidden = true;
-                }
-            } catch (e) {
-            }
-        });
-        return hidden;
-    } catch (e) {
-        return false;
-    }
 }

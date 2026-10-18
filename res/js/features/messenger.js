@@ -1,5 +1,5 @@
 import { installMessengerRenderer } from '../messenger/messenger-page.js';
-import { forceClassicModeOnMobile, watchModernModeTweak, watchImVisualViewport } from '../messenger/mobile-mode.js';
+import { forceClassicModeOnMobile, watchImVisualViewport } from '../messenger/mobile-mode.js';
 import { installAudioNormalizer } from '../messenger/audio-normalizer.js';
 import { patchMonthDayString, syncBodyPeerWindow } from '../messenger/shared.js';
 
@@ -7,9 +7,7 @@ installAudioNormalizer();
 patchMonthDayString();
 watchImVisualViewport();
 
-if (forceClassicModeOnMobile()) {
-    watchModernModeTweak();
-}
+forceClassicModeOnMobile();
 
 let wasImPage = typeof document !== 'undefined' && (Boolean(document.querySelector('#im_container')) || /^\/im(?:\/|$)/.test(window.location.pathname));
 
