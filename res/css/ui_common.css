@@ -575,6 +575,13 @@ input[type="submit"].button_green:hover {
     justify-content: center;
     gap: 5px;
 }
+.buttons_row .button.profile_more_btn {
+    padding-left: 9px;
+    padding-right: 9px;
+}
+.buttons_row .profile_more_btn svg {
+    display: block;
+}
 .form_data .buttons_row {
     justify-content: flex-start;
 }

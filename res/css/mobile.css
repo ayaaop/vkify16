@@ -358,6 +358,9 @@
         height: 1.75rem;
         width: 1.75rem;
         margin-right: 1rem;
+        box-sizing: border-box;
+        padding: calc((1.75rem - var(--icon-h, 14px) * 1.167) / 2)
+            calc((1.75rem - var(--icon-w, 16px) * 1.167) / 2);
         color: rgba(0,0,0,.54);
     }
     body.dark-mode .sidebar .sidebar_inner .link .link_icon {

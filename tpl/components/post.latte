@@ -205,7 +205,7 @@
             </a>
             {var $viewsCount = ($_COOKIE['vkify16_postviews'] ?? '1') === '1' ? $post->getViews() : null}
             <div n:if="$viewsCount" class="post_views" title="{tr('x_views', $viewsCount)}">
-                <svg class="post_views_icon"><use href="#view-14"/></svg>
+                <svg class="post_views_icon" viewBox="1 2 14 10"><use href="#view-14" x="1" y="2"/></svg>
                 <span class="post_views_count">{=vkifyFormatCountSpaced($viewsCount)}</span>
             </div>
         </div>

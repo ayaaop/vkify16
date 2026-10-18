@@ -409,6 +409,12 @@ function syncSvgViewBoxes(files, viewBoxMap, write = true) {
         return svgMatch;
       }
 
+      // <use> with explicit x/y/width/height positions the glyph inside a
+      // fixed outer canvas (e.g. .link_icon); syncing that viewBox breaks it.
+      if (/<use\b[^>]*\b(?:x|y|width|height)\s*=/i.test(svgBody)) {
+        return svgMatch;
+      }
+
       // Multi-<use> icons (e.g. .i16/.i18 action buttons) swap glyphs via CSS;
       // only sync when every referenced icon shares the same viewBox.
       const viewBoxes = new Set();

@@ -116,7 +116,7 @@
             {if $hasActions}
                 <div class="ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
                     <button class="button button_gray profile_more_btn">
-                        &nbsp;
+                        <svg viewBox="0 0 8 16" width="16" height="16" fill="currentColor"><use href="#more-vertical-16"></use></svg>
                     </button>
                     <div id="followers_actions_menu_{$x->getId()}" class="ui_actions_menu">
                         {if $club->getOwner()->getId() != $user->getId() && $manager && $thisUser->getId() == $club->getOwner()->getId()}

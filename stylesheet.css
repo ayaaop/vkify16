@@ -1440,6 +1440,10 @@ body.scrolled .toTop:hover #wrap {
 .sidebar_inner .link .link_icon {
     height: 25px;
     width: 35px;
+    box-sizing: border-box;
+    /* centers each glyph at its natural size (--icon-w/h × 24px-canvas scale) */
+    padding: calc((25px - var(--icon-h, 14px) * 1.042) / 2)
+        calc((35px - var(--icon-w, 16px) * 1.042) / 2);
     opacity: 0.75;
     display: inline-block;
     background-repeat: no-repeat;
