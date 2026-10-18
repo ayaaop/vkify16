@@ -1792,7 +1792,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 /* Modifiers */
 .messenger-app--messages---message .msg-modificators {
-    margin-left: 4px;
+    margin: 0;
 }
 
 .messenger-app--messages---message .msg-modificators p {
@@ -3089,6 +3089,9 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     padding: 10px 38px 0;
     height: unset;
 }
+.messenger-app-end.m-selected:not(.stock-input-bar) {
+    background: var(--vk-im-input-bg);
+}
 
 .messenger-app-end.m-selected:not(.stock-input-bar) .input-m.input-reply {
     padding-right: 55px;
@@ -3109,6 +3112,9 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 .messenger-app-end .input-m.input-reply .input-reply-content {
     position: relative;
     padding-left: 10px;
+    flex-direction: column;
+    align-items: start;
+    gap: 5px;
 }
 
 .messenger-app-end .input-m.input-reply .input-reply-content:before {
@@ -3414,7 +3420,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 .stock-input-bar .messenger-app--input---messagebox {
     padding: 0px 14px;
-    width: calc(100% - 28px - 92px);
+    width: 100%;
 }
 
 .stock-input-bar .messenger-app--input>.ava,
@@ -3424,6 +3430,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     height: 46px;
     border-radius: 50%;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .stock-input-bar #write.expanded-textarea .messenger-app--input---messagebox .content-editable,

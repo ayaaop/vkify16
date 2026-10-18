@@ -648,9 +648,6 @@
     .page_content .page_block:first-child {
         border-radius: 0 0 var(--module-border-radius) var(--module-border-radius);
     }
-    .narrow_column_wrap + .wide_column_wrap .page_block {
-        border-radius:  var(--module-border-radius)
-    }
     .page_block + .page_block.comments {
         margin-top: -8px;
     }
@@ -3486,10 +3483,18 @@
         border-radius: 0;
         box-shadow: none;
     }
+    body.body_im .messenger-app-end.m-selected {
+        box-shadow: 0 -1px 4px rgba(0,0,0,.08);
+    }
     body.body_im .messenger-app .im-chat-input {
         padding: 0;
         border-top: 0;
+        background-color: var(--module-background-color);
         box-shadow: 0 -1px 4px rgba(0,0,0,.08);
+    }
+    body.body_im .messenger-app .m-selected .im-chat-input {
+        box-shadow: none;
+        border-top: 1px solid var(--border-color);
     }
     body.body_im .messenger-app .im-chat-input--textarea {
         margin: 0 96px 0 48px;
