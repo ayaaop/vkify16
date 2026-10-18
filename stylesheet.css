@@ -2929,6 +2929,7 @@ body:not(.mode-2018) .post_full_like .side_button ~ .post_views {
 }
 body.no-post-views .post_views,
 body:not(.no-post-views) .post .post_full_like .action_label {
+body:not(.no-post-views) .post .post_full_like .post_share .action_label {
     display: none;
 }
 
