@@ -13,7 +13,14 @@ function parseNotifyCount(text) {
     return parseInt(t, 10) || 0;
 }
 
-vkify.ready(() => {
+let notificationsRuntimeInitialized = false;
+
+function initNotificationsRuntime() {
+    if (notificationsRuntimeInitialized || !vkify.isLoggedIn()) return;
+    if (typeof window.incrementNotificationsCounter !== 'function') return;
+
+    notificationsRuntimeInitialized = true;
+
     /* upstream al_notifs.js calls __actualPlayNotifSound(type) with
        "newmsg" for incoming messages and "notification" for everything else */
     const soundFiles = {
@@ -91,13 +98,18 @@ vkify.ready(() => {
         }
     }, 'replace');
 
-    const topNotifyBtn = document.querySelector('#top_notify_btn');
-    if (topNotifyBtn) {
+    const pageHeader = document.querySelector('.page_header');
+    if (pageHeader) {
         const notifyObserver = new MutationObserver(() => {
             cachedNotificationsContent = null;
         });
-        notifyObserver.observe(topNotifyBtn, { childList: true, subtree: true, characterData: true });
+        notifyObserver.observe(pageHeader, { childList: true, subtree: true, characterData: true });
     }
+}
+
+vkify.ready(() => {
+    initNotificationsRuntime();
+    vkify.onPageLifecycle('afterPageReady', initNotificationsRuntime, 'after');
 });
 
 vkify.once("initNotificationsPopup", () => {

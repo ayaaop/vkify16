@@ -202,13 +202,20 @@ vkify.once("initializeSearchFastTips", () => {
                     try {
                         const audioQ = currentQuery.replace(/[+\-<>()~*"\\]/g, ' ').trim();
 
+                        const mediaCode = vkify.isLoggedIn() ? [
+                            'var audios = API.audio.search({ q: audioQ, count: 300 });',
+                            'var videos = API.video.search({ q: q, count: 3, extended: 1 });',
+                        ] : [
+                            'var audios = { count: 0, items: [] };',
+                            'var videos = { count: 0, items: [], profiles: [], groups: [] };',
+                        ];
+
                         const code = [
                             'var q = Args.q;',
                             'var audioQ = Args.audio_q;',
                             'var users = API.users.search({ q: q, fields: "photo_50", count: 5 });',
                             'var groups = API.groups.search({ q: q, count: 8 });',
-                            'var audios = API.audio.search({ q: audioQ, count: 300 });',
-                            'var videos = API.video.search({ q: q, count: 3, extended: 1 });',
+                            ...mediaCode,
 
                             'return { users: users, groups: groups, audios: audios, videos: videos };'
                         ].join('\n');
@@ -366,16 +373,19 @@ vkify.once("initializeSearchFastTips", () => {
             }, 250);
         });
 
-        u(document).on('click', function (e) {
-            const searchBox = u('#search_box').first();
-            const fastTips = fastTipsContainer.first();
+        if (!window.__vkifyFastTipsDocumentClickBound) {
+            window.__vkifyFastTipsDocumentClickBound = true;
+            u(document).on('click', function (e) {
+                const searchBox = u('#search_box').first();
+                const fastTips = u('#searchBoxFastTips').first();
 
-            if (fastTips.style.display === 'block' &&
-                !searchBox.contains(e.target) &&
-                !fastTips.contains(e.target)) {
-                hideFastTips();
-            }
-        });
+                if (fastTips?.style.display === 'block' &&
+                    !searchBox?.contains(e.target) &&
+                    !fastTips.contains(e.target)) {
+                    fastTips.style.display = 'none';
+                }
+            });
+        }
     };
 });
 

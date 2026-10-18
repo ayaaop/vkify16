@@ -688,7 +688,7 @@ vkify.onPage(() => {
                 const btn = slot.querySelector('button');
                 btn.addEventListener('click', async (ev) => {
                     ev.preventDefault();
-                    if (btn.disabled) return;
+                    if (!vkify.requireAuth() || btn.disabled) return;
                     btn.disabled = true;
                     btn.classList.add('lagged');
 

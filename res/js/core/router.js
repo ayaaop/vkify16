@@ -77,14 +77,16 @@ window.router = new class Router {
         const sidebar = document.querySelector('.sidebar');
         const header = document.querySelector('.page_header');
         const appbar = document.querySelector('.appbar');
-        if (!pageBody || !sidebar || !header || !appbar) return;
+        if (!pageBody || !header || !appbar) return;
 
         const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"][data-vkify-route-style]'))
             .map(l => l.outerHTML).join('');
         const backdrop = document.querySelector('#backdrop');
+        const runtimeConfig = document.getElementById('_js_ep_script')?.outerHTML || '';
         const title = document.title.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-        const html = `<!doctype html><html><head><title>${title}</title><meta name="csrf" content="${this.csrf}">${styles}</head>` +
-            `<body data-themepack="vkify16">${pageBody.outerHTML}${sidebar.outerHTML}${header.outerHTML}${appbar.outerHTML}${backdrop ? backdrop.outerHTML : ''}</body></html>`;
+        const bodyClass = document.body.classList.contains('no-sidebar') ? ' class="no-sidebar"' : '';
+        const html = `<!doctype html><html><head><title>${title}</title><meta name="vkify-router" content="vkify16"><meta name="csrf" content="${this.csrf}">${styles}</head>` +
+            `<body data-themepack="vkify16"${bodyClass}>${pageBody.outerHTML}${sidebar ? sidebar.outerHTML : ''}${header.outerHTML}${appbar.outerHTML}${backdrop ? backdrop.outerHTML : ''}${runtimeConfig}</body></html>`;
         this._pageCacheSet(url, html);
     }
 
@@ -287,8 +289,34 @@ window.router = new class Router {
         }));
     }
 
+    _syncElementAttributes(target, source) {
+        if (!target || !source) return;
+
+        for (const attribute of Array.from(target.attributes)) {
+            if (!source.hasAttribute(attribute.name)) target.removeAttribute(attribute.name);
+        }
+        for (const attribute of source.attributes) {
+            target.setAttribute(attribute.name, attribute.value);
+        }
+    }
+
+    _syncRuntimeConfig(parsed_content) {
+        const configScript = parsed_content.querySelector('script#_js_ep_script');
+        if (!configScript) return;
+
+        try {
+            const currentConfigScript = document.getElementById('_js_ep_script');
+            if (currentConfigScript) {
+                currentConfigScript.textContent = configScript.textContent;
+            }
+            new Function(configScript.textContent)();
+        } catch (error) {
+            console.warn('[vkify-router] Failed to synchronize runtime config:', error);
+        }
+    }
+
     async _appendPage(parsed_content) {
-        const requiredElements = ['.page_body', '.sidebar', '.page_header', '.appbar'];
+        const requiredElements = ['.page_body', '.page_header', '.appbar'];
         const missingElements = requiredElements.filter(selector => !parsed_content.querySelector(selector));
         if (missingElements.length > 0) {
             console.warn('Missing required elements for AJAX transition:', missingElements);
@@ -302,25 +330,52 @@ window.router = new class Router {
         const backdrop = u(parsed_content.querySelector('#backdrop'));
         const appbar = u(parsed_content.querySelector('.appbar'));
 
+        const previousUserId = Number(window.openvk?.current_id || 0);
         await this._syncManagedStyles(parsed_content);
+        this._syncRuntimeConfig(parsed_content);
+        if (Number(window.openvk?.current_id || 0) !== previousUserId) {
+            this._pageCache.clear();
+        }
 
         if (pageBody.length < 1) {
             throw new Error('Invalid page has been loaded');
         }
 
-        const currentSearchInput = u('.page_header #search_box input').nodes[0];
-        const newSearchInput = pageHeader.find('#search_box input').nodes[0];
-        if (currentSearchInput && newSearchInput) {
-            currentSearchInput.value = newSearchInput.value;
-        }
+        const searchInputValue = document.querySelector('.page_header #search_box input')?.value;
 
         window.__current_page_audio_context = null;
-        parsed_content.querySelectorAll('.page_body script, script[data-vkify-route-script], body > script[src]').forEach(script => {
+        parsed_content.querySelectorAll('.page_body script, script[data-vkify-route-script], body > script[src], head > script[type="module"][src]').forEach(script => {
             if (!this._isScriptAlreadyLoaded(script)) scriptsToAppend.push(script);
         });
 
+        const nextPageHeaderNode = pageHeader.nodes[0];
+        const currentPageHeaderNode = document.querySelector('.page_header');
+        if (currentPageHeaderNode) {
+            this._syncElementAttributes(currentPageHeaderNode, nextPageHeaderNode);
+            currentPageHeaderNode.innerHTML = nextPageHeaderNode.innerHTML;
+        } else {
+            document.querySelector('.appbar')?.insertAdjacentHTML('afterend', nextPageHeaderNode.outerHTML);
+        }
+        const updatedSearchInput = document.querySelector('.page_header #search_box input');
+        if (updatedSearchInput && searchInputValue !== undefined) {
+            updatedSearchInput.value = searchInputValue;
+        }
+
         u('.page_body').html(pageBody.html());
-        u('.sidebar').html(sidebar.html());
+        const nextSidebarNode = sidebar.nodes[0];
+        const currentSidebarNode = document.querySelector('.sidebar');
+        if (nextSidebarNode) {
+            if (currentSidebarNode) {
+                this._syncElementAttributes(currentSidebarNode, nextSidebarNode);
+                currentSidebarNode.innerHTML = nextSidebarNode.innerHTML;
+            } else {
+                document.querySelector('.page_body')?.insertAdjacentHTML('beforebegin', nextSidebarNode.outerHTML);
+            }
+        } else {
+            currentSidebarNode?.remove();
+        }
+        document.body.classList.toggle('no-sidebar', Boolean(parsed_content.body?.classList.contains('no-sidebar') || !nextSidebarNode));
+
         u('.appbar').html(appbar.html());
         // Inner-HTML swaps keep the live element's class list, so propagate
         // the server-rendered appbar classes (e.g. appbar--transparent).
@@ -399,7 +454,7 @@ window.router = new class Router {
 
     checkUrl(url) {
         if (window.openvk?.disable_ajax === 1) return false;
-        if (parseInt(localStorage.getItem('ux.disable_ajax_routing') ?? '0', 10) === 1 || window.openvk?.current_id === 0) return false;
+        if (parseInt(localStorage.getItem('ux.disable_ajax_routing') ?? '0', 10) === 1) return false;
         if (!url) return false;
 
         try {
@@ -474,8 +529,7 @@ window.router = new class Router {
 
             const responseText = await response.text();
             const parsedContent = new DOMParser().parseFromString(responseText, 'text/html');
-            const nextBody = parsedContent.querySelector('body');
-            if (!nextBody || nextBody.getAttribute('data-themepack') !== 'vkify16') {
+            if (!parsedContent.querySelector('meta[name="vkify-router"][content="vkify16"]')) {
                 return { fullLoad: true, url: response.redirected ? response.url : resolvedUrl.href };
             }
 
@@ -540,7 +594,9 @@ function resetVkifyComposer(form) {
     });
     formNode.querySelectorAll('.post-horizontal, .post-vertical, .post-source, .post-has-geo, .post-replyto').forEach(el => {
         el.innerHTML = '';
-        el.classList.remove('appended-geo');
+        el.classList.remove('appended-geo', 'editable_thumbs', 'vkify_makima_composer');
+        el.style.height = '';
+        el.style.width = '';
     });
     formNode.querySelectorAll('.post-has-poll').forEach(el => {
         el.style.display = 'none';

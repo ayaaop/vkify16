@@ -361,6 +361,118 @@
         return placement;
     }
 
+    const PUBLIC_API_METHODS = new Set([
+        'execute',
+        'auth.validateAccount',
+        'auth.getTokenSecure',
+        'ovk.version',
+        'ovk.test',
+        'ovk.chickenWings',
+        'ovk.nuggets',
+        'ovk.getMirrors',
+        'ovk.aboutInstance',
+        'users.get',
+        'users.search',
+        'groups.getById',
+        'groups.search',
+        'wall.getById',
+        'video.get',
+        'video.getUserVideos',
+        'audio.getRecommendations',
+        'audio.getPlaylistById',
+        'utils.getServerTime',
+        'utils.resolveScreenName',
+        'utils.resolveGuid',
+        'stickers.getProducts',
+        'stickers.getStockItems',
+        'stickers.getStickersKeywords',
+    ]);
+
+    function isLoggedIn() {
+        return Number(window.openvk?.current_id || 0) > 0;
+    }
+
+    function getAuthRequiredMessage() {
+        return window.vkifylang?.auth_required_action
+            || 'Please <a href="/">log in</a> or <a href="/register">register</a> to do that.';
+    }
+
+    let authRequiredNoticeAt = 0;
+    let lastUserActionAt = 0;
+    for (const eventName of ['pointerdown', 'keydown', 'submit']) {
+        document.addEventListener(eventName, event => {
+            if (event.isTrusted) lastUserActionAt = Date.now();
+        }, { capture: true, passive: true });
+    }
+
+    function showAuthRequiredNotification() {
+        const now = Date.now();
+        if (now - authRequiredNoticeAt < 4000) return;
+        if (document.readyState !== 'complete' || window.router?.isNavigationInProgress?.()) return;
+        if (now - lastUserActionAt > 5000) return;
+        if (navigator.userActivation && !navigator.userActivation.isActive) return;
+        authRequiredNoticeAt = now;
+
+        const title = typeof tr === 'function' ? tr('login_required_error') : 'Not enough permissions';
+        if (typeof NewNotification === 'function') {
+            NewNotification(title, getAuthRequiredMessage(), null, () => {}, 5000, false);
+        }
+    }
+
+    function requireAuth() {
+        if (isLoggedIn()) return true;
+        showAuthRequiredNotification();
+        return false;
+    }
+
+    function waitForOpenvkConfig() {
+        if (window.openvk || document.readyState === 'complete') return Promise.resolve();
+        return new Promise(resolve => window.addEventListener('load', resolve, { once: true }));
+    }
+
+    function apiMethodNeedsAuth(method, params) {
+        const methodName = String(method);
+        if (methodName === 'execute') {
+            const code = String(params?.code || '');
+            const apiCallPattern = /\bAPI\.([a-z_][a-z0-9_]*)\.([a-z_][a-z0-9_]*)/gi;
+            let match;
+            while ((match = apiCallPattern.exec(code)) !== null) {
+                if (!PUBLIC_API_METHODS.has(`${match[1]}.${match[2]}`)) return true;
+            }
+            return false;
+        }
+
+        return !PUBLIC_API_METHODS.has(methodName);
+    }
+
+    function installApiAuthGate() {
+        if (!window.OVKAPI?.call || window.OVKAPI.call.__vkifyAuthGate) return;
+
+        const originalCall = window.OVKAPI.call.bind(window.OVKAPI);
+        window.OVKAPI.call = async function (method, params = {}, return_exception = false, version = null) {
+            if (!method) return originalCall(method, params, return_exception, version);
+
+            await waitForOpenvkConfig();
+            const hasAccessToken = params && typeof params === 'object' && !!params.access_token;
+            if (isLoggedIn() || hasAccessToken || !apiMethodNeedsAuth(method, params)) {
+                return originalCall(method, params, return_exception, version);
+            }
+
+            const apiMessage = getAuthRequiredMessage().replace(/<[^>]+>/g, '');
+            showAuthRequiredNotification();
+            if (return_exception == true) {
+                return { error: { error_code: 5, error_msg: apiMessage } };
+            }
+
+            const error = new Error(apiMessage);
+            error.error_code = 5;
+            error.error = { error_code: 5, error_msg: apiMessage };
+            throw error;
+        };
+        window.OVKAPI.call.__vkifyAuthGate = true;
+    }
+    installApiAuthGate();
+
     function ready(fn) {
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', fn, { once: true });
@@ -478,6 +590,8 @@
         getCsrf: getCsrf,
         debounce: debounce,
         getOptimalPlacement: getOptimalPlacement,
+        isLoggedIn: isLoggedIn,
+        requireAuth: requireAuth,
 
         resourceUrl: getResourceUrl,
         themeUrl: getThemeUrl,

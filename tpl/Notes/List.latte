@@ -40,7 +40,7 @@
                     {include "../components/page_crumb_header.latte", crumbs: [
                         ['href' => $owner->getURL(), 'title' => $owner->getCanonicalName()],
                         ['title' => tr("notes"), 'count' => $count]
-                    ], extra => $owner->getId() === $thisUser->getId() ? '<a class="button" href="/notes/create">'.tr("create_note").'</a>' : ''
+                    ], extra => isset($thisUser) && $owner->getId() === $thisUser->getId() ? '<a class="button" href="/notes/create">'.tr("create_note").'</a>' : ''
                     }
                 </div>
                 <div class="notes_list_layout scroll_container">

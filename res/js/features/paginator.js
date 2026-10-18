@@ -237,7 +237,7 @@ const canLoadNextPage = (paginatorEl) => {
 const shouldAllowAutoScroll = () => {
     if (document.body.classList.contains('no-scroll')) return false;
     if (Number(localStorage.getItem('ux.disable_ajax_routing') ?? 0) === 1) return false;
-    if (window.openvk?.current_id === 0 || window.openvk?.disable_ajax === 1) return false;
+    if (window.openvk?.disable_ajax === 1) return false;
     if (window.isPaginatorDisabled) return false;
     return true;
 };
@@ -556,7 +556,7 @@ if (!paginatorAutoScrollInit) {
     }
 
     u(document).on('click', '.vkify-paginator-loader', async (e) => {
-        const ajaxRoutingDisabled = Number(localStorage.getItem('ux.disable_ajax_routing') ?? 0) === 1 || window.openvk?.current_id === 0 || window.openvk?.disable_ajax === 1;
+        const ajaxRoutingDisabled = Number(localStorage.getItem('ux.disable_ajax_routing') ?? 0) === 1 || window.openvk?.disable_ajax === 1;
         if (ajaxRoutingDisabled) {
             return;
         }

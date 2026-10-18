@@ -11,7 +11,7 @@
 {/block}
 
 {block appbar_extra}
-<div n:if="$user->getId() === $thisUser->getId()" class="mobileonly" id="group_appbar_extra">
+<div n:if="isset($thisUser) && $user->getId() === $thisUser->getId()" class="mobileonly" id="group_appbar_extra">
     <a class="appbar-extra-btn" href="/groups_create" onclick="showCreateGroupModal(event)" aria-label="{_create_group}">
         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><use href="#add-outline-24"></use></svg>
     </a>
@@ -76,7 +76,7 @@
 {/block}
 
 {block actions}
-    <div class="post_actions ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
+    <div n:if="isset($thisUser)" class="post_actions ui_actions_menu_wrap" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
         <div class="post_actions_icon"></div>
         <div id="group_actions_menu_{$x->getId()}" class="ui_actions_menu">
             {if $x->canBeModifiedBy($thisUser ?? NULL)}
@@ -122,12 +122,12 @@
         [
             'url' => '/search?section=groups',
             'title' => 'search_for_groups',
-            'condition' => $user->getId() === $thisUser->getId()
+            'condition' => isset($thisUser) && $user->getId() === $thisUser->getId()
         ]
     ]}
     {include "../components/ui_rmenu.latte",
         items => $menuItems,
-        ownblockData => $user->getId() !== $thisUser->getId() ? $user : null
+        ownblockData => !isset($thisUser) || $user->getId() !== $thisUser->getId() ? $user : null
     }
     {if !is_null($thisUser)}
         <div class="page_block module page_list_module groups_module nomobile">

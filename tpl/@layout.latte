@@ -14,6 +14,7 @@
             {ifset title}{include title} - {/ifset}{$instance_name}
         </title>
         <meta charset="utf-8" />
+        <meta name="vkify-router" content="vkify16" />
         <link rel="shortcut icon" href="/themepack/vkify16/{$theme->getVersion()}/resource/icons/{= $ovkHatEnabled ? 'ovk.ico' : 'default.ico'}" />
         <meta name="application-name" content="{$instance_name}" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content, viewport-fit=cover" />
@@ -41,14 +42,12 @@
         {css "js/node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css"}
         {script "js/node_modules/handlebars/dist/handlebars.min.js"}
         {script "js/node_modules/lottie-web/build/player/lottie.min.js"}
-        {script_module "js/messages/im.js"}
+        {ifset $thisUser}
+            {script_module "js/messages/im.js"}
+        {/ifset}
         {if $isTimezoned == NULL}
             {script "js/timezone.js"}
         {/if}
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"></noscript>
         {include "_includeCSS.latte"}
         {ifset headIncludes}
             {include headIncludes}
@@ -60,7 +59,7 @@
             <link id="2018-mode-css" rel="stylesheet" href="/themepack/vkify16/{$theme->getVersion()|noescape}/resource/css/2018.css">
         {/if}
     </head>
-    <body {if isset($thisUser)}data-themepack="{$thisUser->getStyle()}"{/if} n:class="$hideSidebar ? no-sidebar, isset($thisUser) && $thisUser->isBanned() ? banned, $darkModeEnabled ? dark-mode, $ovkHatEnabled ? ovkhat, $isMessenger ? body_im">
+    <body data-themepack="{$theme->getId()}" n:class="$hideSidebar ? no-sidebar, isset($thisUser) && $thisUser->isBanned() ? banned, $darkModeEnabled ? dark-mode, $ovkHatEnabled ? ovkhat, $isMessenger ? body_im">
         {include "_icons.latte"}
         <div n:if="\OPENVK_ROOT_CONF['openvk']['preferences']['bellsAndWhistles']['testLabel']" id="test-label">FOR TESTING PURPOSES ONLY</div>
 

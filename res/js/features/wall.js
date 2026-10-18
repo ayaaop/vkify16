@@ -1741,6 +1741,7 @@ vkify.bindOnce('ignoreFeedFix', () => {
 
         e.stopImmediatePropagation();
         e.preventDefault();
+        if (!vkify.requireAuth()) return;
 
         const ENTITY_ID = Number(target.dataset.id);
         const VAL       = Number(target.dataset.val);

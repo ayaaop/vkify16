@@ -1,34 +1,29 @@
+{css "css/main.css"}
+{css "css/bsdn.css"}
+{css "css/dialog.css"}
+{css "css/nsfw-posts.css"}
+{css "css/avatar-edit.css"}
+{css "css/audios.css"}
+{if $isXmas}
+    {css "css/xmas.css"}
+{/if}
+{css "css/messages.css"}
+{css "css/fastchats.css"}
+{css "css/calendar.css"}
+{css "css/emoji/emoji.css"}
+
+<link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/stylesheet/styles.css" />
+<link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/ui_common.css" />
+<link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/notifications.css" />
+<link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/modals.css" />
+<link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/player.css" />
+<link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/messenger.css" />
+<link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/mobile.css" />
+
+{if $isXmas}
+    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/xmas.css" />
+{/if}
 {ifset $thisUser}
-    {if $theme->inheritDefault()}
-        {css "css/main.css"}
-        {css "css/bsdn.css"}
-        {css "css/dialog.css"}
-        {css "css/nsfw-posts.css"}
-        {css "css/avatar-edit.css"}
-        {css "css/audios.css"}
-
-        {if $isXmas}
-            {css "css/xmas.css"}
-        {/if}
-    {/if}
-
-    {css "css/messages.css"}
-    {css "css/fastchats.css"}
-    {css "css/calendar.css"}
-    {css "css/emoji/emoji.css"}
-
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/stylesheet/styles.css" />
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/ui_common.css" />
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/notifications.css" />
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/modals.css" />
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/player.css" />
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/messenger.css" />
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/mobile.css" />
-
-    {if $isXmas}
-        <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/xmas.css" />
-    {/if}
-
     {if $thisUser->getStyleAvatar() == 1}
         {css "css/avatar.1.css"}
     {/if}
@@ -36,19 +31,14 @@
     {if $thisUser->getStyleAvatar() == 2}
         {css "css/avatar.2.css"}
     {/if}
-{else}
-    {css "css/main.css"}
-    {css "css/bsdn.css"}
-    {css "css/dialog.css"}
-    {css "css/notifications.css"}
-    {css "css/nsfw-posts.css"}
-    {css "css/audios.css"}
-    {css "css/emoji/emoji.css"}
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/stylesheet/styles.css" />
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/ui_common.css" />
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/notifications.css" />
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/modals.css" />
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/player.css" />
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/messenger.css" />
-    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/mobile.css" />
+
+    {else}
+    <style>
+        .post-content {
+            padding-bottom: 15px;
+        }
+        .reply .post-content {
+            padding-bottom: 0;
+        }
+    </style>
 {/ifset}

@@ -2,11 +2,12 @@
 {var $iterator    = $videos}
 {var $count       = $paginatorConf->count}
 {var $page        = $paginatorConf->page}
+{var $canUpload   = isset($thisUser) && !\OPENVK_ROOT_CONF['openvk']['preferences']['videos']['disableUploading'] && ($user->getRealId() > 0 ? $user->getId() === $thisUser->getId() : $user->canUploadVideo($thisUser))}
 
 {block title}{_videos} {$user->getCanonicalName()}{/block}
 
 {block appbar_extra}
-<div n:if="$user->getId() === $thisUser->getId()" class="mobileonly" id="group_appbar_extra">
+<div n:if="$canUpload" class="mobileonly" id="group_appbar_extra">
     <a class="appbar-extra-btn" href="javascript:showFastVideoUpload()" aria-label="{_create_group}">
         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><use href="#add-outline-24"></use></svg>
     </a>
@@ -18,7 +19,7 @@
         {include "../components/page_crumb_header.latte", crumbs: [
             ['href' => $user->getURL(), 'title' => $user->getCanonicalName()],
             ['title' => tr("videos"), 'count' => $count]
-        ], extra => '<a class="button nomobile" href="javascript:showFastVideoUpload()">'.tr("upload_video").'</a>'
+        ], extra => $canUpload ? '<a class="button nomobile" href="javascript:showFastVideoUpload()">'.tr("upload_video").'</a>' : ''
         }
         {include "../components/search_bar.latte",
             id => 'videos_search_header',
