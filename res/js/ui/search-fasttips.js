@@ -186,6 +186,7 @@ vkify.once("initializeSearchFastTips", () => {
             const query = u(e.target).first().value.trim();
 
             if (query.length >= 3) {
+                window.vkify?.ensureStyle?.('profile');
                 fastTipsContainer.first().style.display = 'block';
                 clearTimeout(searchTimeout);
 
@@ -359,6 +360,9 @@ vkify.once("initializeSearchFastTips", () => {
 
         searchInput.on('focus', function (e) {
             const inputValue = u(e.target).first().value;
+            if (inputValue.length >= 3) {
+                window.vkify?.ensureStyle?.('profile');
+            }
             fastTipsContainer.first().style.display = inputValue.length >= 3 ? 'block' : 'none';
         });
 
