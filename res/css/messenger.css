@@ -1379,6 +1379,21 @@ body #im_container.compact .crp-list .crp-entry--message---av {
     transition: background-color 0.1s ease;
 }
 
+.messenger-app--messages---message.animated,
+.messenger-app--messages .messenger-special-message.animated {
+    animation-name: vk-im-target;
+}
+
+@keyframes vk-im-target {
+    from {
+        background-color: var(--vk-im-hl-bg);
+    }
+
+    to {
+        background-color: transparent;
+    }
+}
+
 .messenger-app--messages---message:has(+ .messenger-app--messages---message:not(.same-author)) {
     margin-bottom: 4px;
 }
@@ -1820,6 +1835,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     grid-template-columns: 36px minmax(0, 1fr);
     grid-template-rows: auto auto;
     column-gap: 12px;
+    row-gap: 0;
     margin-bottom: 4px;
     line-height: 15px;
 }
@@ -1849,6 +1865,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 .messenger-app--messages---message ._content .reply-msg-container .reply-date {
     grid-column: 2;
+    margin: 0;
     font-size: 12px;
     color: var(--vk-im-time);
     line-height: 14px;
@@ -1958,6 +1975,54 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     line-height: 18px;
     word-break: break-word;
     margin-top: 4px;
+}
+
+.messenger-app--messages---message .msg-attach-wall-card {
+    margin: 5px 0 7px 3px;
+    padding: 0 0 0 9px;
+    border-left: 2px solid var(--quote-border-color);
+    border-radius: 0;
+    background: none;
+    transition: border-color .15s ease;
+}
+
+.messenger-app--messages---message .msg-attach-wall-card:hover {
+    border-left-color: var(--vk-im-reply-hover);
+    background: none;
+}
+
+.messenger-app--messages---message .msg-attach-wall-card .wall-card-head {
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.messenger-app--messages---message .msg-attach-wall-card .wall-card-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+}
+
+.messenger-app--messages---message .msg-attach-wall-card .wall-card-author-name {
+    font-size: 12.5px;
+    color: var(--post-action-color);
+    line-height: 15px;
+}
+
+.messenger-app--messages---message .msg-attach-wall-card .wall-card-date {
+    font-size: 12px;
+    color: var(--vk-im-time);
+    line-height: 14px;
+    margin-top: 3px;
+}
+
+.messenger-app--messages---message .msg-attach-wall-card .wall-card-text {
+    font-size: 13px;
+    color: var(--text-color);
+    line-height: 18px;
+}
+
+.messenger-app--messages---message .msg-attach-wall-card .wall-card-empty {
+    color: var(--muted-text-color-3);
 }
 
 /* VK forwards have no "open message" link */
