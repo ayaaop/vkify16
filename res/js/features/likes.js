@@ -60,6 +60,39 @@ window.formatCompactCount = window.formatCompactCount || function (n) {
     };
 })();
 
+function normalizeRepostCounter(id) {
+    const anchor = document.getElementById(`reposts${id}`);
+    if (!anchor) return;
+
+    const existing = document.getElementById(`repostsCount${id}`);
+    if (existing?.classList.contains('action_count')) return;
+
+    const count = Number(existing?.textContent || 0) || 0;
+    if (existing) {
+        const previous = existing.previousSibling;
+        const next = existing.nextSibling;
+        if (previous?.nodeType === Node.TEXT_NODE) previous.textContent = previous.textContent.replace(/\(\s*$/, '');
+        if (next?.nodeType === Node.TEXT_NODE) next.textContent = next.textContent.replace(/^\s*\)/, '');
+    }
+
+    const counter = document.createElement('span');
+    counter.className = 'action_count';
+    counter.id = `repostsCount${id}`;
+    counter.setAttribute('data-count', count);
+    counter.textContent = count ? window.formatCompactCount(count) : '';
+
+    if (existing) {
+        existing.replaceWith(counter);
+    } else {
+        anchor.appendChild(counter);
+    }
+}
+
+vkify.bindOnce('repostCounterMarkup', () => {
+    if (typeof window.repost !== 'function') return;
+    vkify.hook(window, 'repost', id => normalizeRepostCounter(id), 'before');
+});
+
 const _likesCache = new Map();
 const _likesCacheLimit = 100;
 const _likesCacheSet = (key, value) => {
@@ -72,6 +105,8 @@ const _likesCacheSet = (key, value) => {
 
 async function refreshLikeFaces(btn, liked, likesCount) {
     try {
+        if (!vkify.isLoggedIn()) return;
+
         const scope = btn.first()?.closest('.post, .ovk-vid-details, .pv_wrapper');
         const bar = scope?.querySelector('.post_likes_faces');
         if (!bar) return;
@@ -135,6 +170,7 @@ vkify.bindOnce('likeHandlers', () => {
     u(document).on('click', '.video_like_button, .post_like', async function (e) {
         e.preventDefault();
         e.stopPropagation();
+        if (!vkify.requireAuth()) return false;
 
         const btn = u(this);
         if (btn.attr('data-vkify-like-pending') === '1') return false;
@@ -228,6 +264,10 @@ vkify.bindOnce('likesTooltip', () => {
             }
         },
         onMount: async function (that) {
+            if (!vkify.requireAuth()) {
+                that.setContent(errorTpl({ message: tr('login_required_error') }));
+                return;
+            }
 
             const id = that.reference.dataset.id;
             const type = that.reference.dataset.type;

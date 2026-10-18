@@ -176,8 +176,8 @@ body.dark-mode.mode-2018 .action_icon {
 body.dark-mode .video_info_actions .video_like_button .action_icon {
 	filter: invert(1);
 }
-body.dark-mode:not(.mode-2018) .action_button.side_button,
-body.dark-mode:not(.mode-2018) .side_button .action_count {
+body.dark-mode:not(.mode-2018).no-post-views .action_button.side_button,
+body.dark-mode:not(.mode-2018).no-post-views .side_button .action_count {
 	color: var(--link-color);
 }
 

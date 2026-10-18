@@ -735,8 +735,7 @@ body.scrolled .toTop:hover #wrap {
     transform: rotate(180deg);
 }
 
-#userMenuTooltip,
-.messenger-app--header #profile_actions_tooltip {
+#userMenuTooltip {
     --ui-actions-menu-distance: 0;
 }
 
@@ -2021,7 +2020,7 @@ table,
     position: static;
     margin: 0;
     align-items: center;
-    z-index: 2;
+    z-index: 6;
     flex: 1 1 0;
 }
 
@@ -3227,7 +3226,6 @@ body:not(.mode-2018) .post_full_like .side_button ~ .post_views {
     margin-right: 7px;
 }
 body.no-post-views .post_views,
-body:not(.no-post-views) .post .post_full_like .action_label {
 body:not(.no-post-views) .post .post_full_like .post_share .action_label {
     display: none;
 }
@@ -3249,6 +3247,9 @@ body:not(.no-post-views) .post .post_full_like .post_share .action_label {
 }
 .post-content .attachments .attachment {
     width: 100%;
+}
+.post-content .attachments .attachment:first-child {
+    margin-top: 0;
 }
 .post-content .really_text + .attachments,
 .post-content .attachments_b + .attachments_m {
@@ -5272,7 +5273,7 @@ hr {
     transition: opacity 150ms;
 }
 
-#small_remove_button:hover {
+.cross:hover {
     opacity: 1;
 }
 
@@ -5576,6 +5577,7 @@ body.banned {
     color: var(--muted-text-color-2);
     position: sticky;
     top: 0;
+    z-index: 1;
 }
 
 .emoji-picker-group-items {

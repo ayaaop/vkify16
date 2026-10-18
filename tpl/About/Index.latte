@@ -5,7 +5,7 @@
     <div class="index_rcolumn">
         <div class="page_block login-container">
             <form id="loginForm" action="/login" method="POST" enctype="multipart/form-data">
-                <input class="big_text" id="login" type="text" name="login" required placeholder="{_email}" />
+                <input class="big_text" id="login" type="email" name="login" required placeholder="{_email}" />
                 <input class="big_text" id="password" type="password" name="password" required placeholder="{_password}" />
                 <input type="hidden" name="jReturnTo" value="{$_SERVER['REQUEST_URI']}" />
                 <input type="hidden" name="hash" value="{$csrfToken}" />
