@@ -3279,6 +3279,11 @@
         height: auto;
         overflow-y: visible;
     }
+    .pv_wrapper:not(.mobile-photo-modal) .pv_right_scroll {
+        position: static;
+        height: auto;
+        overflow: visible;
+    }
     .pv_wrapper:not(.mobile-photo-modal) .pv_author_block {
         border-radius: 0;
     }

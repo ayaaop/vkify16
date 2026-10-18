@@ -563,13 +563,39 @@ div.avatar_block:hover .avatar_variants {
 }
 
 .avatar_controls .avatar_variants a {
-  padding: 8px 0;
+  padding: 6px 10px;
+  align-items: center;
+  font-size: 12.5px;
+  line-height: 15px;
 }
-._add_image::before {
-  margin-left: 10px;
+._add_image::before,
+._pe_avatar_edit::before {
+  content: ' ';
+  display: inline-block;
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  margin: 0 9px 0 0;
+  background: url(../icons/edit_photo_icons_white.png) no-repeat 0 1px;
 }
+._pe_avatar_edit::before {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  background: url(../icons/photo_edit_actions.png) no-repeat 0 -65px;
+}
+@media (-webkit-min-device-pixel-ratio: 2), (-o-min-device-pixel-ratio: 2/1), (min-resolution: 192dpi) {
+  ._pe_avatar_edit::before {
+    background-image: url(../icons/photo_edit_actions_2x.png), url(../icons/photo_edit_actions.png);
+    background-size: 16px 148px;
+  }
+}
+
 .avatar_controls .avatar_variants span {
-  margin-left: 8px;
+  margin-left: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .profile_actions .button + .button {

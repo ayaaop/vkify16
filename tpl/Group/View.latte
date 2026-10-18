@@ -49,6 +49,12 @@
             <div class="narrow_column">
 			    {var $avatarPhoto = $club->getAvatarPhoto()}
     			{var $avatarLink = ((is_null($avatarPhoto) ? FALSE : $avatarPhoto->isAnonymous()) ? "/photo" . ("s/" . base_convert((string) $avatarPhoto->getId(), 10, 32)) : $club->getAvatarLink())}
+				{var $avatarSizes = $avatarPhoto ? $avatarPhoto->getSizes() : null}
+				{var $avatarNormal = $avatarSizes['normal'] ?? null}
+				{var $avatarPrettyId = $avatarPhoto ? $avatarPhoto->getPrettyId() : ''}
+				{var $avatarFullUrl = $avatarPhoto ? $avatarPhoto->getURL() : ''}
+				{var $avatarLargeUrl = $avatarPhoto ? $avatarPhoto->getURLBySizeId('large') : ''}
+				{var $avatarPhotoId = $avatarPhoto ? $avatarPhoto->getPrettyId() . ($avatarPhoto->getAccessKey() ? '_' . $avatarPhoto->getAccessKey() : '') : null}
 				<div class="page_block photo_block">
 					<div class="avatar_block" data-club="{$club->getId()}">
 						<div class="avatar_block_inner">
@@ -57,13 +63,11 @@
 								<div {if !$avatarPhoto}style="display:none"{/if} class="avatar_controls">
 									<div class="avatarDelete hoverable"></div>
 									<div class="avatar_variants">
-										<a class="_add_image hoverable" id="vkify_add_image"><span>{_upload_new_picture}</span></a>
+										<a class="_add_image hoverable"><span>{_upload_new_picture}</span></a>
+										<a class="_pe_avatar_edit hoverable" data-pe-action="pe" data-photo-id="{$avatarPrettyId}" data-src="{$avatarFullUrl}" data-large-src="{$avatarLargeUrl}"><span>{=vkifyTr('pe_act_photoeditor')}</span></a>
 									</div>
 								</div>
 							{/if}
-							{var $avatarSizes = $avatarPhoto ? $avatarPhoto->getSizes() : null}
-							{var $avatarNormal = $avatarSizes['normal'] ?? null}
-							{var $avatarPhotoId = $avatarPhoto ? $avatarPhoto->getPrettyId() . ($avatarPhoto->getAccessKey() ? '_' . $avatarPhoto->getAccessKey() : '') : null}
 							<a href="{$avatarLink|nocheck}" style="display: block; line-height: 0;">
 								{include '../components/avatar.latte', author => $club, size => 'normal', id => 'bigAvatar', width => ($avatarNormal ? $avatarNormal->width : 200), height => ($avatarNormal ? $avatarNormal->height : 200), style => 'width: 100%; image-rendering: -webkit-optimize-contrast;', onclick => ($avatarPhotoId ? "PhotoViewer.openById('{$avatarPhotoId}', event);" : null)}
 							</a>

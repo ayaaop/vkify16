@@ -107,7 +107,8 @@
 .pv_left .pv_bottom_actions > a,
 .pv_left .pv_bottom_actions > button,
 .pv_left .pv_bottom_actions > span,
-.pv_left .pv_bottom_actions > .pv_actions_more {
+.pv_left .pv_bottom_actions > .pv_actions_more,
+.pv_left a.pe_delete_selected_btn {
   color: #cccccc;
   opacity: 0.6;
   font-family: inherit;
@@ -118,7 +119,8 @@
 .pv_left .pv_bottom_actions > a:hover,
 .pv_left .pv_bottom_actions > span:hover,
 .pv_left .pv_bottom_actions > .pv_actions_more:hover,
-.pv_left .pv_bottom_actions span.shown {
+.pv_left .pv_bottom_actions span.shown,
+.pv_left a.pe_delete_selected_btn {
   opacity: 1;
   text-decoration: none;
 }
@@ -148,6 +150,93 @@
   height: 6px;
   margin-left: 5px;
   opacity: 0.7;
+}
+#pv_actions_more_menu,
+#pv_actions_more_menu_mobile {
+  min-width: 230px;
+}
+#pv_actions_more_menu .pv_more_act_item,
+#pv_actions_more_menu_mobile .pv_more_act_item {
+  line-height: 16px;
+  padding: 8px 25px 8px 10px;
+  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+#pv_actions_more_menu .pv_more_act_item::before,
+#pv_actions_more_menu_mobile .pv_more_act_item::before {
+  content: " ";
+  width: 18px;
+  height: 16px;
+  flex-shrink: 0;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+  background-image: url(../icons/pv_actions.png?3);
+  background-repeat: no-repeat;
+  background-position: 0 -157px;
+}
+@media (-webkit-min-device-pixel-ratio: 2), (-o-min-device-pixel-ratio: 2/1), (min-resolution: 192dpi) {
+  #pv_actions_more_menu .pv_more_act_item::before,
+  #pv_actions_more_menu_mobile .pv_more_act_item::before {
+    background-image: url(../icons/pv_actions_2x.png?3), url(../icons/pv_actions.png?3);
+    background-size: 18px 220px;
+  }
+}
+#pv_actions_more_menu #pv_more_act_download::before,
+#pv_actions_more_menu_mobile #pv_more_act_download::before {
+  background-position: 0 0;
+}
+#pv_actions_more_menu #pv_more_act_place::before,
+#pv_actions_more_menu_mobile #pv_more_act_place::before {
+  background-position: 0 -20px;
+}
+#pv_actions_more_menu #pv_more_act_to_profile::before,
+#pv_actions_more_menu_mobile #pv_more_act_to_profile::before {
+  background-position: 0 -41px;
+}
+#pv_actions_more_menu #pv_more_act_to_dialog::before,
+#pv_actions_more_menu #pv_more_act_as_title::before,
+#pv_actions_more_menu_mobile #pv_more_act_to_dialog::before,
+#pv_actions_more_menu_mobile #pv_more_act_as_title::before {
+  background-position: 0 -60px;
+}
+#pv_actions_more_menu #pv_more_act_move_to::before,
+#pv_actions_more_menu_mobile #pv_more_act_move_to::before {
+  background-position: 0 -79px;
+}
+#pv_actions_more_menu #pv_more_act_pe::before,
+#pv_actions_more_menu_mobile #pv_more_act_pe::before {
+  background-position: 0 -98px;
+}
+#pv_actions_more_menu #pv_more_act_rotate_cw::before,
+#pv_actions_more_menu_mobile #pv_more_act_rotate_cw::before {
+  background-position: 0 -118px;
+}
+#pv_actions_more_menu #pv_more_act_rotate_ccw::before,
+#pv_actions_more_menu_mobile #pv_more_act_rotate_ccw::before {
+  background-position: 0 -137px;
+}
+#pv_actions_more_menu #pv_more_act_spam::before,
+#pv_actions_more_menu_mobile #pv_more_act_spam::before {
+  background-position: 0 -157px;
+}
+#pv_actions_more_menu #pv_more_act_spe::before,
+#pv_actions_more_menu_mobile #pv_more_act_spe::before {
+  background-position: 0 -197px;
+}
+#pv_actions_more_menu #pv_more_act_edit::before,
+#pv_actions_more_menu_mobile #pv_more_act_edit::before {
+  background-image: url(../icons/photo_edit_actions.png);
+  background-position: 1px -65px;
+}
+@media (-webkit-min-device-pixel-ratio: 2), (-o-min-device-pixel-ratio: 2/1), (min-resolution: 192dpi) {
+  #pv_actions_more_menu #pv_more_act_edit::before,
+  #pv_actions_more_menu_mobile #pv_more_act_edit::before {
+    background-image: url(../icons/photo_edit_actions_2x.png), url(../icons/photo_edit_actions.png);
+    background-size: 16px 148px;
+  }
 }
 .pv_right {
   width: 310px;
@@ -499,6 +588,10 @@ input.vkify_inline_edit_field {
   height: 100%;
 }
 .private .pv_bottom_info {
+  display: none;
+}
+
+.viewer-deleted #_photoDelete {
   display: none;
 }
 
@@ -1011,6 +1104,11 @@ input.vkify_inline_edit_field {
 .miniplayer .ui-resizable-se {
   right: 0;
   bottom: 0;
+}
+
+.ovk-photo-view iframe {
+  height: inherit;
+  width: inherit;
 }
 
 /* post popup */

@@ -62,3 +62,27 @@ if (!function_exists('vkifyDocGlyph')) {
         };
     }
 }
+
+if (!function_exists('vkifyPhotoEditReferences')) {
+    function vkifyPhotoEditReferences(\openvk\Web\Models\Entities\Photo $photo, \openvk\Web\Models\Entities\User $viewer): array
+    {
+        $posts = [];
+        try {
+            foreach ($photo->getParents() as $parent) {
+                if (!$parent || $parent->isDeleted()) {
+                    continue;
+                }
+                if (!$parent instanceof \openvk\Web\Models\Entities\Post
+                    || $parent instanceof \openvk\Web\Models\Entities\Comment
+                    || !$parent->canBeEditedBy($viewer)) {
+                    return ['editable' => false, 'posts' => []];
+                }
+                $posts[] = $parent->getTargetWall() . '_' . $parent->getVirtualId();
+            }
+        } catch (\Throwable $e) {
+            return ['editable' => false, 'posts' => []];
+        }
+
+        return ['editable' => true, 'posts' => array_values(array_unique($posts))];
+    }
+}

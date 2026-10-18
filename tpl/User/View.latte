@@ -110,6 +110,13 @@
             <div class="narrow_column">
 				<div class="page_block photo_block">
 					{var $hasAvatar = !str_contains($user->getAvatarUrl('miniscule'), "/assets/packages/static/openvk/img/camera_200.png")}
+					{var $avatarPhoto = $user->getAvatarPhoto()}
+					{var $avatarSizes = $avatarPhoto ? $avatarPhoto->getSizes() : null}
+					{var $avatarNormal = $avatarSizes['normal'] ?? null}
+					{var $avatarPrettyId = $avatarPhoto ? $avatarPhoto->getPrettyId() : ''}
+					{var $avatarFullUrl = $avatarPhoto ? $avatarPhoto->getURL() : ''}
+					{var $avatarLargeUrl = $avatarPhoto ? $avatarPhoto->getURLBySizeId('large') : ''}
+					{var $avatarPhotoId = $avatarPhoto ? $avatarPhoto->getPrettyId() . ($avatarPhoto->getAccessKey() ? '_' . $avatarPhoto->getAccessKey() : '') : null}
 					<div class="avatar_block">
 						<div class="avatar_block_inner">
 							{if $thisUser && $user->getId() == $thisUser->getId()}
@@ -117,14 +124,11 @@
 								<div {if !$hasAvatar}style="display:none"{/if} class="avatar_controls">
 									<div class="avatarDelete hoverable"></div>
 									<div class="avatar_variants">
-										<a class="_add_image hoverable" id="vkify_add_image"><span>{_upload_new_picture}</span></a>
+										<a class="_add_image hoverable"><span>{_upload_new_picture}</span></a>
+										<a class="_pe_avatar_edit hoverable" data-pe-action="pe" data-photo-id="{$avatarPrettyId}" data-src="{$avatarFullUrl}" data-large-src="{$avatarLargeUrl}"><span>{=vkifyTr('pe_act_photoeditor')}</span></a>
 									</div>
 								</div>
 							{/if}
-							{var $avatarPhoto = $user->getAvatarPhoto()}
-							{var $avatarSizes = $avatarPhoto ? $avatarPhoto->getSizes() : null}
-							{var $avatarNormal = $avatarSizes['normal'] ?? null}
-							{var $avatarPhotoId = $avatarPhoto ? $avatarPhoto->getPrettyId() . ($avatarPhoto->getAccessKey() ? '_' . $avatarPhoto->getAccessKey() : '') : null}
 							<a href="{$user->getAvatarLink()|nocheck}" style="display: block; line-height: 0;">
 								{include '../components/avatar.latte', author => $user, size => 'normal', id => 'bigAvatar', width => ($avatarNormal ? $avatarNormal->width : 200), height => ($avatarNormal ? $avatarNormal->height : 200), alt => $user->getCanonicalName(), style => 'width: 100%; image-rendering: -webkit-optimize-contrast;', onclick => ($avatarPhotoId ? "PhotoViewer.openById('{$avatarPhotoId}', event);" : null), class => ''}
 							</a>

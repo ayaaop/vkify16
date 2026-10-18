@@ -141,16 +141,6 @@ vkify.once('mediaModals', function () {
                     </div>
                     <div class="mobile-photo-body pv_photo photo_viewer_wrapper" style="overflow: hidden; position: relative; touch-action: none;">
                         <img id="ovk-photo-img" style="display:none">
-                        <div class="pv_nav_left ovk-photo-slide-left" id="pv_nav_left">
-                            <div class="pv_nav_btn">
-                                <div class="pv_nav_arrow"></div>
-                            </div>
-                        </div>
-                        <div class="pv_nav_right ovk-photo-slide-right" id="pv_nav_right">
-                            <div class="pv_nav_btn">
-                                <div class="pv_nav_arrow"></div>
-                            </div>
-                        </div>
                     </div>
                     <div class="mobile-photo-footer">
                         <div class="pv_desc" style="display:none;"></div>
@@ -276,6 +266,7 @@ vkify.once('mediaModals', function () {
         };
 
         const onTouchStart = (e) => {
+            if (container.closest('.pv_pe')) return;
             if (e.touches.length === 2) {
                 e.preventDefault();
                 state.startDistance = getDistance(e.touches);
@@ -323,6 +314,7 @@ vkify.once('mediaModals', function () {
             }
         };
         const onTouchMove = (e) => {
+            if (container.closest('.pv_pe')) return;
             if (e.touches.length === 2) {
                 e.preventDefault();
                 const newScale = Math.min(MAX_SCALE, Math.max(1, state.lastScale * (getDistance(e.touches) / state.startDistance)));
@@ -366,6 +358,7 @@ vkify.once('mediaModals', function () {
             }
         };
         const onTouchEnd = (e) => {
+            if (container.closest('.pv_pe')) return;
             if (e.touches.length !== 0 || e.changedTouches.length !== 1) {
                 state.swipeAxis = null;
                 return;

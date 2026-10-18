@@ -45,15 +45,23 @@
                             {=vkifyTr('more')}
                         </span>
                         <div id="pv_actions_more_menu" class="ui_actions_menu dark">
-                            <a n:if="isset($thisUser) && $thisUser->getId() === $photo->getOwner()->getId()" href="javascript:showEditPhotoModal('{$photo->getPrettyId()}')">{_edit}</a>
-                            <a href="{$photo->getURL()}" target="_blank">{_open_original}</a>
-                            <a n:if="isset($thisUser) && $thisUser->getId() != $photo->getOwner()->getId()" href="javascript:reportPhoto({$photo->getId()})">{_report}</a>
+                            {var $isOwner = isset($thisUser) && $thisUser->getId() === $photo->getOwner()->getId()}
+                            {var $albumPrettyId = $photo->getAlbum() ? $photo->getAlbum()->getPrettyId() : ''}
+                            {var $editRefs = $isOwner ? vkifyPhotoEditReferences($photo, $thisUser) : ['editable' => false, 'posts' => []]}
+                            {var $canEditPhotoContent = $editRefs['editable']}
+                            {var $attachedPostsAttr = implode(',', $editRefs['posts'])}
+                            <a n:if="$canEditPhotoContent" id="pv_more_act_pe" class="pv_more_act_item" href="javascript:openVkPhotoEditor('{$photo->getPrettyId()}')" data-photo-id="{$photo->getPrettyId()}" data-album="{$albumPrettyId}" data-attached-posts="{$attachedPostsAttr}" data-src="{$photo->getURL()}" data-large-src="{$photo->getURLBySizeId('large')}">{=vkifyTr('pe_act_photoeditor')}</a>
+                            <a n:if="$canEditPhotoContent" id="pv_more_act_spe" class="pv_more_act_item" href="javascript:openVkStickersEditor('{$photo->getPrettyId()}')" data-photo-id="{$photo->getPrettyId()}" data-album="{$albumPrettyId}" data-attached-posts="{$attachedPostsAttr}" data-src="{$photo->getURL()}" data-large-src="{$photo->getURLBySizeId('large')}">{=vkifyTr('pe_act_stickers')}</a>
+                            <a n:if="$isOwner" id="pv_more_act_edit" class="pv_more_act_item" href="javascript:showEditPhotoModal('{$photo->getPrettyId()}')">{_edit}</a>
+                            <a id="pv_more_act_download" class="pv_more_act_item" href="{$photo->getURL()}" target="_blank">{_open_original}</a>
+                            <a n:if="isset($thisUser) && $thisUser->getId() != $photo->getOwner()->getId()" id="pv_more_act_spam" class="pv_more_act_item" href="javascript:reportPhoto({$photo->getId()})">{_report}</a>
                         </div>
                     </span>
                 </div>
             </div>
         </div>
         <div class="pv_right ovk-photo-details">
+            <div class="pv_right_scroll">
             <div class="pv_author_block clear_fix">
                 <div class="pv_author_img fl_l">
                     <a href="{$owner->getURL()}">
@@ -110,6 +118,7 @@
             {/if}
             <div class="pv_comments"> 
                 {include "../components/comments.latte", comments => $comments, count => $cCount, page => $cPage, model => "photos", parent => $photo, attachMenuInTooltip => true}
+            </div>
             </div>
         </div>
     </div>

@@ -1,18 +1,25 @@
 @font-face {
     font-family: "Roboto";
     font-style: normal;
-    font-stretch: 100%;
+    font-weight: 400;
     font-display: swap;
-    src: url(https://fonts.gstatic.com/s/roboto/v47/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3iUBGEe.woff2) format("woff2");
+    src: url(../resource/fonts/roboto_regular.ttf) format("truetype");
 }
 
 @font-face {
     font-family: "Roboto";
     font-style: normal;
-    font-weight: 400;
-    font-stretch: 100%;
+    font-weight: 500;
     font-display: swap;
-    src: url(https://fonts.gstatic.com/s/roboto/v47/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2) format("woff2");
+    src: url(../resource/fonts/roboto_medium.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url(../resource/fonts/roboto_bold.ttf) format("truetype");
 }
 
 :root {
