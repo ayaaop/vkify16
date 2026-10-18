@@ -31,7 +31,7 @@
     {var $descPlain = $club->getDescription() ?? ''}
     {var $descHtml = $club->getDescriptionHtml()}
     {var $pinnedPost = (new \openvk\Web\Models\Repositories\Posts())->getPinnedPost($club->getId() * -1)}
-    {var $hasMoreInfo = $descPlain !== '' || in_array($club->getAdministratorsListDisplay(), [0, 1])}
+    {var $hasMoreInfo = $canEdit || $descPlain !== '' || $club->getWebsite() || in_array($club->getAdministratorsListDisplay(), [0, 1])}
 
     {include #mobileProfile, $hasMoreInfo, $albums, $audios, $topics, $followersCount, $potentialCount, $pinnedPost, $descHtml, $descPlain, $docs}
 
@@ -327,20 +327,23 @@
 							<div class="group_info_block info">
 								<div class="group_info_rows">
 									{var $descPlain = $club->getDescription() ?? ''}
-									<div class="group_info_row info">
+									<div n:class="group_info_row, info, $canEdit ? vkify_can_inline_edit" n:attr="data-edit-url => $canEdit ? '/club' . $club->getId() . '/edit' : null, data-inline-context => $canEdit ? 'desktop' : null, data-inline-field => $canEdit ? 'about' : null">
 										{if $descHtml}
-											{include "../components/truncated_text.latte", html => $descHtml, plain => $descPlain, limit => 300}
+											{include "../components/truncated_text.latte", html => $descHtml, plain => $descPlain, limit => 300, isEditable => $canEdit, editUrl => "/club" . $club->getId() . "/edit"}
 										{elseif $canEdit}
-											<a href="/club{$club->getId()}/edit">{_desc_none|firstUpper}</a>
+											<div class="pv_can_edit pv_desc_cont" data-edit-url="/club{$club->getId()}/edit" role="button" tabindex="0"><span class="pv_no_description">{_desc_none|firstUpper}</span></div>
 										{else}
 											<span class="nobold">{_desc_none|firstUpper}</span>
 										{/if}
 									</div>
-									<div n:if="$club->getWebsite() || $canEdit" class="group_info_row site">
+									<div n:if="$club->getWebsite() || $canEdit" n:class="group_info_row, site, $canEdit ? vkify_can_inline_edit" n:attr="data-edit-url => $canEdit ? '/club' . $club->getId() . '/edit' : null, data-inline-context => $canEdit ? 'desktop' : null, data-inline-field => $canEdit ? 'website' : null">
 										{if $club->getWebsite()}
-											<div class="line_value"><a n:if="$club->getWebsite()" href="{$club->getWebsite()}" rel="ugc" target="_blank">{$club->getWebsite()}</a></div>
+											<div class="line_value">
+												<a n:if="$club->getWebsite()" href="{$club->getWebsite()}" rel="ugc" target="_blank">{$club->getWebsite()}</a>
+												<span n:if="$canEdit" class="line_div_icon edit" role="button" title="{_edit}"></span>
+											</div>
 										{elseif $canEdit}
-											<a href="/club{$club->getId()}/edit">{_admin_banned_link_not_specified}</a>
+											<div class="pv_can_edit pv_desc_cont" data-edit-url="/club{$club->getId()}/edit" role="button" tabindex="0"><span class="pv_no_description">{_admin_banned_link_not_specified}</span></div>
 										{/if}
 									</div>
 									{include #clubEventDate, mobile => false}

@@ -159,6 +159,20 @@
   flex-direction: column;
   border-left: 1px solid var(--border-color);
 }
+.pv_right_scroll {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.pv_right_scroll > * {
+  flex-shrink: 0;
+}
+.pv_right_scroll > .pv_desc {
+  flex-shrink: 1;
+  min-height: 0;
+}
 .pv_right .scroll_container {
   overflow-y: auto;
   height: 100%;
@@ -197,7 +211,7 @@
 }
 .pv_desc {
   position: relative;
-  margin: 0 15px 15px;
+  margin: 5px 15px 15px;
   line-height: 1.37em;
   max-height: 250px;
   overflow-y: auto;
@@ -208,29 +222,79 @@
 }
 .pv_can_edit {
   display: block;
-  border-radius: 1px;
-  padding: 3px 0;
+  box-sizing: border-box;
+  border-radius: 2px;
+  padding: 5px 10px;
+  margin: 0 -10px;
   color: var(--text-color);
+  cursor: pointer;
+}
+.pv_desc .pv_can_edit,
+.pv_desc .pv_cant_edit {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pv_desc .pv_desc_cont {
+  min-height: 20px;
+  overflow-wrap: break-word;
 }
 .pv_no_description {
   color: var(--muted-text-color);
 }
-.pv_can_edit:hover {
+.pv_desc .pv_can_edit:hover,
+.pv_desc .pv_can_edit:focus-visible {
   background: var(--module-background-color--secondary);
   text-decoration: none;
+  outline: none;
+}
+.pv_desc .vkify_inline_edit_wrap {
+  margin: 0;
+}
+.vkify_inline_edit_wrap {
+  width: 100%;
+}
+.vkify_inline_edit_field {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--border-color-3);
+  border-radius: var(--button-border-radius);
+  background: var(--module-background-color);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.37em;
+  padding: 5px 8px;
+  margin: 0;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  display: block;
+}
+textarea.vkify_inline_edit_field {
+  min-height: 36px;
+}
+input.vkify_inline_edit_field {
+  height: 28px;
 }
 .pv_comments {
   border-top: 1px solid var(--border-color);
-  flex: 1 1 0;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
-.pv_comments #standaloneCommentBox {
-  position: static;
-}
 .pv_comments .page_block.comments {
   flex: 1;
-  overflow: auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.pv_comments .page_block.comments::-webkit-scrollbar {
+  display: none;
+}
+.pv_comments .scroll_container {
+  height: auto;
+  overflow-y: visible;
 }
 .pv_comments .content_page_error {
   padding-block: 0;

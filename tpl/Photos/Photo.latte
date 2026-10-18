@@ -99,9 +99,9 @@
                     {if !empty($descFull)}
                         {include "../components/truncated_text.latte", html => $descFull, plain => $descPlain, limit => 500, isEditable => true, editUrl => "javascript:showEditPhotoModal('" . $photo->getPrettyId() . "')"}
                     {else}
-                        <a class="pv_can_edit" href="javascript:showEditPhotoModal('{$photo->getPrettyId()}')">
+                        <div class="pv_can_edit pv_desc_cont" data-edit-url="javascript:showEditPhotoModal('{$photo->getPrettyId()}')" role="button" tabindex="0">
                             <span class="pv_no_description">{_no_description}</span>
-                        </a>
+                        </div>
                     {/if}
                 {else}
                     {include "../components/truncated_text.latte", html => $descFull, plain => $descPlain, limit => 500}

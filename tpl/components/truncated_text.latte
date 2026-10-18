@@ -73,7 +73,7 @@ if (!function_exists('vkify_truncate_html')) {
 
 {if $html}
     {if $isEditable}
-        <a class="{$editClass}" href="{$editUrl|noescape}">
+        <div class="{$editClass} pv_desc_cont" data-edit-url="{$editUrl}" role="button" tabindex="0">
             {if $bigText}
                 <span class="truncated_text really_text {$textClass}">
                     {vkify_truncate_html($html, $limit, $lineLimit, " <span class='collapse_button' onclick='event.stopPropagation(); event.preventDefault(); expandText(this)'>" . tr('show_more') . "</span>")|noescape}
@@ -85,7 +85,7 @@ if (!function_exists('vkify_truncate_html')) {
             {else}
                 <span class="really_text {$textClass}">{$html|noescape}</span>
             {/if}
-        </a>
+        </div>
     {else}
         {if $bigText}
             <span class="truncated_text really_text {$textClass}">

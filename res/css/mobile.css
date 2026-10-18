@@ -2982,6 +2982,61 @@
     .ovk-diag-body .mobile-info-row {
         margin: 0 -16px;
     }
+    .ovk-msg-sheet .form_data.vkify_can_inline_edit {
+        position: relative;
+        min-height: 22px;
+        padding-right: 28px;
+        cursor: text;
+    }
+    .ovk-msg-sheet .form_data.vkify_can_inline_edit .line_div_icon.edit,
+    .ovk-msg-sheet .group_info_row .line_value .line_div_icon.edit {
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        float: none;
+        width: 22px;
+        height: 22px;
+        margin: 0;
+        opacity: 0.7;
+    }
+    .ovk-msg-sheet .group_info_row {
+        font-size: 14px;
+        line-height: 20px;
+        position: relative;
+        cursor: text;
+    }
+    .ovk-msg-sheet .group_info_row::before {
+        top: 1px;
+    }
+    .ovk-msg-sheet .group_info_row .line_value {
+        position: relative;
+        display: block;
+        padding-right: 28px;
+    }
+    .ovk-msg-sheet .group_info_row .pv_desc_cont {
+        min-height: 20px;
+    }
+    .ovk-msg-sheet .group_info_row .pv_can_edit {
+        margin: 0;
+        padding: 0;
+    }
+    .ovk-msg-sheet .form_field .vkify_inline_edit_wrap {
+        margin: 0;
+    }
+    .ovk-msg-sheet .form_field .vkify_inline_edit_field,
+    .ovk-msg-sheet .group_info_row .vkify_inline_edit_field {
+        height: auto;
+        min-height: 42px;
+        padding: 9px 10px;
+        border: 1px solid var(--border-color-3);
+        border-radius: var(--button-border-radius);
+        font-size: 14px;
+        line-height: 20px;
+    }
+    .ovk-msg-sheet input.vkify_inline_edit_field {
+        min-height: 42px;
+    }
 
     .page_block .action_label {
         display: none;

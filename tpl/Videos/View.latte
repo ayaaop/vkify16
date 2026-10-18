@@ -84,8 +84,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="video_info_description" n:if="$video->getDescription()">
-                    {include "../components/truncated_text.latte", html => $video->getDescription(), limit => 500}
+                <div class="video_info_description" n:if="($canEdit ?? false) || $video->getDescription()">
+                    {if $canEdit ?? false}
+                        {var $vDescPlain = $video->getDescription() ?? ''}
+                        {if !empty($vDescPlain)}
+                            {include "../components/truncated_text.latte", html => $video->getDescription(), plain => $vDescPlain, limit => 500, isEditable => true, editUrl => "javascript:showEditVideoModal('" . $video->getPrettyId() . "')"}
+                        {else}
+                            <div class="pv_can_edit pv_desc_cont" data-edit-url="javascript:showEditVideoModal('{$video->getPrettyId()}')" role="button" tabindex="0">
+                                <span class="pv_no_description">{_no_description}</span>
+                            </div>
+                        {/if}
+                    {else}
+                        {include "../components/truncated_text.latte", html => $video->getDescription(), limit => 500}
+                    {/if}
                 </div>
             </div>
             <div class="clear_fix video_comments">

@@ -60,22 +60,29 @@
         ['label' => tr('registration_date'), 'value' => (string)$user->getRegistrationTime()],
         ['label' => tr('hometown'), 'value' => $user->getHometown()],
         ['label' => tr('politViews'), 'value' => tr('politViews_' . $user->getPoliticalViews())],
-        ['label' => tr('city'), 'value' => $user->getCity()],
+    ]}
+    {var $contactInfoFields = [
+        ['label' => 'email', 'value' => $user->getContactEmail(), 'type' => 'email', 'field' => 'email_contact'],
+        ['label' => 'telegram', 'value' => $user->getTelegram(), 'type' => 'telegram', 'field' => 'telegram'],
+        ['label' => 'personal_website', 'value' => $user->getWebsite(), 'type' => 'website', 'field' => 'website'],
+        ['label' => 'city', 'value' => $user->getCity(), 'type' => 'city', 'field' => 'city'],
+        ['label' => 'address', 'value' => $user->getPhysicalAddress(), 'type' => 'address', 'field' => 'address'],
     ]}
     {var $personalInfoFields = [
-        ['label' => tr('interests'), 'value' => $user->getInterests()],
-        ['label' => tr('favorite_music'), 'value' => $user->getFavoriteMusic()],
-        ['label' => tr('favorite_films'), 'value' => $user->getFavoriteFilms()],
-        ['label' => tr('favorite_shows'), 'value' => $user->getFavoriteShows()],
-        ['label' => tr('favorite_books'), 'value' => $user->getFavoriteBooks()],
-        ['label' => tr('favorite_quotes'), 'value' => $user->getFavoriteQuote()],
-        ['label' => tr('favorite_games'), 'value' => $user->getFavoriteGames()],
-        ['label' => tr('information_about'), 'value' => $user->getDescription()],
+        ['label' => 'interests', 'value' => $user->getInterests(), 'type' => 'list', 'field' => 'interests'],
+        ['label' => 'favorite_music', 'value' => $user->getFavoriteMusic(), 'type' => 'audio', 'url' => '/search?section=audios&q=', 'field' => 'fav_music'],
+        ['label' => 'favorite_films', 'value' => $user->getFavoriteFilms(), 'type' => 'films', 'url' => '/search?section=users&q=&fav_films=', 'field' => 'fav_films'],
+        ['label' => 'favorite_shows', 'value' => $user->getFavoriteShows(), 'type' => 'shows', 'url' => '/search?section=users&q=&fav_shows=', 'field' => 'fav_shows'],
+        ['label' => 'favorite_books', 'value' => $user->getFavoriteBooks(), 'type' => 'books', 'url' => '/search?section=users&q=&fav_books=', 'field' => 'fav_books'],
+        ['label' => 'favorite_quotes', 'value' => $user->getFavoriteQuote(), 'type' => 'plain', 'field' => 'fav_quote'],
+        ['label' => 'favorite_games', 'value' => $user->getFavoriteGames(), 'type' => 'plain', 'field' => 'fav_games'],
+        ['label' => 'information_about', 'value' => $user->getDescription(), 'type' => 'plain', 'field' => 'about'],
     ]}
     {var $canReadInfo = $user->getPrivacyPermission('page.info.read', $thisUser ?? NULL)}
     {var $hasMoreInfo = $canSeeNotes || ($canReadInfo && (
-        $user->getContactEmail() || $user->getTelegram() || $user->getWebsite()
-        || count(array_filter(array_column(array_merge($basicInfoFields, $personalInfoFields), 'value'), fn($v) => !is_null($v) && $v !== '')) > 0
+        $thatIsThisUser
+        || $user->getContactEmail() || $user->getTelegram() || $user->getWebsite()
+        || count(array_filter(array_column(array_merge($basicInfoFields, $contactInfoFields, $personalInfoFields), 'value'), fn($v) => !is_null($v) && $v !== '')) > 0
         || ($additionalFields && (count($additionalFields['contacts'] ?? []) > 0 || count($additionalFields['interests'] ?? []) > 0))
     ))}
 
@@ -87,7 +94,7 @@
     {else}
     
 
-	{include #mobileProfile, $thatIsThisUser, $hasMoreInfo, $stripHasContent, $canSeeVideos, $canSeeAudios, $canSeeGroups, $canSeeMeetings, $canSeeAlbums, $canSeeGifts, $canSeeNotes, $videos, $audios, $albums, $basicInfoFields, $personalInfoFields}
+	{include #mobileProfile, $thatIsThisUser, $hasMoreInfo, $stripHasContent, $canSeeVideos, $canSeeAudios, $canSeeGroups, $canSeeMeetings, $canSeeAlbums, $canSeeGifts, $canSeeNotes, $videos, $audios, $albums, $basicInfoFields, $contactInfoFields, $personalInfoFields}
 
 	{if $hasMoreInfo}
 	<script>
@@ -446,20 +453,15 @@
 								<a class="profile_info profile_more_info_link" onclick="switchProfileInfo();" id="showFullInfoButton">{_additional_information}</a>
 								<div class="profileinfoblock profile_info_full" style="display:none;">
 									{capture $contactInfo_Tmp}
-										{var $contactFields = [
-											['label' => email, 'value' => $user->getContactEmail(), 'type' => 'email'],
-											['label' => telegram, 'value' => $user->getTelegram(), 'type' => 'telegram'],
-											['label' => personal_website, 'value' => $user->getWebsite(), 'type' => 'website'],
-											['label' => city, 'value' => $user->getCity(), 'type' => 'city'],
-											['label' => address, 'value' => $user->getPhysicalAddress(), 'type' => 'address'],
-										]}
 										<table class="ugc-table" border="0" cellspacing="0" cellpadding="0" n:ifcontent>
 										<tbody n:ifcontent>
-											{foreach $contactFields as $field}
-												<tr n:if="!is_null($field['value'])">
+											{foreach $contactInfoFields as $field}
+												<tr n:if="!is_null($field['value']) || $thatIsThisUser" n:attr="data-inline-field => $thatIsThisUser ? $field['field'] : null, data-inline-context => $thatIsThisUser ? 'desktop' : null, data-inline-value => $thatIsThisUser ? ($field['value'] ?? '') : null, data-inline-multiline => $thatIsThisUser ? 'false' : null, data-edit-url => $thatIsThisUser ? '/edit?act=contacts' : null, data-refresh-url => $thatIsThisUser ? $user->getURL() : null">
 													<td class="label"><span class="nobold">{tr($field['label'])	}: </span></td>
-													<td>
-														{if $field['type'] === 'email'}
+													<td n:class="data, $thatIsThisUser ? vkify_can_inline_edit">
+														{if !$field['value'] && $thatIsThisUser}
+															<span class="pv_no_description">{_no_information_provided}</span>
+														{elseif $field['type'] === 'email'}
 															<a href="mailto:{$field['value']}" rel="ugc">{$field['value']}</a>
 														{elseif $field['type'] === 'telegram'}
 															<a href="https://t.me/{$field['value']}" rel="ugc" target="_blank">@{$field['value']}</a>
@@ -470,6 +472,7 @@
 														{else}
 															{$field['value']}
 														{/if}
+														<span n:if="$thatIsThisUser" class="line_div_icon edit" role="button" title="{_edit}"></span>
 													</td>
 												</tr>
 											{/foreach}
@@ -483,23 +486,15 @@
 										</table>
 									{/capture}
 									{capture $uInfo_Tmp}
-										{var $personalFields = [
-											['label' => interests, 'value' => $user->getInterests(), 'type' => 'list'],
-											['label' => favorite_music, 'value' => $user->getFavoriteMusic(), 'type' => 'audio', 'url' => '/search?section=audios&q='],
-											['label' => favorite_films, 'value' => $user->getFavoriteFilms(), 'type' => 'films', 'url' => '/search?section=users&q=&fav_films='],
-											['label' => favorite_shows, 'value' => $user->getFavoriteShows(), 'type' => 'shows', 'url' => '/search?section=users&q=&fav_shows='],
-											['label' => favorite_books, 'value' => $user->getFavoriteBooks(), 'type' => 'books', 'url' => '/search?section=users&q=&fav_books='],
-											['label' => favorite_quotes, 'value' => $user->getFavoriteQuote(), 'type' => 'plain'],
-											['label' => favorite_games, 'value' => $user->getFavoriteGames(), 'type' => 'plain'],
-											['label' => information_about, 'value' => $user->getDescription(), 'type' => 'plain'],
-										]}
 										<table class="ugc-table" border="0" cellspacing="0" cellpadding="0" n:ifcontent>
 											<tbody n:ifcontent>
-												{foreach $personalFields as $field}
-													<tr n:if="!is_null($field['value'])">
+												{foreach $personalInfoFields as $field}
+													<tr n:if="!is_null($field['value']) || $thatIsThisUser" n:attr="data-inline-field => $thatIsThisUser ? $field['field'] : null, data-inline-context => $thatIsThisUser ? 'desktop' : null, data-inline-value => $thatIsThisUser ? ($field['value'] ?? '') : null, data-edit-url => $thatIsThisUser ? '/edit?act=interests' : null, data-refresh-url => $thatIsThisUser ? $user->getURL() : null">
 														<td class="label"><span class="nobold">{tr($field['label'])}: </span></td>
-														<td class="data">
-															{if $field['type'] === 'list'}
+														<td n:class="data, $thatIsThisUser ? vkify_can_inline_edit">
+															{if !$field['value'] && $thatIsThisUser}
+																<span class="pv_no_description">{_no_information_provided}</span>
+															{elseif $field['type'] === 'list'}
 																{var $items = explode(', ', $field['value'])}
 																{foreach $items as $item}
 																	<span>{$item}</span>{if $item != end($items)},{/if}
@@ -512,6 +507,7 @@
 															{else}
 																{$field['value']}
 															{/if}
+															<span n:if="$thatIsThisUser" class="line_div_icon edit" role="button" title="{_edit}"></span>
 														</td>
 													</tr>
 												{/foreach}

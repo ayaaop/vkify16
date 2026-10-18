@@ -1,4 +1,4 @@
-{define mobileProfile, $thatIsThisUser, $hasMoreInfo, $stripHasContent, $canSeeVideos, $canSeeAudios, $canSeeGroups, $canSeeMeetings, $canSeeAlbums, $canSeeGifts, $canSeeNotes, $videos, $audios, $albums, $basicInfoFields, $personalInfoFields}
+{define mobileProfile, $thatIsThisUser, $hasMoreInfo, $stripHasContent, $canSeeVideos, $canSeeAudios, $canSeeGroups, $canSeeMeetings, $canSeeAlbums, $canSeeGifts, $canSeeNotes, $videos, $audios, $albums, $basicInfoFields, $contactInfoFields, $personalInfoFields}
     {var $mobileHeroStatus = $user->onlineStatus() == 2 ? tr('deceased_person') : ($user->isOnline() ? tr('online') : ($user->getOnline()->timestamp() + 2505600 > time() ? ($user->isFemale() ? tr('was_online_f') : tr('was_online_m')) . ' ' . $user->getOnline() : ''))}
     {include '../components/mobile_profile_hero.latte', entity => $user, name => $user->getFullName(), status => $mobileHeroStatus, verified => $user->isVerified()}
 	<div class="mobileonly mobile-profile-content">
@@ -207,25 +207,31 @@
 		{/if}
 
 		{if $user->getPrivacyPermission('page.info.read', $thisUser ?? NULL)}
-			{var $mEmail = $user->getContactEmail()}
-			{var $mTelegram = $user->getTelegram()}
-			{var $mWebsite = $user->getWebsite()}
-			{if $mEmail || $mTelegram || $mWebsite}
-				{capture $moreInfoBlock}
-					{if $mEmail}<a class="mobile-info-row mir-link" href="mailto:{$mEmail}"><svg class="mir-icon" viewBox="0 0 24 24"><use href="#mail-outline-24"></use></svg><div class="mir-text">{$mEmail}</div></a>{/if}
-					{if $mTelegram}<a class="mobile-info-row mir-link" href="https://t.me/{$mTelegram|replace:'@',''}"><svg class="mir-icon" viewBox="0 0 24 24"><use href="#send-24"></use></svg><div class="mir-text">{$mTelegram}</div></a>{/if}
-					{if $mWebsite}<a class="mobile-info-row mir-link" href="{$mWebsite}"><svg class="mir-icon" viewBox="0 0 24 24"><use href="#globe-outline-24"></use></svg><div class="mir-text">{$mWebsite}</div></a>{/if}
-				{/capture}
-				{var $moreInfoBlocks = array_merge($moreInfoBlocks, [$moreInfoBlock])}
-			{/if}
-
-			{var $hasBasicInfo = count(array_filter(array_column($basicInfoFields, 'value'), fn($v) => !is_null($v) && $v !== '')) > 0 || count(($additionalFields['contacts'] ?? [])) > 0}
-			{if $hasBasicInfo}
+			{var $hasContactInfo = $thatIsThisUser || count(array_filter(array_column($contactInfoFields, 'value'), fn($v) => !is_null($v) && $v !== '')) > 0 || count(($additionalFields['contacts'] ?? [])) > 0}
+			{if $hasContactInfo}
 				{capture $moreInfoBlock}
 					<div class="form_group clear_fix">
-						{foreach $basicInfoFields as $mif}
-							{if !is_null($mif['value']) && $mif['value'] !== ''}
-								<div class="form_field"><div class="form_label">{$mif['label']}</div><div class="form_data" dir="auto">{$mif['value']}</div></div>
+						{foreach $contactInfoFields as $mif}
+							{if $thatIsThisUser || (!is_null($mif['value']) && $mif['value'] !== '')}
+								<div class="form_field" n:attr="data-inline-field => $thatIsThisUser ? $mif['field'] : null, data-inline-context => $thatIsThisUser ? 'mobile' : null, data-inline-value => $thatIsThisUser ? ($mif['value'] ?? '') : null, data-inline-multiline => $thatIsThisUser ? 'false' : null, data-edit-url => $thatIsThisUser ? '/edit?act=contacts' : null, data-refresh-url => $thatIsThisUser ? $user->getURL() : null">
+									<div class="form_label">{tr($mif['label'])}</div>
+									<div n:class="form_data, $thatIsThisUser ? vkify_can_inline_edit" dir="auto">
+										{if !$mif['value'] && $thatIsThisUser}
+											<span class="pv_no_description">{_no_information_provided}</span>
+										{elseif $mif['type'] === 'email'}
+											<a href="mailto:{$mif['value']}" rel="ugc">{$mif['value']}</a>
+										{elseif $mif['type'] === 'telegram'}
+											<a href="https://t.me/{$mif['value']|replace:'@',''}" rel="ugc" target="_blank">@{$mif['value']|replace:'@',''}</a>
+										{elseif $mif['type'] === 'website'}
+											<a href="{$mif['value']}" rel="ugc" target="_blank">{$mif['value']}</a>
+										{elseif $mif['type'] === 'city'}
+											<a href="/search?type=section&q=&city={$mif['value']}">{$mif['value']}</a>
+										{else}
+											{$mif['value']}
+										{/if}
+										<span n:if="$thatIsThisUser" class="line_div_icon edit" role="button" title="{_edit}"></span>
+									</div>
+								</div>
 							{/if}
 						{/foreach}
 						{foreach ($additionalFields['contacts'] ?? []) as $field}
@@ -236,13 +242,47 @@
 				{var $moreInfoBlocks = array_merge($moreInfoBlocks, [$moreInfoBlock])}
 			{/if}
 
-			{var $hasPersonalInfo = count(array_filter(array_column($personalInfoFields, 'value'), fn($v) => !is_null($v) && $v !== '')) > 0 || count(($additionalFields['interests'] ?? [])) > 0}
+			{var $hasBasicInfo = count(array_filter(array_column($basicInfoFields, 'value'), fn($v) => !is_null($v) && $v !== '')) > 0}
+			{if $hasBasicInfo}
+				{capture $moreInfoBlock}
+					<div class="form_group clear_fix">
+						{foreach $basicInfoFields as $mif}
+							{if !is_null($mif['value']) && $mif['value'] !== ''}
+								<div class="form_field"><div class="form_label">{$mif['label']}</div><div class="form_data" dir="auto">{$mif['value']}</div></div>
+							{/if}
+						{/foreach}
+					</div>
+				{/capture}
+				{var $moreInfoBlocks = array_merge($moreInfoBlocks, [$moreInfoBlock])}
+			{/if}
+
+			{var $hasPersonalInfo = $thatIsThisUser || count(array_filter(array_column($personalInfoFields, 'value'), fn($v) => !is_null($v) && $v !== '')) > 0 || count(($additionalFields['interests'] ?? [])) > 0}
 			{if $hasPersonalInfo}
 				{capture $moreInfoBlock}
 					<div class="form_group clear_fix">
 						{foreach $personalInfoFields as $mif}
-							{if !is_null($mif['value']) && $mif['value'] !== ''}
-								<div class="form_field"><div class="form_label">{$mif['label']}</div><div class="form_data" dir="auto">{$mif['value']}</div></div>
+							{if $thatIsThisUser || (!is_null($mif['value']) && $mif['value'] !== '')}
+								<div class="form_field" n:attr="data-inline-field => $thatIsThisUser ? $mif['field'] : null, data-inline-context => $thatIsThisUser ? 'mobile' : null, data-inline-value => $thatIsThisUser ? ($mif['value'] ?? '') : null, data-inline-multiline => $thatIsThisUser ? 'true' : null, data-edit-url => $thatIsThisUser ? '/edit?act=interests' : null, data-refresh-url => $thatIsThisUser ? $user->getURL() : null">
+									<div class="form_label">{tr($mif['label'])}</div>
+									<div n:class="form_data, $thatIsThisUser ? vkify_can_inline_edit" dir="auto">
+										{if !$mif['value'] && $thatIsThisUser}
+											<span class="pv_no_description">{_no_information_provided}</span>
+										{elseif $mif['type'] === 'list'}
+											{var $items = explode(', ', $mif['value'])}
+											{foreach $items as $item}
+												<span>{$item}</span>{if $item != end($items)},{/if}
+											{/foreach}
+										{elseif $mif['type'] === 'audio' || $mif['type'] === 'films' || $mif['type'] === 'shows' || $mif['type'] === 'books'}
+											{var $items = explode(', ', $mif['value'])}
+											{foreach $items as $item}
+												<a href="{$mif['url']}{urlencode($item)}">{$item}</a>{if $item != end($items)},{/if}
+											{/foreach}
+										{else}
+											{$mif['value']}
+										{/if}
+										<span n:if="$thatIsThisUser" class="line_div_icon edit" role="button" title="{_edit}"></span>
+									</div>
+								</div>
 							{/if}
 						{/foreach}
 						{foreach ($additionalFields['interests'] ?? []) as $field}

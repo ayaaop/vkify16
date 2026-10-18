@@ -835,6 +835,7 @@ div.avatar_block:hover .avatar_variants {
 }
 .profile_info_block .ugc-table {
   padding-top: 5px;
+  width: 100%;
 }
 
 .guest_actions {
@@ -898,6 +899,47 @@ div.avatar_block:hover .avatar_variants {
 }
 .group_info_row:last-child {
   padding-bottom: 0;
+}
+.group_info_row .pv_can_edit,
+.group_info_row .line_value {
+  display: block;
+  padding: 3px 6px;
+  margin: -3px -6px;
+  border-radius: 2px;
+}
+.group_info_row.vkify_can_inline_edit .line_value:hover {
+  background-color: var(--module-background-color--secondary);
+}
+.group_info_row .line_div_icon.edit,
+.profile_info_block .line_div_icon.edit,
+.ovk-msg-sheet .form_data .line_div_icon.edit {
+  width: 18px;
+  height: 18px;
+  display: none;
+  float: right;
+  margin: 0 2px;
+  cursor: pointer;
+  opacity: 0.7;
+  background: url('data:image/svg+xml;charset=utf-8,%3Csvg%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cpath%20d%3D%22m0%200h24v24h-24z%22%2F%3E%3Cpath%20d%3D%22m13.4588392%208.18201011%202.3597266%202.35972659-5.7491275%205.7485894c-.51550497.5154608-1.14976283.8963668-1.84699864%201.1092222l-1.93499885.5907255c-.11751754.0358764-.24186783-.0303069-.27774413-.1478245-.01292635-.0423419-.01292635-.0875776%200-.1299196l.59066639-1.9348052c.21289308-.6973592.59389563-1.3317162%201.1094918-1.8472682zm.7071399-.70707369%201.1791689-1.17905857c.3905292-.39049574%201.0236708-.39048218%201.4141833.00003028l.9455736.94545246c.3905243.39052429.3905243%201.02368927%200%201.41421356-.0000101.0000101-.0000202.00002019-.0000303.00003029l-1.1791689%201.17905858z%22%20fill%3D%22%2399a2ad%22%20fill-rule%3D%22nonzero%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E') center / 18px 18px no-repeat;
+}
+.group_info_row.vkify_can_inline_edit .line_value:hover .line_div_icon.edit,
+.profile_info_block td.data.vkify_can_inline_edit:hover .line_div_icon.edit {
+  display: inline-block;
+}
+.group_info_row .line_div_icon.edit:hover,
+.profile_info_block .line_div_icon.edit:hover,
+.ovk-msg-sheet .form_data .line_div_icon.edit:hover {
+  opacity: 1;
+}
+.profile_info_block td.data.vkify_can_inline_edit {
+  cursor: text;
+  border-radius: 2px;
+}
+.profile_info_block td.data.vkify_can_inline_edit:hover {
+  background-color: var(--module-background-color--secondary);
+}
+.ugc-table td .vkify_inline_edit_wrap {
+  margin-top: -5px;
 }
 
 .topics_module .module_body {

@@ -560,4 +560,346 @@ vkify.ready(() => {
     vkify.observeDOM(updatePlaylistEmptyState);
 });
 
+function bindInlineFieldEditorOnce() {
+    function autoSizeTextarea(ta) {
+        if (!ta || ta.tagName !== 'TEXTAREA') return;
+        ta.style.height = '0px';
+        ta.style.height = `${Math.min(350, Math.max(36, ta.scrollHeight + 2))}px`;
+    }
+
+    function extractInitialPlainText(rowContainer) {
+        if (!rowContainer) return '';
+        if (rowContainer.querySelector('.pv_no_description')) return '';
+        const fullTextEl = rowContainer.querySelector('.full_text');
+        if (fullTextEl) {
+            const clone = fullTextEl.cloneNode(true);
+            clone.querySelectorAll('.collapse_button').forEach((b) => b.remove());
+            return clone.textContent.trim();
+        }
+        const reallyTextEl = rowContainer.querySelector('.really_text');
+        if (reallyTextEl) {
+            const clone = reallyTextEl.cloneNode(true);
+            clone.querySelectorAll('.collapse_button').forEach((b) => b.remove());
+            return clone.textContent.trim();
+        }
+        const lineLink = rowContainer.querySelector('.line_value a');
+        if (lineLink) return lineLink.textContent.trim();
+        return rowContainer.textContent.trim();
+    }
+
+    function openInlineEditor({ rowContainer, editUrl, fieldName, multiline, resultSelector, refreshUrl, placeholder, fallbackEmptyHtml, mirrorSelectors = [] }) {
+        if (!rowContainer || !editUrl || rowContainer.__vkifyInlineEditing) return;
+        rowContainer.__vkifyInlineEditing = true;
+
+        const metaContainer = rowContainer.closest('[data-inline-field]');
+        const initialText = metaContainer?.dataset.inlineValue ?? extractInitialPlainText(rowContainer);
+        const originalContent = document.createElement('div');
+        originalContent.className = 'vkify_inline_original';
+        while (rowContainer.firstChild) originalContent.appendChild(rowContainer.firstChild);
+        originalContent.hidden = true;
+        originalContent.style.display = 'none';
+        rowContainer.appendChild(originalContent);
+
+        const wrap = document.createElement('div');
+        wrap.className = 'vkify_inline_edit_wrap';
+        const field = document.createElement(multiline ? 'textarea' : 'input');
+        if (!multiline) field.type = 'text';
+        field.className = 'dark vkify_inline_edit_field';
+        field.setAttribute('data-no-autosize', '');
+        field.placeholder = placeholder || '';
+        field.value = initialText;
+        wrap.appendChild(field);
+        rowContainer.appendChild(wrap);
+
+        if (multiline) autoSizeTextarea(field);
+        field.focus();
+        try {
+            const len = field.value.length;
+            field.setSelectionRange(len, len);
+        } catch (_) {}
+
+        let userTyped = false;
+        field.addEventListener('input', () => {
+            userTyped = true;
+            if (multiline) autoSizeTextarea(field);
+        });
+
+        const formPromise = (async () => {
+            const res = await fetch(editUrl, { credentials: 'same-origin' });
+            if (!res.ok || res.redirected) return null;
+            const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+            for (const g of doc.querySelectorAll('.form_group')) {
+                const f = g.querySelector('form');
+                if (f) return f;
+            }
+            return doc.querySelector('form');
+        })().catch(() => null);
+
+        formPromise.then((form) => {
+            if (!form || !wrap.isConnected || userTyped) return;
+            const srcField = form.querySelector(`[name="${fieldName}"]`);
+            if (srcField && typeof srcField.value === 'string') {
+                field.value = srcField.value;
+                if (multiline) autoSizeTextarea(field);
+                try {
+                    const len = field.value.length;
+                    field.setSelectionRange(len, len);
+                } catch (_) {}
+            }
+        });
+
+        let finished = false;
+        let cancelled = false;
+        const restoreOriginal = () => {
+            if (finished) return;
+            finished = true;
+            cancelled = true;
+            rowContainer.__vkifyInlineEditing = false;
+            wrap.remove();
+            while (originalContent.firstChild) rowContainer.insertBefore(originalContent.firstChild, originalContent);
+            originalContent.remove();
+        };
+
+        const saveInline = async () => {
+            if (finished || cancelled) return;
+            finished = true;
+            const newVal = field.value.trim();
+            const form = await formPromise;
+            if (cancelled) return;
+            if (!form) {
+                finished = false;
+                restoreOriginal();
+                return;
+            }
+            const origField = form.querySelector(`[name="${fieldName}"]`);
+            const origVal = origField ? String(origField.value || '').trim() : initialText;
+            if (newVal === origVal) {
+                finished = false;
+                restoreOriginal();
+                return;
+            }
+
+            field.disabled = true;
+
+            try {
+                const fd = new FormData(form);
+                fd.set(fieldName, newVal);
+                const csrf = vkify.getCsrf();
+                if (csrf) fd.set('hash', csrf);
+
+                const postUrl = new URL(form.getAttribute('action') || editUrl, new URL(editUrl, location.href)).href;
+                const res = await fetch(postUrl, {
+                    method: 'POST',
+                    body: fd,
+                    credentials: 'same-origin',
+                });
+                const resHtml = await res.text();
+                const resDoc = new DOMParser().parseFromString(resHtml, 'text/html');
+                const flash = extractFlash(resDoc);
+                let freshEl = resDoc.querySelector(resultSelector);
+                if (res.ok && flash?.type !== 'err' && !freshEl && refreshUrl) {
+                    // Group/user edit forms render the edit page after POST, not the profile.
+                    const freshRes = await fetch(refreshUrl, { credentials: 'same-origin', cache: 'no-store' });
+                    if (freshRes.ok && !freshRes.redirected) {
+                        freshEl = new DOMParser().parseFromString(await freshRes.text(), 'text/html')
+                            .querySelector(resultSelector);
+                    }
+                }
+                if (!res.ok || flash?.type === 'err' || !freshEl) {
+                    NewNotification(flash?.title || tr('error'), flash?.message || tr('error'), null);
+                    finished = false;
+                    restoreOriginal();
+                    return;
+                }
+
+                rowContainer.__vkifyInlineEditing = false;
+                const applyFreshContent = (target, html, fresh = freshEl) => {
+                    const freshMeta = fresh?.closest?.('[data-inline-field]');
+                    const targetMeta = target?.closest?.('[data-inline-field]');
+                    if (freshMeta && targetMeta) {
+                        ['inlineField', 'inlineValue', 'inlineMultiline', 'editUrl', 'refreshUrl'].forEach((key) => {
+                            if (Object.prototype.hasOwnProperty.call(freshMeta.dataset, key)) {
+                                targetMeta.dataset[key] = freshMeta.dataset[key];
+                            } else {
+                                delete targetMeta.dataset[key];
+                            }
+                        });
+                    }
+                    target.innerHTML = html;
+                };
+                const replacementHtml = freshEl.innerHTML.trim() ? freshEl.innerHTML : fallbackEmptyHtml;
+                if (replacementHtml) {
+                    applyFreshContent(rowContainer, replacementHtml);
+                    for (const selector of mirrorSelectors) {
+                        document.querySelectorAll(selector).forEach((target) => {
+                            if (target !== rowContainer) applyFreshContent(target, replacementHtml);
+                        });
+                    }
+                } else {
+                    wrap.remove();
+                    while (originalContent.firstChild) rowContainer.insertBefore(originalContent.firstChild, originalContent);
+                    originalContent.remove();
+                }
+
+                const stack = window.messagebox_stack || [];
+                const viewer = stack.slice().reverse().find((m) =>
+                    m?._viewer?.modal?.getNode?.()?.nodes?.[0]?.contains(rowContainer))?._viewer;
+                const entry = viewer?.items?.[viewer.currentId];
+                if (entry && entry.cached) {
+                    const cached = document.createElement('div');
+                    cached.innerHTML = entry.cached;
+                    const oldDesc = cached.querySelector(resultSelector);
+                    if (oldDesc) {
+                        oldDesc.replaceWith(rowContainer.cloneNode(true));
+                        entry.cached = cached.innerHTML;
+                    }
+                }
+            } catch (err) {
+                console.error('Inline edit save failed:', err);
+                finished = false;
+                restoreOriginal();
+            }
+        };
+
+        field.addEventListener('keydown', (ke) => {
+            if (ke.key === 'Escape') {
+                ke.preventDefault();
+                ke.stopPropagation();
+                restoreOriginal();
+                return;
+            }
+            if (ke.key === 'Enter' && (!multiline || ke.ctrlKey || ke.metaKey)) {
+                ke.preventDefault();
+                ke.stopPropagation();
+                saveInline();
+            }
+        });
+
+        field.addEventListener('blur', () => {
+            saveInline();
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.collapse_button, .vkify_inline_edit_wrap')) return;
+
+        // 1. Photo description (.pv_desc)
+        const pvEditLink = e.target.closest('.pv_desc .pv_can_edit');
+        if (pvEditLink) {
+            const innerAnchor = e.target.closest('a');
+            if (innerAnchor && innerAnchor !== pvEditLink) return;
+            const actionRef = pvEditLink.dataset.editUrl || pvEditLink.getAttribute('href') || '';
+            const m = actionRef.match(/showEditPhotoModal\(\s*['"]([^'"]+)['"]\s*\)/);
+            if (m) {
+                e.preventDefault();
+                e.stopPropagation();
+                const photoId = m[1];
+                const pvDesc = pvEditLink.closest('.pv_desc');
+                openInlineEditor({
+                    rowContainer: pvDesc,
+                    editUrl: `/photo${photoId}/edit`,
+                    fieldName: 'desc',
+                    multiline: true,
+                    resultSelector: '.pv_desc',
+                    placeholder: tr('no_description'),
+                    fallbackEmptyHtml: `<div class="pv_can_edit pv_desc_cont" data-edit-url="javascript:showEditPhotoModal('${photoId}')" role="button" tabindex="0"><span class="pv_no_description">${tr('no_description')}</span></div>`,
+                });
+                return;
+            }
+        }
+
+        // 2. Video description (.video_info_description)
+        const mvEditLink = e.target.closest('.video_info_description .pv_can_edit');
+        if (mvEditLink) {
+            const innerAnchor = e.target.closest('a');
+            if (innerAnchor && innerAnchor !== mvEditLink) return;
+            const actionRef = mvEditLink.dataset.editUrl || mvEditLink.getAttribute('href') || '';
+            const m = actionRef.match(/showEditVideoModal\(\s*['"]([^'"]+)['"]\s*\)/);
+            if (m) {
+                e.preventDefault();
+                e.stopPropagation();
+                const videoId = m[1];
+                const mvDesc = mvEditLink.closest('.video_info_description');
+                openInlineEditor({
+                    rowContainer: mvDesc,
+                    editUrl: `/video${videoId}/edit`,
+                    fieldName: 'desc',
+                    multiline: true,
+                    resultSelector: '.video_info_description',
+                    placeholder: tr('no_description'),
+                    fallbackEmptyHtml: `<div class="pv_can_edit pv_desc_cont" data-edit-url="javascript:showEditVideoModal('${videoId}')" role="button" tabindex="0"><span class="pv_no_description">${tr('no_description')}</span></div>`,
+                });
+                return;
+            }
+        }
+
+        // 3. Group info / website rows (.group_info_rows .group_info_row.info / .site)
+        const groupRow = e.target.closest('.group_info_rows .group_info_row.info, .group_info_rows .group_info_row.site');
+        if (groupRow) {
+            const isSiteRow = groupRow.classList.contains('site');
+            const clickedLink = e.target.closest('a');
+            const isEditAnchor = clickedLink && /\/club\d+\/edit$/.test(clickedLink.getAttribute('href') || '');
+            const isEditIcon = Boolean(e.target.closest('.line_div_icon.edit'));
+            if (clickedLink && !isEditAnchor) return;
+            if (!isEditAnchor && !isEditIcon && !groupRow.classList.contains('vkify_can_inline_edit')) return;
+
+            const editUrl = groupRow.dataset.editUrl || (isEditAnchor ? clickedLink.getAttribute('href') : '');
+            if (!editUrl) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const rowType = isSiteRow ? 'site' : 'info';
+            const mobileSelector = `#mobile_group_more_info_content .group_info_row.${rowType}`;
+            const desktopSelector = `#group_info_content .group_info_row.${rowType}`;
+            const isMobileContext = groupRow.dataset.inlineContext === 'mobile' || Boolean(groupRow.closest('.ovk-msg-sheet'));
+            openInlineEditor({
+                rowContainer: groupRow,
+                editUrl,
+                fieldName: isSiteRow ? 'website' : 'about',
+                multiline: !isSiteRow,
+                resultSelector: isMobileContext ? mobileSelector : desktopSelector,
+                refreshUrl: editUrl.replace(/\/edit$/, ''),
+                placeholder: isSiteRow ? tr('admin_banned_link_not_specified') : tr('desc_none'),
+                fallbackEmptyHtml: `<div class="pv_can_edit pv_desc_cont" data-edit-url="${editUrl}" role="button" tabindex="0"><span class="pv_no_description">${isSiteRow ? tr('admin_banned_link_not_specified') : tr('desc_none')}</span></div>`,
+                mirrorSelectors: [desktopSelector, mobileSelector],
+            });
+            return;
+        }
+
+        const profileData = e.target.closest('.profile_info_block tr[data-inline-field] .data.vkify_can_inline_edit, .form_field[data-inline-field] .form_data.vkify_can_inline_edit');
+        if (profileData && !e.target.closest('a')) {
+            const row = profileData.closest('[data-inline-field]');
+            const fieldName = row.dataset.inlineField;
+            const editUrl = row.dataset.editUrl;
+            const refreshUrl = row.dataset.refreshUrl;
+            if (!fieldName || !editUrl || !refreshUrl) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const mobileSelector = `#mobile_more_info_content .form_field[data-inline-field="${fieldName}"] .form_data`;
+            const desktopSelector = `.profile_info_block tr[data-inline-field="${fieldName}"] .data`;
+            const isMobileContext = row.dataset.inlineContext === 'mobile' || Boolean(row.closest('.ovk-msg-sheet'));
+            openInlineEditor({
+                rowContainer: profileData,
+                editUrl,
+                fieldName,
+                multiline: row.dataset.inlineMultiline !== 'false',
+                resultSelector: isMobileContext ? mobileSelector : desktopSelector,
+                refreshUrl,
+                mirrorSelectors: [desktopSelector, mobileSelector],
+            });
+        }
+    }, true);
+
+    document.addEventListener('keydown', (e) => {
+        const editTarget = e.target.closest?.('.pv_can_edit[role="button"]');
+        if (!editTarget || (e.key !== 'Enter' && e.key !== ' ')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        editTarget.click();
+    }, true);
+}
+
+vkify.bindOnce('vkifyInlineFieldEditor', bindInlineFieldEditorOnce);
+
 })();

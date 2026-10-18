@@ -214,13 +214,40 @@
     <div id="mobile_group_more_info_content" style="display:none;">
         {var $moreInfoBlocks = []}
 
-        {if $descPlain !== ''}
+        {if $canEdit || $descPlain !== '' || $club->getWebsite()}
             {capture $moreInfoBlock}
                 <div class="form_group clear_fix">
                     <div class="form_field">
                         <div class="form_label">{_information}</div>
                         <div class="form_data" dir="auto">
-                            {include "../components/truncated_text.latte", html => $descHtml, plain => $descPlain, limit => 500}
+                            <div class="group_info_rows">
+                                <div n:class="group_info_row, info, $canEdit ? vkify_can_inline_edit" n:attr="data-edit-url => $canEdit ? '/club' . $club->getId() . '/edit' : null, data-inline-context => $canEdit ? 'mobile' : null, data-inline-field => $canEdit ? 'about' : null">
+                                    {if $descHtml}
+                                        {include "../components/truncated_text.latte", html => $descHtml, plain => $descPlain, limit => 500, isEditable => $canEdit, editUrl => "/club" . $club->getId() . "/edit"}
+                                    {elseif $canEdit}
+                                        <div class="pv_can_edit pv_desc_cont" data-edit-url="/club{$club->getId()}/edit" role="button" tabindex="0"><span class="pv_no_description">{_desc_none|firstUpper}</span></div>
+                                    {else}
+                                        <span class="nobold">{_desc_none|firstUpper}</span>
+                                    {/if}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div n:if="$club->getWebsite() || $canEdit" class="form_field">
+                        <div class="form_label">{_website}</div>
+                        <div class="form_data" dir="auto">
+                            <div class="group_info_rows">
+                                <div n:class="group_info_row, site, $canEdit ? vkify_can_inline_edit" n:attr="data-edit-url => $canEdit ? '/club' . $club->getId() . '/edit' : null, data-inline-context => $canEdit ? 'mobile' : null, data-inline-field => $canEdit ? 'website' : null">
+                                    {if $club->getWebsite()}
+                                        <div class="line_value">
+                                            <a href="{$club->getWebsite()}" rel="ugc" target="_blank">{$club->getWebsite()}</a>
+                                            <span n:if="$canEdit" class="line_div_icon edit" role="button" title="{_edit}"></span>
+                                        </div>
+                                    {elseif $canEdit}
+                                        <div class="pv_can_edit pv_desc_cont" data-edit-url="/club{$club->getId()}/edit" role="button" tabindex="0"><span class="pv_no_description">{_admin_banned_link_not_specified}</span></div>
+                                    {/if}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
