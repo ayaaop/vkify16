@@ -384,7 +384,6 @@ body.vkify-force-classic label:has(> input#im\.modern_mode) {
     cursor: pointer;
 }
 
-/* VK im-action menu icons (im_actions.png sprite, same layout as upstream) */
 #profile_actions_tooltip .im-action {
     padding-left: 0;
     vertical-align: middle;
@@ -1736,10 +1735,6 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 .messenger-app--messages---message.msg-hoverable:hover .actions-2 .star-icon {
     opacity: 0.65;
-}
-
-.messenger-app--messages---message .actions-2 .star-icon:hover {
-    transform: scale(1.15);
 }
 
 .messenger-app--messages---message.msg-important .actions-2 .star-icon,
@@ -3297,7 +3292,21 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 .messenger-app .im-chat-input--scroll .im-chat-input--attaches {
     padding-right: 2px;
+    margin-top: 0;
+}
+
+.messenger-app .im-chat-input--scroll .im-chat-input--attaches:has(.post-horizontal:not(:empty), .post-vertical:not(:empty)) {
     margin-top: 10px;
+}
+
+.stock-input-bar .messenger-app--input---messagebox .post-horizontal:not(:empty),
+.stock-input-bar .messenger-app--input---messagebox .post-vertical:not(:empty) {
+    margin-top: 10px;
+}
+
+.messenger-app .post-horizontal.vkify_makima_composer + .post-vertical:not(:empty),
+.stock-input-bar .post-horizontal.vkify_makima_composer + .post-vertical:not(:empty) {
+    margin-top: 8px;
 }
 
 .messenger-app .im-chat-input--attaches .multi_media_preview {
@@ -3337,7 +3346,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 }
 
 .stock-input-bar .messenger-app--input---messagebox {
-    margin: 0px 14px;
+    padding: 0px 14px;
     width: calc(100% - 28px - 92px);
 }
 

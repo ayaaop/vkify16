@@ -532,6 +532,37 @@ input[type="submit"].button_green:hover {
     color: var(--link-color);
 }
 
+.button.button_baw {
+    background-color: rgba(0, 0, 0, 0.55);
+    color: #fff;
+}
+.button.button_baw:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+}
+.button.button_baw:active {
+    background-color: rgba(0, 0, 0, 0.85);
+    color: #fff;
+}
+.button.button_baw.button_baw_inverted {
+    background-color: rgba(255, 255, 255, 0.92);
+    color: #111;
+}
+.button.button_baw.button_baw_inverted:hover {
+    background-color: #fff;
+    color: #111;
+}
+.button.button_baw.button_baw_inverted:active {
+    background-color: rgba(255, 255, 255, 0.78);
+    color: #111;
+}
+.button.button_baw.button_disabled,
+.button.button_baw.button_disabled:hover,
+.button.button_baw.button_disabled:active {
+    background-color: rgba(255, 255, 255, 0.35);
+    color: rgba(0, 0, 0, 0.55);
+}
+
 .ovk-diag-action > button:last-of-type:not(:only-of-type) {
     color: var(--link-color);
     background-color: transparent;

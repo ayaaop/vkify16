@@ -60,7 +60,7 @@ export function createPeerInfoView({ html, tr, PeerAvatar = null }) {
             }
             const wrap = e.currentTarget;
             if (wrap.classList.contains('shown')) {
-                uiActionsMenu.toggle(wrap, false);
+                uiActionsMenu.show(wrap, null, {align: "right"});
             } else {
                 openMenu(wrap);
             }

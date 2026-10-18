@@ -21,8 +21,8 @@
 
         u(body).toggleClass('ovkhat', enabled);
 
-        if (window.Favicon && typeof window.Favicon.set === 'function') {
-            window.Favicon.set(enabled ? 'ovk' : 'default');
+        if (window.Favicon && typeof window.Favicon.update === 'function') {
+            window.Favicon.update();
         } else {
             const favicon = document.querySelector('link[rel="shortcut icon"]');
             if (favicon) {

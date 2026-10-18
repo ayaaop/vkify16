@@ -3,7 +3,7 @@
 {var $instance_name = \OPENVK_ROOT_CONF['openvk']['appearance']['name']}
 {var $darkModeEnabled = ($_COOKIE['vkify16_darkmode'] ?? '0') === '1'}
 {var $mode2018Enabled = ($_COOKIE['vkify16_2018mode'] ?? '0') === '1'}
-{var $ovkHatEnabled = ($_COOKIE['ovkhat'] ?? '0') === '1'}
+{var $ovkHatEnabled = ($_COOKIE['ovkhat'] ?? '1') === '1'}
 {var $hideSidebar = $_SERVER['REQUEST_URI'] === '/' || $_SERVER['REQUEST_URI'] === '/reg' || $_SERVER['REQUEST_URI'] === '/login' || (isset($thisUser) && $thisUser->isBanned())}
 {var $isMessenger = preg_match('~^/im([/?]|$)~', $_SERVER['REQUEST_URI'] ?? '')}
 {if !isset($parentModule) || substr($parentModule, 0, 21) === 'libchandler:absolute.'}
@@ -14,7 +14,7 @@
             {ifset title}{include title} - {/ifset}{$instance_name}
         </title>
         <meta charset="utf-8" />
-        <link rel="shortcut icon" href="/themepack/vkify16/{$theme->getVersion()}/resource/icons/default.ico" />
+        <link rel="shortcut icon" href="/themepack/vkify16/{$theme->getVersion()}/resource/icons/{= $ovkHatEnabled ? 'ovk.ico' : 'default.ico'}" />
         <meta name="application-name" content="{$instance_name}" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content, viewport-fit=cover" />
         <meta n:ifset="$csrfToken" name="csrf" value="{$csrfToken}" />
