@@ -494,9 +494,15 @@ vkify.once('initTextareaInteraction', () => {
     window.initTextareaInteraction = () => {
         if (!vkify.bindOnce('textareaInteraction', window.initTextareaInteraction)) return;
 
+        const isMobileView = () => (typeof window.isMobile === 'function'
+            ? window.isMobile()
+            : window.matchMedia('(max-width: 768px)').matches);
+
         const showComposer = (target) => {
             if (target.tagName === 'TEXTAREA' || target.classList?.contains('submit_post_field')) {
-                target.closest('.model_content_textarea')?.classList.add('shown');
+                const box = target.closest('.model_content_textarea');
+                if (isMobileView() && isMobileTeaserComposerEl(box)) return;
+                box?.classList.add('shown');
                 if (target.classList?.contains('small-textarea')) {
                     target.classList.add('expanded-textarea');
                 }
@@ -508,10 +514,12 @@ vkify.once('initTextareaInteraction', () => {
         });
 
         const checkAttachments = () => {
+            const mobile = isMobileView();
             document.querySelectorAll('.model_content_textarea').forEach(box => {
                 const horizontal = box.querySelector('.post-horizontal');
                 const vertical = box.querySelector('.post-vertical');
-                if ((horizontal?.children.length || vertical?.children.length)) {
+                if ((horizontal?.children.length || vertical?.children.length)
+                    && !(mobile && isMobileTeaserComposerEl(box))) {
                     box.classList.add('shown');
                 }
             });
@@ -631,11 +639,49 @@ function bindAjaxPostCleanup() {
     });
 }
 
+function isComposerFormDirty(form) {
+    if (!form) return false;
+    const ta = form.querySelector('textarea[name="text"]');
+    if (ta && ta.value.trim().length > 0) return true;
+    const horizontal = form.querySelector('.post-horizontal');
+    if (horizontal && horizontal.querySelector('a.upload-item')) return true;
+    const vertical = form.querySelector('.post-vertical');
+    if (vertical && vertical.querySelector('.vertical-attachment')) return true;
+    const pollInput = form.querySelector('input[name="poll"]');
+    if (pollInput && pollInput.value && pollInput.value !== 'none') return true;
+    const geoInput = form.querySelector('input[name="geo"]');
+    if (geoInput && geoInput.value.trim().length > 0) return true;
+    const sourceInput = form.querySelector('input[name="source"]');
+    if (sourceInput && sourceInput.value && sourceInput.value !== 'none') return true;
+    return false;
+}
+
+function hasAnyUnsavedWallWork() {
+    if (document.querySelector('.post.editing, #_edit_post_modal')) return true;
+    const forms = document.querySelectorAll('#write form, .model_content_textarea form');
+    for (const form of forms) {
+        if (isComposerFormDirty(form)) return true;
+    }
+    return false;
+}
+
+function bindWallBeforeUnloadGuard() {
+    if (!vkify.bindOnce('wallBeforeUnloadGuard', bindWallBeforeUnloadGuard)) return;
+    window.addEventListener('beforeunload', (e) => {
+        if (hasAnyUnsavedWallWork()) {
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        }
+    });
+}
+
 setupWallCheckboxListeners();
 bindCommentCancelOnce();
 bindSourceButtonOrderFix();
 bindWallAjaxActions();
 bindAjaxPostCleanup();
+bindWallBeforeUnloadGuard();
 
 let _groupInfoTabsInitialized = false;
 function initGroupInfoTabs() {
@@ -1115,7 +1161,12 @@ function bindPostEditOnce() {
                 }
 
                 if (api_post.copy_history?.length > 0) {
-                    container.find('.post-repost').html(`<span>${tr('has_repost')}.</span>`);
+                    const copyQuote = post.find('.post.copy_quote').nodes[0];
+                    if (copyQuote) {
+                        container.find('.post-repost').html(copyQuote.outerHTML);
+                    } else {
+                        container.find('.post-repost').html(`<span>${tr('has_repost')}.</span>`);
+                    }
                 }
 
                 api_post.attachments?.forEach(att => {
@@ -1124,10 +1175,59 @@ function bindPostEditOnce() {
                     if (att[attType]?.access_key) aid += `_${att[attType].access_key}`;
 
                     if (attType === 'video' || attType === 'photo') {
-                        const preview = attType === 'photo' ? att[attType].sizes[1].url : att[attType].image[0].url;
-                        window.__appendToTextarea({ type: attType, preview, id: aid }, container);
+                        if (attType === 'photo') {
+                            const pObj = att.photo;
+                            const sizes = pObj.sizes || [];
+                            const best = sizes[4] || sizes[3] || sizes[2] || sizes[1] || sizes[0] || {};
+                            const full = sizes[9] || sizes[sizes.length - 1] || best;
+                            window.__appendToTextarea({
+                                type: 'photo',
+                                id: aid,
+                                preview: full.url || best.url,
+                                fullsize_url: full.url || best.url,
+                                width: full.width || best.width || pObj.width || 0,
+                                height: full.height || best.height || pObj.height || 0
+                            }, container);
+                        } else {
+                            const vObj = att.video;
+                            const preview = vObj.image?.[0]?.url || '';
+                            const platform = vObj.platform || '';
+                            const duration = !platform && vObj.duration && typeof fmtTime === 'function' ? fmtTime(vObj.duration) : '';
+                            window.__appendToTextarea({
+                                type: 'video',
+                                id: aid,
+                                preview,
+                                title: vObj.title || '',
+                                duration,
+                                platform,
+                                width: vObj.width || 640,
+                                height: vObj.height || 360
+                            }, container);
+                        }
                     } else if (attType === 'poll') {
-                        window.__appendToTextarea({ type: attType, alignment: 'vertical', html: tr('poll'), id: att[attType].id, undeletable: true }, container);
+                        const pollNode = post.find('.poll').nodes[0];
+                        const pollTitle = att.poll?.question || pollNode?.querySelector('.poll_title, b, h4')?.textContent || tr('poll');
+                        window.__appendToTextarea({
+                            type: attType,
+                            alignment: 'vertical',
+                            html: `<div class="attachment_note composer_poll_preview"><div class="attachment_note_content"><span class="attachment_note_text">${tr('poll')}</span><span class="attachment_note_name">${escapeHtml(pollTitle)}</span></div></div>`,
+                            id: att[attType].id,
+                            undeletable: true
+                        }, container);
+                    } else if (attType === 'doc') {
+                        const hiddenBlock = post.find(`div[data-att_type='doc'][data-att_id='${aid}']`).nodes[0];
+                        const docWrap = hiddenBlock?.closest('.attachment_doc');
+                        let docHtml = '';
+                        if (docWrap) {
+                            const mainDoc = docWrap.querySelector(':scope > .docMainItem');
+                            if (mainDoc) {
+                                const clone = mainDoc.cloneNode(true);
+                                clone.querySelector('.doc_volume, .doc_top_panel')?.remove();
+                                docHtml = `<div class="attachment_doc">${clone.outerHTML}</div>`;
+                            }
+                        }
+                        if (!docHtml && hiddenBlock) docHtml = hiddenBlock.innerHTML;
+                        window.__appendToTextarea({ type: attType, alignment: 'vertical', html: docHtml, id: aid }, container);
                     } else {
                         const found_block = post.find(`div[data-att_type='${attType}'][data-att_id='${aid}']`);
                         window.__appendToTextarea({ type: attType, alignment: 'vertical', html: found_block.html(), id: aid }, container);
@@ -1209,6 +1309,7 @@ function bindPostEditOnce() {
                 editModal.getNode().addClass('ovk-msg-fullscreen');
                 const modalNode = editModal.getNode();
                 populateEditForm(modalNode);
+                requestAnimationFrame(() => window.vkifyUpdateComposerMediaGrid?.(modalNode));
                 modalNode.find('.edit_menu #__edit_cancel').on('click', () => editModal.close());
                 modalNode.find('.edit_menu #__edit_save').on('click', () => {
                     modalNode.find('.ovk-diag-action button').first()?.click();
@@ -1919,5 +2020,136 @@ function bindArchivePostPageOnce() {
 }
 
 bindArchivePostPageOnce();
+
+let vkifyMobileComposerOpen = false;
+
+function isMobileTeaserComposerEl(writeEl) {
+    if (!writeEl || writeEl.closest('.ovk-msg-all')) return false;
+    if (document.body.classList.contains('body_im')) return false;
+    if (writeEl.querySelector('.messenger-app--input---messagebox')) return false;
+    const form = writeEl.querySelector('form');
+    if (!form || !form.querySelector('textarea[name="text"]')) return false;
+    if (form.querySelector('.wall-comment-cancel')) return false;
+    if (!writeEl.querySelector('.post-attach-menu')) return false;
+    return true;
+}
+
+function findMobilePostComposer(target) {
+    const writeEl = target?.closest?.('#write');
+    if (!isMobileTeaserComposerEl(writeEl)) return null;
+    return { writeEl, form: writeEl.querySelector('form') };
+}
+
+function openMobilePostComposer(writeEl, form) {
+    if (vkifyMobileComposerOpen || typeof CMessageBox !== 'function') return;
+    vkifyMobileComposerOpen = true;
+
+    const anchor = document.createComment('vkify-mobile-composer');
+    writeEl.parentNode.insertBefore(anchor, writeEl);
+
+    let restored = false;
+    let onSubmitForPublish = null;
+    const restore = () => {
+        if (restored) return;
+        restored = true;
+        vkifyMobileComposerOpen = false;
+        if (onSubmitForPublish) {
+            form.removeEventListener('submit', onSubmitForPublish);
+            onSubmitForPublish = null;
+        }
+        const ta = writeEl.querySelector('textarea[name="text"]');
+        if (ta) {
+            ta.removeAttribute('data-no-autosize');
+            window.vkifyTextareaAutosize?.apply?.(ta);
+        }
+        writeEl.classList.remove('shown', 'expanded-textarea');
+        if (anchor.parentNode) {
+            anchor.parentNode.insertBefore(writeEl, anchor);
+            anchor.remove();
+        } else {
+            writeEl.remove();
+        }
+    };
+
+    const publish = () => {
+        const submitBtn = form.querySelector('input[type="submit"]');
+        if (submitBtn && !submitBtn.disabled) submitBtn.click();
+    };
+
+    const modal = new CMessageBox({
+        title: tr('write'),
+        close_on_buttons: false,
+        unique_name: 'post_composer_modal',
+        body: '<div id="_new_post_modal"></div>',
+        buttons: [tr('publish'), tr('cancel')],
+        callbacks: [publish, () => modal.close()],
+    });
+    const modalNode = modal.getNode();
+    const holder = modalNode.find('#_new_post_modal').nodes[0];
+    if (!modalNode.length || !holder) {
+        vkifyMobileComposerOpen = false;
+        anchor.remove();
+        return;
+    }
+    modalNode.addClass('ovk-msg-fullscreen');
+    holder.appendChild(writeEl);
+    writeEl.classList.add('shown', 'expanded-textarea');
+
+    const ta = writeEl.querySelector('textarea[name="text"]');
+    if (ta) {
+        ta.setAttribute('data-no-autosize', '');
+        ta.style.height = '';
+        setTimeout(() => ta.focus({ preventScroll: true }), 250);
+    }
+    requestAnimationFrame(() => window.vkifyUpdateComposerMediaGrid?.(modalNode.nodes[0]));
+
+    const origExit = modal.__exitDialog.bind(modal);
+    modal.__exitDialog = (...args) => {
+        restore();
+        origExit(...args);
+    };
+
+    // ajax_posting locates .scroll_container via e.target.parentNode.parentNode.parentNode,
+    // so the composer must be back in the page before the submit bubbles to the router handler
+    onSubmitForPublish = () => modal.close();
+    form.addEventListener('submit', onSubmitForPublish);
+}
+
+function bindMobilePostComposerOnce() {
+    if (!vkify.bindOnce('mobilePostComposer', bindMobilePostComposerOnce)) return;
+
+    const isMobileView = () => (typeof window.isMobile === 'function'
+        ? window.isMobile()
+        : window.matchMedia('(max-width: 768px)').matches);
+
+    const tryOpen = (e, stop) => {
+        if (!isMobileView() || vkifyMobileComposerOpen) return;
+        const hit = findMobilePostComposer(e.target);
+        if (!hit) return;
+        if (stop) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        openMobilePostComposer(hit.writeEl, hit.form);
+    };
+
+    document.addEventListener('pointerdown', (e) => tryOpen(e, true), true);
+    document.addEventListener('mousedown', (e) => {
+        if (!('PointerEvent' in window)) tryOpen(e, true);
+    }, true);
+    document.addEventListener('touchstart', (e) => {
+        if (!('PointerEvent' in window)) tryOpen(e, true);
+    }, true);
+    document.addEventListener('click', (e) => tryOpen(e, true), true);
+    document.addEventListener('focusin', (e) => {
+        if (!isMobileView() || vkifyMobileComposerOpen) return;
+        const hit = findMobilePostComposer(e.target);
+        if (!hit) return;
+        e.target.blur?.();
+        openMobilePostComposer(hit.writeEl, hit.form);
+    }, true);
+}
+
+bindMobilePostComposerOnce();
 
 })();

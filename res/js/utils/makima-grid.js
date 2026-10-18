@@ -1,8 +1,22 @@
-// Copy of the layout math from /opt/openvk/Web/static/js/messages/components/makima_grid.js.
-// Only the pure computation part is ported (the htm MediaTile/MessageMakimaGrid
-// components are messenger-bound and not needed here). Used by
-// features/makima-attachments.js to re-flow wall/comment media attachments
-// into a mosaic on mobile, where the server-side fixed-width layout doesn't fit.
+// Port of OpenVK's PHP Makima layout (\openvk\Web\Util\Makima\Makima::computeMasonryLayout)
+// and VK's ThumbsEdit.processThumbs. Used by features/attachment-picker.js
+// (composer media grid) and features/makima-attachments.js (mobile wall/comment
+// media reflow) so client-side grids match server-rendered post layouts.
+
+const ORIENT_WIDE = 0;
+const ORIENT_REGULAR = 1;
+const ORIENT_SLIM = 2;
+
+function getOrientation(ratio) {
+    if (ratio >= 1.2) return ORIENT_WIDE;
+    if (ratio >= 0.8) return ORIENT_REGULAR;
+    return ORIENT_SLIM;
+}
+
+function calculateMultiThumbsHeight(ratios, w, m) {
+    const sum = ratios.reduce((acc, r) => acc + r, 0) || 1;
+    return (w - (ratios.length - 1) * m) / sum;
+}
 
 /**
  * Extracts width, height and aspect ratio from a photo or video attachment.
@@ -49,12 +63,12 @@ export function getMediaDimensions(att) {
 }
 
 /**
- * Computes Makima mosaic layout for attachments.
- * Takes into account container dimensions (FastChats vs Standard Chat vs Mobile).
+ * Computes Makima mosaic layout for attachments, matching
+ * \openvk\Web\Util\Makima\Makima::computeMasonryLayout.
  *
  * @param {Array} visualItems - Array of { type: 'photo'|'video', photo/video, ... }
- * @param {Object} options - { isFastchat, depth, maxWidth, maxHeight }
- * @returns {Object} Layout object with gridWidth, gridHeight, and layoutRows or columns
+ * @param {Object} options - { isFastchat, depth, maxWidth, maxHeight, gap }
+ * @returns {Object} Layout object with gridWidth, gridHeight, and single/split_left/rows
  */
 export function computeMakimaGrid(visualItems, options = {}) {
     const count = visualItems.length;
@@ -64,20 +78,22 @@ export function computeMakimaGrid(visualItems, options = {}) {
     const depth = options.depth || 0;
 
     let maxW = options.maxWidth;
-    if (!maxW) {
-        maxW = isFastchat ? 205 : 380;
+    if (!maxW || maxW < 0) {
+        maxW = isFastchat ? 205 : 510;
         if (depth > 0) {
             maxW = Math.max(180, maxW - depth * 20);
         }
     }
 
     let maxH = options.maxHeight;
-    if (!maxH) {
-        maxH = isFastchat ? 230 : 350;
+    if (!maxH || maxH < 0) {
+        maxH = Math.round(maxW * 0.666);
         if (depth > 0) {
             maxH = Math.max(180, maxH - depth * 15);
         }
     }
+
+    const gap = options.gap ?? 2;
 
     const items = visualItems.map(item => ({
         att: item,
@@ -118,158 +134,308 @@ export function computeMakimaGrid(visualItems, options = {}) {
         };
     }
 
-    // ── 2 Items ─────────────────────────────────────────────
-    if (count === 2) {
-        const r0 = items[0].dims.ratio;
-        const r1 = items[1].dims.ratio;
+    const rawRatios = items.map(it => it.dims.ratio);
+    const orients = rawRatios.map(getOrientation);
+    // Clamp extreme portrait/panorama ratios (e.g. tall phone screenshots) so
+    // multi-tile grids don't collapse columns/rows into tiny slivers.
+    const ratios = rawRatios.map(r => Math.max(0.6, Math.min(1.8, r)));
+    const avgRatio = ratios.reduce((acc, r) => acc + r, 0) / count;
+    const maxRatio = maxW / maxH;
 
-        // If both are very wide panoramas, stack them vertically
-        if (r0 >= 1.6 && r1 >= 1.6) {
-            const h0 = Math.round(Math.min(maxH * 0.48, maxW / r0));
-            const h1 = Math.round(Math.min(maxH * 0.48, maxW / r1));
+    // ── 2 Items (Makima.php case 2) ─────────────────────────
+    if (count === 2) {
+        const r0 = ratios[0], r1 = ratios[1];
+
+        // Two wide pics that can be stacked on top of each other
+        if (
+            orients[0] === ORIENT_WIDE && orients[1] === ORIENT_WIDE
+            && avgRatio > 1.4 * maxRatio && Math.abs(r0 - r1) < 0.2
+        ) {
+            const computedHeight = Math.ceil(Math.min(maxW / r0, Math.min(maxW / r1, (maxH - gap) / 2)));
+            const w = Math.ceil(maxW);
             return {
                 type: 'standard',
-                gridWidth: maxW,
-                gridHeight: h0 + h1 + 2,
+                gridWidth: w,
+                gridHeight: computedHeight * 2 + gap,
                 rows: [
-                    { height: h0, ratio: maxW / h0, tiles: [{ item: items[0].att, flex: 1, height: h0 }] },
-                    { height: h1, ratio: maxW / h1, tiles: [{ item: items[1].att, flex: 1, height: h1 }] }
+                    { height: computedHeight, ratio: w / computedHeight, tiles: [{ item: items[0].att, flex: 1, width: w, height: computedHeight }] },
+                    { height: computedHeight, ratio: w / computedHeight, tiles: [{ item: items[1].att, flex: 1, width: w, height: computedHeight }] }
                 ]
             };
         }
 
-        // Default: side by side
-        const avgR = (r0 + r1) / 2;
-        let rowH = Math.round((maxW / 2) / avgR);
-        rowH = Math.max(isFastchat ? 70 : 110, Math.min(maxH * 0.75, rowH));
-
-        return {
-            type: 'standard',
-            gridWidth: maxW,
-            gridHeight: rowH,
-            rows: [
-                {
-                    height: rowH,
-                    ratio: maxW / rowH,
-                    tiles: [
-                        { item: items[0].att, flex: 1, height: rowH },
-                        { item: items[1].att, flex: 1, height: rowH }
-                    ]
-                }
-            ]
-        };
-    }
-
-    // ── 3 Items ─────────────────────────────────────────────
-    if (count === 3) {
-        const r0 = items[0].dims.ratio;
-        const r1 = items[1].dims.ratio;
-        const r2 = items[2].dims.ratio;
-
-        // If all 3 are wide photos: 1 on top (100%), 2 below (50% each)
-        if (r0 >= 1.2 && r1 >= 1.2 && r2 >= 1.2) {
-            const hTop = Math.round(Math.min(maxH * 0.52, maxW / r0));
-            const hBottom = Math.round(Math.min(maxH - hTop - 2, (maxW / 2) / ((r1 + r2) / 2)));
-            const safeBottom = Math.max(isFastchat ? 60 : 90, hBottom);
-
+        // Two wide or two regular pics side by side with equal widths
+        if (
+            (orients[0] === ORIENT_WIDE && orients[1] === ORIENT_WIDE)
+            || (orients[0] === ORIENT_REGULAR && orients[1] === ORIENT_REGULAR)
+        ) {
+            const computedWidth = (maxW - gap) / 2;
+            const h = Math.ceil(Math.min(computedWidth / r0, Math.min(computedWidth / r1, maxH)));
+            const w0 = Math.ceil(computedWidth);
+            const w1 = Math.ceil(maxW) - gap - w0;
             return {
                 type: 'standard',
-                gridWidth: maxW,
-                gridHeight: hTop + safeBottom + 2,
+                gridWidth: Math.ceil(maxW),
+                gridHeight: h,
                 rows: [
-                    { height: hTop, ratio: maxW / hTop, tiles: [{ item: items[0].att, flex: 1, height: hTop }] },
                     {
-                        height: safeBottom,
-                        ratio: maxW / safeBottom,
+                        height: h,
+                        ratio: maxW / h,
                         tiles: [
-                            { item: items[1].att, flex: 1, height: safeBottom },
-                            { item: items[2].att, flex: 1, height: safeBottom }
+                            { item: items[0].att, flex: 1, width: w0, height: h },
+                            { item: items[1].att, flex: 1, width: w1, height: h }
                         ]
                     }
                 ]
             };
         }
 
-        // Classic Makima 3-photo: 1 dominant on left, 2 stacked on right
-        const totalH = Math.round(Math.min(maxH, Math.max(isFastchat ? 120 : 180, maxW * 0.65)));
-        const hSub = Math.round((totalH - 2) / 2);
+        // Next to each other, different ratios
+        const w0 = ((maxW - gap) / r1) / ((1 / r0) + (1 / r1));
+        const w1 = maxW - w0 - gap;
+        const h = Math.ceil(Math.min(maxH, Math.min(w0 / r0, w1 / r1)));
+        const cw0 = Math.ceil(w0);
+        const cw1 = Math.ceil(maxW) - gap - cw0;
 
-        return {
-            type: 'split_left',
-            gridWidth: maxW,
-            gridHeight: totalH,
-            leftTile: { item: items[0].att, flex: 1.35, height: totalH },
-            rightTiles: [
-                { item: items[1].att, flex: 1, height: hSub },
-                { item: items[2].att, flex: 1, height: hSub }
-            ]
-        };
-    }
-
-    // ── 4 Items ─────────────────────────────────────────────
-    if (count === 4) {
-        // 2x2 grid
-        const rowH = Math.round(Math.min(maxH * 0.48, Math.max(isFastchat ? 65 : 95, (maxW / 2) * 0.72)));
         return {
             type: 'standard',
-            gridWidth: maxW,
-            gridHeight: rowH * 2 + 2,
+            gridWidth: Math.ceil(maxW),
+            gridHeight: h,
             rows: [
                 {
-                    height: rowH,
-                    ratio: maxW / rowH,
+                    height: h,
+                    ratio: maxW / h,
                     tiles: [
-                        { item: items[0].att, flex: 1, height: rowH },
-                        { item: items[1].att, flex: 1, height: rowH }
-                    ]
-                },
-                {
-                    height: rowH,
-                    ratio: maxW / rowH,
-                    tiles: [
-                        { item: items[2].att, flex: 1, height: rowH },
-                        { item: items[3].att, flex: 1, height: rowH }
+                        { item: items[0].att, flex: w0, width: cw0, height: h },
+                        { item: items[1].att, flex: w1, width: cw1, height: h }
                     ]
                 }
             ]
         };
     }
 
-    // ── 5 to 10 Items ────────────────────────────────────────
-    let rowCounts = [];
-    if (count === 5) rowCounts = [2, 3];
-    else if (count === 6) rowCounts = [3, 3];
-    else if (count === 7) rowCounts = [3, 2, 2];
-    else if (count === 8) rowCounts = [2, 3, 3];
-    else if (count === 9) rowCounts = [3, 3, 3];
-    else rowCounts = [3, 3, 4]; // 10
+    // ── 3 Items (Makima.php case 3) ─────────────────────────
+    if (count === 3) {
+        const r0 = ratios[0], r1 = ratios[1], r2 = ratios[2];
 
-    const numRows = rowCounts.length;
-    const targetRowH = Math.round(Math.min(maxH * 0.45, Math.max(isFastchat ? 55 : 85, (maxH - (numRows - 1) * 2) / numRows)));
+        // Three wide photos: one on top, two below
+        if (orients[0] === ORIENT_WIDE && orients[1] === ORIENT_WIDE && orients[2] === ORIENT_WIDE) {
+            const hCover = Math.min(maxW / r0, (maxH - gap) * (2 / 3));
+            const w2 = (maxW - gap) / 2;
+            const h = Math.min(maxH - hCover - gap, Math.min(w2 / r1, w2 / r2));
+            const r0H = Math.ceil(hCover);
+            const r1H = Math.ceil(h);
+            const cw0 = Math.ceil(w2);
+            const cw1 = Math.ceil(maxW) - gap - cw0;
 
-    let itemIdx = 0;
-    const rows = [];
-    let totalH = 0;
+            return {
+                type: 'standard',
+                gridWidth: Math.ceil(maxW),
+                gridHeight: Math.ceil(gap + hCover + h),
+                rows: [
+                    { height: r0H, ratio: maxW / r0H, tiles: [{ item: items[0].att, flex: 1, width: Math.ceil(maxW), height: r0H }] },
+                    {
+                        height: r1H,
+                        ratio: maxW / r1H,
+                        tiles: [
+                            { item: items[1].att, flex: 1, width: cw0, height: r1H },
+                            { item: items[2].att, flex: 1, width: cw1, height: r1H }
+                        ]
+                    }
+                ]
+            };
+        }
 
-    for (let r = 0; r < numRows; r++) {
-        const cInRow = rowCounts[r];
-        const rowTiles = [];
-        for (let c = 0; c < cInRow && itemIdx < count; c++) {
-            rowTiles.push({
-                item: items[itemIdx++].att,
-                flex: 1,
-                height: targetRowH
+        // One on the left, two stacked on the right
+        const wCover = Math.min(maxH * r0, (maxW - gap) * (3 / 4));
+        const h1 = (r1 * (maxH - gap)) / (r2 + r1);
+        const h0 = maxH - gap - h1;
+        const w = Math.max(1, Math.min(maxW - gap - wCover, Math.min(h1 * r2, h0 * r1)));
+        const availW = Math.ceil(maxW) - gap;
+        const leftW = Math.round((availW * wCover) / (wCover + w));
+        const rightW = availW - leftW;
+        const totalH = Math.ceil(maxH);
+        const ch0 = Math.ceil(h0);
+        const ch1 = totalH - gap - ch0;
+
+        return {
+            type: 'split_left',
+            gridWidth: Math.ceil(maxW),
+            gridHeight: totalH,
+            leftTile: { item: items[0].att, flex: wCover / w, width: leftW, height: totalH },
+            rightTiles: [
+                { item: items[1].att, flex: h0, width: rightW, height: ch0 },
+                { item: items[2].att, flex: h1, width: rightW, height: ch1 }
+            ]
+        };
+    }
+
+    // ── 4 Items (Makima.php case 4) ─────────────────────────
+    if (count === 4) {
+        const r0 = ratios[0], r1 = ratios[1], r2 = ratios[2], r3 = ratios[3];
+
+        // Four wide photos: one on top, three below
+        if (
+            orients[0] === ORIENT_WIDE && orients[1] === ORIENT_WIDE
+            && orients[2] === ORIENT_WIDE && orients[3] === ORIENT_WIDE
+        ) {
+            const hCover = Math.min(maxW / r0, (maxH - gap) * (2 / 3));
+            const hRaw = (maxW - 2 * gap) / (r1 + r2 + r3);
+            const w0 = hRaw * r1;
+            const w1 = hRaw * r2;
+            const w2 = hRaw * r3;
+            const h = Math.min(maxH - gap - hCover, hRaw);
+            const r0H = Math.ceil(hCover);
+            const r1H = Math.ceil(h);
+            const cw0 = Math.ceil(w0);
+            const cw1 = Math.ceil(w1);
+            const cw2 = Math.ceil(maxW) - 2 * gap - cw0 - cw1;
+
+            return {
+                type: 'standard',
+                gridWidth: Math.ceil(maxW),
+                gridHeight: Math.ceil(hCover + gap + h),
+                rows: [
+                    { height: r0H, ratio: maxW / r0H, tiles: [{ item: items[0].att, flex: 1, width: Math.ceil(maxW), height: r0H }] },
+                    {
+                        height: r1H,
+                        ratio: maxW / r1H,
+                        tiles: [
+                            { item: items[1].att, flex: w0, width: cw0, height: r1H },
+                            { item: items[2].att, flex: w1, width: cw1, height: r1H },
+                            { item: items[3].att, flex: w2, width: cw2, height: r1H }
+                        ]
+                    }
+                ]
+            };
+        }
+
+        // One on the left, three stacked on the right
+        const wCover = Math.min(maxH * r0, (maxW - gap) * (2 / 3));
+        const wRaw = (maxH - 2 * gap) / (1 / r1 + 1 / r2 + 1 / r3);
+        const h0 = wRaw / r1;
+        const h1 = wRaw / r2;
+        const h2 = wRaw / r3 + gap;
+        const w = Math.max(1, Math.min(wRaw, maxW - gap - wCover));
+        const availW = Math.ceil(maxW) - gap;
+        const leftW = Math.round((availW * wCover) / (wCover + w));
+        const rightW = availW - leftW;
+        const totalH = Math.ceil(maxH);
+        const ch0 = Math.ceil(h0);
+        const ch1 = Math.ceil(h1);
+        const ch2 = totalH - 2 * gap - ch0 - ch1;
+
+        return {
+            type: 'split_left',
+            gridWidth: Math.ceil(maxW),
+            gridHeight: totalH,
+            leftTile: { item: items[0].att, flex: wCover / w, width: leftW, height: totalH },
+            rightTiles: [
+                { item: items[1].att, flex: h0, width: rightW, height: ch0 },
+                { item: items[2].att, flex: h1, width: rightW, height: ch1 },
+                { item: items[3].att, flex: h2, width: rightW, height: ch2 }
+            ]
+        };
+    }
+
+    // ── 5+ Items (Makima.php / ThumbsEdit.processThumbs default branch) ──
+    const ratiosCropped = avgRatio > 1.1
+        ? ratios.map(r => Math.max(r, 1.0))
+        : ratios.map(r => Math.min(r, 1.0));
+
+    const tries = [];
+
+    // Try two lines (at least 2 items per row, balanced row counts)
+    for (let firstLine = 2; firstLine <= count - 2; firstLine++) {
+        const secondLine = count - firstLine;
+        if (Math.abs(firstLine - secondLine) > 2) continue;
+        tries.push({
+            config: [firstLine, secondLine],
+            heights: [
+                calculateMultiThumbsHeight(ratiosCropped.slice(0, firstLine), maxW, gap),
+                calculateMultiThumbsHeight(ratiosCropped.slice(firstLine), maxW, gap)
+            ]
+        });
+    }
+
+    // Try three lines (at least 2 items per row, balanced row counts)
+    for (let firstLine = 2; firstLine <= count - 4; firstLine++) {
+        for (let secondLine = 2; secondLine <= count - firstLine - 2; secondLine++) {
+            const thirdLine = count - firstLine - secondLine;
+            const maxInRow = Math.max(firstLine, secondLine, thirdLine);
+            const minInRow = Math.min(firstLine, secondLine, thirdLine);
+            if (maxInRow - minInRow > 2) continue;
+            tries.push({
+                config: [firstLine, secondLine, thirdLine],
+                heights: [
+                    calculateMultiThumbsHeight(ratiosCropped.slice(0, firstLine), maxW, gap),
+                    calculateMultiThumbsHeight(ratiosCropped.slice(firstLine, firstLine + secondLine), maxW, gap),
+                    calculateMultiThumbsHeight(ratiosCropped.slice(firstLine + secondLine), maxW, gap)
+                ]
             });
         }
-        rows.push({ height: targetRowH, ratio: maxW / targetRowH, tiles: rowTiles });
-        totalH += targetRowH;
     }
-    totalH += (numRows - 1) * 2;
+
+    let optimalConfiguration = null;
+    let optimalHeights = null;
+    let optimalDifference = Infinity;
+
+    for (const candidate of tries) {
+        const { config, heights } = candidate;
+        let confH = gap * (heights.length - 1);
+        for (const h of heights) confH += h;
+
+        let confDiff = Math.abs(confH - maxH);
+        if (config.length > 1) {
+            if (config[0] > config[1] || (config.length >= 3 && config[1] > config[2])) {
+                confDiff = (confDiff + 50) * 1.5;
+            }
+        }
+
+        if (!optimalConfiguration || confDiff < optimalDifference) {
+            optimalConfiguration = config;
+            optimalHeights = heights;
+            optimalDifference = confDiff;
+        }
+    }
+
+    let itemIdx = 0;
+    let totalHeight = 0;
+    const rows = [];
+
+    for (let i = 0; i < optimalConfiguration.length; i++) {
+        const lineChunksNum = optimalConfiguration[i];
+        const lineHeight = optimalHeights[i];
+        totalHeight += lineHeight;
+        const rowH = Math.ceil(lineHeight);
+
+        let totalWidth = 0;
+        const rowTiles = [];
+        for (let j = 0; j < lineChunksNum && itemIdx < count; j++) {
+            const thumbRatio = ratiosCropped[itemIdx];
+            const att = items[itemIdx].att;
+            itemIdx++;
+            const isLast = j === lineChunksNum - 1;
+            const w = isLast
+                ? Math.max(1, Math.ceil(maxW) - totalWidth - gap * Math.max(0, lineChunksNum - 1))
+                : Math.ceil(thumbRatio * lineHeight);
+            totalWidth += w;
+            rowTiles.push({
+                item: att,
+                flex: thumbRatio,
+                width: w,
+                height: rowH
+            });
+        }
+        rows.push({ height: rowH, ratio: maxW / rowH, tiles: rowTiles });
+    }
+
+    const gridHeight = Math.ceil(totalHeight + gap * (optimalHeights.length - 1));
 
     return {
         type: 'standard',
-        gridWidth: maxW,
-        gridHeight: totalH,
-        rows: rows
+        gridWidth: Math.ceil(maxW),
+        gridHeight,
+        rows
     };
 }

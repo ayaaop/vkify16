@@ -1618,11 +1618,13 @@
         display: none;
     }
 
-    /* fullscreen edit post modal */
-    .ovk-msg-fullscreen:has(#_edit_post_modal) .ovk-diag-body {
+    /* fullscreen post composer modals */
+    .ovk-msg-fullscreen:has(#_edit_post_modal) .ovk-diag-body,
+    .ovk-msg-fullscreen:has(#_new_post_modal) .ovk-diag-body {
         padding: 0 !important;
     }
-    .ovk-msg-fullscreen #_edit_post_modal {
+    .ovk-msg-fullscreen #_edit_post_modal,
+    .ovk-msg-fullscreen #_new_post_modal {
         display: flex;
         flex-direction: column;
         flex: 1;
@@ -1630,32 +1632,44 @@
         height: 100%;
         width: 100%;
     }
-    .ovk-msg-fullscreen #_edit_post_modal .edit_menu {
+    .ovk-msg-fullscreen #_edit_post_modal .edit_menu,
+    .ovk-msg-fullscreen #_new_post_modal #write {
         display: flex;
         flex-direction: column;
         flex: 1;
         min-height: 0;
         height: 100%;
+        width: 100%;
+        margin: 0;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal .edit_menu {
         padding: 0;
         background: none;
     }
-    .ovk-msg-fullscreen #_edit_post_modal form {
+    .ovk-msg-fullscreen #_edit_post_modal form,
+    .ovk-msg-fullscreen #_new_post_modal form {
         display: flex;
         flex-direction: column;
         flex: 1;
         min-height: 0;
         height: 100%;
+        width: 100%;
+        margin: 0;
     }
-    .ovk-msg-fullscreen #_edit_post_modal .edit-menu-textarea {
+    .ovk-msg-fullscreen #_edit_post_modal .edit-menu-textarea,
+    .ovk-msg-fullscreen #_new_post_modal .textareas {
         display: flex;
         flex-direction: column;
         flex: 1;
         min-height: 0;
+        position: relative;
     }
     /* !important beats the inline height vkifyTextareaAutosize writes */
-    .ovk-msg-fullscreen #_edit_post_modal textarea {
+    .ovk-msg-fullscreen #_edit_post_modal textarea,
+    .ovk-msg-fullscreen #_new_post_modal textarea {
         flex: 1;
-        min-height: 0;
+        min-height: 0 !important;
+        max-height: none !important;
         height: auto !important;
         width: 100%;
         box-sizing: border-box;
@@ -1667,49 +1681,137 @@
         padding: 16px;
         resize: none;
     }
-    .ovk-msg-fullscreen #_edit_post_modal .post-buttons {
+    .ovk-msg-fullscreen #_edit_post_modal .post-buttons,
+    .ovk-msg-fullscreen #_new_post_modal .post-buttons {
         display: flex;
         flex-direction: column;
         flex: none;
         min-height: 0;
-        max-height: 45%;
+        max-height: 55%;
         margin-top: auto;
         padding: 0;
     }
     .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-horizontal,
-    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-vertical {
+    .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-horizontal {
+        flex: none;
+        margin: 8px 16px 0 !important;
+        padding: 0 !important;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-vertical,
+    .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-vertical {
         flex: 0 1 auto;
         min-height: 0;
         overflow-y: auto;
     }
-    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-horizontal:not(:empty),
     .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-vertical:not(:empty) {
         padding: 8px 16px;
     }
+    .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-vertical:not(:empty) {
+        padding: 0 16px;
+    }
+    .vertical-attachment .audioEntry .audioEntryWrapper {
+        padding: 0;
+    }
+    .post-horizontal.vkify_makima_composer .ui_thumb_x_button,
+    .post-horizontal.vkify_makima_composer .photo_thumb_btns_container {
+        opacity: 1;
+    }
+    .post-horizontal.vkify_makima_composer .ui_thumb_x_button {
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.75));
+    }
+    .post-horizontal.vkify_makima_composer .ui_thumb_x_button .ui_thumb_x {
+        width: 12px;
+        height: 12px;
+        opacity: 0.95;
+    }
+    .post-buttons .vertical-attachment .vertical-attachment-remove:not(.lagged) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        min-height: 32px;
+        margin: -4px -4px -4px 4px;
+        cursor: pointer;
+    }
+    .post-source #remove_source_button,
+    .post-replyto #remove_reply_button,
+    #small_remove_button {
+        width: 24px;
+        height: 24px;
+        margin: 0;
+        -webkit-mask-size: 12px 12px;
+        mask-size: 12px 12px;
+    }
     .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-repost,
-    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-source {
+    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-source,
+    .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-has-poll,
+    .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-has-geo,
+    .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-source,
+    .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-replyto {
         flex: none;
     }
     .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-repost:not(:empty),
-    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-source:not(:empty) {
+    .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-source:not(:empty),
+    .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-has-geo:not(:empty),
+    .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-source:not(:empty),
+    .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-replyto:not(:empty) {
         padding: 4px 16px;
     }
-    .ovk-msg-fullscreen #_edit_post_modal .post-bottom-acts {
+    .ovk-msg-fullscreen #_edit_post_modal .post-bottom-acts,
+    .ovk-msg-fullscreen #_new_post_modal .post-bottom-acts {
         flex: none;
         margin-top: auto;
-        padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px));
+        padding: 16px 0 calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+        margin: 16px 16px 0;
         border-top: 1px solid var(--border-color);
-        background-color: var(--module-header-background-color);
+        background-color: var(--module-background-color);
     }
-    .ovk-msg-fullscreen #_edit_post_modal .edit_menu_buttons {
+    .ovk-msg-fullscreen #_edit_post_modal .edit_menu_buttons,
+    .ovk-msg-fullscreen #_new_post_modal .post-bottom-buttons input[type="submit"] {
         display: none;
     }
-    .ovk-msg-fullscreen #_edit_post_modal .post-opts.ui_actions_menu {
+
+    .ovk-msg-fullscreen .post-attach-menu {
+        gap: 14px;
+    }
+    .ovk-msg-fullscreen .post-attach-menu__icon {
+        width: 24px;
+        height: 24px;
+    }
+    .ovk-msg-fullscreen .attach_source .post-attach-menu__icon {
+        width: 22px;
+        height: 22px;
+    }
+    .ovk-msg-fullscreen .post-attach-menu__icon svg {
+        width: 20px;
+        height: 20px;
+    }
+    .ovk-msg-fullscreen .ui_actions_menu .post-attach-menu__icon {
+        margin-right: 8px;
+    }
+
+    /* touch drag-reorder for composer attachments */
+    .post-buttons .upload-item {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    .ovk-msg-fullscreen #_edit_post_modal .post-opts.ui_actions_menu,
+    .ovk-msg-fullscreen #_new_post_modal .post-opts.ui_actions_menu,
+    .ovk-msg-fullscreen #_new_post_modal .ui_actions_menu {
         max-width: calc(100vw - 32px);
         min-width: 180px;
         z-index: 1000;
     }
-    .ovk-msg-fullscreen #_edit_post_modal .post-opts label.checkbox {
+    .ovk-msg-fullscreen #_edit_post_modal .post-opts label.checkbox,
+    .ovk-msg-fullscreen #_new_post_modal .post-opts label.checkbox {
         padding: 6px 12px;
         cursor: pointer;
     }
@@ -1886,11 +1988,10 @@
     .attachments_b.makima .attachment .media {
         width: 100% !important;
         height: 100% !important;
-        max-height: none !important;
-        object-fit: cover !important;
     }
     .attachments_b.makima .attachment .compact_video {
         margin: 0;
+        height: 100%!important;
     }
 
     /* upload / picker / photos */
@@ -1955,22 +2056,53 @@
     .search_row .controls {
         width: fit-content;
     }
+    .ovk-msg-sheet .ovk-diag-head:has(.toggle_link),
+    .ovk-msg-fullscreen .ovk-diag-head:has(.toggle_link) {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-rows: auto auto;
+        align-items: center;
+        align-content: center;
+        column-gap: 4px;
+    }
+    .ovk-diag-head:has(.toggle_link) .ovk-diag-head-close {
+        grid-column: 1;
+        grid-row: 1 / span 2;
+        margin-right: 0;
+    }
     .picker-title-text {
-        vertical-align: top;
+        grid-column: 2;
+        grid-row: 1;
+        font-size: 15px;
+        line-height: 18px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .toggle_link {
-        display: inline-block;
-        height: 100%;
+        grid-column: 2;
+        grid-row: 2;
+        display: block;
+        height: auto;
+        min-width: 0;
+        line-height: 16px;
     }
     .toggle_link .divider {
-        vertical-align: top;
+        display: none;
     }
     .toggle_link a {
         white-space: nowrap;
-        max-width: 170px;
-        display: inline-block;
+        max-width: 100%;
+        display: block;
+        font-size: 12.5px;
+        line-height: 16px;
+        color: var(--accent-color) !important;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+    .ovk-diag-head:has(.toggle_link) .ovk-diag-head-apply {
+        grid-column: 3;
+        grid-row: 1 / span 2;
     }
 
     /* tabs */

@@ -26,6 +26,7 @@ vkify.once('mediaModals', function () {
     }
 
     document.addEventListener('click', async (e) => {
+        if (e.target.closest('.upload-delete, .ui_thumb_x_button')) return;
         const videoLink = e.target.closest('#videoOpen');
         if (!videoLink) return;
         const videoId = videoLink.dataset.id;

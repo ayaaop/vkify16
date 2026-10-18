@@ -32,7 +32,7 @@
                 <div class="text reply_text" id="text{$comment->getId()}">
                     {include "truncated_text.latte", html => $comment->getText(), plain => $comment->getText(false), limit => 500}
 
-                    {var $attachmentWidth = 180}
+                    {var $attachmentWidth = 240}
                     {var $attachmentsLayout = $comment->getChildrenWithLayout($attachmentWidth)}
                     <div n:ifcontent class="attachments attachments_b" style="height: {$attachmentsLayout->height|noescape}; width: {$attachmentsLayout->width|noescape};">
                         <div class="attachment" n:foreach="$attachmentsLayout->tiles as $attachment" style="float: {$attachment[3]|noescape}; width: {$attachment[0]|noescape}; height: {$attachment[1]|noescape};" data-localized-nsfw-text="{_nsfw_warning}">

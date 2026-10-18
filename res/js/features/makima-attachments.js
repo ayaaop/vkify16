@@ -64,7 +64,7 @@ import { computeMakimaGrid } from '../utils/makima-grid.js';
         if (maxW <= 0) return;
         const layout = computeMakimaGrid(st.items, {
             maxWidth: maxW,
-            maxHeight: maxW,
+            maxHeight: Math.round(maxW * 0.666),
             isFastchat: false,
         });
         if (!layout || layout.type === 'single') return;
@@ -80,6 +80,9 @@ import { computeMakimaGrid } from '../utils/makima-grid.js';
             const row = document.createElement('div');
             row.className = 'makima_row';
             row.style.height = layout.gridHeight + 'px';
+            if (layout.gridWidth && layout.gridWidth < maxW) {
+                row.style.width = layout.gridWidth + 'px';
+            }
             row.appendChild(place(layout.leftTile.item, layout.leftTile.flex));
             const col = document.createElement('div');
             col.className = 'makima_col';

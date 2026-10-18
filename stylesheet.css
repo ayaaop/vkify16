@@ -1951,6 +1951,10 @@ table,
 .composer.model_content_textarea .post-horizontal:not(:empty) + .post-vertical:not(:empty) {
     margin-top: 10px;
 }
+.composer.model_content_textarea :is(.post-vertical, .post-source, .post-repost):not(:empty),
+.post-buttons :is(.post-vertical, .post-source, .post-repost):not(:empty) {
+    margin-top: 10px;
+}
 .vertical-attachment.upload-item {
     gap: 10px;
 }
@@ -1996,6 +2000,10 @@ table,
     white-space: nowrap;
 }
 
+.post-attach-menu {
+    position: relative;
+    z-index: 6;
+}
 #wallAttachmentMenu {
     display: flex !important;
     opacity: 1;
@@ -2118,15 +2126,20 @@ table,
 .post-source #remove_source_button,
 .post-replyto #remove_reply_button,
 #small_remove_button {
-    background: url(../resource/icons/attach_icons.png?4) no-repeat 0 0;
-    width: 9px;
-    height: 9px;
-    margin: 5px 0 5px 10px;
+    background: var(--search-placeholder-color);
+    -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M10.7%202.7a1%201%200%200%200-1.4-1.4L6%204.6%202.7%201.3a1%201%200%201%200-1.4%201.4L4.6%206%201.3%209.3a1%201%200%200%200%201.4%201.4L6%207.4l3.3%203.3a1%201%200%200%200%201.4-1.4L7.4%206l3.3-3.3z%22%2F%3E%3C%2Fsvg%3E") center / 10px 10px no-repeat;
+    mask: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M10.7%202.7a1%201%200%200%200-1.4-1.4L6%204.6%202.7%201.3a1%201%200%201%200-1.4%201.4L4.6%206%201.3%209.3a1%201%200%200%200%201.4%201.4L6%207.4l3.3%203.3a1%201%200%200%200%201.4-1.4L7.4%206l3.3-3.3z%22%2F%3E%3C%2Fsvg%3E") center / 10px 10px no-repeat;
+    width: 16px;
+    height: 16px;
+    margin: 0 0 0 10px;
+    cursor: pointer;
+    opacity: 0.7;
     transition: opacity 0.15s ease;
 }
 .post-source #remove_source_button:hover,
+.post-replyto #remove_reply_button:hover,
 #small_remove_button:hover {
-    opacity: 0.9;
+    opacity: 1;
 }
 
 #wallAttachmentMenu > a {
@@ -2246,8 +2259,283 @@ body:not(.body_im) .post-upload::before {
 }
 .post-has-poll[style="display: block;"],
 .composer.model_content_textarea
-    :is(.post-horizontal:not(:empty), .post-vertical:not(:empty), .post-has-geo:not(:empty), .post-source:not(:empty), .post-has-geo.appended-geo) {
+    :is(.post-vertical:not(:empty), .post-has-geo:not(:empty), .post-source:not(:empty), .post-has-geo.appended-geo) {
     display: flex !important;
+}
+.composer.model_content_textarea .post-horizontal:not(:empty) {
+    display: block !important;
+}
+
+/* VK ThumbsEdit / Makima composer attachment grid */
+.post-horizontal.vkify_makima_composer {
+    position: relative;
+    user-select: none;
+    overflow: visible !important;
+    box-sizing: content-box;
+    display: block !important;
+}
+.composer.model_content_textarea .post-horizontal.vkify_makima_composer:not(:empty) {
+    margin: 6px 20px 0;
+    padding: 0;
+}
+.module_body .post-horizontal.vkify_makima_composer:not(:empty) {
+    margin: 6px 0 0;
+    padding: 0;
+}
+.post-horizontal.vkify_makima_composer > a.upload-item.thumb_wrap {
+    position: absolute;
+    display: block;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 2px;
+    background: var(--module-background-color--secondary);
+    transition: left 0.15s ease, top 0.15s ease, width 0.15s ease, height 0.15s ease,
+        box-shadow 0.18s ease, scale 0.18s ease;
+    text-decoration: none !important;
+    z-index: 1;
+}
+.post-horizontal.vkify_makima_composer > a.upload-item.thumb_wrap.single_video_thumb {
+    background: transparent;
+}
+.post-buttons .upload-item {
+    transition: box-shadow 0.18s ease, scale 0.18s ease;
+}
+.post-buttons .upload-item.currently_dragging {
+    scale: 1.04;
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.3),
+        0 6px 14px rgba(0, 0, 0, 0.22),
+        0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+.post-horizontal.vkify_makima_composer > a.upload-item.thumb_wrap.currently_dragging {
+    transition: box-shadow 0.18s ease, scale 0.18s ease;
+    z-index: 20;
+}
+html.vkify-composer-dragging,
+html.vkify-composer-dragging * {
+    user-select: none !important;
+    cursor: grabbing !important;
+}
+.post-horizontal.vkify_makima_composer > a.upload-item.thumb_wrap.dragged {
+    outline: 2px solid var(--accent-color);
+    z-index: 15;
+}
+.post-horizontal.vkify_makima_composer .draggable_thumb {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
+    background: var(--module-background-color--secondary);
+}
+.post-horizontal.vkify_makima_composer .draggable_thumb img.preview {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: cover;
+    display: block;
+}
+.post-horizontal.vkify_makima_composer > a.upload-item.thumb_wrap.single_thumb .draggable_thumb img.preview {
+    object-fit: contain;
+}
+.post-horizontal.vkify_makima_composer .draggable_thumb .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.2);
+    display: none;
+    pointer-events: none;
+}
+.post-horizontal.vkify_makima_composer .ui_thumb_x_button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(29, 32, 34, 0.6);
+    border-radius: 0 0 0 2px;
+    padding: 5px;
+    cursor: pointer;
+    outline: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 100ms linear;
+}
+.post-horizontal.vkify_makima_composer .thumb_wrap:hover .ui_thumb_x_button {
+    opacity: 1;
+}
+.post-horizontal.vkify_makima_composer .ui_thumb_x_button .ui_thumb_x {
+    display: block;
+    background: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M10.7%202.7a1%201%200%200%200-1.4-1.4L6%204.6%202.7%201.3a1%201%200%201%200-1.4%201.4L4.6%206%201.3%209.3a1%201%200%200%200%201.4%201.4L6%207.4l3.3%203.3a1%201%200%200%200%201.4-1.4L7.4%206l3.3-3.3z%22%2F%3E%3C%2Fsvg%3E") center / contain no-repeat;
+    opacity: 0.85;
+    width: 8px;
+    height: 8px;
+}
+.post-horizontal.vkify_makima_composer .ui_thumb_x_button:hover .ui_thumb_x {
+    opacity: 1;
+}
+.post-horizontal.vkify_makima_composer .photo_thumb_btns_container {
+    width: 100%;
+    overflow: hidden;
+    height: 54px;
+    text-align: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: 0;
+    line-height: 0;
+    vertical-align: top;
+    opacity: 0;
+    transition: opacity 100ms linear;
+    z-index: 4;
+}
+.post-horizontal.vkify_makima_composer .thumb_wrap.compact_thumb .photo_thumb_btns_container {
+    height: 36px;
+}
+.post-horizontal.vkify_makima_composer .thumb_wrap:hover .photo_thumb_btns_container {
+    opacity: 1;
+}
+.post-horizontal.vkify_makima_composer .photo_thumb_btns_overlay {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 15px 12px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.55) 100%);
+    box-sizing: border-box;
+}
+.post-horizontal.vkify_makima_composer .photo_thumb_btns {
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+.post-horizontal.vkify_makima_composer .photo_thumb_btn_editor,
+.post-horizontal.vkify_makima_composer .photo_thumb_btn_show {
+    height: 24px;
+    width: 24px;
+    display: inline-block;
+    vertical-align: top;
+    cursor: pointer;
+    opacity: 0.75;
+    transition: opacity 100ms linear;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.post-horizontal.vkify_makima_composer .photo_thumb_btn_editor:hover,
+.post-horizontal.vkify_makima_composer .photo_thumb_btn_show:hover {
+    opacity: 1;
+}
+.post-horizontal.vkify_makima_composer .photo_thumb_btn_show {
+    background-image: url(../resource/icons/zoom_photo.png);
+    background-size: 15px 15px;
+}
+.post-horizontal.vkify_makima_composer .photo_thumb_btn_editor {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='9' cy='10' r='1.2' fill='%23ffffff' stroke='none'/%3E%3Ccircle cx='15' cy='10' r='1.2' fill='%23ffffff' stroke='none'/%3E%3Cpath d='M8.5 14.5c1 1.5 2.2 2 3.5 2s2.5-.5 3.5-2'/%3E%3C/svg%3E");
+    background-size: 20px 20px;
+}
+.post-horizontal.vkify_makima_composer .video_thumb_play {
+    opacity: 1;
+    pointer-events: none;
+}
+.post-horizontal.vkify_makima_composer .thumb_wrap:hover .video_thumb_play {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+.post-horizontal.vkify_makima_composer .video_thumb_label {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 8px;
+    padding: 0 7px;
+    border-radius: 3px;
+    background: var(--overlay-background);
+    color: var(--white);
+    font-size: 12.5px;
+    line-height: 23px;
+    height: 23px;
+    white-space: nowrap;
+    z-index: 3;
+    pointer-events: none;
+}
+.post-horizontal.vkify_makima_composer .video_thumb_label_item + .video_thumb_label_item {
+    margin-left: 6px;
+}
+.post-horizontal.vkify_makima_composer .composer_video_item_info {
+    display: none;
+    padding: 8px 0 0;
+    text-align: left;
+}
+.post-horizontal.vkify_makima_composer > a.upload-item.thumb_wrap.single_video_thumb .composer_video_item_info {
+    display: block;
+}
+.post-horizontal.vkify_makima_composer .composer_video_item_info .video_item_title {
+    color: var(--link-color);
+}
+.post-horizontal.vkify_makima_composer > a.upload-item.thumb_wrap.single_video_thumb:hover .composer_video_item_info .video_item_title {
+    text-decoration: underline;
+}
+.post-buttons .vertical-attachment.upload-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+.post-buttons .vertical-attachment .vertical-attachment-content {
+    flex: 1 1 0%;
+    min-width: 0;
+    max-width: calc(100% - 24px);
+    overflow: hidden;
+}
+.post-buttons .vertical-attachment .vertical-attachment-remove {
+    flex: 0 0 auto;
+}
+.post-buttons .vertical-attachment .attachment_doc {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+.post-buttons .vertical-attachment .attachment_doc .docListViewItem {
+    padding: 6px 0;
+    border-bottom: none;
+    min-width: 0;
+    max-width: 100%;
+}
+.post-buttons .vertical-attachment .attachment_doc .docListViewItem .doc_content {
+    flex: 1 1 0%;
+    min-width: 0;
+    overflow: hidden;
+}
+.post-buttons .vertical-attachment .attachment_doc .docListViewItem .doc_content a,
+.post-buttons .vertical-attachment .attachment_doc .docListViewItem .doc_name {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.post-buttons .vertical-attachment .attachment_note {
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+.post-buttons .vertical-attachment .attachment_note .attachment_note_content {
+    flex: 1 1 0%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.post-buttons .post-repost .post.copy_quote {
+    margin: 8px 0 4px;
 }
 .post-buttons .attachment_note,
 #_addAudioAdditional {
@@ -4968,8 +5256,7 @@ hr {
     color: var(--heading-color);
 }
 
-#small_remove_button,
-.post-source #remove_source_button.post-replyto #remove_reply_button, #small_remove_button, .cross {
+.cross {
     width: 16px;
     height: 16px;
     cursor: pointer;

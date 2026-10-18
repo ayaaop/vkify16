@@ -1,6 +1,9 @@
+import { computeMakimaGrid } from '../utils/makima-grid.js';
+
 (() => {
 
 const tr = window.tr;
+const vtr = (key, fallback) => (window.vkifylang && window.vkifylang[key]) || fallback || key;
 const LoaderUtils = window.LoaderUtils;
 const CF = window.ContentFetcher;
 const MAX_ATTACHMENTS = window.openvk?.max_attachments || 10;
@@ -19,6 +22,13 @@ const formatRelativeTime = (timestamp) => {
     catch { return d.toLocaleDateString(); }
 };
 
+const VIDEO_PLATFORM_LABELS = { youtube: 'YouTube', vimeo: 'Vimeo', rutube: 'Rutube' };
+const videoPlatformLabel = (platform) => {
+    if (!platform) return '';
+    const known = VIDEO_PLATFORM_LABELS[String(platform).toLowerCase()];
+    return known || String(platform).replace(/^./, (c) => c.toUpperCase());
+};
+
 const ajloader = {
     _count: 0,
     show() { this._count++; u('#ajloader').addClass('shown'); },
@@ -26,25 +36,375 @@ const ajloader = {
     async wrap(fn) { this.show(); try { return await fn(); } finally { this.hide(); } }
 };
 
+const composerLayoutRaf = new WeakMap();
+function scheduleComposerLayout(containerEl) {
+    if (!containerEl) return;
+    if (containerEl.nodeType !== 1 && containerEl.nodes?.[0]) {
+        containerEl = containerEl.nodes[0];
+    }
+    if (!containerEl || containerEl.nodeType !== 1 || composerLayoutRaf.has(containerEl)) return;
+    composerLayoutRaf.set(containerEl, requestAnimationFrame(() => {
+        composerLayoutRaf.delete(containerEl);
+        layoutComposerHorizontal(containerEl);
+    }));
+}
+
+// Pure layout computation shared by layoutComposerHorizontal and the drag
+// reorder preview: given an ordered list of attachment elements, returns the
+// Makima tile placements in container space (padding applied by the caller)
+// plus the total content height. Returns null when layout is impossible.
+function computeComposerBoxes(containerEl, items) {
+    const isFastchat = Boolean(containerEl.closest('.fc_tab_wrap, #fastchats_container, .fastchat-box'));
+    const isMessenger = Boolean(isFastchat || containerEl.closest('.im-chat-input, .messenger-app--input, .messenger-layer, #im_container'));
+    const isMobileModal = Boolean(containerEl.closest('#_edit_post_modal, #_new_post_modal'));
+
+    const padKey = isMobileModal ? 'm' : 'd';
+    if (!containerEl.__mkPad || containerEl.__mkPadKey !== padKey) {
+        const style = window.getComputedStyle(containerEl);
+        containerEl.__mkPadKey = padKey;
+        containerEl.__mkPad = {
+            x: (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0),
+            top: parseFloat(style.paddingTop) || 0,
+            bottom: parseFloat(style.paddingBottom) || 0,
+            left: parseFloat(style.paddingLeft) || 0,
+        };
+    }
+    const pad = containerEl.__mkPad;
+
+    const parentEl = containerEl.parentElement;
+    const msgBoxEl = isMessenger ? containerEl.closest('.im-chat-input--textarea, .messenger-app--input---messagebox') : null;
+    let availW = (containerEl.clientWidth ? containerEl.clientWidth - pad.x : 0)
+        || (msgBoxEl?.clientWidth || 0)
+        || (parentEl ? parentEl.clientWidth - 40 : 0);
+    if (!availW || availW < 120) {
+        availW = isMobileModal
+            ? Math.max(240, (window.innerWidth || 360) - 32)
+            : (isFastchat ? 220 : (isMessenger ? 400 : 510));
+    }
+    const maxW = Math.min(isFastchat ? 240 : (isMessenger ? 420 : 510), availW);
+    const maxH = isFastchat
+        ? Math.min(160, Math.round(maxW * 0.66))
+        : (isMobileModal ? Math.min(230, Math.round(maxW * 0.66)) : Math.round(maxW * 0.666));
+    const GAP = 4;
+
+    const visualItems = items.map((el) => {
+        const type = el.dataset.type || 'photo';
+        let w = parseInt(el.dataset.width, 10) || 0;
+        let h = parseInt(el.dataset.height, 10) || 0;
+        const img = el.querySelector('img');
+        if ((!w || !h) && img) {
+            w = img.naturalWidth || parseInt(img.getAttribute('width'), 10) || 0;
+            h = img.naturalHeight || parseInt(img.getAttribute('height'), 10) || 0;
+            if (w && h) {
+                el.dataset.width = String(w);
+                el.dataset.height = String(h);
+            }
+        }
+        if (!w || !h) {
+            w = type === 'video' ? 640 : 600;
+            h = type === 'video' ? 360 : 450;
+        }
+        return type === 'video'
+            ? { el, type: 'video', video: { width: w, height: h } }
+            : { el, type: 'photo', photo: { width: w, height: h } };
+    });
+
+    const layout = computeMakimaGrid(visualItems, {
+        maxWidth: maxW,
+        maxHeight: maxH,
+        gap: GAP,
+        isFastchat: false,
+    });
+
+    if (!layout) return null;
+
+    const tiles = [];
+    let contentH = 0;
+
+    if (layout.type === 'single') {
+        const t = layout.tile;
+        const isSingleVideoWithTitle = Boolean(!isMessenger && t.item.el.dataset.type === 'video' && t.item.el.dataset.title);
+        tiles.push({ el: t.item.el, x: 0, y: 0, w: t.width, h: t.height, isSingle: true, videoTitle: isSingleVideoWithTitle });
+        contentH = t.height + (isSingleVideoWithTitle ? 28 : 0);
+    } else if (layout.type === 'split_left') {
+        const totalFlex = (layout.leftTile.flex || 1.35) + 1;
+        const leftW = layout.leftTile.width || Math.round(((maxW - GAP) * (layout.leftTile.flex || 1.35)) / totalFlex);
+        const rightW = layout.rightTiles[0]?.width || (maxW - GAP - leftW);
+        const totalH = layout.gridHeight;
+        tiles.push({ el: layout.leftTile.item.el, x: 0, y: 0, w: leftW, h: totalH });
+
+        const rCount = layout.rightTiles.length;
+        const totalRightFlex = layout.rightTiles.reduce((acc, t) => acc + (t.flex || 1), 0) || rCount;
+        const availRightH = totalH - GAP * Math.max(0, rCount - 1);
+        let curY = 0;
+        layout.rightTiles.forEach((rt, idx) => {
+            const tileH = idx === rCount - 1
+                ? totalH - curY
+                : (rt.height || Math.round((availRightH * (rt.flex || 1)) / totalRightFlex));
+            tiles.push({ el: rt.item.el, x: leftW + GAP, y: curY, w: rightW, h: tileH });
+            curY += tileH + GAP;
+        });
+        contentH = totalH;
+    } else if (Array.isArray(layout.rows)) {
+        let curY = 0;
+        layout.rows.forEach((row, rIdx) => {
+            const rowH = row.height;
+            const rowTiles = row.tiles || [];
+            const totalFlex = rowTiles.reduce((acc, t) => acc + (t.flex || 1), 0) || 1;
+            const availRowW = maxW - GAP * Math.max(0, rowTiles.length - 1);
+            let curX = 0;
+            rowTiles.forEach((t, tIdx) => {
+                const tileW = tIdx === rowTiles.length - 1
+                    ? maxW - curX
+                    : (t.width || Math.round((availRowW * (t.flex || 1)) / totalFlex));
+                tiles.push({ el: t.item.el, x: curX, y: curY, w: tileW, h: rowH });
+                curX += tileW + GAP;
+            });
+            curY += rowH + (rIdx < layout.rows.length - 1 ? GAP : 0);
+        });
+        contentH = curY;
+    }
+
+    return { tiles, contentHeight: contentH, pad, isMessenger };
+}
+
+function applyComposerTileBox(boxes, t) {
+    const { pad, isMessenger } = boxes;
+    const { el, x, y, w, h, isSingle } = t;
+    const leftBase = pad.left, padTop = pad.top;
+    const isSingleVideoWithTitle = Boolean(!isMessenger && isSingle && el.dataset.type === 'video' && el.dataset.title);
+    const sig = `${Math.round(leftBase + x)},${Math.round(padTop + y)},${Math.round(w)},${Math.round(h)},${isSingle ? 1 : 0},${isSingleVideoWithTitle ? 1 : 0}`;
+    if (el.__mkSig === sig) return;
+    el.__mkSig = sig;
+    el.style.position = 'absolute';
+    el.style.left = `${Math.round(leftBase + x)}px`;
+    el.style.top = `${Math.round(padTop + y)}px`;
+    el.style.width = `${Math.round(w)}px`;
+    el.classList.toggle('single_thumb', Boolean(isSingle));
+    el.classList.toggle('compact_thumb', Math.round(h) < 65 || Math.round(w) < 90);
+    el.classList.toggle('single_video_thumb', isSingleVideoWithTitle);
+    const dr = el.querySelector('.draggable_thumb');
+    if (isSingleVideoWithTitle) {
+        if (dr) dr.style.height = `${Math.round(h)}px`;
+        el.style.height = `${Math.round(h + 28)}px`;
+    } else {
+        if (dr) dr.style.height = '100%';
+        el.style.height = `${Math.round(h)}px`;
+    }
+    el.style.margin = '0';
+}
+
+function layoutComposerHorizontal(containerEl) {
+    if (!containerEl) return;
+    if (containerEl.nodeType !== 1 && containerEl.nodes?.[0]) {
+        containerEl = containerEl.nodes[0];
+    }
+    if (!containerEl || containerEl.nodeType !== 1) return;
+
+    const items = Array.from(containerEl.children).filter(
+        (el) => el.tagName === 'A' && el.classList.contains('upload-item')
+    );
+
+    if (items.length === 0) {
+        containerEl.classList.remove('editable_thumbs', 'vkify_makima_composer');
+        containerEl.style.height = '';
+        containerEl.style.width = '';
+        return;
+    }
+
+    containerEl.classList.add('editable_thumbs', 'vkify_makima_composer');
+
+    const boxes = computeComposerBoxes(containerEl, items);
+    if (!boxes) return;
+
+    const { pad } = boxes;
+
+    items.forEach((el, idx) => {
+        if (el.getAttribute('index') !== String(idx)) el.setAttribute('index', String(idx));
+        el.classList.add('thumb_wrap');
+        const img = el.querySelector('img');
+        if (img && !img.dataset.vkifyLoadBound) {
+            img.dataset.vkifyLoadBound = '1';
+            img.addEventListener('load', () => {
+                if (img.naturalWidth && img.naturalHeight) {
+                    el.dataset.width = String(img.naturalWidth);
+                    el.dataset.height = String(img.naturalHeight);
+                    scheduleComposerLayout(containerEl);
+                }
+            });
+        }
+    });
+
+    boxes.tiles.forEach((t) => applyComposerTileBox(boxes, t));
+    const px = `${Math.round(pad.top + pad.bottom + boxes.contentHeight)}px`;
+    if (containerEl.style.height !== px) containerEl.style.height = px;
+}
+
+window.vkifyUpdateComposerMediaGrid = (rootEl) => {
+    const root = rootEl?.nodes ? rootEl.nodes[0] : (rootEl || document);
+    if (!root) return;
+    if (root.classList?.contains('post-horizontal')) {
+        layoutComposerHorizontal(root);
+        return;
+    }
+    root.querySelectorAll?.('.post-horizontal').forEach(layoutComposerHorizontal);
+};
+
+function decorateHorizontalItem(anchorEl, opts = {}) {
+    if (!anchorEl || anchorEl.nodeType !== 1) return;
+    const type = opts.type || anchorEl.dataset.type || 'photo';
+    const id = opts.id || anchorEl.dataset.id || '';
+    const openId = opts.viewerId || id;
+    const isVideo = type === 'video';
+    const cleanPhotoId = String(id).split('_').slice(0, 2).join('_');
+
+    if (opts.width) anchorEl.dataset.width = String(opts.width);
+    if (opts.height) anchorEl.dataset.height = String(opts.height);
+    if (opts.duration) anchorEl.dataset.duration = String(opts.duration);
+    if (opts.title) anchorEl.dataset.title = String(opts.title);
+    if (opts.platform) anchorEl.dataset.platform = String(opts.platform);
+    if (opts.preview) anchorEl.dataset.preview = String(opts.preview);
+    if (opts.fullsize_url) anchorEl.dataset.fullsize = String(opts.fullsize_url);
+
+    anchorEl.classList.add('upload-item', 'thumb_wrap');
+    anchorEl.setAttribute('draggable', 'false');
+    if (isVideo) {
+        anchorEl.classList.add('thumb_video_wrap');
+        anchorEl.id = 'videoOpen';
+    } else {
+        anchorEl.setAttribute(
+            'onclick',
+            `if(!event.target.closest('.upload-delete, .ui_thumb_x_button, .ui_extra_btn_pe, .photo_thumb_btn_editor'))PhotoViewer.openById('${openId}', event)`
+        );
+    }
+
+    const existingImg = anchorEl.querySelector('img');
+    const previewSrc = opts.preview || existingImg?.getAttribute('src') || '';
+    const duration = opts.duration || anchorEl.dataset.duration || '';
+    const title = opts.title || anchorEl.dataset.title || '';
+    const platform = opts.platform || anchorEl.dataset.platform || '';
+    const photoOwnerId = Number(String(cleanPhotoId).split('_')[0]);
+    const currentUserId = Number(window.openvk?.current_id || 0);
+    const canEditPhoto = Boolean(!isVideo && currentUserId && photoOwnerId === currentUserId);
+
+    anchorEl.innerHTML = `
+        <div class="draggable_thumb clear_fix">
+            <img class="preview" draggable="false" src="${previewSrc}" alt="..." />
+            <div class="overlay"></div>
+            ${isVideo ? `<div class="video_thumb_play"></div>` : ''}
+            ${isVideo && (duration || platform) ? `
+                <div class="video_thumb_label">
+                    ${platform ? `<span class="video_thumb_label_item">${escapeHtml(videoPlatformLabel(platform))}</span>` : ''}
+                    ${duration ? `<span class="video_thumb_label_item">${escapeHtml(duration)}</span>` : ''}
+                </div>
+            ` : ''}
+            ${!isVideo ? `
+                <div class="photo_thumb_btns_container ui_thumb_extra">
+                    <div class="photo_thumb_btns_overlay">
+                        <div class="photo_thumb_btns">
+                            <div class="photo_thumb_btn_show ui_extra_btn_show" data-tip="simple-black" data-tiptitle="${tr('photo')}"></div>
+                            ${canEditPhoto ? `<div class="photo_thumb_btn_editor ui_extra_btn_pe" data-photo-id="${cleanPhotoId}" data-src="${opts.fullsize_url || previewSrc}" data-large-src="${opts.fullsize_url || previewSrc}" data-tip="simple-black" data-tiptitle="${vtr('pe_act_stickers', 'Effects & stickers')}"></div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+            <div class="ui_thumb_x_button upload-delete" data-tip="simple-black" data-tiptitle="${tr('detach') || tr('delete')}">
+                <div class="ui_thumb_x"></div>
+            </div>
+        </div>
+        ${isVideo && title ? `
+            <div class="video_item_info composer_video_item_info">
+                <div class="video_item_title"><span class="video_name">${escapeHtml(title)}</span></div>
+            </div>
+        ` : ''}
+    `;
+}
+
 vkify.bindOnce('composerAttachmentHandlers', () => {
     document.addEventListener('click', (e) => {
-        const del = e.target.closest('.upload-delete');
-        if (del && e.target.closest('#videoOpen')) {
+        const peBtn = e.target.closest('.ui_extra_btn_pe, .photo_thumb_btn_editor');
+        if (peBtn && peBtn.closest('.post-horizontal')) {
             e.preventDefault();
             e.stopPropagation();
-            u(del).closest('a.upload-item').remove();
+            e.stopImmediatePropagation();
+            const item = peBtn.closest('a.upload-item');
+            const rawId = peBtn.dataset.photoId || item?.dataset?.id || '';
+            const cleanId = String(rawId).split('_').slice(0, 2).join('_');
+            const ownerId = Number(String(cleanId).split('_')[0]);
+            const curUid = Number(window.openvk?.current_id || 0);
+            if (cleanId && curUid && ownerId === curUid && typeof window.openVkStickersEditor === 'function') {
+                window.openVkStickersEditor(cleanId, { fromComposer: true });
+            }
+            return;
+        }
+
+        const del = e.target.closest('.upload-delete, .ui_thumb_x_button');
+        if (del && del.closest('.post-horizontal')) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            const item = del.closest('a.upload-item');
+            const container = item?.parentElement;
+            item?.remove();
+            if (container) layoutComposerHorizontal(container);
+            return;
         }
     }, true);
 
-    u(document).on('click', '.vertical-attachment #small_remove_button', (e) => {
+    u(document).on('click', '.vertical-attachment #small_remove_button, .vertical-attachment .vertical-attachment-remove:not(.lagged)', (e) => {
         e.preventDefault();
         u(e.target).closest('.vertical-attachment').remove();
     });
-    u(document).on('click', '.post-horizontal .upload-delete', (e) => {
-        e.preventDefault(); e.stopPropagation();
-        u(e.target).closest('a.upload-item').remove();
+    u(document).on('click', '.post-horizontal .upload-delete, .post-horizontal .ui_thumb_x_button', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const item = e.target.closest('a.upload-item');
+        const container = item?.parentElement;
+        item?.remove();
+        if (container) layoutComposerHorizontal(container);
     });
-    u(document).on('click', '.post-buttons .upload-item', (e) => { e.preventDefault(); e.stopPropagation(); });
+    u(document).on('click', '.post-buttons .upload-item', (e) => {
+        if (e.target.closest('a[href^="/doc"], a[href^="/note"], a.viewerOpener, .audioEntry')) return;
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    if (typeof PhotoViewer === 'function' && PhotoViewer.prototype && !PhotoViewer.prototype.__vkifyDeleteHooked) {
+        PhotoViewer.prototype.__vkifyDeleteHooked = true;
+        const origDeleteItem = PhotoViewer.prototype.deleteItem;
+        PhotoViewer.prototype.deleteItem = async function (element) {
+            const res = await origDeleteItem.apply(this, arguments);
+            const rawId = element?.id || this.currentId || '';
+            const cleanId = String(rawId).split('_').slice(0, 2).join('_');
+            if (cleanId) {
+                const containers = new Set();
+                document.querySelectorAll(`.post-horizontal a.upload-item[data-type="photo"][data-id^="${cleanId}"]`).forEach((item) => {
+                    if (item.parentElement) containers.add(item.parentElement);
+                    item.remove();
+                });
+                containers.forEach((c) => scheduleComposerLayout(c));
+            }
+            return res;
+        };
+    }
+
+    // Observe .post-horizontal changes (uploads, drag-drop swaps, pastes, resets)
+    vkify.observeDOM((mutations) => {
+        const toRelayout = new Set();
+        for (const m of mutations) {
+            if (m.type !== 'childList') continue;
+            const target = m.target;
+            if (target?.nodeType === 1 && target.classList?.contains('post-horizontal')) {
+                Array.from(target.children).forEach((ch) => {
+                    if (ch.tagName === 'A' && ch.classList.contains('upload-item') && !ch.querySelector('.draggable_thumb') && !ch.classList.contains('lagged')) {
+                        decorateHorizontalItem(ch);
+                    }
+                });
+                toRelayout.add(target);
+            }
+        }
+        toRelayout.forEach((c) => scheduleComposerLayout(c));
+    });
 });
 
 const getAttachedCount = (form, playlistMode = false) => {
@@ -70,20 +430,24 @@ const canAttach = (form, count = 1, playlistMode = false) => {
     return true;
 };
 
-const appendHorizontal = (form, { type, id, viewerId, preview, page_url, key, fullsize_url }) => {
+const appendHorizontal = (form, { type, id, viewerId, preview, page_url, key, fullsize_url, width, height, duration, title, platform }) => {
     if (!form?.length || !type || !id) return;
     const isVideo = type === 'video';
     const openId = viewerId || id;
     const href = page_url || id;
     const dataKey = key ? ` data-key="${key}"` : '';
-    form.find('.post-horizontal').append(`
-        <a ${isVideo ? 'id="videoOpen"' : ''} ${type === 'photo' ? `onclick="if(!event.target.closest('.upload-delete'))PhotoViewer.openById('${openId}', event)"` : ''} 
-           draggable="true" href="/${type}${href}" class="upload-item" data-type='${type}' data-id="${id}"${dataKey}>
-            <span class="upload-delete">×</span>
-            ${isVideo ? `<div class='play-button'><div class='play-button-ico'></div></div>` : ''}
+    const container = form.find('.post-horizontal');
+    container.append(`
+        <a ${isVideo ? 'id="videoOpen"' : ''}
+           draggable="false" href="/${type}${href}" class="upload-item thumb_wrap" data-type='${type}' data-id="${id}"${dataKey}>
             <img draggable="false" src="${preview}" alt='...'>
         </a>
     `);
+    const added = container.nodes[0]?.lastElementChild;
+    if (added) {
+        decorateHorizontalItem(added, { type, id, viewerId: openId, preview, page_url: href, key, fullsize_url, width, height, duration, title, platform });
+        layoutComposerHorizontal(container.nodes[0]);
+    }
 };
 
 const appendVertical = (form, { type, id, html, undeletable }, playlistMode = false) => {
@@ -91,13 +455,23 @@ const appendVertical = (form, { type, id, html, undeletable }, playlistMode = fa
     const target = playlistMode ? '.PE_audios' : '.post-vertical';
     const dataTypeAttr = playlistMode ? '' : ` data-type='${type}'`;
     form.find(target).append(`
-        <div class="vertical-attachment upload-item" draggable="true"${dataTypeAttr} data-id="${id}">
+        <div class="vertical-attachment upload-item" draggable="false"${dataTypeAttr} data-id="${id}">
             <div class='vertical-attachment-content' draggable="false">${html || ''}</div>
             <div class='${undeletable ? 'lagged' : ''} vertical-attachment-remove'>
                 <div id='small_remove_button'></div>
             </div>
         </div>
     `);
+};
+
+window.__appendToTextarea = (attachmentObj, textareaNode) => {
+    const form = textareaNode?.find ? textareaNode : u(textareaNode);
+    if (!form?.length || !attachmentObj) return;
+    if (attachmentObj.alignment === 'vertical') {
+        appendVertical(form, attachmentObj, false);
+    } else {
+        appendHorizontal(form, attachmentObj);
+    }
 };
 
 // biome-ignore lint/correctness/noUnusedVariables: helper
@@ -612,11 +986,15 @@ const renderPhotoItem = (photo, isSelected) => {
     const key = photo.access_key || '';
     const fullId = baseId + (key ? `_${key}` : '');
     const pageUrl = baseId + (key ? `?key=${key}` : '');
-    const thumb = photo.sizes[4]?.url || photo.sizes[1]?.url || photo.sizes[0]?.url;
-    const preview = photo.sizes[4]?.url || photo.sizes[1]?.url || photo.sizes[0]?.url;
-    const fullsize = photo.sizes[9]?.url || photo.sizes[photo.sizes.length - 1]?.url;
+    const bestSize = photo.sizes?.[4] || photo.sizes?.[3] || photo.sizes?.[2] || photo.sizes?.[1] || photo.sizes?.[0];
+    const maxSize = photo.sizes?.[9] || photo.sizes?.[photo.sizes.length - 1] || bestSize;
+    const thumb = bestSize?.url || '';
+    const preview = maxSize?.url || thumb;
+    const fullsize = maxSize?.url || thumb;
+    const w = maxSize?.width || bestSize?.width || photo.width || 0;
+    const h = maxSize?.height || bestSize?.height || photo.height || 0;
     return `<a class="photos_choose_row picker-item-attach ${isSelected ? 'selected' : ''}" href="javascript:void(0)" 
-               data-picker-id="${fullId}" data-key="${key}" data-page-url="${pageUrl}" data-preview="${preview}" data-fullsize="${fullsize}">
+               data-picker-id="${fullId}" data-key="${key}" data-page-url="${pageUrl}" data-preview="${preview}" data-fullsize="${fullsize}" data-width="${w}" data-height="${h}">
         <div class="photo_row_img" style="background-image: url('${thumb}')"></div>
         <div class="photos_choose_row_bg"></div>
         <div class="media_check_btn_wrap picker-item-select"><div class="media_check_btn"></div></div>
@@ -878,7 +1256,9 @@ class PhotoPicker extends AttachmentPickerBase {
             page_url: row.attr('data-page-url') || id,
             key,
             preview: row.attr('data-preview'),
-            fullsize_url: row.attr('data-fullsize')
+            fullsize_url: row.attr('data-fullsize'),
+            width: Number(row.attr('data-width')) || 0,
+            height: Number(row.attr('data-height')) || 0
         };
     }
 
@@ -1073,15 +1453,18 @@ const VideoAdapter = {
         const authorName = author ? (author.first_name ? `${author.first_name} ${author.last_name}` : author.name) : 'Unknown';
         const authorUrl = author ? (video.owner_id > 0 ? `/${author.id}` : `/club${Math.abs(video.owner_id)}`) : '#';
         const platform = video.platform || (video.type && video.type !== 0 && video.type !== 'video' ? 'External' : '');
+        const durationStr = !platform && video.duration ? fmtTime(video.duration) : '';
+        const vw = video.width || video.image?.[0]?.width || 640;
+        const vh = video.height || video.image?.[0]?.height || 360;
 
-        return `<div class="video_item ${selected ? 'selected' : ''}" data-picker-id="${fullId}" data-key="${key}" data-page-url="${pageUrl}" data-preview="${thumb}" data-url="${video.player || `/video${baseId}`}">
+        return `<div class="video_item ${selected ? 'selected' : ''}" data-picker-id="${fullId}" data-key="${key}" data-page-url="${pageUrl}" data-preview="${thumb}" data-url="${video.player || `/video${baseId}`}" data-title="${escapeHtml(video.title || '')}" data-duration="${escapeHtml(durationStr)}" data-platform="${escapeHtml(platform)}" data-width="${vw}" data-height="${vh}">
             <a class="video_item__thumb_link picker-item-attach" href="javascript:void(0)">
                 <div class="video_item_thumb_wrap">
                     <div class="video_item_thumb" style="background-image: url('${thumb}')"></div>
                     <div class="video_item_controls">
                         <div class="video_thumb_label">
-                            ${platform ? `<span class="video_thumb_label_item video_thumb_label_platform">${platform}</span>` : ''}
-                            ${!platform && video.duration ? `<span class="video_thumb_label_item video_thumb_label_duration">${fmtTime(video.duration)}</span>` : ''}
+                            ${platform ? `<span class="video_thumb_label_item video_thumb_label_platform">${escapeHtml(videoPlatformLabel(platform))}</span>` : ''}
+                            ${durationStr ? `<span class="video_thumb_label_item video_thumb_label_duration">${durationStr}</span>` : ''}
                         </div>
                         <div class="media_check_btn_wrap picker-item-select"><div class="media_check_btn"></div></div>
                     </div>
@@ -1103,7 +1486,12 @@ const VideoAdapter = {
             page_url: row.attr('data-page-url') || id,
             key,
             preview: row.attr('data-preview'),
-            fullsize_url: row.attr('data-url')
+            fullsize_url: row.attr('data-url'),
+            title: row.attr('data-title') || '',
+            duration: row.attr('data-duration') || '',
+            platform: row.attr('data-platform') || '',
+            width: Number(row.attr('data-width')) || 640,
+            height: Number(row.attr('data-height')) || 360
         };
     }
 };
@@ -1301,6 +1689,17 @@ const DocumentAdapter = {
     },
 
     getItemData(row, id) {
+        const docItem = row.find('.docMainItem').nodes[0];
+        if (docItem) {
+            const clone = docItem.cloneNode(true);
+            clone.querySelector('.doc_volume')?.remove();
+            return {
+                type: 'doc',
+                id,
+                alignment: 'vertical',
+                html: `<div class="attachment_doc">${clone.outerHTML}</div>`
+            };
+        }
         const name = row.attr('data-name') || '';
         const urlParts = (id || '').split("_");
         return {
@@ -1391,6 +1790,7 @@ const NoteAdapter = {
 
     getItemData(row, id) {
         const name = row.attr('data-name') || '';
+        const rawNoteId = String(id).split('_')[1] || id;
         return {
             type: 'note',
             id,
@@ -1399,7 +1799,7 @@ const NoteAdapter = {
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 10"><polygon points="0 0 0 10 8 10 8 4 4 4 4 0 0 0"/><polygon points="5 0 5 3 8 3 5 0"/></svg>
                 <div class='attachment_note_content'>
                     <span class="attachment_note_text">${tr('note')}</span>
-                    <span class="attachment_note_name">${ovk_proc_strtr(escapeHtml(name), 66)}</span>
+                    <span class="attachment_note_name"><a href="javascript:void(showArticle(${rawNoteId}));">${ovk_proc_strtr(escapeHtml(name), 66)}</a></span>
                 </div>
             </div>`
         };
@@ -1586,7 +1986,9 @@ vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
                         fullsize_url: videoPreview,
                     });
                 }
-                window.messagebox_stack.forEach(m => { m.close(); });
+                [...window.messagebox_stack]
+                    .filter(m => !['post_composer_modal', 'post_editor_modal'].includes(m.unique_name))
+                    .forEach(m => { m.close(); });
                 if (!formNode) vkify.navigate(location.href);
             } else {
                 fastError(append_result?.flash?.message || tr('error'));
@@ -1700,5 +2102,268 @@ vkify.bindOnce('pickerButtons', () => {
         await openPicker('audio', u('.PE_wrapper'), 0, { playlistMode: true });
     });
 });
+
+// Pointer-based reordering for composer attachments. Native HTML5 drag & drop
+// is suppressed entirely: it never fires on touch (the long-press opens the
+// browser context menu instead) and its ghost-image UX is worse than lifting
+// the tile itself. Touch needs a ~350ms hold; mouse drags start after a small
+// movement threshold so clicks still open the viewer.
+(function bindComposerTouchReorder() {
+    const ITEM_SEL = '.post-buttons .post-horizontal > .upload-item, .post-buttons .post-vertical > .upload-item';
+    const HOLD_MS = 350;
+    let drag = null;
+    let pendingCommit = null;
+    let suppressClickUntil = 0;
+
+    const updateDragPos = (s, x, y) => {
+        if (s.isHorizontal) {
+            s.item.__mkSig = null;
+            s.item.style.left = `${Math.round(x - s.grabX)}px`;
+            s.item.style.top = `${Math.round(y - s.grabY)}px`;
+        } else {
+            const tx = x - s.grabX - s.item.offsetLeft;
+            const ty = y - s.grabY - s.item.offsetTop;
+            s.item.style.transform = `translate(${tx}px, ${ty}px)`;
+        }
+    };
+
+    // VK's grid sorter never mutates the DOM mid-drag: slot geometry is frozen
+    // at activation, the target slot is determined from the frozen grid, and
+    // siblings transition directly via left/top/width/height to their preview
+    // positions. The actual DOM insertBefore happens once after the drop glide
+    // finishes — avoiding both reflow feedback loops and transform/left-top
+    // transition conflicts on release.
+    const processDragMove = (s) => {
+        const x = s.lastX, y = s.lastY;
+        const item = s.item;
+        updateDragPos(s, x, y);
+
+        if (!s.isHorizontal) {
+            const cy = item.offsetTop + (y - s.grabY - item.offsetTop) + item.offsetHeight / 2;
+            const tiles = [];
+            for (const t of s.container.children) {
+                if (t !== item && t.classList?.contains('upload-item')) tiles.push(t);
+            }
+            let desired = 0;
+            for (const t of tiles) {
+                if (cy > t.offsetTop + t.offsetHeight / 2) desired++;
+            }
+            if (desired === s.previewIndex) return;
+            s.previewIndex = desired;
+            const ref = tiles[desired] || null;
+            if (ref !== item.nextSibling) s.container.insertBefore(item, ref);
+            return;
+        }
+
+        const mpX = x - s.containerRect.left;
+        const mpY = y - s.containerRect.top;
+        let desired = -1;
+        for (let k = 0; k < s.slots.length; k++) {
+            const b = s.slots[k];
+            const ix = b.w * 0.12, iy = b.h * 0.12;
+            if (mpX >= b.l + ix && mpX <= b.l + b.w - ix && mpY >= b.t + iy && mpY <= b.t + b.h - iy) {
+                desired = k;
+                break;
+            }
+        }
+        if (desired < 0 || desired === s.previewIndex) return;
+        s.previewIndex = desired;
+
+        const previewOrder = s.sibs.slice();
+        previewOrder.splice(desired, 0, item);
+        s.previewOrder = previewOrder;
+
+        const boxes = computeComposerBoxes(s.container, previewOrder);
+        if (!boxes) return;
+        s.targetBoxes = boxes;
+        for (const t of boxes.tiles) {
+            if (t.el === item) {
+                s.targetTile = t;
+                continue;
+            }
+            applyComposerTileBox(boxes, t);
+        }
+    };
+
+    const activate = (s) => {
+        if (s.activated) return;
+        const allItems = Array.from(s.container.children).filter(
+            (t) => t.classList?.contains('upload-item')
+        );
+        if (allItems.length <= 1) return;
+        s.activated = true;
+        s.isHorizontal = s.container.classList.contains('post-horizontal');
+        s.grabX = s.lastX - s.item.offsetLeft;
+        s.grabY = s.lastY - s.item.offsetTop;
+        s.containerRect = s.container.getBoundingClientRect();
+        s.slots = allItems.map((t) => ({
+            l: t.offsetLeft,
+            t: t.offsetTop,
+            w: t.offsetWidth,
+            h: t.offsetHeight,
+        }));
+        s.sibs = allItems.filter((t) => t !== s.item);
+        s.startIndex = allItems.indexOf(s.item);
+        s.previewIndex = s.startIndex;
+        s.previewOrder = null;
+        if (s.isHorizontal) {
+            const initBoxes = computeComposerBoxes(s.container, allItems);
+            s.targetBoxes = initBoxes;
+            s.targetTile = initBoxes?.tiles.find((t) => t.el === s.item) || null;
+        }
+        s.item.classList.add('currently_dragging');
+        s.item.style.zIndex = '20';
+        s.item.style.pointerEvents = 'none';
+        try { s.item.setPointerCapture?.(s.pointerId); } catch {}
+        document.documentElement.classList.add('vkify-composer-dragging');
+        if (s.pointerType === 'touch') navigator.vibrate?.(15);
+    };
+
+    const endDrag = () => {
+        if (!drag) return;
+        const s = drag;
+        drag = null;
+        clearTimeout(s.timer);
+        if (!s.activated) return;
+        suppressClickUntil = Date.now() + 450;
+        document.documentElement.classList.remove('vkify-composer-dragging');
+        s.item.classList.remove('currently_dragging');
+
+        if (!s.isHorizontal) {
+            s.item.style.zIndex = '';
+            s.item.style.pointerEvents = '';
+            s.item.style.transform = '';
+            return;
+        }
+
+        // Glide the dragged tile into its target slot via left/top/width/height
+        // before mutating DOM order (mirrors VK GridSorter._onMouseUp), then
+        // commit insertBefore once the 150ms transition finishes.
+        if (s.targetBoxes && s.targetTile) {
+            applyComposerTileBox(s.targetBoxes, s.targetTile);
+        }
+
+        let commitTimer = null;
+        const commit = () => {
+            if (pendingCommit === commit) pendingCommit = null;
+            clearTimeout(commitTimer);
+            if (s.previewOrder && s.previewIndex !== s.startIndex) {
+                const ref = s.sibs[s.previewIndex] || null;
+                if (ref !== s.item.nextSibling) s.container.insertBefore(s.item, ref);
+            }
+            s.item.style.zIndex = '';
+            s.item.style.pointerEvents = '';
+            if (s.container.isConnected) {
+                layoutComposerHorizontal(s.container);
+            }
+        };
+        pendingCommit = commit;
+        commitTimer = setTimeout(commit, 165);
+    };
+
+    ['submit', 'keydown'].forEach((ev) =>
+        window.addEventListener(ev, () => {
+            if (pendingCommit) pendingCommit();
+        }, true)
+    );
+
+    document.addEventListener('pointerdown', (e) => {
+        if (pendingCommit) pendingCommit();
+        if (drag) return;
+        if (e.pointerType !== 'touch' && !(e.pointerType === 'mouse' && e.button === 0)) return;
+        const item = e.target.closest?.(ITEM_SEL);
+        if (!item) return;
+        const container = item.parentElement;
+        if (!container || container.querySelectorAll(':scope > .upload-item').length <= 1) return;
+        if (e.target.closest('button, .upload-delete, .ui_thumb_x_button')) return;
+        const innerLink = e.target.closest('a');
+        if (innerLink && innerLink !== item) return;
+        drag = {
+            item,
+            container,
+            pointerId: e.pointerId,
+            pointerType: e.pointerType,
+            startX: e.clientX,
+            startY: e.clientY,
+            lastX: e.clientX,
+            lastY: e.clientY,
+            grabX: 0,
+            grabY: 0,
+            activated: false,
+            moved: false,
+            timer: e.pointerType === 'touch'
+                ? setTimeout(() => { if (drag) activate(drag); }, HOLD_MS)
+                : null,
+        };
+    }, true);
+
+    document.addEventListener('pointermove', (e) => {
+        const s = drag;
+        if (!s || e.pointerId !== s.pointerId) return;
+        const dx = e.clientX - s.startX;
+        const dy = e.clientY - s.startY;
+        if (!s.activated) {
+            const dist2 = dx * dx + dy * dy;
+            if (s.pointerType === 'mouse') {
+                if (dist2 > 25) activate(s);
+            } else if (dist2 > 169) {
+                clearTimeout(s.timer);
+                drag = null;
+            }
+            return;
+        }
+        s.lastX = e.clientX;
+        s.lastY = e.clientY;
+        s.moved = true;
+        if (!s.queued) {
+            s.queued = true;
+            requestAnimationFrame(() => {
+                s.queued = false;
+                if (drag === s) processDragMove(s);
+            });
+        }
+    }, true);
+
+    ['pointerup', 'pointercancel'].forEach((ev) =>
+        document.addEventListener(ev, (e) => {
+            if (drag && e.pointerId === drag.pointerId) endDrag();
+        }, true)
+    );
+
+    window.addEventListener('blur', endDrag);
+
+    // kill the native drag session (ghost image + upstream al_wall.js handlers)
+    window.addEventListener('dragstart', (e) => {
+        if (e.target.closest?.(ITEM_SEL)) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+        }
+    }, true);
+
+    document.addEventListener('touchmove', (e) => {
+        if (drag?.activated) e.preventDefault();
+    }, { capture: true, passive: false });
+
+    document.addEventListener('contextmenu', (e) => {
+        const isMobileView = typeof window.isMobile === 'function'
+            ? window.isMobile()
+            : window.matchMedia('(max-width: 768px)').matches;
+        if ((drag || isMobileView) && e.target.closest?.(ITEM_SEL)) {
+            e.preventDefault();
+        }
+    });
+
+    // Capture on window so this runs before document-level capture handlers
+    // (such as media-modals.js's #videoOpen listener) after releasing a drag.
+    window.addEventListener('click', (e) => {
+        if (pendingCommit) pendingCommit();
+        if (Date.now() < suppressClickUntil && e.target.closest?.(ITEM_SEL)) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+        }
+    }, true);
+})();
 
 })();
