@@ -189,6 +189,13 @@ body.dark-mode .ovk-diag-head {
 	color: var(--text-color);
 	border-bottom: 1px solid var(--border-color);
 }
+.ovk-diag-head .picker-header-back,
+.choose_upload_area,.video_choose_upload_area_cont .video_add_external {
+	color: var(--text-color)
+}
+.ovk-diag-head .picker-header-back:hover {
+	background-color: var(--button-background-color);
+}
 body.dark-mode .button.button_gray {
 	color: var(--text-color)!important;
 }

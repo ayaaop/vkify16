@@ -502,6 +502,17 @@ const buildUploadButton = (labelKey = 'upload_button') => `
         <span class="choose_upload_area_label">${tr(labelKey)}</span>
     </div>`;
 
+const buildVideoUploadButtons = () => `
+    <div class="video_choose_upload_area_cont clear_fix">
+        <div class="choose_upload_area video_choose_upload_area picker-upload-btn" data-upload-tab="file" role="button" tabindex="0">
+            <span class="choose_upload_area_label">${tr('upload_video')}</span>
+        </div>
+        <div class="video_add_external picker-upload-external-btn" data-upload-tab="youtube" role="button" tabindex="0">
+            <span class="video_choose_upload_separator"></span>
+            <span class="video_add_external_icon">${tr('video_youtube_upload')}</span>
+        </div>
+    </div>`;
+
 const buildSearchUI = (placeholderKey, inputType = 'search') => `
     <div class="ui_search_new ui_search ui_search_field_empty picker-search">
         <div class="ui_search_input_block">
@@ -543,6 +554,8 @@ class AttachmentPickerBase {
         this.type = options.type || 'photo';
         this.playlistMode = !!options.playlistMode;
         this.selected = new Set();
+        this.selectedData = new Map();
+        this._lastSelectedEl = null;
         this.viewingUser = this.club === 0;
         this.msgbox = null;
     }
@@ -589,14 +602,21 @@ class AttachmentPickerBase {
     }
 
     updateAttachButton() {
-        const bar = this.msgbox.getNode().find('.ovk-diag-action');
+        const bar = this.msgbox?.getNode().find('.ovk-diag-action');
+        if (!bar?.length) return;
         const btn = bar.find('.picker-attach-selected');
+        const cancelLink = bar.find('.picker-bottom-cancel');
         const count = this.selected.size;
+        const hasStaticButtons = bar.find(':scope > :not(.picker-attach-selected):not(.picker-bottom-cancel)').length > 0;
         if (count > 0) {
-            if (!btn.length) bar.prepend(`<input type="button" class="button picker-attach-selected" value="${tr('attach')} (${count})">`);
+            if (!hasStaticButtons && !cancelLink.length) {
+                bar.prepend(`<a href="javascript:void(0)" class="picker-bottom-cancel">${tr('cancel')}</a>`);
+            }
+            if (!btn.length) bar.append(`<input type="button" class="button picker-attach-selected" value="${tr('attach')} (${count})">`);
             else btn.attr('value', `${tr('attach')} (${count})`);
         } else {
             btn.remove();
+            if (!hasStaticButtons) cancelLink.remove();
         }
     }
 
@@ -604,22 +624,52 @@ class AttachmentPickerBase {
         return this.adapter?.getItemData?.(row, id) || { type: this.type, id };
     }
 
-    handleItemSelect(row, id) {
-        if (this.isSelected(id)) {
+    _setRowSelected(row, id, select) {
+        if (!row?.length || !id) return false;
+        if (!select) {
             this.selected.delete(id);
+            this.selectedData.delete(id);
             row.removeClass('selected');
             row.find('.picker-item-select span, .attachAudio span, .attachDocument span').text(tr('attach'));
-        } else {
-            const currentAttached = getAttachedCount(this.form, this.playlistMode);
-            const pendingNew = [...this.selected].filter(sid => !isAttached(this.form, this.type, sid, this.playlistMode)).length;
-            if (!this.playlistMode && currentAttached + pendingNew + 1 > MAX_ATTACHMENTS) {
-                NewNotification(tr('error'), tr('too_many_attachments'), null, () => {}, 5000, false);
+            return true;
+        }
+        if (this.isSelected(id)) return true;
+        const currentAttached = getAttachedCount(this.form, this.playlistMode);
+        const pendingNew = [...this.selected].filter(sid => !isAttached(this.form, this.type, sid, this.playlistMode)).length;
+        if (!this.playlistMode && currentAttached + pendingNew + 1 > MAX_ATTACHMENTS) {
+            NewNotification(tr('error'), tr('too_many_attachments'), null, () => {}, 5000, false);
+            return false;
+        }
+        this.selected.add(id);
+        this.selectedData.set(id, this._getItemData(row, id));
+        row.addClass('selected');
+        row.find('.picker-item-select span, .attachAudio span, .attachDocument span').text(tr('detach'));
+        return true;
+    }
+
+    handleItemSelect(row, id, event = null) {
+        const targetEl = row?.nodes?.[0] || null;
+        const targetSelect = !this.isSelected(id);
+
+        if (event?.shiftKey && this._lastSelectedEl && targetEl && this._lastSelectedEl !== targetEl && this._lastSelectedEl.parentElement === targetEl.parentElement) {
+            const siblings = Array.from(targetEl.parentElement.querySelectorAll('[data-picker-id]'));
+            const aIdx = siblings.indexOf(this._lastSelectedEl);
+            const bIdx = siblings.indexOf(targetEl);
+            if (aIdx !== -1 && bIdx !== -1) {
+                const [from, to] = aIdx < bIdx ? [aIdx, bIdx] : [bIdx, aIdx];
+                for (let i = from; i <= to; i++) {
+                    const sib = u(siblings[i]);
+                    const sibId = sib.attr('data-picker-id');
+                    if (!this._setRowSelected(sib, sibId, targetSelect) && targetSelect) break;
+                }
+                this._lastSelectedEl = targetEl;
+                this.updateAttachButton();
                 return;
             }
-            this.selected.add(id);
-            row.addClass('selected');
-            row.find('.picker-item-select span, .attachAudio span, .attachDocument span').text(tr('detach'));
         }
+
+        this._setRowSelected(row, id, targetSelect);
+        this._lastSelectedEl = targetEl;
         this.updateAttachButton();
     }
 
@@ -639,8 +689,9 @@ class AttachmentPickerBase {
         const toAttach = [...this.selected].filter(id => !isAttached(this.form, this.type, id, this.playlistMode));
         if (!canAttach(this.form, toAttach.length, this.playlistMode)) return;
         toAttach.forEach(id => {
-            const row = this.msgbox.getNode().find(`[data-picker-id="${id}"]`);
-            this.attachItem(this._getItemData(row, id));
+            const row = this.msgbox?.getNode().find(`[data-picker-id="${id}"]`);
+            const data = row?.length ? this._getItemData(row, id) : this.selectedData.get(id);
+            if (data) this.attachItem(data);
         });
     }
 }
@@ -810,6 +861,8 @@ class AttachmentPicker extends AttachmentPickerBase {
             this.viewingUser = !this.viewingUser;
             this.updateToggleLink();
             this.selected.clear();
+            this.selectedData.clear();
+            this._lastSelectedEl = null;
             this._switchContainer(this.viewingUser);
 
             const cache = this._getCache();
@@ -831,7 +884,7 @@ class AttachmentPicker extends AttachmentPickerBase {
             e.stopPropagation();
             const row = u(e.target).closest('[data-picker-id]');
             const id = row.attr('data-picker-id');
-            this.handleItemSelect(row, id);
+            this.handleItemSelect(row, id, e);
         });
 
         node.on('click', '.picker-item-attach', (e) => {
@@ -841,7 +894,7 @@ class AttachmentPicker extends AttachmentPickerBase {
             const row = u(e.target).closest('[data-picker-id]');
             const id = row.attr('data-picker-id');
             if (e.ctrlKey || e.metaKey || e.shiftKey) {
-                this.handleItemSelect(row, id);
+                this.handleItemSelect(row, id, e);
             } else {
                 this.handleItemAttach(row, id);
             }
@@ -849,6 +902,11 @@ class AttachmentPicker extends AttachmentPickerBase {
 
         node.on('click', '.picker-attach-selected', () => {
             this.attachSelected();
+            this.close();
+        });
+
+        node.on('click', '.picker-bottom-cancel', (e) => {
+            e.preventDefault();
             this.close();
         });
 
@@ -1029,9 +1087,12 @@ const fetchAlbums = async (ownerId, page = 0) => {
     });
 };
 
-const fetchPhotos = async (ownerId, albumId, page = 0) => {
+const fetchPhotos = async (ownerId, albumId, page = 0, rev = false) => {
     const params = { owner_id: ownerId, photo_sizes: 1, count: PHOTO_PER_PAGE, offset: page * PHOTO_PER_PAGE };
-    if (albumId) params.album_id = albumId;
+    if (albumId) {
+        params.album_id = albumId;
+        if (rev) params.rev = 1;
+    }
     const method = albumId ? 'photos.get' : 'photos.getAll';
     const result = await window.OVKAPI.call(method, params);
     if (!result) return { items: [], hasMore: false, count: 0 };
@@ -1192,7 +1253,7 @@ class PhotoAlbumView {
     get ownerId() { return this.picker.getOwnerId(); }
 
     async prefetch() {
-        this.photos = await fetchPhotos(this.ownerId, this.albumId, 0);
+        this.photos = await fetchPhotos(this.ownerId, this.albumId, 0, true);
     }
 
     buildBody() {
@@ -1209,7 +1270,7 @@ class PhotoAlbumView {
             container: () => node.find('#photos_content'),
             load: async (page, signal) => {
                 this.page++;
-                return await fetchPhotos(this.ownerId, this.albumId, this.page);
+                return await fetchPhotos(this.ownerId, this.albumId, this.page, true);
             },
             render: (result, container) => {
                 const rows = container.find('.photos_choose_rows');
@@ -1233,11 +1294,11 @@ class PhotoAlbumView {
     }
 
     getButtons() {
-        return [tr('paginator_back')];
+        return [];
     }
 
     getCallbacks() {
-        return [() => this.picker.switchToMainView()];
+        return [];
     }
 }
 
@@ -1266,6 +1327,48 @@ class PhotoPicker extends AttachmentPickerBase {
         await this._showMainView();
     }
 
+    _mountView(view, title, buttons = [], callbacks = []) {
+        this._currentView?.disconnectScrollers?.();
+        this._currentView = view;
+
+        if (!this.msgbox || !this.msgbox.getNode()?.nodes?.[0]?.isConnected) {
+            this._showMessageBox(view, title, buttons, callbacks);
+            return;
+        }
+
+        const node = this.msgbox.getNode();
+        const head = node.find('.ovk-diag-head');
+        const closeBtn = head.find('.ovk-diag-head-close').nodes[0];
+        const applyBtn = head.find('.ovk-diag-head-apply').nodes[0];
+        head.html('');
+        if (view instanceof PhotoAlbumView) {
+            const backEl = document.createElement('div');
+            backEl.className = 'back picker-header-back';
+            backEl.setAttribute('role', 'button');
+            backEl.setAttribute('tabindex', '0');
+            backEl.textContent = title || tr('paginator_back');
+            head.nodes[0]?.appendChild(backEl);
+        } else {
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'ovk-diag-head-title picker-title-text';
+            titleSpan.textContent = title;
+            head.nodes[0]?.appendChild(titleSpan);
+        }
+        if (closeBtn) head.nodes[0]?.appendChild(closeBtn);
+        if (applyBtn) head.nodes[0]?.appendChild(applyBtn);
+        if (this.club !== 0 && view instanceof PhotoMainView) {
+            this.addClubToggleLink();
+        }
+
+        const body = node.find('.ovk-diag-body');
+        body.html(view.buildBody());
+        if (body.nodes[0]) body.nodes[0].scrollTop = 0;
+
+        this._lastSelectedEl = null;
+        view.setupHandlers(node);
+        this.updateAttachButton();
+    }
+
     async _showMainView() {
         const view = new PhotoMainView(this);
         const stateKey = this.viewingUser ? 'user' : 'group';
@@ -1275,8 +1378,7 @@ class PhotoPicker extends AttachmentPickerBase {
             await ajloader.wrap(() => view.prefetch());
         }
         this._mainViewState[stateKey] = view.getState();
-        this._currentView = view;
-        this._showMessageBox(view, tr('select_photo'), [], []);
+        this._mountView(view, tr('select_photo'), [], []);
     }
 
     async switchToAlbumView(albumId, title) {
@@ -1284,15 +1386,12 @@ class PhotoPicker extends AttachmentPickerBase {
             const stateKey = this.viewingUser ? 'user' : 'group';
             this._mainViewState[stateKey] = this._currentView.getState();
         }
-        this.close();
         const view = new PhotoAlbumView(this, albumId, title);
         await ajloader.wrap(() => view.prefetch());
-        this._currentView = view;
-        this._showMessageBox(view, title, view.getButtons(), view.getCallbacks());
+        this._mountView(view, title, view.getButtons(), view.getCallbacks());
     }
 
     async switchToMainView() {
-        this.close();
         await this._showMainView();
     }
 
@@ -1301,9 +1400,10 @@ class PhotoPicker extends AttachmentPickerBase {
             const stateKey = this.viewingUser ? 'user' : 'group';
             this._mainViewState[stateKey] = this._currentView.getState();
         }
-        this.close();
         this.viewingUser = !this.viewingUser;
         this.selected.clear();
+        this.selectedData.clear();
+        this._lastSelectedEl = null;
         await this._showMainView();
     }
 
@@ -1339,10 +1439,15 @@ class PhotoPicker extends AttachmentPickerBase {
             await this.toggleContext();
         });
 
+        node.on('click', '.picker-header-back', async (e) => {
+            e.preventDefault();
+            await this.switchToMainView();
+        });
+
         node.on('click', '.picker-item-select', (e) => {
             e.preventDefault(); e.stopPropagation();
             const row = u(e.target).closest('[data-picker-id]');
-            this.handleItemSelect(row, row.attr('data-picker-id'));
+            this.handleItemSelect(row, row.attr('data-picker-id'), e);
         });
 
         node.on('click', '.picker-item-attach', (e) => {
@@ -1351,7 +1456,7 @@ class PhotoPicker extends AttachmentPickerBase {
             const row = u(e.target).closest('[data-picker-id]');
             const id = row.attr('data-picker-id');
             if (e.ctrlKey || e.metaKey || e.shiftKey) {
-                this.handleItemSelect(row, id);
+                this.handleItemSelect(row, id, e);
             } else {
                 this.handleItemAttach(row, id);
             }
@@ -1361,27 +1466,33 @@ class PhotoPicker extends AttachmentPickerBase {
             this.attachSelected();
             this.close();
         });
+
+        node.on('click', '.picker-bottom-cancel', (e) => {
+            e.preventDefault();
+            this.close();
+        });
     }
 }
 
 const VideoAdapter = {
     title: tr('selecting_video'),
     width: '640px',
-    supportsClubToggle: false,
+    supportsClubToggle: true,
     perPage: DEFAULT_PER_PAGE,
     emptyMessage: tr('no_videos'),
     rowsClass: 'video_block_layout',
 
-    // biome-ignore lint/correctness/noUnusedFunctionParameters: interface
     buildBody(picker, preRendered) {
         const { itemsHTML, emptyHTML } = getPreRenderedHTML(preRendered, VideoAdapter.emptyMessage, 'video_block_layout');
+        const activeKey = picker.viewingUser ? 'user' : 'group';
+        const hasClub = picker.club !== 0;
         return `<div class='attachment_selector'>
-            ${buildUploadButton()}
+            ${buildVideoUploadButtons()}
             <div class="videos_choose_search">
                 ${buildSearchUI('search_for_videos')}
             </div>
             <div class="picker-content" style="height: unset; padding: 0">
-                <div class="picker-items">${itemsHTML || emptyHTML}</div>
+                ${buildDualContainers(activeKey, hasClub, itemsHTML, emptyHTML)}
             </div>
         </div>`;
     },
@@ -1389,11 +1500,13 @@ const VideoAdapter = {
     setupHandlers(picker) {
         const node = picker.msgbox.getNode();
 
-        node.on('click', '.picker-upload-btn', (e) => {
+        node.on('click', '.picker-upload-btn, .picker-upload-external-btn', (e) => {
             e.preventDefault();
             e.stopPropagation();
+            const tab = u(e.currentTarget).attr('data-upload-tab') || 'file';
+            const clubId = picker.club !== 0 && !picker.viewingUser ? Math.abs(picker.club) : 0;
             picker.close();
-            window.showFastVideoUpload?.(picker.form, e);
+            window.showFastVideoUpload?.(picker.form, e, clubId, tab);
         });
 
         node.on('click', '.video_item__thumb_link', (e) => {
@@ -1403,7 +1516,7 @@ const VideoAdapter = {
             const row = u(e.target).closest('[data-picker-id]');
             const id = row.attr('data-picker-id');
             if (e.ctrlKey || e.metaKey || e.shiftKey) {
-                picker.handleItemSelect(row, id);
+                picker.handleItemSelect(row, id, e);
             } else {
                 picker.handleItemAttach(row, id);
             }
@@ -1415,7 +1528,7 @@ const VideoAdapter = {
             const row = u(e.target).closest('[data-picker-id]');
             const id = row.attr('data-picker-id');
             if (e.ctrlKey || e.metaKey || e.shiftKey) {
-                picker.handleItemSelect(row, id);
+                picker.handleItemSelect(row, id, e);
             } else {
                 picker.handleItemAttach(row, id);
             }
@@ -1432,7 +1545,7 @@ const VideoAdapter = {
 
         const videos = picker.query
             ? await window.OVKAPI.call('video.search', { ...params, q: picker.query })
-            : await window.OVKAPI.call('video.get', { ...params, owner_id: window.openvk.current_id });
+            : await window.OVKAPI.call('video.get', { ...params, owner_id: picker.getOwnerId() });
 
         if (!videos) return null;
 
@@ -1651,9 +1764,50 @@ const DocumentAdapter = {
         const node = picker.msgbox.getNode();
 
         node.on('click', '.picker-upload-btn', () => {
-            picker.close();
+            const form = picker.form;
             const clubId = picker.club !== 0 && !picker.viewingUser ? Math.abs(picker.club) : NaN;
-            window.showDocumentUploadDialog?.("search", clubId, () => {}, picker.form);
+            picker.close();
+            window.showDocumentUploadDialog?.("search", clubId, async (payload) => {
+                if (!form?.length || !payload) return;
+                if (typeof payload === 'string') {
+                    const doc = new DOMParser().parseFromString(payload, 'text/html');
+                    const mainItem = doc.querySelector('.docMainItem');
+                    const id = mainItem?.dataset?.id || '';
+                    if (mainItem && id) {
+                        const clone = mainItem.cloneNode(true);
+                        clone.querySelector('.doc_volume')?.remove();
+                        appendVertical(form, {
+                            type: 'doc',
+                            id,
+                            alignment: 'vertical',
+                            html: `<div class="attachment_doc">${clone.outerHTML}</div>`
+                        });
+                    }
+                    return;
+                }
+                const docId = payload.id;
+                if (!docId) return;
+                try {
+                    const res = await window.OVKAPI.call('docs.getById', { docs: docId });
+                    const d = Array.isArray(res) ? res[0] : (res?.items?.[0] || null);
+                    const fullId = d ? `${d.owner_id}_${d.id}${d.access_key ? `_${d.access_key}` : ''}` : docId;
+                    const title = d?.title || docId;
+                    const urlParts = String(fullId).split('_');
+                    const keyQuery = urlParts[2] ? `?key=${urlParts[2]}` : '';
+                    appendVertical(form, {
+                        type: 'doc',
+                        id: fullId,
+                        alignment: 'vertical',
+                        html: `<div class="docMainItem attachment_doc attachment_note">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 10"><polygon points="0 0 0 10 8 10 8 4 4 4 4 0 0 0"/><polygon points="5 0 5 3 8 3 5 0"/></svg>
+                            <div class='attachment_note_content'>
+                                <span class="attachment_note_text">${tr("document")}</span>
+                                <span class="attachment_note_name"><a href="/doc${urlParts[0]}_${urlParts[1]}${keyQuery}">${ovk_proc_strtr(escapeHtml(title), 50)}</a></span>
+                            </div>
+                        </div>`
+                    });
+                } catch (_) {}
+            }, form);
         });
     },
 
@@ -1875,10 +2029,12 @@ function setupVideoTitleAutofill(container, fileSelector, linkSelector, nameSele
     });
 }
 
-vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
+vkify.hook(window, 'showFastVideoUpload', (formNode, event, clubId = 0, initialTab = 'file') => {
     window.vkify?.ensureStyle?.('settings');
-    let current_tab = 'file';
+    let current_tab = initialTab === 'youtube' ? 'youtube' : 'file';
     const is_from_messenger = formNode && formNode.closest('.messenger-layer').length > 0;
+    const resolvedClubId = Math.abs(Number(clubId || new URLSearchParams(location.search).get('gid') || 0)) || 0;
+    const uploadEndpoint = resolvedClubId > 0 ? `/videos/upload?gid=${resolvedClubId}` : '/videos/upload';
     const msg = new CMessageBox({
         title: tr('upload_video'),
         close_on_buttons: false,
@@ -1925,7 +2081,7 @@ vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
                     form_data.append('name', video_name);
                     form_data.append('desc', video_desc);
                     form_data.append('link', video_link);
-                    form_data.append('unlisted', formNode ? 1 : 0);
+                    form_data.append('unlisted', is_from_messenger ? 1 : 0);
                     form_data.append('hash', vkify.getCsrf());
 
                     if (is_from_messenger) {
@@ -1937,7 +2093,7 @@ vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
                     }
 
                     uploadBtn?.classList.add('lagged');
-                    const ytRes = await fetch('/videos/upload', { method: 'POST', body: form_data });
+                    const ytRes = await fetch(uploadEndpoint, { method: 'POST', body: form_data });
                     append_result = await ytRes.json();
                     break;
                 }
@@ -1950,7 +2106,7 @@ vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
                     form_data.append('name', video_name);
                     form_data.append('desc', video_desc);
                     form_data.append('blob', video_file.files[0]);
-                    form_data.append('unlisted', formNode ? 1 : 0);
+                    form_data.append('unlisted', is_from_messenger ? 1 : 0);
                     form_data.append('hash', vkify.getCsrf());
 
                     if (is_from_messenger) {
@@ -1962,7 +2118,7 @@ vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
                     }
 
                     uploadBtn?.classList.add('lagged');
-                    const res = await fetch('/videos/upload', { method: 'POST', body: form_data });
+                    const res = await fetch(uploadEndpoint, { method: 'POST', body: form_data });
                     append_result = await res.json();
                     break;
                 }
@@ -2028,7 +2184,7 @@ vkify.hook(window, 'showFastVideoUpload', (formNode, event) => {
         if (name) switchTab(name);
     });
 
-    switchTab('file');
+    switchTab(current_tab);
     initVideoTitleAutofill('#_fast_video_upload');
     vkify.initTabSliderSafe?.();
 }, 'replace');
@@ -2065,7 +2221,8 @@ vkify.bindOnce('pickerButtons', () => {
         if (video) {
             e.preventDefault();
             e.stopImmediatePropagation();
-            await openPicker('video', resolveForm(video));
+            const club = Number(video.dataset.club ?? 0);
+            await openPicker('video', resolveForm(video), club);
             return;
         }
 

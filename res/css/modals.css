@@ -1186,8 +1186,80 @@ input.vkify_inline_edit_field {
 .choose_upload_area_label {
   display: inline-block;
   padding-left: 29px;
-  background: url(../icons/upload_icon.png)
-    no-repeat left 2px;
+  background: url(../icons/upload_icon.png) no-repeat left 2px;
+}
+.video_choose_upload_area_cont {
+  display: flex;
+  margin: -20px -25px 15px;
+  background-color: var(--module-background-color--secondary);
+}
+.video_choose_upload_area_cont .video_choose_upload_area {
+  margin: 0;
+  padding: 8.5px 10px;
+  width: 65%;
+  flex: 0 0 65%;
+  box-sizing: border-box;
+}
+.video_choose_upload_area_cont .choose_upload_area_label {
+  padding: 5px 5px 5px 30px;
+  background-position: left 6px;
+}
+.video_choose_upload_area_cont .video_add_external {
+  position: relative;
+  width: 35%;
+  flex: 0 0 35%;
+  padding: 8.5px 10px 8.5px 0;
+  text-align: center;
+  color: var(--link-color);
+  cursor: pointer;
+  opacity: 0.7;
+  box-sizing: border-box;
+}
+.video_choose_upload_area_cont .video_add_external:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+.video_choose_upload_separator {
+  width: 1px;
+  position: absolute;
+  left: 0;
+  top: 8.5px;
+  bottom: 8.5px;
+  background-color: var(--border-color-3);
+}
+.video_add_external_icon {
+  background: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%2F%3E%3Cpath%20stroke%3D%22%239EB4CC%22%20stroke-width%3D%221.75%22%20d%3D%22M10%2014l4-4%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20stroke%3D%22%239EB4CC%22%20stroke-width%3D%221.75%22%20d%3D%22M16.5%2013.5c3-3%203.5-5.5%201.5-7.5s-4.5-1.5-7.5%201.5M7.5%2010.5C4.5%2013.5%204%2016%206%2018s4.5%201.5%207.5-1.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") no-repeat 0 center / 24px 24px;
+  display: inline-block;
+  padding: 5px 5px 5px 30px;
+}
+.ovk-diag-head .picker-header-back {
+  margin: 0 0 0 -25px;
+  padding: 0 20px 0 36px;
+  height: 54px;
+  line-height: 54px;
+  color: var(--accent-text-color);
+  background: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2217%22%20viewBox%3D%220%200%2010%2017%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20d%3D%22M8.5%201.5L1.5%208.5l7%207%22%2F%3E%3C%2Fsvg%3E")
+              no-repeat 13px 18px / 10px 17px;
+  float: left;
+  cursor: pointer;
+  border-radius: var(--module-border-radius) 0 0 0;
+  max-width: calc(100% - 60px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ovk-diag-head .picker-header-back:hover {
+  text-decoration: none;
+  background-color: var(--accent-color-4);
+}
+.ovk-diag-action .picker-bottom-cancel {
+  display: inline-block;
+  margin: 5px 20px;
+  color: var(--link-color);
+  vertical-align: middle;
+}
+.ovk-diag-action .picker-bottom-cancel:hover {
+  text-decoration: underline;
 }
 .ovk-diag-body .attachment_selector:not(:has(.button)) .pr.pr_medium {
   margin: 15px auto;
