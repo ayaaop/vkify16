@@ -339,3 +339,12 @@
 .AudioPlaylistSnippet__covers:not(.AudioPlaylistSnippet__covers--playing) .AudioPlaylistSnippet__stop {
 	display: none !important;
 }
+.AudioPlaylistSnippet__comments #replies.page_block {
+	margin-bottom: 0;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+.AudioPlaylistSnippet__comments #replies.page_block:last-child {
+	border-bottom-left-radius: var(--module-border-radius);
+	border-bottom-right-radius: var(--module-border-radius);
+}

@@ -179,7 +179,9 @@ vkify.bindOnce('likeHandlers', () => {
         const heart = btn.find('.action_icon');
         const isLiked = heart.attr('id') === 'liked';
         const isPost = btn.hasClass('post_like');
-        const hasLikesTooltip = isPost || btn.hasClass('video_like_button');
+        const type = btn.attr('data-type');
+        const hasLikesTooltip = (isPost || btn.hasClass('video_like_button'))
+            && type !== 'note' && type !== 'audio_playlist';
 
         let counter = btn.find('.action_count');
         if (counter.length < 1) {
@@ -206,7 +208,15 @@ vkify.bindOnce('likeHandlers', () => {
 
         let ok = false;
         try {
-            if (link) {
+            if (type === 'audio_playlist' || type === 'note') {
+                const [owner_id, item_id] = (btn.attr('data-id') || '').split('_').map(Number);
+                if (Number.isInteger(owner_id) && Number.isInteger(item_id)) {
+                    await window.OVKAPI.call(isLiked ? 'likes.delete' : 'likes.add', {
+                        type, owner_id, item_id
+                    });
+                    ok = true;
+                }
+            } else if (link) {
                 ok = window.ky
                     ? (await window.ky.post(link), true)
                     : (await fetch(link, { method: 'POST', credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })).ok;
@@ -232,7 +242,7 @@ vkify.bindOnce('likeHandlers', () => {
 vkify.bindOnce('likesTooltip', () => {
     window.tippy.delegate(document.body, {
         animation: 'up_down',
-        target: `.post_like[data-type]:not([data-likes="0"]), .video_like_button[data-type]:not([data-likes="0"])`,
+        target: `.post_like[data-type]:not([data-type="note"]):not([data-type="audio_playlist"]):not([data-likes="0"]), .video_like_button[data-type]:not([data-likes="0"])`,
         theme: 'special vk',
         placement: 'top-start',
         content: '',

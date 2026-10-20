@@ -302,10 +302,17 @@
         flex-shrink: 0;
         height: 44px;
     }
-    .appbar-tabs-menu-extra .archive_actions_icon {
+    .appbar-tabs-menu-extra .archive_actions_icon,
+    .appbar-tabs-menu-extra .feed_filter_icon {
         display: inline-block;
         width: 16px;
         height: 16px;
+        cursor: pointer;
+    }
+    .appbar-tabs-menu-extra .feed_lists_icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
     }
     .appbar-extra-btn-wrap {

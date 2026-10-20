@@ -86,3 +86,65 @@ if (!function_exists('vkifyPhotoEditReferences')) {
         return ['editable' => true, 'posts' => array_values(array_unique($posts))];
     }
 }
+
+if (!function_exists('vkifyGetFeedSources')) {
+    function vkifyGetFeedSources(\openvk\Web\Models\Entities\User $user): array
+    {
+        $subs = \Chandler\Database\DatabaseConnection::i()
+            ->getContext()
+            ->table('subscriptions')
+            ->where('follower', $user->getRealId());
+
+        $ids = [];
+        foreach ($subs as $rel) {
+            $ids[] = $rel->target * ($rel->model === 'openvk\\Web\\Models\\Entities\\User' ? 1 : -1);
+        }
+        $ids = array_values(array_unique($ids));
+        if (empty($ids)) {
+            return [];
+        }
+
+        $entities = get_entities($ids, true);
+        $sources = [];
+        foreach ($entities as $entity) {
+            if (!$entity || $entity->isDeleted()) {
+                continue;
+            }
+            $realId = (int) $entity->getRealId();
+            if ($realId === 0 || $realId === $user->getRealId()) {
+                continue;
+            }
+            $sources[] = [
+                'id' => $realId,
+                'name' => $entity->getCanonicalName(),
+                'avatar' => $entity->getAvatarUrl('miniscule'),
+                'url' => $entity->getURL(),
+                'type' => $realId > 0 ? 'user' : 'group',
+            ];
+        }
+
+        usort($sources, fn(array $a, array $b) => strcasecmp($a['name'], $b['name']));
+        return $sources;
+    }
+}
+
+if (!function_exists('vkifyGetOwnedCustomFeeds')) {
+    function vkifyGetOwnedCustomFeeds(\openvk\Web\Models\Entities\User $user): array
+    {
+        if (!class_exists('\openvk\Web\Models\Search\Catalogue')) {
+            return [];
+        }
+        $lists = [];
+        try {
+            foreach (\openvk\Web\Models\Search\Catalogue::getOwn($user, 1) as $item) {
+                if (!$item || $item->isDeleted()) {
+                    continue;
+                }
+                $lists[] = $item->toVkApiStructOfFeed($user);
+            }
+        } catch (\Throwable $e) {
+            return [];
+        }
+        return $lists;
+    }
+}

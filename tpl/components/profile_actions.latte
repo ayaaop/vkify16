@@ -1,4 +1,5 @@
 {php if (!function_exists('vkifyTr')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_i18n.php';}
+{php if (!function_exists('vkifyGetOwnedCustomFeeds')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
 <div class="profile_actions clear_fix nomobile">
 	{ifset $thisUser}
 		{if $user->getId() != $thisUser->getId()}
@@ -115,6 +116,22 @@
 				<a id="__ignoreSomeone" onclick="onIgnoreSomeoneClick(event)" data-val="{if $isIgnored}0{else}1{/if}" data-id="{$user->getId()}">
 					{if $isIgnored}{_unignore_user}{else}{_ignore_user}{/if}
 				</a>
+			{/if}
+			{var $ownedCustomFeeds = vkifyGetOwnedCustomFeeds($thisUser)}
+			{if sizeof($ownedCustomFeeds) > 0}
+				<div class="separator"></div>
+				<div class="profile_custom_feeds_header">{=vkifyTr('profile_custom_feeds')}</div>
+				{foreach $ownedCustomFeeds as $cFeed}
+					{var $inFeed = in_array($user->getRealId(), $cFeed->source_ids ?? [])}
+					<a class="ui_actions_menu_item page_actions_subitem {if $inFeed}checked{/if}"
+					   data-list-id="{$cFeed->id}"
+					   data-list-title="{$cFeed->title}"
+					   data-source-ids="{implode(',', $cFeed->source_ids ?? [])}"
+					   data-entity-id="{$user->getRealId()}"
+					   onclick="window.vkifyFeedLists?.toggleEntityInList(this, event); return false;">
+						{$cFeed->title}
+					</a>
+				{/foreach}
 			{/if}
 		{else}
 			<a class="_add_image">
