@@ -21,7 +21,8 @@ body #im_container .crp-list .crp-entry--message---av img,
 .fwd-modal-content .fwd-avatar,
 .pinned-message-ava,
 .peer-window .peer-side .peer-info .peer-avatar,
-.peer-window .peer-side .peer-info .peer-avatar > img {
+.peer-window .peer-side .peer-info .peer-avatar > img,
+.entity_vertical_list.mini .entity_vertical_list_item img {
     border-radius: 0 !important;
 }
 

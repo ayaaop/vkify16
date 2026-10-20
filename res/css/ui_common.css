@@ -1174,9 +1174,17 @@ input.ui_search_field {
 input.ui_search_field {
     background: url(../icons/search_icon.png)
     no-repeat;
+    color: var(--text-color);
     padding-left: 28px;
     border-left: 20px solid transparent;
     background-position: 0;
+}
+input.ui_search_field::-webkit-search-decoration,
+input.ui_search_field::-webkit-search-cancel-button,
+input.ui_search_field::-webkit-search-results-button,
+input.ui_search_field::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    display: none;
 }
 input.ui_search_field::placeholder,
 input[type~="text"]::placeholder,

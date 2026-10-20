@@ -1,11 +1,29 @@
 /* iOS platform adaptations */
 @media (max-width: 768px) {
+    html.platform-ios {
+        background-color: #ebedf0;
+    }
+    html.platform-ios:has(body.dark-mode) {
+        background-color: #0a0a0a;
+    }
+    html.platform-ios:has(body.body_im) {
+        background-color: var(--module-background-color, #fff);
+    }
+    html.platform-ios:has(body.body_im.dark-mode) {
+        background-color: #19191a;
+    }
     html.platform-ios body {
         -webkit-tap-highlight-color: transparent;
         --header-height: 44px;
         --module-border-radius: 10px !important;
         --button-border-radius: 10px !important;
         --tooltip-border-radius: 12px !important;
+    }
+    .platform-ios .layout {
+        margin-bottom: 0 !important;
+    }
+    .platform-ios body:not(.body_im) .page_body {
+        padding-bottom: env(safe-area-inset-bottom, 0px);
     }
     /* iOS has no ripples */
     .platform-ios .button:active, .platform-ios .action_button:active,
@@ -431,6 +449,20 @@
     .platform-ios .body_im .messenger-app--header.messages--peers-header-peer-name {
         height: calc(var(--header-height) + env(safe-area-inset-top));
         padding-top: env(safe-area-inset-top);
+    }
+    .platform-ios body.body_im .page_body {
+        top: calc(var(--ovk-vv-top, 0px) + var(--header-height) + env(safe-area-inset-top));
+        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - env(safe-area-inset-top));
+        max-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - env(safe-area-inset-top));
+    }
+    .platform-ios body.body_im #im_container.at_page,
+    .platform-ios body.body_im #im_container.at_page:not(.compact) .im_page.page-conversations,
+    .platform-ios body.body_im #im_container.at_page #im_page_containers,
+    .platform-ios body.body_im #im_container.at_page .im_page:not(.hidden),
+    .platform-ios body.body_im #im_container.at_page .im_page.page-other {
+        min-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - env(safe-area-inset-top));
+        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - env(safe-area-inset-top));
+        max-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - env(safe-area-inset-top));
     }
     .platform-ios .body_im .messenger-app--header--info {
         position: absolute;

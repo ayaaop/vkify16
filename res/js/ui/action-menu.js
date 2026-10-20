@@ -187,12 +187,20 @@ vkify.once('uiActionsMenu', function () {
   function elevatePageBlock(pageBlock, elevate) {
     if (!pageBlock) return;
     if (elevate) {
+      if (getStyle(pageBlock, 'position') === 'static') {
+        data(pageBlock, 'elevatedStaticPos', true);
+        pageBlock.style.position = 'relative';
+      }
       pageBlock.style.zIndex = 'calc(var(--action-menu-z-index, 5) + 1)';
     } else {
       // only remove if no other open menus remain inside this page_block
       const stillOpen = pageBlock.querySelector('.ui_actions_menu_wrap.shown');
       if (!stillOpen) {
         pageBlock.style.zIndex = '';
+        if (data(pageBlock, 'elevatedStaticPos')) {
+          pageBlock.style.position = '';
+          data(pageBlock, 'elevatedStaticPos', false);
+        }
       }
     }
   }
