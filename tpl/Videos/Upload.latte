@@ -6,10 +6,11 @@
 {/block}
 
 {block content}
+{var $uploadOwner = $owner ?? $thisUser}
 <div class="page_block">
     {include "../components/page_crumb_header.latte", crumbs: [
-        ['href' => $thisUser->getURL(), 'title' => $thisUser->getCanonicalName()],
-        ['href' => "/videos{$thisUser->getId()}", 'title' => tr("videos")],
+        ['href' => $uploadOwner->getURL(), 'title' => $uploadOwner->getCanonicalName()],
+        ['href' => "/videos{$uploadOwner->getRealId()}", 'title' => tr("videos")],
         ['title' => tr("upload_video")]
     ]}
     <div id="_video_upload_form" class="form_group page_padding">

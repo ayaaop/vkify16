@@ -1086,6 +1086,9 @@ a.page_module_upload:hover .page_upload_label,
 .page_upload_label.page_docs_upload {
   background-position: 1px -92px;
 }
+.page_upload_label.page_videos_upload {
+  background-position: 0px -73px;
+}
 .page_upload_label.page_audios_upload {
   background-position: 0px -35px;
 }
@@ -1100,6 +1103,9 @@ a.page_module_upload:hover .page_upload_label,
 }
 .wide_column .page_upload_label.page_photos_upload {
   background-position: 0px -32px;
+}
+.wide_column .page_upload_label.page_videos_upload {
+  background-position: 0px -144px;
 }
 
 #group_info_tabs.ui_tabs {

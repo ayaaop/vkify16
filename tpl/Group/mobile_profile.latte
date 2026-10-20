@@ -1,4 +1,4 @@
-{define mobileProfile, $hasMoreInfo, $albums, $audios, $topics, $followersCount, $potentialCount, $pinnedPost, $descHtml, $descPlain, $docs}
+{define mobileProfile, $hasMoreInfo, $albums, $audios, $videos, $topics, $followersCount, $potentialCount, $pinnedPost, $descHtml, $descPlain, $docs}
     {php if (!function_exists('vkifyDocGlyph')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
     {include '../components/mobile_profile_hero.latte', entity => $club, name => $club->getName(), status => $club->isEvent() ? tr('event_type_open') : tr('group_type_open'), verified => $club->isVerified()}
 
@@ -94,9 +94,10 @@
         </div>
 
         {var $canSeeAlbums = $albumsCount > 0}
+        {var $canSeeVideos = ($videosCount ?? 0) > 0}
         {var $canSeeAudios = $audiosCount > 0}
         {var $canSeeDocs   = $docsCount   > 0}
-        {var $stripHasContent = $canSeeAlbums || $canSeeAudios || $canSeeDocs}
+        {var $stripHasContent = $canSeeAlbums || $canSeeVideos || $canSeeAudios || $canSeeDocs}
 
         {if $canEdit || $club->isEveryoneCanUploadAudios() || $stripHasContent}
         <div class="page_block mobile-scroll-modules">
@@ -120,6 +121,30 @@
                     <a href="/albums{$club->getId() * -1}" class="module_body msm-placeholder">
                         <svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#camera-28"></use></svg>
                         <span class="msm-placeholder-label">{_upload_photo}</span>
+                    </a>
+                </div>
+            {/if}
+            {if $canSeeVideos}
+                {var $firstVideo = $videos[0] ?? null}
+                <div class="module clear video_module mobile-scroll-card">
+                    {include '../components/module_header.latte', href => '/videos' . $club->getRealId(), label => tr('videos'), count => $videosCount}
+                    <div class="module_body">
+                        <a href="{if $firstVideo}/video{$firstVideo->getPrettyId()}{else}/videos{$club->getRealId()}{/if}" id="videoOpen" data-id="{if $firstVideo}{$firstVideo->getPrettyId()}{/if}" class="video">
+                            {if $firstVideo}
+                                <div class="page_video_thumb" style="background-image: url('{$firstVideo->getThumbnailURL()}');"></div>
+                                <div class="page_video_play_icon"></div>
+                            {else}
+                                <div class="msm-placeholder"><svg width="40" height="40" fill="currentColor" viewBox="0 0 24 24"><use href="#video-24"></use></svg></div>
+                            {/if}
+                        </a>
+                    </div>
+                </div>
+            {elseif $canEdit}
+                <div class="module clear video_module mobile-scroll-card">
+                    {include '../components/module_header.latte', href => '/videos' . $club->getRealId(), label => tr('videos')}
+                    <a href="/videos/upload?gid={$club->getId()}" onclick="showFastVideoUpload(null, event, {$club->getId()}); return false;" class="module_body msm-placeholder">
+                        <svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#video-28"></use></svg>
+                        <span class="msm-placeholder-label">{_upload_video}</span>
                     </a>
                 </div>
             {/if}

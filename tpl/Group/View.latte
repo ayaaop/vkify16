@@ -23,6 +23,7 @@
 {block content}
     {var $audios = iterator_to_array($audios)}
     {var $albums = iterator_to_array($albums)}
+    {var $videos = iterator_to_array($videos ?? [])}
     {var $topics = iterator_to_array($topics)}
     {var $docs   = iterator_to_array((new \openvk\Web\Models\Repositories\Documents())->getDocumentsByOwner($club->getRealId())->offsetLimit(0, 6))}
     {var $followersCount = $club->getFollowersCount()}
@@ -33,7 +34,7 @@
     {var $pinnedPost = (new \openvk\Web\Models\Repositories\Posts())->getPinnedPost($club->getId() * -1)}
     {var $hasMoreInfo = $canEdit || $descPlain !== '' || $club->getWebsite() || in_array($club->getAdministratorsListDisplay(), [0, 1])}
 
-    {include #mobileProfile, $hasMoreInfo, $albums, $audios, $topics, $followersCount, $potentialCount, $pinnedPost, $descHtml, $descPlain, $docs}
+    {include #mobileProfile, $hasMoreInfo, $albums, $audios, $videos, $topics, $followersCount, $potentialCount, $pinnedPost, $descHtml, $descPlain, $docs}
 
     {if $hasMoreInfo}
     <script>
@@ -230,6 +231,39 @@
 						{elseif $canEdit}
 							<a href="/albums{$club->getId() * -1}" class="page_module_upload">
 								<div class="page_upload_label page_photos_upload"></div>{_upload_photo}</a>
+						{/if}
+					</div>
+
+					<div n:if="($videosCount ?? 0) > 0 || $canEdit" class="module video_module">
+						{if ($videosCount ?? 0) > 0}
+							{include '../components/module_header.latte', href => '/videos' . $club->getRealId(), label => tr('videos'), count => $videosCount}
+							<div class="module_body clear_fix">
+								<div class="video_row" n:foreach="$videos as $video">
+									<a id="videoOpen" data-id="{$video->getPrettyId()}" class="video fl_l" href="/video{$video->getPrettyId()}">
+										<div class="video_thumb_label">
+											{if $video->getType() != 0}
+												<span class="video_thumb_label_item">
+													{$video->getType() == \openvk\Web\Models\Entities\Video::TYPE_EMBED ? 'YouTube' : ''}
+												</span>
+												{if $video->getFormattedLength() != '00:00'}
+													<div class="divider"></div>
+													{$video->getFormattedLength()}
+												{/if}
+											{else}
+												{$video->getFormattedLength()}
+											{/if}
+										</div>
+										<div class="page_video_play_icon"></div>
+										<span class="page_video_thumb" style="background-image: url('{$video->getThumbnailURL()}');"></span>
+									</a>
+									<div class="info clear">
+										<a href="/video{$video->getPrettyId()}">{ovk_proc_strtr($video->getName(), 30)}</a>
+									</div>
+								</div>
+							</div>
+						{elseif $canEdit}
+							<a href="/videos/upload?gid={$club->getId()}" onclick="showFastVideoUpload(null, event, {$club->getId()}); return false;" class="page_module_upload">
+								<div class="page_upload_label page_videos_upload"></div>{_upload_video}</a>
 						{/if}
 					</div>
 
