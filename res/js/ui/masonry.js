@@ -38,16 +38,21 @@ vkify.once('masonry', () => {
 
             const cols = getColumnCount(container, options);
             const gap = options.gap;
-            const containerWidth = container.clientWidth;
-            const colWidth = (containerWidth - gap * (cols - 1)) / cols;
+            const cs = getComputedStyle(container);
+            const padLeft = parseFloat(cs.paddingLeft) || 0;
+            const padRight = parseFloat(cs.paddingRight) || 0;
+            const padTop = parseFloat(cs.paddingTop) || 0;
+            const padBottom = parseFloat(cs.paddingBottom) || 0;
+            const contentWidth = container.clientWidth - padLeft - padRight;
+            const colWidth = (contentWidth - gap * (cols - 1)) / cols;
             const colHeights = Array(cols).fill(0);
 
             container.classList.add('masonry-active');
 
             items.forEach((item) => {
                 const shortestCol = colHeights.indexOf(Math.min(...colHeights));
-                const x = shortestCol * (colWidth + gap);
-                const y = colHeights[shortestCol];
+                const x = padLeft + shortestCol * (colWidth + gap);
+                const y = padTop + colHeights[shortestCol];
 
                 item.style.width = colWidth + 'px';
                 item.style.left = x + 'px';
@@ -57,7 +62,7 @@ vkify.once('masonry', () => {
                 colHeights[shortestCol] += itemHeight + gap;
             });
 
-            container.style.height = Math.max(...colHeights) - gap + 'px';
+            container.style.height = padTop + padBottom + Math.max(...colHeights) - gap + 'px';
             vkify.paginator?.scheduleCheck?.();
         }
 
@@ -79,6 +84,12 @@ vkify.once('masonry', () => {
             requestAnimationFrame(doLayout);
             attachImageListeners(container, doLayout);
 
+            let ro = null;
+            if (typeof ResizeObserver !== 'undefined') {
+                ro = new ResizeObserver(() => requestAnimationFrame(doLayout));
+                ro.observe(container);
+            }
+
             let resizeTimeout;
             const onResize = () => {
                 clearTimeout(resizeTimeout);
@@ -94,7 +105,7 @@ vkify.once('masonry', () => {
                 destroy: () => destroy(container)
             };
 
-            instances.set(container, { instance, onResize, resizeTimeout });
+            instances.set(container, { instance, onResize, resizeTimeout, ro });
             return instance;
         }
 
@@ -115,6 +126,7 @@ vkify.once('masonry', () => {
             if (!data) return;
 
             window.removeEventListener('resize', data.onResize);
+            data.ro?.disconnect();
             clearTimeout(data.resizeTimeout);
 
             const items = container.querySelectorAll(data.instance.options.itemSelector);
@@ -158,7 +170,7 @@ vkify.once('masonry', () => {
 
 function initAlbumMasonry() {
     if (document.querySelector('.album-flex')) {
-        Masonry.initAll('.album-flex', { itemSelector: '.masonry-item', columns: 3, gap: 10, breakpoints: { 600: 2, 450: 1 } });
+        Masonry.initAll('.album-flex', { itemSelector: '.masonry-item', columns: 3, gap: 10, breakpoints: { 500: 2, 360: 1 } });
         requestAnimationFrame(() => vkify.paginator?.scheduleCheck?.());
     }
 }

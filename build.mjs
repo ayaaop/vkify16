@@ -29,6 +29,7 @@ const modules = [
     'ui/sidebar-affix.js',
     'ui/custom-select.js',
     'ui/tab-slider.js',
+    'ui/masonry.js',
     'ui/tooltips-simple.js',
     'ui/form-modal.js',
     'ui/notifications-popup.js',

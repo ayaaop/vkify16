@@ -36,7 +36,7 @@
                         - onclick: (optional) onclick handler
                       Note: If not provided, will be auto-generated based on $wallOwner.
 *}
-<div class="nomobile page_block ui_rmenu ui_rmenu_pr {$additionalCssClass ?? ''}" id="{$id ?? 'wall_rmenu'}" role="list">
+<div class="nomobile page_block ui_rmenu ui_rmenu_pr {($autoExpand ?? true) ? '_ui_rmenu_auto_expand' : ''} {$additionalCssClass ?? ''}" id="{$id ?? 'wall_rmenu'}" role="list">
     {var $ownblockEntity = (isset($ownblockData) && is_object($ownblockData)) ? $ownblockData : ($wallOwner ?? null)}
     {if $ownblockEntity && is_object($ownblockEntity)}
         {var $ownblockData = [
@@ -106,11 +106,11 @@
                         {/if}
                     </a>
                     {if isset($item['subitems']) && is_array($item['subitems'])}
-                        {var $anySubitemActive = ($item['active'] ?? false) || array_filter($item['subitems'], fn($s) => $s['active'] ?? false)}
-                        {if $anySubitemActive}
+                        {var $anySubitemActive = ($item['showSubitems'] ?? false) || ($item['active'] ?? false) || array_filter($item['subitems'], fn($s) => $s['active'] ?? false)}
+                        <div class="_ui_rmenu_sublist ui_rmenu_sublist" n:attr="style => !$anySubitemActive ? 'display: none;' : null">
                             {foreach $item['subitems'] as $subitem}
                                 {if !isset($subitem['condition']) || $subitem['condition']}
-                                    <a class="ui_rmenu_subitem {($subitem['active'] ?? false) ? 'ui_rmenu_item_sel' : ''}" href="{$subitem['url']}" n:attr="id => $subitem['id'] ?? null">
+                                    <a class="ui_rmenu_subitem _ui_rmenu_subitem {($subitem['active'] ?? false) ? 'ui_rmenu_item_sel' : ''} {$subitem['class'] ?? ''}" href="{$subitem['url']}" n:attr="id => $subitem['id'] ?? null, onclick => $subitem['onclick'] ?? null">
                                         {if isset($subitem['extraItem']) && (!isset($subitem['extraItem']['condition']) || $subitem['extraItem']['condition'])}
                                             <span class="ui_rmenu_extra_item {$subitem['extraItem']['class']}"
                                                   data-href="{$subitem['extraItem']['url']}"
@@ -122,12 +122,13 @@
                                     </a>
                                 {/if}
                             {/foreach}
-                        {/if}
+                        </div>
                     {/if}
                 </div>
             {/if}
         {/if}
     {/foreach}
+    <div class="ui_rmenu_slider _ui_rmenu_slider"></div>
 </div>
 <div class="mobileonly mobile-rmenu-wrap-but-actually">
     {if isset($ownblockData)}
@@ -175,25 +176,22 @@
                             </a>
                         </li>
                         {if isset($item['subitems']) && is_array($item['subitems'])}
-                            {var $anySubitemActive = ($item['active'] ?? false) || array_filter($item['subitems'], fn($s) => $s['active'] ?? false)}
-                            {if $anySubitemActive}
-                                {foreach $item['subitems'] as $subitem}
-                                    {if !isset($subitem['condition']) || $subitem['condition']}
-                                        <li class="ui_tab_subitem_wrap">
-                                            <a class="ui_tab ui_tab_subitem {($subitem['active'] ?? false) ? 'ui_tab_sel' : ''} {$subitem['class'] ?? ''}" href="{$subitem['url']}" n:attr="id => $subitem['id'] ?? null, onclick => $subitem['onclick'] ?? null">
-                                                {if isset($subitem['translate']) && $subitem['translate'] === false}{$subitem['title']}{else}{_$subitem['title']}{/if}
-                                                {if isset($subitem['extraItem']) && (!isset($subitem['extraItem']['condition']) || $subitem['extraItem']['condition'])}
-                                                    <span class="ui_tab_extra_item {$subitem['extraItem']['class'] ?? ''}"
-                                                          data-href="{$subitem['extraItem']['url'] ?? ''}"
-                                                          n:attr="onclick => isset($subitem['extraItem']['onclick']) ? $subitem['extraItem']['onclick'] : (isset($subitem['extraItem']['url']) ? 'event.stopPropagation(); window.location.href=this.dataset.href;' : null)">
-                                                        {$subitem['extraItem']['content']|noescape}
-                                                    </span>
-                                                {/if}
-                                            </a>
-                                        </li>
-                                    {/if}
-                                {/foreach}
-                            {/if}
+                            {foreach $item['subitems'] as $subitem}
+                                {if !isset($subitem['condition']) || $subitem['condition']}
+                                    <li class="ui_tab_subitem_wrap">
+                                        <a class="ui_tab ui_tab_subitem {($subitem['active'] ?? false) ? 'ui_tab_sel' : ''} {$subitem['class'] ?? ''}" href="{$subitem['url']}" n:attr="id => $subitem['id'] ?? null, onclick => $subitem['onclick'] ?? null">
+                                            {if isset($subitem['translate']) && $subitem['translate'] === false}{$subitem['title']}{else}{_$subitem['title']}{/if}
+                                            {if isset($subitem['extraItem']) && (!isset($subitem['extraItem']['condition']) || $subitem['extraItem']['condition'])}
+                                                <span class="ui_tab_extra_item {$subitem['extraItem']['class'] ?? ''}"
+                                                      data-href="{$subitem['extraItem']['url'] ?? ''}"
+                                                      n:attr="onclick => isset($subitem['extraItem']['onclick']) ? $subitem['extraItem']['onclick'] : (isset($subitem['extraItem']['url']) ? 'event.stopPropagation(); window.location.href=this.dataset.href;' : null)">
+                                                    {$subitem['extraItem']['content']|noescape}
+                                                </span>
+                                            {/if}
+                                        </a>
+                                    </li>
+                                {/if}
+                            {/foreach}
                         {/if}
                     {/if}
                 {/if}

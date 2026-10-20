@@ -1,5 +1,5 @@
 {block content}
-    <div class="video_item scroll_node{if $search ?? false} search_content{/if}" data-uniqueid="video-{$video->getVirtualId()}">
+    <div class="video_item scroll_node{if $search ?? false} search_content{/if}" data-uniqueid="video-{$video->getPrettyId()}">
         <a href="/video{$video->getPrettyId()}" id="videoOpen" data-id="{$video->getPrettyId()}">
             <div class="video_item_thumb_wrap">
                 <div class="video_item_thumb" style="background-image: url('{$video->getThumbnailURL()}')"></div>

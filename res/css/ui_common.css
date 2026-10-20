@@ -926,8 +926,8 @@ h2.page_block_h2.tabs_header {
     cursor: pointer;
 }
 .ui_rmenu_subitem {
-    padding-left: 28px;
-    color: var(--muted-text-color);
+    padding: 0 5px 0 28px;
+    color: var(--muted-text-color-2);
 }
 .ui_rmenu_item:hover,
 .ui_rmenu_subitem:hover,
@@ -938,7 +938,7 @@ h2.page_block_h2.tabs_header {
 }
 .ui_rmenu_item_sel,
 .ui_rmenu_item_sel:hover {
-    color: var(--text-link);
+    color: var(--text-color);
     font-weight: 500;
     -webkit-font-smoothing: subpixel-antialiased;
     -moz-osx-font-smoothing: auto;
@@ -948,7 +948,36 @@ h2.page_block_h2.tabs_header {
 .ui_rmenu_subitem.ui_rmenu_item_sel,
 .ui_rmenu_subitem.ui_rmenu_item_sel:hover {
     color: var(--text-color);
+    padding-left: 26px;
+}
+.ui_rmenu_sublist {
+    overflow: hidden;
+}
+.ui_rmenu_slider {
+    position: absolute;
+}
+.ui_rmenu_sliding .ui_rmenu_slider {
+    top: 0;
+    position: absolute;
+    left: 0;
+    border: none;
+    height: 32px;
+    width: 2px;
+    background-color: var(--accent-color-2);
+    transition:
+        margin-top 0.2s ease,
+        transform 0.2s ease;
+    z-index: 1;
+}
+.ui_rmenu_sliding .ui_rmenu_item_sel,
+.ui_rmenu_sliding .ui_rmenu_item_sel:hover {
+    padding-left: 20px;
+    border-left: none;
+}
+.ui_rmenu_sliding .ui_rmenu_subitem.ui_rmenu_item_sel,
+.ui_rmenu_sliding .ui_rmenu_subitem.ui_rmenu_item_sel:hover {
     padding-left: 28px;
+    border-left: none;
 }
 
 .ui_rmenu_item_text {

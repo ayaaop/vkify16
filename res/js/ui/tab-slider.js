@@ -224,4 +224,184 @@ vkify.restoreTabScrolls = function (container, scrolls) {
     });
 };
 
+function isSublistVisible(sublist) {
+    return !!(sublist && sublist.style.display !== 'none' && getComputedStyle(sublist).display !== 'none');
+}
+
+function getRelativeTop(el, menu) {
+    if (!el || !menu) return 0;
+    return el.getBoundingClientRect().top - menu.getBoundingClientRect().top;
+}
+
+const uiRightMenu = {
+    initMenu(menu) {
+        if (!menu || menu.classList.contains('ui_rmenu_sliding')) return;
+        const scroller = menu.querySelector('._ui_rmenu_slider, .ui_rmenu_slider');
+        const firstItem = menu.querySelector('.ui_rmenu_item');
+        const selectedItem = menu.querySelector('.ui_rmenu_item_sel');
+        const curItem = selectedItem || firstItem;
+        if (!scroller || !curItem) return;
+
+        const height = curItem.offsetHeight || 32;
+        const top = selectedItem ? Math.round(getRelativeTop(curItem, menu)) : 0;
+        scroller.style.height = `${height}px`;
+        scroller.style.top = `${top}px`;
+        scroller.style.transform = '';
+        menu.classList.add('ui_rmenu_sliding');
+    },
+
+    switchMenu(el, force = false) {
+        const menu = el?.closest?.('.ui_rmenu');
+        if (!menu) return false;
+        const curItem = menu.querySelector('.ui_rmenu_item_sel');
+        if (el === curItem && !force) return false;
+
+        uiRightMenu.initMenu(menu);
+
+        const height = el.offsetHeight || 32;
+        let top = Math.round(getRelativeTop(el, menu));
+        const hidden = [];
+        const shown = [];
+
+        if (menu.classList.contains('_ui_rmenu_auto_expand')) {
+            const sublists = Array.from(menu.querySelectorAll('._ui_rmenu_sublist'));
+            const nextSibling = el.nextElementSibling;
+            const newSublist = el.classList.contains('_ui_rmenu_subitem')
+                ? el.closest('._ui_rmenu_sublist')
+                : (nextSibling?.classList.contains('_ui_rmenu_sublist') ? nextSibling : null);
+
+            sublists.forEach(sub => {
+                if (isSublistVisible(sub) && sub !== newSublist) {
+                    hidden.push(sub);
+                    sub.style.display = 'none';
+                }
+            });
+            if (newSublist && !isSublistVisible(newSublist)) {
+                shown.push(newSublist);
+                newSublist.style.display = 'block';
+            }
+            top = Math.round(getRelativeTop(el, menu));
+            hidden.forEach(sub => { sub.style.display = 'block'; });
+            shown.forEach(sub => { sub.style.display = 'none'; });
+        }
+
+        const scroller = menu.querySelector('._ui_rmenu_slider, .ui_rmenu_slider');
+        if (scroller) {
+            const mtop = parseInt(scroller.style.top, 10) || 0;
+            scroller.style.height = `${height}px`;
+            scroller.style.transform = `translateY(${top - mtop}px)`;
+        }
+
+        if (curItem) curItem.classList.remove('ui_rmenu_item_sel');
+        el.classList.add('ui_rmenu_item_sel');
+
+        if (menu.classList.contains('_ui_rmenu_auto_expand')) {
+            hidden.forEach(sub => {
+                if (window.jQuery) window.jQuery(sub).stop(true, true).slideUp(100);
+                else sub.style.display = 'none';
+            });
+            shown.forEach(sub => {
+                if (window.jQuery) window.jQuery(sub).stop(true, true).slideDown(100);
+                else sub.style.display = 'block';
+            });
+        } else if (el.classList.contains('_ui_rmenu_subitem')) {
+            const parentSub = el.closest('._ui_rmenu_sublist');
+            if (parentSub && !isSublistVisible(parentSub)) {
+                if (window.jQuery) window.jQuery(parentSub).stop(true, true).slideDown(100);
+                else parentSub.style.display = 'block';
+            }
+        }
+        return true;
+    },
+
+    fixScroller(el) {
+        const menu = el?.closest?.('.ui_rmenu');
+        if (!menu || !el) return;
+        const scroller = menu.querySelector('._ui_rmenu_slider, .ui_rmenu_slider');
+        if (!scroller) return;
+        const wasSliding = menu.classList.contains('ui_rmenu_sliding');
+        if (wasSliding) menu.classList.remove('ui_rmenu_sliding');
+        const height = el.offsetHeight || 32;
+        const top = Math.round(getRelativeTop(el, menu));
+        const mtop = parseInt(scroller.style.top, 10) || 0;
+        scroller.style.height = `${height}px`;
+        scroller.style.transform = `translateY(${top - mtop}px)`;
+        void el.offsetLeft;
+        if (wasSliding) menu.classList.add('ui_rmenu_sliding');
+    }
+};
+
+window.uiRightMenu = uiRightMenu;
+vkify.uiRightMenu = uiRightMenu;
+
+let pendingRmenuTransition = null;
+
+document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || (typeof e.button === 'number' && e.button !== 0) || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    if (e.target.closest('.ui_rmenu_extra_item')) return;
+    const item = e.target.closest('.ui_rmenu .ui_rmenu_item:not(.ui_ownblock), .ui_rmenu .ui_rmenu_subitem');
+    if (!item) return;
+    const href = item.getAttribute('href');
+    if (!href || href === '#' || href.startsWith('#') || href.startsWith('javascript:')) return;
+    const menu = item.closest('.ui_rmenu');
+    if (!menu) return;
+
+    uiRightMenu.initMenu(menu);
+    const scroller = menu.querySelector('._ui_rmenu_slider, .ui_rmenu_slider');
+    const scrollerRect = scroller?.getBoundingClientRect();
+    const menuRect = menu.getBoundingClientRect();
+    const startTop = scrollerRect ? Math.round(scrollerRect.top - menuRect.top) : (parseInt(scroller?.style.top, 10) || 0);
+    const startHeight = scrollerRect ? Math.round(scrollerRect.height) : (parseInt(scroller?.style.height, 10) || 32);
+
+    pendingRmenuTransition = {
+        menuId: menu.id || 'wall_rmenu',
+        menuEl: menu,
+        startTop,
+        startHeight,
+        targetHref: href,
+        startedAt: performance.now()
+    };
+    uiRightMenu.switchMenu(item);
+}, true);
+
+vkify.onPageLifecycle('afterPageSwap', () => {
+    if (!pendingRmenuTransition) return;
+    const { menuId, startTop, startHeight, targetHref, startedAt } = pendingRmenuTransition;
+    pendingRmenuTransition = null;
+    if (performance.now() - startedAt > 1500) return;
+
+    const newMenu = document.getElementById(menuId) || document.querySelector('.nomobile.ui_rmenu');
+    if (!newMenu || !newMenu.parentNode) return;
+
+    const scroller = newMenu.querySelector('._ui_rmenu_slider, .ui_rmenu_slider');
+    const targetItem = Array.from(newMenu.querySelectorAll('.ui_rmenu_item, .ui_rmenu_subitem'))
+        .find(a => a.getAttribute('href') === targetHref) || newMenu.querySelector('.ui_rmenu_item_sel');
+    if (!scroller || !targetItem) return;
+
+    const duration = 200;
+    const elapsed = performance.now() - startedAt;
+    if (elapsed >= duration) {
+        uiRightMenu.initMenu(newMenu);
+        return;
+    }
+
+    const endHeight = targetItem.offsetHeight || 32;
+    const endTop = Math.round(getRelativeTop(targetItem, newMenu));
+    const t = Math.min(1, Math.max(0, elapsed / duration));
+    const eased = 1 - Math.pow(1 - t, 2.2);
+    const currentTop = Math.round(startTop + (endTop - startTop) * eased);
+    const remainingMs = Math.max(40, Math.round(duration - elapsed));
+
+    scroller.style.transition = 'none';
+    scroller.style.height = `${startHeight}px`;
+    scroller.style.top = `${currentTop}px`;
+    scroller.style.transform = '';
+    newMenu.classList.add('ui_rmenu_sliding');
+    void scroller.offsetHeight;
+    scroller.style.transition = `margin-top ${remainingMs}ms ease-out, transform ${remainingMs}ms ease-out`;
+
+    scroller.style.height = `${endHeight}px`;
+    scroller.style.transform = `translateY(${endTop - currentTop}px)`;
+});
+
 })();

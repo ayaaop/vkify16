@@ -201,7 +201,11 @@ const getLastLoadedPage = (paginatorEl, containerEl) => {
 };
 
 const refreshAlbumMasonry = (containerEl) => {
-    if (!containerEl || !containerEl.classList.contains('album_photos')) return;
+    if (!containerEl || !containerEl.classList.contains('album-flex')) return;
+    if (window.Masonry?.get?.(containerEl)) {
+        window.Masonry.refresh(containerEl);
+        return;
+    }
     if (typeof window.applyVkifyAlbumMosaic === 'function') {
         window.applyVkifyAlbumMosaic();
         return;
