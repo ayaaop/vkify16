@@ -823,12 +823,12 @@ vkify.once('photoEditor', function () {
         getSharpness() { return this.unsharpAmount || 0; }
         getSepia() { return this.sepiaAmount || 0; }
 
-        setExposure(v) { this.exposure = v; this.render(); }
-        setContrast(v) { this.contrast = v; this.render(); }
-        setSaturation(v) { this.saturation = Math.min(0.85, v); this.render(); }
-        setVignette(v) { this.vignetteAmount = v; this.render(); }
-        setSharpness(v) { this.unsharpAmount = v; this.render(); }
-        setSepia(v) { this.sepiaAmount = v; this.render(); }
+        setExposure(v) { this._mode = 'params'; this.exposure = v; this.render(); }
+        setContrast(v) { this._mode = 'params'; this.contrast = v; this.render(); }
+        setSaturation(v) { this._mode = 'params'; this.saturation = Math.min(0.85, v); this.render(); }
+        setVignette(v) { this._mode = 'params'; this.vignetteAmount = v; this.render(); }
+        setSharpness(v) { this._mode = 'params'; this.unsharpAmount = v; this.render(); }
+        setSepia(v) { this._mode = 'params'; this.sepiaAmount = v; this.render(); }
 
         restoreAll() {
             this._mode = 'filter';
@@ -1278,7 +1278,7 @@ vkify.once('photoEditor', function () {
                 head.appendChild(applyBtn);
             }
         } else {
-            rootNode.style.width = '700px';
+            rootNode.style.width = '706px';
             rootNode.classList.add('vkify-pe-dialog', 'ovk-msg-sheet');
         }
         const diagBody = rootNode.querySelector('.ovk-diag-body');
@@ -1391,6 +1391,11 @@ vkify.once('photoEditor', function () {
                 const oldSlider = t.querySelector('.pe_filter_amount_slider');
                 if (oldSlider && t.dataset.filter !== snap.currentFilter) oldSlider.remove();
             });
+            const isParamsMode = snap.mode === 'params';
+            tabFiltersBtn?.classList.toggle('selected', !isParamsMode);
+            tabParamsBtn?.classList.toggle('selected', isParamsMode);
+            if (tabFiltersContent) tabFiltersContent.style.display = isParamsMode ? 'none' : 'block';
+            if (tabParamsContent) tabParamsContent.style.display = isParamsMode ? 'block' : 'none';
             renderFilterThumbnails();
             updateStateIndicators();
         }
@@ -1665,6 +1670,7 @@ vkify.once('photoEditor', function () {
         // Undo / Reset all
         undoLink?.addEventListener('click', (e) => {
             e.preventDefault();
+            const wasParamsTab = tabParamsBtn?.classList.contains('selected');
             pushPeUndo();
             hideCropOverlay();
             closePopover();
@@ -1674,6 +1680,9 @@ vkify.once('photoEditor', function () {
                 inst.setValue(def, false);
             });
             rootNode.querySelector('#pe_filter_original')?.click();
+            if (wasParamsTab) {
+                peEngine.applyParameters();
+            }
             renderFilterThumbnails();
             updateStateIndicators();
         });
@@ -2059,14 +2068,25 @@ vkify.once('photoEditor', function () {
         packs.forEach((p) => {
             const pId = String(p.id);
             stickerPacksData[pId] = (p.stickers || []).map((stk) => {
-                const sId = `${pId}_${stk.id || stk.sticker_id}`;
-                const u128 = stk.photo_128 || `/sticker/${pId}/${stk.id || stk.sticker_id}_128.webp`;
+                const rawId = stk.id || stk.sticker_id;
+                const sId = `${pId}_${rawId}`;
+                const u128 = stk.photo_128 || `/sticker/${pId}/${rawId}_128.webp`;
                 const u256 = stk.photo_256 || u128;
-                const u512 = stk.photo_512 || `/sticker/${pId}/${stk.id || stk.sticker_id}_512.webp`;
+                const u512 = stk.photo_512 || `/sticker/${pId}/${rawId}_512.webp`;
+                let animUrl = stk.animation_url
+                    || (stk.animations && stk.animations[0]?.url)
+                    || (u128.endsWith('.json') ? u128 : '')
+                    || ((stk.is_animated || p.is_animated) ? `/sticker/${pId}/${rawId}_512.json` : '');
+                const isLottie = Boolean(animUrl || stk.is_animated || p.is_animated || u128.endsWith('.json'));
+                if (isLottie && !animUrl && pId && rawId) {
+                    animUrl = `/sticker/${pId}/${rawId}_512.json`;
+                }
                 const item = {
                     id: sId,
-                    rawId: stk.id || stk.sticker_id,
+                    rawId,
                     packId: pId,
+                    isLottie,
+                    animationUrl: animUrl,
                     sizes: { 128: u128, 256: u256, 512: u512 },
                 };
                 stickersMap[sId] = item;
@@ -2076,10 +2096,20 @@ vkify.once('photoEditor', function () {
 
         const packTabsHtml = packs.map((p, idx) => {
             const firstStk = (p.stickers && p.stickers[0]) || null;
-            const iconUrl = p.icon || (firstStk ? (firstStk.photo_128 || `/sticker/${p.id}/${firstStk.id}_128.webp`) : '');
+            const firstRawId = firstStk ? (firstStk.id || firstStk.sticker_id) : p.id;
+            const animUrl = p.animation_url
+                || (firstStk && (firstStk.animation_url || (firstStk.animations && firstStk.animations[0]?.url) || (firstStk.is_animated ? `/sticker/${p.id}/${firstRawId}_512.json` : '')))
+                || (p.is_animated ? `/sticker/${p.id}/${firstRawId}_512.json` : '');
+            const isLottie = Boolean(animUrl || p.is_animated || (firstStk && firstStk.is_animated) || (p.photo_128 && p.photo_128.endsWith('.json')) || (firstStk && firstStk.photo_128 && firstStk.photo_128.endsWith('.json')));
+            const finalAnimUrl = animUrl
+                || (p.photo_128 && p.photo_128.endsWith('.json') ? p.photo_128 : '')
+                || (firstStk && firstStk.photo_128 && firstStk.photo_128.endsWith('.json') ? firstStk.photo_128 : '');
+            const iconUrl = p.icon || p.photo_128 || (firstStk ? (firstStk.photo_128 || `/sticker/${p.id}/${firstRawId}_128.webp`) : '');
             return `
                 <div class="pe_sticker_pack_tab ${idx === 0 ? 'pe_selected' : ''}" id="pe_stickers_pack_tab_${p.id}" data-pack-id="${p.id}" title="${p.title || p.name || ''}">
-                    ${iconUrl ? `<img src="${iconUrl}" alt="" />` : ''}
+                    ${isLottie && finalAnimUrl
+                        ? `<div class="sticker-lottie-thumb pe_lottie_thumb" data-anim-url="${finalAnimUrl}"></div>`
+                        : (iconUrl ? `<img src="${iconUrl}" alt="" />` : '')}
                 </div>
             `;
         }).join('');
@@ -2304,9 +2334,41 @@ vkify.once('photoEditor', function () {
             el.classList.toggle('pe_text_roboto_style', !isImpact && !isLobster);
         }
 
+        function mountStickerLayerContent(layer, { stickerUrl = '', animationUrl = '' }) {
+            layer.dataset.stickerUrl = stickerUrl || '';
+            if (animationUrl) {
+                layer.dataset.animationUrl = animationUrl;
+            } else {
+                delete layer.dataset.animationUrl;
+            }
+            if (animationUrl && window.lottie) {
+                layer.style.backgroundImage = '';
+                const lottieHost = document.createElement('div');
+                lottieHost.className = 'pe_layer_lottie_host';
+                layer.appendChild(lottieHost);
+                try {
+                    const anim = window.lottie.loadAnimation({
+                        container: lottieHost,
+                        renderer: 'svg',
+                        loop: true,
+                        autoplay: true,
+                        path: animationUrl,
+                    });
+                    layer._lottieAnim = anim;
+                    return;
+                } catch (_) {
+                    lottieHost.remove();
+                }
+            }
+            if (stickerUrl) {
+                layer.style.backgroundImage = `url('${stickerUrl}')`;
+            }
+        }
+
         function captureSpeState() {
             const stickers = Array.from(stickerLayersEl.children).map((el) => ({
                 stickerUrl: el.dataset.stickerUrl || '',
+                animationUrl: el.dataset.animationUrl || '',
                 left: el.offsetLeft,
                 top: el.offsetTop,
                 width: el.offsetWidth,
@@ -2369,6 +2431,9 @@ vkify.once('photoEditor', function () {
             selectionBoxEl = null;
             deleteSelectedBtn.style.display = 'none';
 
+            Array.from(stickerLayersEl.children).forEach((el) => {
+                try { el._lottieAnim?.destroy?.(); } catch (_) {}
+            });
             stickerLayersEl.innerHTML = '';
             (snap.stickers || []).forEach((s) => {
                 const layer = document.createElement('div');
@@ -2377,10 +2442,9 @@ vkify.once('photoEditor', function () {
                 layer.style.height = `${s.height}px`;
                 layer.style.left = `${s.left}px`;
                 layer.style.top = `${s.top}px`;
-                layer.style.backgroundImage = `url('${s.stickerUrl}')`;
-                layer.dataset.stickerUrl = s.stickerUrl;
                 layer.dataset.rotation = String(s.rotation || '0');
                 if (Number(s.rotation)) layer.style.transform = `rotateZ(${s.rotation}deg)`;
+                mountStickerLayerContent(layer, { stickerUrl: s.stickerUrl, animationUrl: s.animationUrl });
                 stickerLayersEl.appendChild(layer);
             });
 
@@ -2521,9 +2585,11 @@ vkify.once('photoEditor', function () {
             layer.style.height = `${size}px`;
             layer.style.left = `${Math.round(x - size / 2)}px`;
             layer.style.top = `${Math.round(y - size / 2)}px`;
-            layer.style.backgroundImage = `url('${sticker.sizes[512] || sticker.sizes[256] || sticker.sizes[128]}')`;
-            layer.dataset.stickerUrl = sticker.sizes[512] || sticker.sizes[256] || sticker.sizes[128];
             layer.dataset.rotation = '0';
+            mountStickerLayerContent(layer, {
+                stickerUrl: sticker.sizes[512] || sticker.sizes[256] || sticker.sizes[128],
+                animationUrl: sticker.isLottie ? sticker.animationUrl : '',
+            });
             stickerLayersEl.appendChild(layer);
             selectLayer(layer);
             updateSaveButtonState();
@@ -2640,6 +2706,23 @@ vkify.once('photoEditor', function () {
 
         // Render sticker pack grid
         const stickersListEl = pePanel.querySelector('.pe_sticker_pack_list');
+        function initPeLottieThumbs(root) {
+            if (!window.lottie || !root) return;
+            root.querySelectorAll('.pe_lottie_thumb[data-anim-url]').forEach((thumb) => {
+                const url = thumb.dataset.animUrl;
+                if (!url || thumb._lottieInitialized) return;
+                thumb._lottieInitialized = true;
+                try {
+                    thumb._lottieAnim = window.lottie.loadAnimation({
+                        container: thumb,
+                        renderer: 'svg',
+                        loop: false,
+                        autoplay: false,
+                        path: url,
+                    });
+                } catch (_) {}
+            });
+        }
         function renderStickerPack(packId) {
             pePanel.querySelectorAll('.pe_sticker_pack_tab').forEach((t) => {
                 t.classList.toggle('pe_selected', String(t.dataset.packId) === String(packId));
@@ -2650,12 +2733,16 @@ vkify.once('photoEditor', function () {
                 return;
             }
             stickersListEl.innerHTML = list.map((stk) => `
-                <div class="pe_sticker_preview" data-sticker-id="${stk.id}">
-                    <img src="${stk.sizes[128]}" loading="lazy" alt="" />
+                <div class="pe_sticker_preview ${stk.isLottie ? 'is-lottie-item' : ''}" data-sticker-id="${stk.id}">
+                    ${stk.isLottie && stk.animationUrl
+                        ? `<div class="sticker-lottie-thumb pe_lottie_thumb" data-anim-url="${stk.animationUrl}"></div>`
+                        : `<img src="${stk.sizes[128]}" loading="lazy" alt="" />`}
                 </div>
             `).join('');
+            initPeLottieThumbs(stickersListEl);
         }
 
+        initPeLottieThumbs(pePanel.querySelector('.pe_sticker_packs_tabs'));
         if (packs.length > 0) {
             renderStickerPack(packs[0].id);
         } else {
@@ -2664,6 +2751,24 @@ vkify.once('photoEditor', function () {
 
         pePanel.querySelectorAll('.pe_sticker_pack_tab').forEach((tab) => {
             tab.addEventListener('click', () => renderStickerPack(tab.dataset.packId));
+        });
+
+        stickersListEl.addEventListener('mouseover', (e) => {
+            const item = e.target.closest('.pe_sticker_preview.is-lottie-item');
+            if (!item) return;
+            const thumb = item.querySelector('.pe_lottie_thumb');
+            if (thumb?._lottieAnim) {
+                thumb._lottieAnim.setLoop(true);
+                thumb._lottieAnim.play();
+            }
+        });
+        stickersListEl.addEventListener('mouseout', (e) => {
+            const item = e.target.closest('.pe_sticker_preview.is-lottie-item');
+            if (!item || item.contains(e.relatedTarget)) return;
+            const thumb = item.querySelector('.pe_lottie_thumb');
+            if (thumb?._lottieAnim) {
+                thumb._lottieAnim.goToAndStop(0, true);
+            }
         });
 
         stickersListEl.addEventListener('click', (e) => {
@@ -3238,18 +3343,46 @@ vkify.once('photoEditor', function () {
                 oCtx.drawImage(maxImg, 0, 0, outW, outH);
 
                 // Draw sticker layers
+                const loadStickerDrawable = async (sLayer) => {
+                    const url = sLayer.dataset.stickerUrl;
+                    if (url && !url.endsWith('.json')) {
+                        try {
+                            return await new Promise((res, rej) => {
+                                const im = new Image();
+                                im.crossOrigin = 'Anonymous';
+                                im.onload = () => res(im);
+                                im.onerror = rej;
+                                im.src = url;
+                            });
+                        } catch (_) {}
+                    }
+                    const svgEl = sLayer.querySelector('.pe_layer_lottie_host svg');
+                    if (svgEl) {
+                        const clone = svgEl.cloneNode(true);
+                        if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                        clone.setAttribute('width', '512');
+                        clone.setAttribute('height', '512');
+                        const svgXml = new XMLSerializer().serializeToString(clone);
+                        const svgBlob = new Blob([svgXml], { type: 'image/svg+xml;charset=utf-8' });
+                        const blobUrl = URL.createObjectURL(svgBlob);
+                        try {
+                            return await new Promise((res, rej) => {
+                                const im = new Image();
+                                im.onload = () => res(im);
+                                im.onerror = rej;
+                                im.src = blobUrl;
+                            });
+                        } finally {
+                            URL.revokeObjectURL(blobUrl);
+                        }
+                    }
+                    return null;
+                };
                 const stickerNodes = Array.from(stickerLayersEl.children);
                 for (const sLayer of stickerNodes) {
-                    const url = sLayer.dataset.stickerUrl;
-                    if (!url) continue;
                     try {
-                        const sImg = await new Promise((res, rej) => {
-                            const im = new Image();
-                            im.crossOrigin = 'Anonymous';
-                            im.onload = () => res(im);
-                            im.onerror = rej;
-                            im.src = url;
-                        });
+                        const sImg = await loadStickerDrawable(sLayer);
+                        if (!sImg) continue;
                         const w = sLayer.offsetWidth * sizeCoeff;
                         const h = sLayer.offsetHeight * sizeCoeff;
                         const x = sLayer.offsetLeft * sizeCoeff;

@@ -689,10 +689,20 @@
   box-sizing: border-box;
 }
 
-.pe_editor .pe_sticker_pack_tab img {
+.pe_editor .pe_sticker_pack_tab img,
+.pe_editor .pe_sticker_pack_tab .pe_lottie_thumb {
   max-width: 28px;
   max-height: 28px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
+  pointer-events: none;
+}
+
+.pe_editor .pe_sticker_pack_tab .pe_lottie_thumb svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
 }
 
 .pe_editor .pe_sticker_pack_tab:hover {
@@ -719,11 +729,21 @@
   margin: 3px;
 }
 
-.pe_editor .pe_sticker_preview img {
+.pe_editor .pe_sticker_preview img,
+.pe_editor .pe_sticker_preview .pe_lottie_thumb {
   max-width: 82px;
   max-height: 82px;
+  width: 82px;
+  height: 82px;
   object-fit: contain;
   pointer-events: none;
+  margin: 0 auto;
+}
+
+.pe_editor .pe_sticker_preview .pe_lottie_thumb svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
 }
 
 .pe_editor .pe_sticker_preview:hover {
@@ -1023,6 +1043,18 @@
   background-repeat: no-repeat;
   background-position: center;
   cursor: move;
+}
+
+.pe_canvas .pe_canvas_layer .pe_layer_lottie_host {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.pe_canvas .pe_canvas_layer .pe_layer_lottie_host svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
 }
 
 .pe_canvas canvas.pe_drawing_canvas {
