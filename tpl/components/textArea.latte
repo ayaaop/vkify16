@@ -22,11 +22,12 @@
 {var $clubDataRealId = $canModifyClub ? $club->getRealId() : null}
 {var $showGroupPostOpts = $isPostComposer && $canModifyClub && ($owner ?? 0) < 0}
 {var $showCommentAsGroup = !$isPostComposer && $canModifyClub}
+{var $anonHide = $showGroupPostOpts}
 
 <div id="write" class="composer has_emoji_picker model_content_textarea">
     <form id="write-form-{$textAreaId}" action="{$route}" method="post" enctype="multipart/form-data" style="margin:0;">
         {if $thisUser ?? NULL}
-            <a class="post_field_user_link" href="{$thisUser->getURL()}">
+            <a class="post_field_user_link" href="{$showGroupPostOpts ? $club->getURL() : $thisUser->getURL()}">
                 {include 'avatar.latte',
                     author => $thisUser,
                     size => 'miniscule',
@@ -34,6 +35,7 @@
                     width => 28,
                     height => 28,
                     alt => $thisUser->getCanonicalName(),
+                    style => $showGroupPostOpts ? 'opacity: 0;' : null,
                     data => ['user-url' => $thisUser->getURL()]}
 
                 {if $hasClub}
@@ -44,7 +46,7 @@
                         width => 28,
                         height => 28,
                         alt => $club->getCanonicalName(),
-                        style => 'opacity: 0;',
+                        style => $showGroupPostOpts ? 'opacity: 1;' : 'opacity: 0;',
                         data => ['group-url' => $club->getURL()]}
                 {/if}
 
@@ -106,7 +108,7 @@
                                 <div class="post-attach-menu__icon"><svg width="16" height="13" viewBox="0 0 16 13"><use href="#menu-my-photos"/></svg></div>
                                 {_photo}
                             </a>
-                            <a id="__videoAttachment" class="attach_video">
+                            <a id="__videoAttachment" class="attach_video" n:attr="data-club => $clubDataId">
                                 <div class="post-attach-menu__icon"><svg width="14" height="14" viewBox="0 0 14 14"><use href="#menu-my-videos"/></svg></div>
                                 {_video}
                             </a>
@@ -145,7 +147,8 @@
                             <div class="post-attach-menu__icon"><svg width="16" height="13" viewBox="0 0 16 13"><use href="#menu-my-photos"/></svg></div>
                         </a>
                         <a id="__videoAttachment" class="attach_video"
-                           data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_video}">
+                           data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_video}"
+                           n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"><svg width="14" height="14" viewBox="0 0 14 14"><use href="#menu-my-videos"/></svg></div>
                         </a>
                         <a id="__audioAttachment" class="attach_audio"
@@ -187,7 +190,8 @@
                             <div class="post-attach-menu__icon"><svg width="16" height="13" viewBox="0 0 16 13"><use href="#menu-my-photos"/></svg></div>
                         </a>
                         <a id="__videoAttachment" class="attach_video"
-                           data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_video}">
+                           data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_video}"
+                           n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"><svg width="14" height="14" viewBox="0 0 14 14"><use href="#menu-my-videos"/></svg></div>
                         </a>
                         <a id="__audioAttachment" class="attach_audio"
@@ -226,17 +230,14 @@
                             </div>
                             <div class="post-opts ui_actions_menu" id="postOptsTooltip{$textAreaId}">
                             {if $showGroupPostOpts}
-                                <label class="checkbox" n:if="!$club || $club->getWallType() == 1">
-                                    <input type="checkbox" name="as_group" form="write-form-{$textAreaId}" onchange="window.handleWallAsGroupClick(this)" />
-                                    <span>{_post_as_group}</span>
-                                </label>
-                                <label class="checkbox" id="forceSignOpt" style="display: none;">
+                                <input type="hidden" name="as_group" value="on" form="write-form-{$textAreaId}" />
+                                <label class="checkbox" id="forceSignOpt">
                                     <input type="checkbox" name="force_sign" form="write-form-{$textAreaId}" />
                                     <span>{_add_signature}</span>
                                 </label>
                             {/if}
 
-                            <label n:if="$anonEnabled" class="checkbox" id="octoberAnonOpt">
+                            <label n:if="$anonEnabled" class="checkbox" id="octoberAnonOpt" n:attr="style => $anonHide ? 'display: none;' : null">
                                 <input type="checkbox" name="anon" form="write-form-{$textAreaId}" onchange="window.handleWallAnonClick(this)" />
                                 <span>{_as_anonymous}</span>
                             </label>

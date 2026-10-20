@@ -7,8 +7,6 @@ const LoaderUtils = window.LoaderUtils;
 
 u(document).off('input');
 
-const WALL_CHECKBOX_NAMES = ['as_group', 'force_sign', 'anon', 'nsfw'];
-
 const ATTACH_ICONS = {
     photo:    ['menu-my-photos', 16, 13],
     video:    ['menu-my-videos', 14, 14],
@@ -223,37 +221,6 @@ function resetWallComposer(form) {
     if (geo) geo.innerHTML = '';
     if (replyto) replyto.innerHTML = '';
     if (replyToInput) replyToInput.value = '';
-
-    syncWallCheckboxHiddenInputs(form);
-}
-
-function syncWallCheckboxHiddenInputs(form) {
-    if (!form) return;
-
-    WALL_CHECKBOX_NAMES.forEach(name => {
-        const control = findWallFormControl(form, name);
-        if (!control || !control.checked) return;
-
-        let hiddenInput = form.querySelector(`input[name="${name}"][type="hidden"]`);
-        if (!hiddenInput) {
-            hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = name;
-            form.appendChild(hiddenInput);
-        }
-
-        hiddenInput.value = 'on';
-    });
-}
-
-function setupWallCheckboxListeners() {
-    if (!vkify.bindOnce('wallCheckboxListeners', setupWallCheckboxListeners)) return;
-
-    ['force_sign', 'nsfw'].forEach(name => {
-        u(document).on('change', `input[name="${name}"]`, (e) => {
-            syncWallCheckboxHiddenInputs(resolveWallFormContext(e.target));
-        });
-    });
 }
 
 function switchAvatar(el, targetType) {
@@ -383,7 +350,6 @@ window.handleWallAsGroupClick = window.handleWallAsGroupClick || ((el) => {
         }
 
         switchAvatar(el, 'group');
-        syncWallCheckboxHiddenInputs(form);
     });
 
 window.handleWallAnonClick = window.handleWallAnonClick || ((el) => {
@@ -424,7 +390,6 @@ window.handleWallAnonClick = window.handleWallAnonClick || ((el) => {
         }
 
         switchAvatar(el, 'anon');
-        syncWallCheckboxHiddenInputs(form);
     });
 
 function bumpSelectedTabCountOnNewPost(form) {
@@ -593,7 +558,7 @@ function bindWallAjaxActions() {
             return;
         }
 
-        const deleteTarget = e.target.closest('#_wallDelete, #_ajaxDelete, .delete');
+        const deleteTarget = e.target.closest('#_wallDelete, .delete:not(#_ajaxDelete)');
         if (deleteTarget && typeof window.ajax_delete === 'function') {
             e.preventDefault();
             e.stopPropagation();
@@ -676,7 +641,6 @@ function bindWallBeforeUnloadGuard() {
     });
 }
 
-setupWallCheckboxListeners();
 bindCommentCancelOnce();
 bindSourceButtonOrderFix();
 bindWallAjaxActions();

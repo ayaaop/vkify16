@@ -617,7 +617,6 @@ function resetVkifyComposer(form) {
     const root = formNode.closest('#write');
     if (root) {
         root.querySelectorAll('.post-opts input[type="checkbox"]:not([name="as_group"])').forEach(el => { el.checked = false; });
-        root.querySelectorAll('input[type="hidden"][name="nsfw"], input[type="hidden"][name="force_sign"], input[type="hidden"][name="anon"], input[type="hidden"][name="as_group"]').forEach(el => el.remove());
     }
 }
 
@@ -635,10 +634,6 @@ u(document).on('submit', 'form', async (e) => {
     const target = u(form);
     if (target.closest('#write').first()) {
         e.preventDefault();
-
-        if (typeof window.syncWallCheckboxHiddenInputs === 'function') {
-            window.syncWallCheckboxHiddenInputs(form);
-        }
 
         if (typeof window.ajax_posting === 'function') {
             if (typeof window.bumpSelectedTabCountOnNewPost === 'function') {
