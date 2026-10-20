@@ -2016,31 +2016,34 @@ table,
 .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head {
     border-bottom: 1px solid var(--border-color);
 }
-body:not(.dark-mode) .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head {
+.ovk-diag-cont.vkify-olist-dialog .ovk-diag-head {
     background-color: var(--module-header-background-color);
     color: var(--text-color);
 }
-body:not(.dark-mode) .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tab,
-body:not(.dark-mode) .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tabs .ui_tab {
+body:not(.dark-mode) .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ovk-diag-head-close {
+    filter: invert(0.5);
+}
+.ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tab,
+.ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tabs .ui_tab {
     color: var(--muted-text-color-2);
     opacity: 1;
 }
-body:not(.dark-mode) .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tab:hover,
-body:not(.dark-mode) .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tabs .ui_tab:hover {
-    border-bottom: 2px solid var(--tab-hover-border-color);
+.ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tab:hover,
+.ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tabs .ui_tab:hover {
+    border-bottom: 2px solid var(--border-color-2);
 }
-body:not(.dark-mode) .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tab_sel,
-body:not(.dark-mode) .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tab_sel:hover,
-body:not(.dark-mode) .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tabs .ui_tab_sel,
-body:not(.dark-mode) .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tabs .ui_tab_sel:hover {
+.ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tab_sel,
+.ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tab_sel:hover,
+.ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tabs .ui_tab_sel,
+.ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tabs .ui_tab_sel:hover {
     color: var(--text-color);
     opacity: 1;
     border-bottom: 2px solid var(--accent-color-2);
 }
-body:not(.dark-mode) .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tabs.ui_tabs_sliding .ui_tabs_slider {
+.ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tabs.ui_tabs_sliding .ui_tabs_slider {
     background-color: var(--accent-color-2);
 }
-body:not(.dark-mode) .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ovk-diag-head-close-icon {
+.ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ovk-diag-head-close-icon {
     color: var(--muted-text-color);
 }
 .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ui_tabs {
