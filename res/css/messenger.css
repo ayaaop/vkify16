@@ -69,10 +69,10 @@ html:has(.body_im),body.body_im,.body_im .layout {
 
 body.body_im .page_body {
 	position: fixed;
-	top: calc(var(--header-height) + 15px);
+	top: calc(var(--header-height) + 15px + var(--top-popups-height, 0px));
 	margin: 0;
-	height: calc(100dvh - var(--header-height));
-	max-height: calc(100dvh - var(--header-height));
+	height: calc(100dvh - var(--header-height) - var(--top-popups-height, 0px));
+	max-height: calc(100dvh - var(--header-height) - var(--top-popups-height, 0px));
 	float: none;
 	margin-left: 164px !important;
 }
@@ -87,8 +87,8 @@ body.body_im .page_body {
     margin: 0;
     width: 100%;
     position: relative;
-    height: calc(100dvh - var(--header-height) + 15px);
-    max-height: calc(100dvh - var(--header-height) + 15px);
+    height: calc(100dvh - var(--header-height) + 15px - var(--top-popups-height, 0px));
+    max-height: calc(100dvh - var(--header-height) + 15px - var(--top-popups-height, 0px));
 }
 
 #im_container.at_page:not(.compact) {
@@ -104,7 +104,7 @@ body.body_im .page_body {
     width: 230px;
     min-width: 0;
     max-height: calc(100vh - var(--header-height) - 15px);
-    max-height: calc(100dvh - var(--header-height) - 15px);
+    max-height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
     overflow-y: auto;
     scrollbar-width: none;
     box-sizing: border-box;
@@ -130,12 +130,12 @@ body.body_im .page_body {
 /* .messenger-app--messages is upstream's internal scroll container. */
 #im_container.at_page #im_page_containers {
     height: calc(100vh - var(--header-height) - 15px);
-    height: calc(100dvh - var(--header-height) - 15px);
+    height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
 }
 
 /* Page scrolls instead of clipping the input bar if height math is off. */
 #im_container.at_page .im_page.page-other {
-    height: calc(100dvh - var(--header-height) - 15px);
+    height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
     display: flex;
     flex-direction: column;
     scrollbar-color: var(--border-color-3) var(--module-background-color--secondary);
@@ -143,14 +143,14 @@ body.body_im .page_body {
 }
 
 #im_container.at_page .im_page:not(.hidden) {
-    height: calc(100dvh - var(--header-height) - 15px);
-    min-height: calc(100dvh - var(--header-height) - 15px);
+    height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
+    min-height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
 }
 
 /* .crp-list clips long lists unless its parent is height-constrained. */
 #im_container.at_page:not(.compact) .im_page.page-conversations {
     height: calc(100vh - var(--header-height) - 15px);
-    height: calc(100dvh - var(--header-height) - 15px);
+    height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -224,6 +224,8 @@ body.body_im .sidebar {
 }
 body:has(#im_container.at_page) .sidebar {
     scrollbar-width: none;
+    max-height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
+    overflow-y: auto;
 }
 body:has(#im_container.at_page) .sidebar::-webkit-scrollbar {
     display: none;
@@ -1289,10 +1291,13 @@ body #im_container.compact .crp-list .crp-entry--message---av {
 
 .messenger-app--tab-friends .friends-list-side {
     border: 0;
+    position: sticky;
+    top: 0;
+    border-bottom: 1px solid var(--border-color)
 }
 
 .messenger-app--tab-friends .friends-list-top:has(.search_input) {
-    border-top: 1px solid var(--border-color);
+    border-top: 0;
     border-bottom: 1px solid var(--border-color)
 }
 
@@ -1667,7 +1672,7 @@ body #im_container.compact .crp-list .crp-entry--message---av {
 .messenger-app--messages---message--wrap .checkmark {
     width: 17px;
     height: 17px;
-    margin: 0;
+    margin: 0 8px;
     background-image: url(../icons/msg_check.png);
     background-repeat: no-repeat;
     background-position: 0 0;
@@ -1676,7 +1681,7 @@ body #im_container.compact .crp-list .crp-entry--message---av {
 
 .messenger-app--messages---message.same-author .checkmark,
 .messenger-app--messages---message.same-author .error-checkmark {
-    margin: 0;
+    margin: 0 8px;
 }
 
 /* VK */
@@ -1748,7 +1753,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     mask: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20d%3D%22M3.5%203.5l7%207m0-7l-7%207%22%2F%3E%3C%2Fsvg%3E") center no-repeat !important;
 }
 
-.messenger-app--messages---message .actions-2 .star-icon {
+.messenger-app--messages---message .actions-2 .star-icon,
+.messenger-app--messages---message.msg-important .actions-2 .star-icon, .messenger-app--messages---message .actions-2 .star-icon.active {
     width: 12px !important;
     height: 13px !important;
     background: url(../icons/m_star_small.png) no-repeat 0 0 !important;
@@ -1761,7 +1767,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 .messenger-app--messages---message.msg-important .actions-2 .star-icon,
 .messenger-app--messages---message .actions-2 .star-icon.active {
-    background-position: 0 -16px !important;
+    background: url(../icons/m_star_small.png) no-repeat 0 0 !important;
     opacity: 0.85 !important;
 }
 
@@ -1890,8 +1896,11 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 .messenger-app--messages---message ._content .reply-msg-container .reply-compact-attach {
     color: var(--muted-text-color-3);
-    border-radius: 2px;
-    background: color-mix(in srgb, var(--text-color) 4%, var(--transparent));
+    border-radius: 0;
+    background: none;
+}
+.messenger-app--messages---message ._content .reply-msg-container .reply-compact-attach:hover {
+    background: none;
 }
 
 /* Forwarded messages use the same flat im-mess_fwd model as reply quotes. */
@@ -3526,6 +3535,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 #im_container.at_page.compact {
     --sidebar-width: 318px;
+    --compact-page-height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
     margin: 0;
 }
 
@@ -3550,7 +3560,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 #im_container.compact .im_page.page-conversations {
     width: 316px;
     height: calc(100vh - var(--header-height) - 15px);
-    height: calc(100dvh - var(--header-height) - 15px);
+    height: var(--compact-page-height);
     display: flex !important;
     flex-direction: column;
     position: static;
@@ -3570,7 +3580,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     position: static;
     width: var(--messenger-width);
     height: calc(100vh - var(--header-height) - 15px);
-    height: calc(100dvh - var(--header-height) - 15px);
+    height: var(--compact-page-height);
     background-color: var(--module-background-color);
     border: 1px solid var(--border-color);
     border-left: 0;
@@ -4155,8 +4165,15 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
    ========================================================================== */
 
 @media (max-width: 768px) {
+    body:has(#im_container.at_page) .sidebar {
+        max-height: none;
+    }
+    #im_container.at_page.compact {
+        --compact-page-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
+    }
     .body_im .appbar {
-        position: static;
+        position: relative;
+        top: var(--top-popups-height, 0px);
     }
 
     /* --ovk-vv-* tracks the visual viewport on browsers where only it shrinks
@@ -4167,13 +4184,13 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     }
     body.body_im .page_body {
         margin: 0!important;
-        top: calc(var(--ovk-vv-top, 0px) + var(--header-height));
-        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
-        max-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
+        top: calc(var(--ovk-vv-top, 0px) + var(--header-height) + var(--top-popups-height, 0px));
+        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
+        max-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
     }
     body.body_im .messenger-app--header.messages--peers-header-peer-name,
     body.body_im .messages--actions {
-        top: var(--ovk-vv-top, 0px);
+        top: calc(var(--ovk-vv-top, 0px) + var(--top-popups-height, 0px));
     }
 
     #im_container.at_page:not(.compact) #im_page_tabs {
@@ -4197,8 +4214,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     }
 
     #im_container.at_page {
-        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
-        max-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
+        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
+        max-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
     }
 
     #im_container.at_page:not(.compact) .im_page.page-conversations,
@@ -4206,9 +4223,9 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     #im_container.at_page .im_page:not(.hidden),
     #im_container.at_page .im_page.page-other {
         min-height: calc(100vh - var(--header-height));
-        min-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
+        min-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
         height: calc(100vh - var(--header-height));
-        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
+        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
     }
 
     .im_mobile .msg-attachments-container:has(.msg-makima-grid) {
@@ -5428,4 +5445,3 @@ body.dark-mode #fastchats_container .rb_inactive .fc_tab_head {
 #fastchats_container .fc_fixed .chats_sp.rb_resize {
     display: none;
 }
-

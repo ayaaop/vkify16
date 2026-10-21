@@ -43,7 +43,7 @@ export function createPeerInfoView({ html, tr, PeerAvatar = null }) {
                 return;
             }
             if (!trigger.classList.contains('shown')) {
-                uiActionsMenu.show(trigger, null, { align: 'right' });
+                uiActionsMenu.show(trigger, null, { align: 'right', appendParentCls: 'body' });
             }
         };
 
@@ -60,7 +60,7 @@ export function createPeerInfoView({ html, tr, PeerAvatar = null }) {
             }
             const wrap = e.currentTarget;
             if (wrap.classList.contains('shown')) {
-                uiActionsMenu.show(wrap, null, {align: "right"});
+                uiActionsMenu.show(wrap, null, { align: 'right', appendParentCls: 'body' });
             } else {
                 openMenu(wrap);
             }
@@ -417,7 +417,7 @@ export function createPeerInfoView({ html, tr, PeerAvatar = null }) {
                     <div class="messenger-app--header--online">${subtitle}</div>
                 </div>
                 <div class="messenger-app-header--actions">
-                    <div class="messenger-app-header--more-actions ui_actions_menu_wrap ui_actions_menu_left_align" onClick=${onActionsClick} onMouseEnter=${onActionsMouseEnter} onMouseLeave=${onActionsMouseLeave}>
+                    <div class="messenger-app-header--more-actions ui_actions_menu_wrap ui_actions_menu_left_align" data-append-parent-cls="body" onClick=${onActionsClick} onMouseEnter=${onActionsMouseEnter} onMouseLeave=${onActionsMouseLeave}>
                         <div id="profile_more_btn" class="messenger-app-header--more-actions--trigger"></div>
                         <div id="profile_actions_tooltip" class="ui_actions_menu">
                             ${canInvite ? html`

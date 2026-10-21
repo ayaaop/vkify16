@@ -648,6 +648,7 @@ vkify.once('uiActionsMenu', function () {
           if (appendMatch) opts.appendParentCls = appendMatch[1];
         }
         if (wrap.dataset.menuId) opts.menuId = wrap.dataset.menuId;
+        if (wrap.dataset.appendParentCls) opts.appendParentCls = wrap.dataset.appendParentCls;
         uiActionsMenu.toggle(wrap, null, opts);
       }
     }

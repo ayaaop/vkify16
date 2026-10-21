@@ -78,7 +78,7 @@
         </div>
 
         <div id="post-buttons{$textAreaId}" class="post-buttons">
-            <div class="post-horizontal"></div>
+            <div class="post-horizontal{if !$isPostComposer} post-horizontal--comment{/if}"></div>
             <div class="post-vertical"></div>
             <div class="post-has-poll">{_poll}</div>
             <div class="post-has-geo"></div>

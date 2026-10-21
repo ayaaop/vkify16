@@ -57,6 +57,9 @@ function computeComposerBoxes(containerEl, items) {
     const isFastchat = Boolean(containerEl.closest('.fc_tab_wrap, #fastchats_container, .fastchat-box'));
     const isMessenger = Boolean(isFastchat || containerEl.closest('.im-chat-input, .messenger-app--input, .messenger-layer, #im_container'));
     const isMobileModal = Boolean(containerEl.closest('#_edit_post_modal, #_new_post_modal'));
+    // Comment attachments render via getChildrenWithLayout(240), which passes
+    // maxHeight = maxWidth, so the composer preview uses the same 240x240 box.
+    const isComment = containerEl.classList.contains('post-horizontal--comment');
 
     const padKey = isMobileModal ? 'm' : 'd';
     if (!containerEl.__mkPad || containerEl.__mkPadKey !== padKey) {
@@ -81,10 +84,11 @@ function computeComposerBoxes(containerEl, items) {
             ? Math.max(240, (window.innerWidth || 360) - 32)
             : (isFastchat ? 220 : (isMessenger ? 400 : 510));
     }
-    const maxW = Math.min(isFastchat ? 240 : (isMessenger ? 420 : 510), availW);
+    const maxW = Math.min(isFastchat ? 240 : (isComment ? 240 : (isMessenger ? 420 : 510)), availW);
     const maxH = isFastchat
         ? Math.min(160, Math.round(maxW * 0.66))
-        : (isMobileModal ? Math.min(230, Math.round(maxW * 0.66)) : Math.round(maxW * 0.666));
+        : (isComment ? maxW
+            : (isMobileModal ? Math.min(230, Math.round(maxW * 0.66)) : Math.round(maxW * 0.666)));
     const GAP = 4;
 
     const visualItems = items.map((el) => {

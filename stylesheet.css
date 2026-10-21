@@ -3538,7 +3538,7 @@ h4.gifts_section_header {
 }
 
 .stickers_gift_selector_box {
-    border-color: var(--border-color-4);
+    border-color: var(--border-color-2);
     background: var(--module-background-color);
 }
 .stickers_gift_token {
@@ -3605,6 +3605,12 @@ h4.gifts_section_header {
 .stickers_gift_suggestion_name {
     font-size: 12.5px;
     color: var(--text-color);
+}
+.stickers_gift_top_preview div[style] {
+    color: var(--muted-text-color-2) !important;
+}
+.stickers_gift_top_preview #stickers_gift_price_value {
+    color: var(--text-color) !important;
 }
 
 /* replies */

@@ -1199,8 +1199,6 @@ input.ui_search_field {
     border: none;
     margin: 0;
     line-height: 18px;
-}
-input.ui_search_field {
     background: url(../icons/search_icon.png)
     no-repeat;
     color: var(--text-color);
@@ -1225,7 +1223,7 @@ input[type~="text"]:focus::placeholder,
 textarea:focus::placeholder {
     color: var(--search-placeholder-focus-color);
 }
-.ui_search_reset {
+body .ui_search_reset {
     position: absolute;
     width: 38px;
     background: url(../icons/cross.png) no-repeat
@@ -1237,11 +1235,11 @@ textarea:focus::placeholder {
     z-index: 4;
     opacity: 0.75;
 }
-.ui_search_reset:hover {
+body .ui_search_reset:hover {
     opacity: 1;
     filter: none;
 }
-.ui_search_field_empty .ui_search_reset {
+body .ui_search_field_empty .ui_search_reset {
     visibility: hidden;
     opacity: 0;
 }
@@ -2093,4 +2091,92 @@ select:focus,.content-editable:focus {
 .toTop.inactive,
 .toTop.inactive * {
     pointer-events: none;
+}
+
+.site-notices {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 240;
+    max-height: 50dvh;
+    overflow-y: auto;
+}
+
+.site-notice {
+	font-size: 12.5px;
+	line-height: 18px;
+    background-color: var(--module-background-color--secondary);
+    border: 1px solid var(--dropdown-border-color);
+}
+
+.site-notice .contanier {
+    width: min(100%, var(--layout-width, 960px));
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 0 0 0 6px;
+	color: var(--muted-text-color-2);
+    display: flex;
+    align-items: center;
+}
+
+.site-notice .contanier::before {
+    content: "";
+    flex: 0 0 16px;
+    height: 16px;
+    background: url(../icons/alert.svg) center / contain no-repeat;
+}
+
+.site-notice .text {
+    flex: 1;
+    min-width: 0;
+    padding: 6px;
+}
+
+.site-notice a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.site-notice__close {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    padding: 6px;
+    opacity: .75;
+}
+
+.site-notice__close:hover {
+    opacity: 1;
+}
+
+.site-notice__close svg {
+    width: 20px;
+    height: 20px;
+}
+
+.cookies-popup {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 240;
+    max-height: 50dvh;
+    overflow-y: auto;
+}
+
+.page_header {
+    top: var(--top-popups-height, 0px);
+}
+
+.page_body {
+    margin-top: calc(var(--header-height) + 15px + var(--top-popups-height, 0px));
+}
+
+.sidebar {
+    margin-top: calc(var(--header-height) + 15px + var(--top-popups-height, 0px));
+}
+
+#backdrop {
+    top: calc(var(--header-height) + var(--top-popups-height, 0px));
 }

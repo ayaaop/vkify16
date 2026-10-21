@@ -539,7 +539,7 @@
         + ', .ui_tab, .ui_tab_plain, .sidebar_inner .link, .mobile-info-row'
         + ', .mobile-scroll-card, .action_button, .msg-dropdown-menu .msg-dropdown-item'
         + ', .messenger-app--header--back a';
-    const RIPPLE_UNBOUNDED_SELECTOR = '.appbar .hamburger, .appbar-extra-btn'
+    const RIPPLE_UNBOUNDED_SELECTOR = '.appbar :is(.hamburger, .appbar-back, .appbar-extra-btn)'
         + ', .ovk-msg-fullscreen .ovk-diag-head-close, .ovk-msg-fullscreen .ovk-diag-head-apply'
         + ', .ovk-msg-sheet .ovk-diag-head-close, .ovk-msg-sheet .ovk-diag-head-apply'
         + ', .ovk-modal-video-window .video_top_button'

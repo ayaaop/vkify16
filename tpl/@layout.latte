@@ -99,7 +99,12 @@
 
         <div class="layout">
             <div id="xhead" class="dm"></div>
-            
+
+            <div class="site-notices" n:ifcontent>
+                {include "components/globalalert.latte"}
+                {include "components/tainted.latte"}
+            </div>
+
             <div class="appbar{if isset($transparentAppbar) && $transparentAppbar} appbar--transparent{/if}" id="appbar">
                 <div class="hamburger" id="mobileMenuTrigger">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -550,13 +555,7 @@
                     <div class="pr_bt"></div><div class="pr_bt"></div><div class="pr_bt"></div>
                 </div>
             </div>
-        <div class="bottom-popups" n:ifcontent>
-            {include "components/globalalert.latte"}
-            {include "components/tainted.latte"}
-            {include "components/http_warn.latte"}
             {include "components/cookies.latte"}
-        </div>
-
         {script "js/node_modules/msgpack-lite/dist/msgpack.min.js"}
         {script "js/node_modules/soundjs/lib/soundjs.min.js"}
         {script "js/node_modules/ky/umd.js"}

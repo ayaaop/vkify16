@@ -1,6 +1,12 @@
 (function () {
 'use strict';
 
+function getHeaderOffset() {
+    const header = parseFloat(getComputedStyle(document.body).getPropertyValue('--header-height')) || 42;
+    const notices = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-popups-height')) || 0;
+    return header + 15 + notices;
+}
+
 vkify.once("updateNarrow", () => {
     let __narrowBar = {
         bar: null, barBlock: null, wideCol: null, pl: null, ajloader: null,
@@ -65,7 +71,7 @@ vkify.once("updateNarrow", () => {
 
         const wh = Math.round(window.lastWindowHeight || window.innerHeight || 0);
         const st = Math.round(window.scrollY || 0);
-        const headH = 57;
+        const headH = getHeaderOffset();
         const delta = 1;
 
         const isFixed = s.isFixed;
@@ -149,7 +155,6 @@ vkify.once("updateNarrow", () => {
 });
 
 vkify.once('affixedNavigation', () => {
-    const HEAD_H = 57;
     const SCROLL_TOLERANCE = 4;
 
     let state = null;
@@ -206,10 +211,10 @@ vkify.once('affixedNavigation', () => {
         });
     }
 
-    function affixMenu(menu, hiddenOffset) {
+    function affixMenu(menu, hiddenOffset, headH) {
         setStyles(menu, {
             position: 'fixed',
-            top: HEAD_H - hiddenOffset,
+            top: headH - hiddenOffset,
             width: state.anchorWidth,
             marginTop: null
         });
@@ -239,6 +244,7 @@ vkify.once('affixedNavigation', () => {
         }
 
         const scrollTop = getScrollTop();
+        const headH = getHeaderOffset();
         const menuHeight = menu.offsetHeight;
         const pageHeight = pageBody.offsetHeight;
 
@@ -249,9 +255,9 @@ vkify.once('affixedNavigation', () => {
             return;
         }
 
-        const shouldAffix = scrollTop > state.initialTop - HEAD_H;
+        const shouldAffix = scrollTop > state.initialTop - headH;
         const delta = scrollTop - state.lastScrollTop;
-        const maxHiddenOffset = Math.max(0, menuHeight + HEAD_H);
+        const maxHiddenOffset = Math.max(0, menuHeight + headH);
 
         if (!shouldAffix) {
             resetMenu(menu);
@@ -261,7 +267,7 @@ vkify.once('affixedNavigation', () => {
                 state.hiddenOffset = Math.max(0, Math.min(maxHiddenOffset, state.hiddenOffset + delta));
             }
 
-            affixMenu(menu, state.hiddenOffset);
+            affixMenu(menu, state.hiddenOffset, headH);
         }
 
         state.lastScrollTop = scrollTop;

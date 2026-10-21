@@ -136,7 +136,7 @@ function renderEditMenuLayout(apiPost, type, postId) {
                 </div>
             </div>
                 <div class='post-buttons'>
-                    <div class="post-horizontal"></div>
+                    <div class="post-horizontal${type === 'comment' ? ' post-horizontal--comment' : ''}"></div>
                     <div class="post-vertical"></div>
                     <div class="post-repost"></div>
                     <div class="post-source"></div>

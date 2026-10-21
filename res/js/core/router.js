@@ -6,6 +6,27 @@ window.isMobileAndExpanded = function() {
     return window.isMobile() && document.body.classList.contains('menu-expanded');
 };
 
+vkify.ready(() => {
+    const notices = document.querySelector('.site-notices');
+    if (!notices) return;
+    const syncHeight = () => {
+        const height = `${notices.getBoundingClientRect().height}px`;
+        if (document.documentElement.style.getPropertyValue('--top-popups-height') !== height) {
+            document.documentElement.style.setProperty('--top-popups-height', height);
+            requestAnimationFrame(() => {
+                window.updateLeftMenuInit?.();
+                window.updateNarrow?.();
+            });
+        }
+    };
+    new ResizeObserver(syncHeight).observe(notices);
+    new MutationObserver(syncHeight).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['style']
+    });
+    syncHeight();
+});
+
 window.router = new class Router {
     constructor() {
         this.managedStyleLinks = new Map();
