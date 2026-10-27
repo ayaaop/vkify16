@@ -283,7 +283,7 @@
         opacity: 0.9;
     }
     .appbar-tabs-menu-item--subitem.appbar-tabs-menu-item--active .appbar-tabs-menu-label {
-        color: var(--accent-color);
+        color: var(--link-color);
         font-weight: 500;
         opacity: 1;
     }
@@ -1757,7 +1757,7 @@
         height: 12px;
         opacity: 0.95;
     }
-    .post-buttons .vertical-attachment .vertical-attachment-remove:not(.lagged) {
+    :is(.post-buttons, .post-vertical) .vertical-attachment .vertical-attachment-remove:not(.lagged) {
         display: flex;
         align-items: center;
         justify-content: center;

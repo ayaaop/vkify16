@@ -4,6 +4,7 @@
 {var $transparentAppbar = true}
 {var $backdrops = $club->getBackDropPictureURLs()}
 {var $canEdit = $thisUser && $club->canBeModifiedBy($thisUser)}
+{var $canReport = $thisUser->getId() != $club->getOwner()->getId()}
 {block title}{$club->getName()}{/block}
 
 {block headIncludes}
@@ -149,14 +150,16 @@
 														{_add_to_left_menu}
 													{/if}
 												</a>
-												<div class="separator"></div>
 											{/if}
 											{if $thisUser->getChandlerUser()->can("access")->model("admin")->whichBelongsTo(NULL)}
+												<div n:if="$canEdit" class="separator"></div>
 												<a href="/admin/clubs/id{$club->getId()}">{_manage_group_action}</a>
 												<a href="/admin/logs?obj_id={$club->getId()}&obj_type=Club">{_last_actions}</a>
+												<div n:if="$canReport" class="separator"></div>
 											{/if}
-											{var $canReport = $thisUser->getId() != $club->getOwner()->getId()}
-											<a n:if="$canReport" href="javascript:reportClub({$club->getId()})">{_report}</a>
+											{if $canReport}
+												<a href="javascript:reportClub({$club->getId()})">{_report}</a>
+											{/if}
 									</div>
 								</div>
 							</div>

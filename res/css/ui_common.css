@@ -76,6 +76,10 @@ ul li {
     padding: 4px 0 4px 3px;
 }
 
+input[type="text"], input[type="password"], input[type~="text"], input[type~="password"], input[type="email"], input[type="phone"], input[type~="email"], input[type~="phone"], input[type="search"], input[type~="search"], input[type~="date"], input[type~="time"], input[type="url"], input[type~="url"], input[type~="datetime-local"], select {
+    font-family: var(--font-family)
+}
+
 span {
     padding: 0;
     color: inherit;
@@ -1194,6 +1198,7 @@ a.ui_crumb {
 }
 input.ui_search_field {
     padding: 14px 44px 13px 48px;
+    font-size: 13px;
     box-sizing: border-box;
     width: 100%;
     border: none;
