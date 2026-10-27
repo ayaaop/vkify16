@@ -19,10 +19,41 @@ vkify.once('simpleTooltips', () => {
             wrapped.replaceChildren();
             const label = document.createElement('div');
             label.className = 'tt_text';
-            label.textContent = text;
+            if (!options.black || options.html) {
+                label.innerHTML = text;
+            } else {
+                label.textContent = text;
+            }
             wrapped.appendChild(label);
         }
         return true;
+    }
+
+    function getAppendParent(el, opts = {}) {
+        if (document.fullscreenElement) return document.fullscreenElement;
+        if (opts.appendEl) {
+            return (typeof opts.appendEl === 'string' ? document.getElementById(opts.appendEl) : opts.appendEl) || document.body;
+        }
+        if (opts.appendParentCls) {
+            return el.closest?.('.' + opts.appendParentCls) || document.body;
+        }
+        if (el.closest?.('.fc_tab, #fastchats_container, .ovk-msg-all')) {
+            return document.body;
+        }
+        if (typeof getComputedStyle === 'function') {
+            let positioned = null;
+            for (let parent = el.parentElement; parent && parent !== document.body && parent !== document.documentElement; parent = parent.parentElement) {
+                const style = getComputedStyle(parent);
+                if (/(hidden|auto|scroll|clip)/.test(style.overflow + style.overflowX + style.overflowY)) {
+                    return document.body;
+                }
+                if (!positioned && (style.position === 'relative' || style.position === 'absolute' || style.position === 'fixed')) {
+                    positioned = parent;
+                }
+            }
+            if (positioned) return positioned;
+        }
+        return document.body;
     }
 
     function position(tt) {
@@ -30,43 +61,72 @@ vkify.once('simpleTooltips', () => {
         if (!el.isConnected) return tooltips.destroy(el);
         const anchor = el.getBoundingClientRect();
         const size = container.getBoundingClientRect();
-        const shift = opts.shift || [11, 8, 8];
+        const rawShift = typeof opts.shift === 'function' ? opts.shift() : opts.shift;
+        const shift = rawShift || (opts.black ? [11, 8, 8] : [2, 8, 8]);
         const side = opts.dir === 'left' || opts.dir === 'right';
         const gapAbove = Number(shift[1]) || 0;
         const gapBelow = Number(shift[2] ?? shift[1]) || 0;
-        let above;
-        if (opts.dir === 'down') {
-            above = true;
-        } else if (opts.dir === 'up') {
-            above = false;
-        } else if (side) {
-            above = false;
-        } else {
-            const fitsAbove = anchor.top >= size.height + gapAbove + 8;
-            const fitsBelow = window.innerHeight - anchor.bottom >= size.height + gapBelow + 8;
-            above = opts.toup === false ? (!fitsBelow && fitsAbove) : (fitsAbove || !fitsBelow);
-        }
-        const gap = above ? gapAbove : gapBelow;
+        let above = false;
+        let needLeft = false;
+        let vTop, vLeft;
 
-        let top, left;
         if (side) {
-            top = anchor.top + (anchor.height - size.height) / 2;
-            left = opts.dir === 'right' ? anchor.right + gap : anchor.left - size.width - gap;
+            const sideGap = Number(shift[0]) || 8;
+            vTop = anchor.top + (anchor.height - size.height) / 2 - gapAbove;
+            vLeft = opts.dir === 'right' ? anchor.right + sideGap : anchor.left - size.width - sideGap;
         } else {
-            top = above ? anchor.top - size.height - gap : anchor.bottom + gap;
-            left = opts.center ? anchor.left + (anchor.width - size.width) / 2 : anchor.left - (Number(shift[0]) || 0);
-            if (opts.align === 'end') left = anchor.right - size.width + (Number(shift[0]) || 0);
+            if (opts.dir === 'down' || opts.forcetoup) {
+                above = true;
+            } else if (opts.dir === 'up' || opts.forcetodown) {
+                above = false;
+            } else {
+                const fitsAbove = anchor.top >= size.height + gapAbove + 8;
+                const fitsBelow = window.innerHeight - anchor.bottom >= size.height + gapBelow + 8;
+                above = opts.toup === false ? (!fitsBelow && fitsAbove) : (fitsAbove || !fitsBelow);
+            }
+            const gap = above ? gapAbove : gapBelow;
+            const shiftX = Number(above ? shift[0] : (shift[3] ?? shift[0])) || 0;
+            vTop = above ? anchor.top - size.height - gap : anchor.bottom + gap;
+            vLeft = anchor.left - shiftX;
+
+            needLeft = !opts.forceright && !opts.center && Boolean(
+                opts.needLeft
+                || opts.align === 'end'
+                || ((opts.black || opts.checkLeft || opts.typeClass === 'like_tt')
+                    && window.innerWidth
+                    && (vLeft + size.width > window.innerWidth - 4))
+            );
+            if (needLeft) {
+                vLeft -= size.width - (opts.reverseOffset || (opts.typeClass === 'like_tt' ? 80 : 39));
+            } else if (opts.center) {
+                vLeft = anchor.left + (anchor.width - size.width) / 2;
+            }
         }
-        top = Math.max(4, Math.min(window.innerHeight - size.height - 4, top));
-        left = Math.max(4, Math.min(window.innerWidth - size.width - 4, left));
+
+        if (window.innerHeight) {
+            vTop = Math.max(4, Math.min(window.innerHeight - size.height - 4, vTop));
+        }
+        if (window.innerWidth) {
+            vLeft = Math.max(4, Math.min(window.innerWidth - size.width - 4, vLeft));
+        }
+
+        const host = container.parentElement;
+        let top, left;
+        if (!host || host === document.body || host === document.documentElement) {
+            top = vTop + (window.scrollY || window.pageYOffset || 0);
+            left = vLeft + (window.scrollX || window.pageXOffset || 0);
+        } else {
+            const hostRect = host.getBoundingClientRect ? host.getBoundingClientRect() : { top: 0, left: 0 };
+            top = vTop - hostRect.top + (host.scrollTop || 0);
+            left = vLeft - hostRect.left + (host.scrollLeft || 0);
+        }
 
         container.classList.toggle('tt_down', above && !side);
         container.classList.toggle('tt_up', !above && !side);
-        container.classList.toggle('tt_left', opts.dir === 'left');
-        container.classList.toggle('tt_right', opts.dir === 'right');
+        container.classList.toggle('tt_right', opts.dir === 'left');
+        container.classList.toggle('tt_left', opts.dir === 'right');
+        container.classList.toggle('toleft', !side && needLeft);
         container.classList.toggle('tocenter', !!opts.center);
-        const arrowLeft = Math.max(9, Math.min(size.width - 9, anchor.left + anchor.width / 2 - left));
-        container.style.setProperty('--tt-arrow-left', `${arrowLeft}px`);
         container.style.top = `${top}px`;
         container.style.left = `${left}px`;
         return { top, left, above, side };
@@ -77,13 +137,13 @@ vkify.once('simpleTooltips', () => {
             if (el.tt && el.tt.el) return el.tt;
             if (!el.tthide) {
                 el.tthide = () => { el.showing = false; tooltips.hide(el); };
-                el.addEventListener('mouseout', el.tthide);
+                if (!options.nohide) el.addEventListener('mouseout', el.tthide);
             }
             const container = document.createElement('div');
             container.className = 'tt_w';
             container.innerHTML = '<div class="wrapped"></div>';
             container.hidden = true;
-            (document.fullscreenElement || document.body).appendChild(container);
+            getAppendParent(el, options).appendChild(container);
             const tt = {
                 el, container, opts: options, shown: false,
                 show: (opts) => tooltips.show(el, opts),
@@ -95,11 +155,17 @@ vkify.once('simpleTooltips', () => {
                     if (tt.shown) position(tt);
                 },
             };
-            container.addEventListener('mouseover', () => tooltips.show(el));
-            container.addEventListener('mouseleave', () => tooltips.hide(el));
+            if (!options.nohideover && (!options.text || options.hasover)) {
+                container.addEventListener('mouseover', () => tooltips.show(el));
+                container.addEventListener('mouseleave', () => tooltips.hide(el));
+            } else {
+                container.addEventListener('mouseover', () => tooltips.show(el));
+                container.addEventListener('mouseleave', () => tooltips.hide(el));
+            }
             el.tt = tt;
             instances.add(tt);
             options.init?.(tt);
+            options.onCreate?.(tt);
             return tt;
         },
         show(el, options = {}) {
@@ -107,7 +173,7 @@ vkify.once('simpleTooltips', () => {
             el.showing = true;
             const tt = (el.tt && el.tt.el) ? el.tt : tooltips.create(el, options);
             tt.opts = { ...tt.opts, ...options };
-            const host = document.fullscreenElement || document.body;
+            const host = getAppendParent(el, tt.opts);
             if (tt.container.parentElement !== host) host.appendChild(tt.container);
             clearTimeout(el.ttimer);
             clearTimeout(el.hidetimer);
@@ -246,11 +312,14 @@ vkify.once('simpleTooltips', () => {
     window.addEventListener('scroll', () => tooltips.rePositionAll(), true);
     window.addEventListener('resize', () => tooltips.rePositionAll());
     document.addEventListener('fullscreenchange', () => {
-        const host = document.fullscreenElement || document.body;
         for (const tt of instances) {
+            const host = getAppendParent(tt.el, tt.opts);
             if (tt.container.parentElement !== host) host.appendChild(tt.container);
         }
         tooltips.rePositionAll();
+    });
+    vkify.onPageLifecycle('beforePageLeave', () => {
+        tooltips.destroyAll();
     });
     vkify.onPageLifecycle('afterPageReady', () => {
         for (const tt of instances) if (!tt.el.isConnected) tooltips.destroy(tt.el);

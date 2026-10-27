@@ -64,7 +64,8 @@
                 <div class="form_field">
                     <div class="form_label">URL</div>
                     <div class="form_data">
-                        <input type="text" name="url" id="appUrlInput" value="{$url ?? ''}" />
+                        <input type="text" name="url" id="appUrlInput" value="{$url ?? ''}"
+                            n:attr="data-url-hint => $create ? (tr('app_creation_hint_url') . '<br><br>' . tr('app_creation_hint_iframe')) : null, onfocus => $create ? 'showTooltip(this, {text: this.dataset.urlHint, dir: \'right\', slideX: 15, width: 260, shift: [10, 0, 0], hasover: true, nohide: true})' : null, onblur => $create ? 'tooltips.hide(this)' : null" />
                     </div>
                 </div>
                 <div class="form_field">
@@ -98,27 +99,5 @@
 
     <script>
         window.coins = {$coins};
-
-        {if $create}
-        (function initAppUrlInfoTooltip() {
-            const urlInput = document.getElementById('appUrlInput');
-            if (!urlInput || urlInput.dataset.urlInfoBound) return;
-            urlInput.dataset.urlInfoBound = '1';
-
-            tippy(urlInput, {
-                theme: 'light vk',
-                placement: 'right-start',
-                trigger: 'focus',
-                interactive: true,
-                interactiveBorder: 8,
-                appendTo: 'parent',
-                animation: 'left_right',
-                duration: [100, 100],
-                offset: [0, 8],
-                allowHTML: true,
-                content: {=(json_encode(tr('app_creation_hint_url') . '<br><br>' . tr('app_creation_hint_iframe')))|noescape}
-            });
-        })();
-        {/if}
     </script>
 {/block}

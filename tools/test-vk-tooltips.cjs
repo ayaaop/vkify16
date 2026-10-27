@@ -7,6 +7,7 @@ const vm = require('node:vm');
 test('themed tooltip call sites use VK-style inline showTitle/showTooltip', () => {
     const files = [
         '../tpl/About/Language.latte',
+        '../tpl/Apps/Edit.latte',
         '../tpl/Audio/bigplayer.latte',
         '../tpl/Audio/player.latte',
         '../tpl/Documents/components/doc.latte',
