@@ -33,7 +33,7 @@
     .platform-ios .sidebar_inner .link:active, .platform-ios .mobile-info-row:active,
     .platform-ios .mobile-scroll-card:active, .platform-ios .profile_link:active,
     .platform-ios .msg-dropdown-item:active, .platform-ios .appbar :is(.hamburger, .appbar-back, .appbar-extra-btn):active,
-    .platform-ios .ovk-diag-head-close:active,
+    .platform-ios :is(.ovk-diag-head-close, .ovk-diag-head .picker-header-back):active,
     .platform-ios .ovk-diag-head-apply:active,
     .platform-ios .ovk-modal-video-window .video_top_button:active,
     .platform-ios .messenger-app--header--back a:active,
@@ -90,6 +90,7 @@
     .platform-ios .ovk-modal-video-window #video_top_controls .video_top_button,
     .platform-ios .ovk-msg-fullscreen .ovk-diag-head-close,
     .platform-ios .ovk-msg-fullscreen .ovk-diag-head-apply,
+    .platform-ios .ovk-diag-cont .ovk-diag-head .picker-header-back,
     .platform-ios .body_im .messenger-app--header--back a {
         color: var(--accent-color-2);
     }
@@ -396,6 +397,7 @@
     .platform-ios .ovk-msg-fullscreen .ovk-diag-head-apply,
     .platform-ios .ovk-msg-sheet .ovk-diag-head-close,
     .platform-ios .ovk-msg-sheet .ovk-diag-head-apply,
+    .platform-ios .ovk-diag-cont .ovk-diag-head .picker-header-back,
     .platform-ios .ovk-modal-video-window .video_top_button {
         width: 44px;
         height: 44px;

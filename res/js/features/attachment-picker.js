@@ -1346,12 +1346,27 @@ class PhotoPicker extends AttachmentPickerBase {
         const applyBtn = head.find('.ovk-diag-head-apply').nodes[0];
         head.html('');
         if (view instanceof PhotoAlbumView) {
+            const label = title || tr('paginator_back');
             const backEl = document.createElement('div');
             backEl.className = 'back picker-header-back';
             backEl.setAttribute('role', 'button');
             backEl.setAttribute('tabindex', '0');
-            backEl.textContent = title || tr('paginator_back');
-            head.nodes[0]?.appendChild(backEl);
+            backEl.setAttribute('aria-label', tr('back'));
+            const backIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            backIcon.setAttribute('class', 'mobileonly');
+            backIcon.setAttribute('viewBox', '0 0 28 28');
+            backIcon.setAttribute('width', '28');
+            backIcon.setAttribute('height', '28');
+            backIcon.setAttribute('fill', 'currentColor');
+            backIcon.innerHTML = '<use href="#arrow-left-outline-28"></use>';
+            const backLabel = document.createElement('span');
+            backLabel.className = 'picker-header-back-label';
+            backLabel.textContent = label;
+            backEl.append(backIcon, backLabel);
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'ovk-diag-head-title picker-title-text mobileonly';
+            titleSpan.textContent = label;
+            head.nodes[0]?.append(backEl, titleSpan);
         } else {
             const titleSpan = document.createElement('span');
             titleSpan.className = 'ovk-diag-head-title picker-title-text';
