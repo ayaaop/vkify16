@@ -65,7 +65,7 @@ vkify.once("initAlbumPhotosLoader", () => {
         const createEmptyState = () => {
             const wrapper = document.createElement('div');
             wrapper.innerHTML = emptyStateTpl({
-                icon_src: vkify.resourceUrl('icons/no_posts.png'),
+                icon_src: vkify.resourceUrl('icons/no_posts.svg'),
                 empty_text: tr('is_x_photos_zero')
             });
             return wrapper.firstElementChild;

@@ -4124,7 +4124,7 @@ h4.gifts_section_header {
 }
 .video_item .video_item_thumb_wrap {
     background-size: initial;
-    background-image: url("/web/20200518035514im_/https://vk.com/images/icons/video_empty.png");
+    background-image: url("../resource/icons/video_empty.svg");
     background-color: var(--module-header-background-color);
     background-repeat: no-repeat;
     background-position: 50%;
