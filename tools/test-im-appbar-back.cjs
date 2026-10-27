@@ -67,6 +67,7 @@ test('conversation list keeps the menu; chat uses its own header back button', (
     assert.equal(chat.getBack(), null);
     assert.equal(chat.menu.hidden, true);
     assert.equal(chat.title.textContent, 'Ada');
+    assert.equal(chat.title.hidden, true);
 });
 
 test('contact returns to chat and leaving IM restores the menu', async () => {

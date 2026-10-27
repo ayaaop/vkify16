@@ -120,7 +120,7 @@
         color: var(--accent-text-color);
         cursor: pointer;
     }
-    .appbar :is(.hamburger, .appbar-back)[hidden] {
+    .appbar :is(.hamburger, .appbar-back, .appbar-title)[hidden] {
         display: none !important;
     }
     body.body_im #im_container .im_page:not(.hidden) .peer-back.button {
@@ -3373,7 +3373,7 @@
     /* chat header overlays the appbar while a conversation is open */
     body.body_im .messenger-app--header.messages--peers-header-peer-name {
         position: fixed;
-        top: 0;
+        top: var(--top-popups-height, 0px);
         left: 0;
         right: 0;
         width: auto;

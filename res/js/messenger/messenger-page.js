@@ -49,6 +49,7 @@ function syncImAppbarBack() {
             title.innerHTML = title._vkifyImOriginalHTML;
             delete title._vkifyImOriginalHTML;
         }
+        title.hidden = chatHasBack;
     }
     let back = appbar.querySelector('.appbar-back');
     if (!back && showBack) {

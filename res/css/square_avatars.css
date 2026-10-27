@@ -36,3 +36,8 @@ body #im_container .crp-list .crp-entry--message---av img,
     bottom: -2px;
     right: -2px;
 }
+
+body #im_container .crp-list .crp-entry .crp-entry--message.unread {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
