@@ -417,7 +417,7 @@ export function createPeerInfoView({ html, tr, PeerAvatar = null }) {
                     <div class="messenger-app--header--online">${subtitle}</div>
                 </div>
                 <div class="messenger-app-header--actions">
-                    <div class="messenger-app-header--more-actions ui_actions_menu_wrap ui_actions_menu_left_align" data-append-parent-cls="body" onClick=${onActionsClick} onMouseEnter=${onActionsMouseEnter} onMouseLeave=${onActionsMouseLeave}>
+                    <div class="messenger-app-header--more-actions ui_actions_menu_wrap" data-align="right" data-append-parent-cls="body" onClick=${onActionsClick} onMouseEnter=${onActionsMouseEnter} onMouseLeave=${onActionsMouseLeave}>
                         <div id="profile_more_btn" class="messenger-app-header--more-actions--trigger"></div>
                         <div id="profile_actions_tooltip" class="ui_actions_menu">
                             ${canInvite ? html`
