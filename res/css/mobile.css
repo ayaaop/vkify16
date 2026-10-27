@@ -389,7 +389,7 @@
     body.menu-expanded {
         overflow: hidden;
     }
-    html:has(body.dimmed) {
+    html:has(body.dimmed),body.dimmed {
         overflow-y: hidden!important;
         scrollbar-gutter: stable;
     }

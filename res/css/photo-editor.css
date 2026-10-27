@@ -1561,7 +1561,7 @@
     height: 76px;
   }
 
-  .pv_wrapper.pv_pe .pe_editor .pe_sticker_preview img {
+  .pe_editor .pe_sticker_preview img, .pe_editor .pe_sticker_preview .pe_lottie_thumb {
     max-width: 66px;
     max-height: 66px;
   }
