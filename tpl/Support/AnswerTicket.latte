@@ -96,7 +96,7 @@
                     <div class="reply_content">
                         <div class="fl_r reply_actions_wrap">
                             <div class="reply_actions" n:if="isset($thisUser)">
-                                <a class="reply_action reply_delete_action" href="/support/comment/{$comment->getId()}/delete?hash={rawurlencode($csrfToken)}" data-tip="simple-black" data-tiptitle="{_delete}"></a>
+                                <a class="reply_action reply_delete_action" href="/support/comment/{$comment->getId()}/delete?hash={rawurlencode($csrfToken)}" data-title="{_delete}" onmouseover="showTitle(this)"></a>
                             </div>
                         </div>
                         <div class="reply_author">

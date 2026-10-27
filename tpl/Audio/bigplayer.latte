@@ -2,11 +2,11 @@
 <div n:class="bigPlayer, ctx_place, $tidy ? tidy">
     <div class="bigPlayerWrapper">
         <div class="playButtons">
-            <div class="playButton musicIcon" data-tip='simple-black' data-align="bottom-start" data-tiptitle="{_play_tip} [Space]"><div class="playIcon"></div></div>
+            <div class="playButton musicIcon" data-title="{_play_tip} [Space]" onmouseover="{='showTitle(this, null, null, {dir: "up"})'|noescape}"><div class="playIcon"></div></div>
                 
             <div class="arrowsButtons">
-                <div class="nextButton musicIcon" data-tip='simple-black' data-align="bottom-start" data-tiptitle=""></div>
-                <div class="backButton musicIcon" data-tip='simple-black' data-align="bottom-start" data-tiptitle=""></div>
+                <div class="nextButton musicIcon" data-title="" onmouseover="{='showTitle(this, null, null, {dir: "up"})'|noescape}"></div>
+                <div class="backButton musicIcon" data-title="" onmouseover="{='showTitle(this, null, null, {dir: "up"})'|noescape}"></div>
             </div>
         </div>
 
@@ -49,15 +49,15 @@
         </div>
 
         <div class="additionalButtons">
-            <div class="repeatButton musicIcon" data-tip='simple-black' data-align="bottom-end" data-tiptitle="{_repeat_tip} [R]" ></div>
-            <div class="shuffleButton musicIcon" data-tip='simple-black' data-align="bottom-end" data-tiptitle="{_shuffle_tip}"></div>
-            <div class="deviceButton musicIcon" data-tip='simple-black' data-align="bottom-end" data-tiptitle="{_mute_tip} [M]"></div>
+            <div class="repeatButton musicIcon" onmouseover="{='showTitle(this, null, null, {dir: "up", align: "end"})'|noescape}" data-title="{_repeat_tip} [R]" ></div>
+            <div class="shuffleButton musicIcon" onmouseover="{='showTitle(this, null, null, {dir: "up", align: "end"})'|noescape}" data-title="{_shuffle_tip}"></div>
+            <div class="deviceButton musicIcon" onmouseover="{='showTitle(this, null, null, {dir: "up", align: "end"})'|noescape}" data-title="{_mute_tip} [M]"></div>
 			<form name="status_popup_form" style="display: none !important;">
 				<input type="text" name="status" size="50" value="{$thisUser->getStatus()}">
 				<input type="checkbox" name="broadcast" n:attr="checked => $thisUser->isBroadcastEnabled()">
 				<input type="hidden" name="hash" value="{$csrfToken}">
 			</form>
-			<div class="statusButton musicIcon{if $thisUser->isBroadcastEnabled()} pressed{/if}" data-tip="simple-black" data-align="bottom-end" data-tiptitle="{_broadcast_audio}"></div>
+			<div class="statusButton musicIcon{if $thisUser->isBroadcastEnabled()} pressed{/if}" onmouseover="{='showTitle(this, null, null, {dir: "up", align: "end"})'|noescape}" data-title="{_broadcast_audio}"></div>
         </div>
     </div>
 </div>

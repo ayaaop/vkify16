@@ -40,13 +40,13 @@
                     {php $hasAudio = isset($thisUser) && $audio->isInLibraryOf($thisUser)}
 
                     {if !$hideButtons}
-                        <div class="remove-icon musicIcon" data-id="{$audio->getId()}" n:if="isset($thisUser) && $hasAudio" data-tip="simple-black" data-tiptitle="{_remove}"></div>
-                        <div class="add-icon musicIcon hovermeicon" data-id="{$audio->getId()}" n:if="isset($thisUser) && !$hasAudio && !$isWithdrawn" data-tip="simple-black" data-tiptitle="{_add}"></div>
-                        <div class="remove-icon-group musicIcon" data-id="{$audio->getId()}" data-club="{$club->getId()}" n:if="isset($thisUser) && isset($club) && $club->canBeModifiedBy($thisUser)" data-tip="simple-black" data-tiptitle="{_c_remove_from_group}"></div>
-                        <div class="add-icon-group musicIcon hidden" data-id="{$audio->getId()}" n:if="isset($thisUser) && !$isWithdrawn" data-tip="simple-black" data-tiptitle="{_c_add_to_group}"></div>
-                        <a class="download-icon musicIcon" n:if='isset($thisUser) && !$isWithdrawn && $isAvailable && \OPENVK_ROOT_CONF["openvk"]["preferences"]["music"]["exposeOriginalURLs"]' href="{$audio->getOriginalURL()}" download="{$audio->getDownloadName()}" data-tip="simple-black" data-tiptitle="{_download_video}"></a>
-                        <div class="edit-icon musicIcon" data-lyrics="{$audio->getLyrics()}" data-title="{$audio->getTitle()}" data-performer="{$audio->getPerformer()}" data-explicit="{(int)$audio->isExplicit()}" data-searchable="{(int)!$audio->isUnlisted()}" n:if="isset($thisUser) && $editable && !$isWithdrawn" data-tip="simple-black" data-tiptitle="{_edit}"></div>
-                        <div class="report-icon musicIcon" data-id="{$audio->getId()}" n:if="isset($thisUser) && !$editable && !$isWithdrawn" data-tip="simple-black" data-tiptitle="{_report}"></div>
+                        <div class="remove-icon musicIcon" data-id="{$audio->getId()}" n:if="isset($thisUser) && $hasAudio" data-title="{_remove}" onmouseover="showTitle(this)"></div>
+                        <div class="add-icon musicIcon hovermeicon" data-id="{$audio->getId()}" n:if="isset($thisUser) && !$hasAudio && !$isWithdrawn" data-title="{_add}" onmouseover="showTitle(this)"></div>
+                        <div class="remove-icon-group musicIcon" data-id="{$audio->getId()}" data-club="{$club->getId()}" n:if="isset($thisUser) && isset($club) && $club->canBeModifiedBy($thisUser)" data-title="{_c_remove_from_group}" onmouseover="showTitle(this)"></div>
+                        <div class="add-icon-group musicIcon hidden" data-id="{$audio->getId()}" n:if="isset($thisUser) && !$isWithdrawn" data-title="{_c_add_to_group}" onmouseover="showTitle(this)"></div>
+                        <a class="download-icon musicIcon" n:if='isset($thisUser) && !$isWithdrawn && $isAvailable && \OPENVK_ROOT_CONF["openvk"]["preferences"]["music"]["exposeOriginalURLs"]' href="{$audio->getOriginalURL()}" download="{$audio->getDownloadName()}" data-title="{_download_video}" onmouseover="showTitle(this)"></a>
+                        <div class="edit-icon musicIcon" data-lyrics="{$audio->getLyrics()}" data-title="{$audio->getTitle()}" data-performer="{$audio->getPerformer()}" data-explicit="{(int)$audio->isExplicit()}" data-searchable="{(int)!$audio->isUnlisted()}" n:if="isset($thisUser) && $editable && !$isWithdrawn" onmouseover="showTitle(this, this.dataset.tipTitle)" data-tip-title="{_edit}"></div>
+                        <div class="report-icon musicIcon" data-id="{$audio->getId()}" n:if="isset($thisUser) && !$editable && !$isWithdrawn" data-title="{_report}" onmouseover="showTitle(this)"></div>
                     {/if}
                 </div>
             </div>

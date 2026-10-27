@@ -61,13 +61,13 @@ function renderEditMenuLayout(apiPost, type, postId) {
 
     const inlineAttachButtons = type === 'post'
         ? `
-            <a class="attach_photo" id="__photoAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('photo')}">
+            <a class="attach_photo" id="__photoAttachment" data-club="${clubId}" onmouseover="showTitle(this)" data-title="${tr('photo')}">
                 ${attachIcon('photo')}
             </a>
-            <a class="attach_video" id="__videoAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('video')}">
+            <a class="attach_video" id="__videoAttachment" data-club="${clubId}" onmouseover="showTitle(this)" data-title="${tr('video')}">
                 ${attachIcon('video')}
             </a>
-            <a class="attach_audio" id="__audioAttachment" data-club="${clubId}" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('audio')}">
+            <a class="attach_audio" id="__audioAttachment" data-club="${clubId}" onmouseover="showTitle(this)" data-title="${tr('audio')}">
                 ${attachIcon('audio')}
             </a>
         `
@@ -158,16 +158,16 @@ function renderRepostBottomLayout() {
             <div class="post-bottom-acts">
                 <div class="post-attach-menu">
                     <div id="wallAttachmentMenu">
-                        <a id="__photoAttachment" class="attach_photo" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('photo')}" data-club="0">
+                        <a id="__photoAttachment" class="attach_photo" onmouseover="showTitle(this)" data-title="${tr('photo')}" data-club="0">
                             ${attachIcon('photo')}
                         </a>
-                        <a id="__videoAttachment" class="attach_video" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('video')}" data-club="0">
+                        <a id="__videoAttachment" class="attach_video" onmouseover="showTitle(this)" data-title="${tr('video')}" data-club="0">
                             ${attachIcon('video')}
                         </a>
-                        <a id="__audioAttachment" class="attach_audio" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('audio')}" data-club="0">
+                        <a id="__audioAttachment" class="attach_audio" onmouseover="showTitle(this)" data-title="${tr('audio')}" data-club="0">
                             ${attachIcon('audio')}
                         </a>
-                        <a id="__documentAttachment" class="attach_document" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('document')}" data-club="0">
+                        <a id="__documentAttachment" class="attach_document" onmouseover="showTitle(this)" data-title="${tr('document')}" data-club="0">
                             ${attachIcon('document')}
                         </a>
                     </div>

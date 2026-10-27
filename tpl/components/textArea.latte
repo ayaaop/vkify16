@@ -142,17 +142,17 @@
                         </div>
                     {elseif $isPostComposer}
                         <a id="__photoAttachment" class="attach_photo"
-                           data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_photo}"
+                           data-title="{_photo}" aria-label="{_photo}" role="button" onmouseover="showTitle(this)"
                            n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"><svg width="16" height="13" viewBox="0 0 16 13"><use href="#menu-my-photos"/></svg></div>
                         </a>
                         <a id="__videoAttachment" class="attach_video"
-                           data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_video}"
+                           data-title="{_video}" aria-label="{_video}" role="button" onmouseover="showTitle(this)"
                            n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"><svg width="14" height="14" viewBox="0 0 14 14"><use href="#menu-my-videos"/></svg></div>
                         </a>
                         <a id="__audioAttachment" class="attach_audio"
-                           data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_audio}"
+                           data-title="{_audio}" aria-label="{_audio}" role="button" onmouseover="showTitle(this)"
                            n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"><svg width="13" height="16" viewBox="0 0 12.94 16.02"><use href="#menu-my-audios"/></svg></div>
                         </a>
@@ -185,22 +185,22 @@
                         </div>
                     {else}
                         <a id="__photoAttachment" class="attach_photo"
-                           data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_photo}"
+                           data-title="{_photo}" aria-label="{_photo}" role="button" onmouseover="showTitle(this)"
                            n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"><svg width="16" height="13" viewBox="0 0 16 13"><use href="#menu-my-photos"/></svg></div>
                         </a>
                         <a id="__videoAttachment" class="attach_video"
-                           data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_video}"
+                           data-title="{_video}" aria-label="{_video}" role="button" onmouseover="showTitle(this)"
                            n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"><svg width="14" height="14" viewBox="0 0 14 14"><use href="#menu-my-videos"/></svg></div>
                         </a>
                         <a id="__audioAttachment" class="attach_audio"
-                           data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_audio}"
+                           data-title="{_audio}" aria-label="{_audio}" role="button" onmouseover="showTitle(this)"
                            n:attr="data-club => $clubDataId">
                             <div class="post-attach-menu__icon"><svg width="13" height="16" viewBox="0 0 12.94 16.02"><use href="#menu-my-audios"/></svg></div>
                         </a>
                         <a n:if="$docsEnabled" id="__documentAttachment" class="attach_document"
-                           data-tip="simple-black" data-align="bottom-start" data-tiptitle="{_document}"
+                           data-title="{_document}" aria-label="{_document}" role="button" onmouseover="showTitle(this)"
                            n:attr="data-club => $clubDataRealId">
                             <div class="post-attach-menu__icon"><svg width="12" height="14" viewBox="0 0 12 14"><use href="#menu-my-docs"/></svg></div>
                         </a>
@@ -262,7 +262,7 @@
                         <input type="button" value="{_cancel}" class="button button_light wall-comment-cancel" />
                     {/if}
 
-                    <input type="submit" value="{_send}" class="button" />
+                    <input type="submit" value="{if $isPostComposer}{_publish}{else}{_send}{/if}" class="button" />
                 </div>
             </div>
             <div class="post-replyto" n:if="$attachMenuInTooltip"></div>

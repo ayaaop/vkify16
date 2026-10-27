@@ -33,9 +33,9 @@
         </div>
     </div>
     <div class="doc_volume" n:if="!$hideButtons && $thisUser">
-        <div class="doc_action" n:if="!$modifiable" id="report_icon" data-tip="simple-black" data-tiptitle="{_report}"></div>
-        <div class="doc_action" n:if="$modifiable" id="edit_icon" data-tip="simple-black" data-tiptitle="{_edit}" onclick="window.vkifyDocEdit(event)"></div>
-        <div class="doc_action" n:if="!$copied" id="add_icon" data-tip="simple-black" data-tiptitle="{_add}"></div>
-        <div class="doc_action" n:if="$copied" id="remove_icon" data-tip="simple-black" data-tiptitle="{_remove}"></div>
+        <div class="doc_action" n:if="!$modifiable" id="report_icon" data-title="{_report}" onmouseover="showTitle(this)"></div>
+        <div class="doc_action" n:if="$modifiable" id="edit_icon" data-title="{_edit}" onmouseover="showTitle(this)" onclick="window.vkifyDocEdit(event)"></div>
+        <div class="doc_action" n:if="!$copied" id="add_icon" data-title="{_add}" onmouseover="showTitle(this)"></div>
+        <div class="doc_action" n:if="$copied" id="remove_icon" data-title="{_remove}" onmouseover="showTitle(this)"></div>
     </div>
 </div>

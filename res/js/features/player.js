@@ -54,7 +54,7 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
         </div>
 
         <div class="bsdn_controls">
-            <button class="bsdn_playButton" data-tip="simple-black" data-tiptitle="${tr('play_tip')}" data-delay="1" data-align="top-start" data-tiptheme="vkify-player" data-tipoffset="0,0">
+            <button class="bsdn_playButton" onmouseover="showTitle(this, null, null, {dir:'down', showdt:1000, className:'vkify-player'})" data-title="${tr('play_tip')}">
                 <svg class="bsdn_playIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <g fill="none" fill-rule="evenodd">
                         <g fill-rule="nonzero">
@@ -80,7 +80,7 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
                 <time class="bsdn_timeFull">--:--</time>
             </div>
 
-            <div class="bsdn_soundIcon" data-tip="simple-black" data-tiptitle="${tr('mute_tip')}" data-delay="1" data-align="top-center" data-tiptheme="vkify-player" data-tipoffset="0,0">
+            <div class="bsdn_soundIcon" onmouseover="showTitle(this, null, null, {dir:'down', center:true, showdt:1000, className:'vkify-player'})" data-title="${tr('mute_tip')}">
                 <svg class="bsdn_volumeIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <g fill="#fff" fill-rule="evenodd">
                         <path class="_speaker" d="M12.980843 18.8227621c-.032051 1.2070086-.6704932 1.608931-1.8287519.6202507-1.7185995-1.4687545-3.60887471-3.1942931-4.24215929-3.7215065-.63217937-.528454-1.64491897-.6202511-3.07284859-.6202511-1.42682441 0-1.81505873-.6202511-1.81505873-1.2405016s-.01369327-1.8288162-.01369327-2.001246c0-.0549443.00464608-.085056.01369327-.1291845.01954957-.0953551-.05817756-.9728525 0-1.591076.08510106-.90556663.38823432-1.24050252 1.81505873-1.24050252 1.42792962 0 2.44066922-.09179716 3.07284859-.62025109.63328458-.52845393 2.52355979-2.25275186 4.24215929-3.72150644 1.1582587-.98868024 1.7967003-.58675756 1.8287514.62025106.0431031 1.60645033 5e-7 3.85020301 5e-7 6.68226949 0 2.8295855.0431032 5.3568042 0 6.9632545z"></path>
@@ -91,7 +91,7 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
                 </svg>
             </div>
 
-            <div class="bsdn_soundControl" data-tip="simple-black" data-tiptitle="${vkifyTip('player_volume_tip', 'Volume')}" data-delay="1" data-align="top-center" data-tiptheme="vkify-player" data-tipoffset="0,0">
+            <div class="bsdn_soundControl" onmouseover="showTitle(this, null, null, {dir:'down', center:true, showdt:1000, className:'vkify-player'})" data-title="${vkifyTip('player_volume_tip', 'Volume')}">
                 <div class="bsdn_soundControlPadding"></div>
                 <div class="bsdn_soundControlSubWrap">
                     <div class="bsdn_soundControlPlayed" style="width: 100%;"></div>
@@ -99,13 +99,13 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
                 </div>
             </div>
 
-            <div class="bsdn_repeatButton" data-tip="simple-black" data-tiptitle="${vkifyTip('player_repeat_enable_tip', 'Enable auto-repeat')}" data-delay="1" data-align="top-center" data-tiptheme="vkify-player" data-tipoffset="0,0">
+            <div class="bsdn_repeatButton" onmouseover="showTitle(this, null, null, {dir:'down', center:true, showdt:1000, className:'vkify-player'})" data-title="${vkifyTip('player_repeat_enable_tip', 'Enable auto-repeat')}">
                 <svg class="bsdn_repeatIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path class="_replay" d="m12 4.5000003c4.418278 0 8 3.581722 8 8s-3.581722 8-8 8-8-3.581722-8-8c0-.5522847.44771525-1 1-1s1 .4477153 1 1c0 3.3137085 2.6862915 6 6 6s6-2.6862915 6-6-2.6862915-6-6-6v3.09577928c0 .09950642-.0370887.19544034-.104024.26906913-.1486028.16346309-.4015821.17550969-.5650451.02690691l-4.28830818-3.89846194c-.01565124-.0142284-.03061645-.02919361-.04484485-.04484485-.24767129-.27243841-.22759356-.69407063.04484485-.94174191l4.28830818-3.89846194c.0736287-.06693527.1695627-.10402398.2690691-.10402398.2209139 0 .4.17908611.4.40000002z" fill="#fff"></path>
                 </svg>
             </div>
 
-            <div class="bsdn_fullScreenButton" data-tip="simple-black" data-tiptitle="${vkifyTip('player_fullscreen_tip', 'Fullscreen')}" data-delay="1" data-align="top-end" data-tiptheme="vkify-player" data-tipoffset="0,0">
+            <div class="bsdn_fullScreenButton" onmouseover="showTitle(this, null, null, {dir:'down', align:'end', showdt:1000, className:'vkify-player'})" data-title="${vkifyTip('player_fullscreen_tip', 'Fullscreen')}">
                 <svg class="bsdn_fullscreenIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <g fill="#fff" fill-rule="evenodd">
                         <path class="_enter" d="M10.5 19c0 .5522847-.4477153 1-1 1H5c-.55228475 0-1-.4477153-1-1v-4.5c0-.5522847.44771525-1 1-1s1 .4477153 1 1v2.0715l3.36290054-3.3643932.00012963-.0001296c.39052429-.3905243 1.02368923-.3905243 1.41421353 0l.0157791.0157791.0001297.0001296c.3904527.3905959.3903366 1.0237609-.0002593 1.4142136L7.4285 18H9.5c.5522847 0 1 .4477153 1 1zM18 7.4285l-3.3629005 3.3643932c-.0000432.0000432-.0000865.0000864-.0001297.0001296-.3905243.3905243-1.0236892.3905243-1.4142135 0l-.0157791-.0157791c-.0000433-.0000432-.0000865-.0000864-.0001297-.0001296-.3904527-.3905959-.3903366-1.02376087.0002593-1.41421356L16.5715 6H14.5c-.5522847 0-1-.44771525-1-1s.4477153-1 1-1H19c.5522847 0 1 .44771525 1 1v4.5c0 .5522847-.4477153 1-1 1s-1-.4477153-1-1z"></path>
@@ -330,12 +330,9 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
         var volumeSlider = el.querySelector('.bsdn_soundControl');
         var repeatButton = el.querySelector('.bsdn_repeatButton');
         var setVolumeHoverTipEnabled = function(enabled) {
-            if (!volumeSlider || !volumeSlider._tippy) return;
-            if (enabled) volumeSlider._tippy.enable();
-            else {
-                volumeSlider._tippy.hide();
-                volumeSlider._tippy.disable();
-            }
+            if (!volumeSlider) return;
+            volumeSlider._vkNoTooltip = !enabled;
+            if (!enabled) window.tooltips?.hide(volumeSlider, { fasthide: true });
         };
 
         var getRepeatTipText = function(enabled) {
@@ -349,8 +346,8 @@ vkify.hook(window, '_bsdnTpl', function(name, author) {
             var enabled = !!v.loop;
             repeatButton.classList.toggle('is-on', enabled);
             var tipText = getRepeatTipText(enabled);
-            repeatButton.setAttribute('data-tiptitle', tipText);
-            if (repeatButton._tippy) repeatButton._tippy.setContent(tipText);
+            repeatButton.setAttribute('data-title', tipText);
+            if (repeatButton.tt?.shown) window.showTitle(repeatButton);
         };
 
         delete listeners[".bsdn_terebilkaLowerWrap"];

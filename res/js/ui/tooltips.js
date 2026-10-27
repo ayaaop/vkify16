@@ -1,6 +1,6 @@
 /**
  * Dismissable onboarding popups (Tippy-backed) and shared helpers for
- * tooltips-simple.js, notifications-popup.js, music-popup.js. Action menus
+ * notifications-popup.js and music-popup.js. Action menus
  * moved to action-menu.js — Tippy's DOM relocation broke stacking/closest().
  */
 

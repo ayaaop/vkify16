@@ -1185,11 +1185,11 @@ vkify.once('photoEditor', function () {
                     </div>
                     <div class="pe_canvas_wrap"></div>
                     <div class="pe_actions">
-                        <div class="pe_action" id="pe_crop" data-tip="simple-black" data-tiptitle="${vtr('pe_crop', 'Crop')}"><div></div></div>
-                        <div class="pe_action" id="pe_blur" data-tip="simple-black" data-tiptitle="${vtr('pe_blur', 'Blur')}"><div></div></div>
-                        <div class="pe_action" id="pe_rotate" data-tip="simple-black" data-tiptitle="${vtr('pe_rotate', 'Rotate')}"><div></div></div>
-                        <div class="pe_action" id="pe_auto" data-tip="simple-black" data-tiptitle="${vtr('pe_auto', 'Auto-correction')}"><div></div></div>
-                        <div class="pe_action" id="pe_text" data-tip="simple-black" data-tiptitle="${vtr('pe_text', 'Add text')}"><div></div></div>
+                        <div class="pe_action" id="pe_crop" onmouseover="showTitle(this)" data-title="${vtr('pe_crop', 'Crop')}"><div></div></div>
+                        <div class="pe_action" id="pe_blur" onmouseover="showTitle(this)" data-title="${vtr('pe_blur', 'Blur')}"><div></div></div>
+                        <div class="pe_action" id="pe_rotate" onmouseover="showTitle(this)" data-title="${vtr('pe_rotate', 'Rotate')}"><div></div></div>
+                        <div class="pe_action" id="pe_auto" onmouseover="showTitle(this)" data-title="${vtr('pe_auto', 'Auto-correction')}"><div></div></div>
+                        <div class="pe_action" id="pe_text" onmouseover="showTitle(this)" data-title="${vtr('pe_text', 'Add text')}"><div></div></div>
                     </div>
                 </div>
                 <div class="pe_tabs_panel" id="pe_tabs_panel" style="display:block; opacity:1;">

@@ -306,13 +306,13 @@ function decorateHorizontalItem(anchorEl, opts = {}) {
                 <div class="photo_thumb_btns_container ui_thumb_extra">
                     <div class="photo_thumb_btns_overlay">
                         <div class="photo_thumb_btns">
-                            <div class="photo_thumb_btn_show ui_extra_btn_show" data-tip="simple-black" data-tiptitle="${tr('photo')}"></div>
-                            ${canEditPhoto ? `<div class="photo_thumb_btn_editor ui_extra_btn_pe" data-photo-id="${cleanPhotoId}" data-src="${opts.fullsize_url || previewSrc}" data-large-src="${opts.fullsize_url || previewSrc}" data-tip="simple-black" data-tiptitle="${vtr('pe_act_stickers', 'Effects & stickers')}"></div>` : ''}
+                            <div class="photo_thumb_btn_show ui_extra_btn_show" onmouseover="showTitle(this)" data-title="${tr('photo')}"></div>
+                            ${canEditPhoto ? `<div class="photo_thumb_btn_editor ui_extra_btn_pe" data-photo-id="${cleanPhotoId}" data-src="${opts.fullsize_url || previewSrc}" data-large-src="${opts.fullsize_url || previewSrc}" onmouseover="showTitle(this)" data-title="${vtr('pe_act_stickers', 'Effects & stickers')}"></div>` : ''}
                         </div>
                     </div>
                 </div>
             ` : ''}
-            <div class="ui_thumb_x_button upload-delete" data-tip="simple-black" data-tiptitle="${tr('detach') || tr('delete')}">
+            <div class="ui_thumb_x_button upload-delete" onmouseover="showTitle(this)" data-title="${tr('detach') || tr('delete')}">
                 <div class="ui_thumb_x"></div>
             </div>
         </div>

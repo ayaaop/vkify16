@@ -257,16 +257,7 @@ time.bsdn_timeFull,
 .bsdn_teaser {
     background-color: rgba(0, 0, 0, .9);
 }
-.tippy-box[data-theme~='vkify-player'] {
-    padding: 7px 12px 8px;
-}
-.tippy-box[data-theme~='vkify-player'] .tippy-content {
-    font-size: 13px;
-    padding: 0;
-    line-height: 18px;
-    font-weight: 500;
-}
-:fullscreen .tippy-box[data-theme~='vkify-player'] .tippy-content {
+:fullscreen .tt_w.vkify-player .tt_text {
     font-size: 16px;
     line-height: 22px;
 }
