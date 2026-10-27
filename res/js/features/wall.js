@@ -1900,7 +1900,7 @@ u(document).on('click', '.post.reply', function(e) {
     let comment   = u(this);
     let authorId  = comment.data('owner-id');
     let commentId = comment.data('comment-id');
-    let authorNm  = (comment.data('mention-name') || '').trim();
+    let authorNm  = (comment.data('mention-name') || '').replace(/#/g, '').trim();
     let fromGroup = comment.attr('data-from-group') === 'true';
     let postId    = comment.data('post-id');
     let inputbox  = postId == null ? u('#standaloneCommentBox textarea') : u('#wall-post-input' + postId);
@@ -1910,7 +1910,7 @@ u(document).on('click', '.post.reply', function(e) {
     let attachments = inputbox.closest('.model_content_textarea').find('.post-buttons');
 
     inputbox.nodes.forEach(node => {
-        node.value = node.value.replace(/(^\[([A-Za-z0-9]+)\|([\p{L} 0-9@]+)\], |^)/u, mention);
+        node.value = node.value.replace(/(^\[([A-Za-z0-9]+)\|([^\]\r\n]+)\], |^)/u, mention);
     });
     inputbox.trigger('focusin');
     inputbox.closest('.model_content_textarea').addClass('shown');
@@ -1927,7 +1927,7 @@ u(document).on('click', '.post.reply', function(e) {
         attachments.find('.post-replyto').html('');
         attachments.find('input[name="reply_to_comment"]').attr('value', '');
         inputbox.nodes.forEach(node => {
-            node.value = node.value.replace(/^\[[A-Za-z0-9]+\|[\p{L} 0-9@]+\], /u, '');
+            node.value = node.value.replace(/^\[[A-Za-z0-9]+\|[^\]\r\n]+\], /u, '');
         });
     });
 });
