@@ -283,9 +283,10 @@ vkify.once('affixedNavigation', () => {
 
         const scrollTop = getScrollTop();
         const previousState = state;
-        const preserveOffset = previousState && previousState.anchor === anchor;
+        const preserveOffset = previousState && previousState.anchor === anchor && previousState.menu === menu;
 
         state = {
+            menu: menu,
             anchor: anchor,
             anchorWidth: anchor.offsetWidth,
             initialTop: getDocumentTop(anchor),
