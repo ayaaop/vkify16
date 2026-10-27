@@ -316,7 +316,7 @@
                                 </script>
                             {elseif $section === 'docs'}
                                 {foreach $data as $dat}
-                                    {include "../Documents/components/doc.latte", doc => $dat, copyImportance => true, scroll_ocntext => true}
+                                    {include "../Documents/components/doc.latte", doc => $dat, copyImportance => true, scroll_context => true}
                                 {/foreach}
 
                                 <script n:if="$count > 0 && !empty($query)">

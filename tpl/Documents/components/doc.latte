@@ -6,7 +6,7 @@
 {var $scroll_context = $scroll_context ?? false}
 {var $hideButtons = $hideButtons ?? false}
 
-<div n:class="search_row, docMainItem, docListViewItem, $scroll_context ? scroll_node" data-id="{$doc->getPrettiestId()}">
+<div n:class="search_row, docMainItem, docListViewItem, $scroll_context ? scroll_node" data-id="{$doc->getPrettiestId()}" n:attr="data-uniqueid => $scroll_context ? ('doc-' . $doc->getPrettiestId()) : null">
     <a class="viewerOpener" data-id="{$doc->getPrettiestId()}" href="/doc{$doc->getPrettyId()}?key={$doc->getAccessKey()}">
         {if $preview}
             <img class="doc_icon" alt="document_preview" src="{$preview->getURLBySizeId('tiny')}">
