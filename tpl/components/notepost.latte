@@ -41,11 +41,12 @@
             </div>
         </div>
         <div class='post_edit'></div>
-        <div class="post_full_like_wrap" n:if="$thisUser && !($forceNoLike ?? false)" n:ifcontent>
+        <div class="post_full_like_wrap" n:if="$thisUser && !($forceNoCommentsLink ?? false)" n:ifcontent>
             <div class="post_full_like">
-                <a n:if="!($forceNoCommentsLink ?? false) && $commentsCount == 0" class="action_button side_button post_reply" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">
+                <a class="action_button side_button post_reply" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">
                     <svg class="action_icon"><use class="i16" href="#comment-14"></use><use class="i18" href="#comment-outline-24"></use></svg>
-                    <span class="action_label">{_comment}</span>
+                    <span class="action_label">{_reply}</span>
+                    <span class="action_count">{$commentsCount}</span>
                 </a>
             </div>
         </div>
