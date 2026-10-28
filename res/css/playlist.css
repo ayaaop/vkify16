@@ -230,13 +230,14 @@
 	overflow: hidden;
 }
 .AudioPlaylistSnippet__actions .action_button .action_label {
-	vertical-align: middle;
+	display: none;
 }
 .post_more .action_icon {
 	display: none;
 }
-.post_more .action_label {
+.AudioPlaylistSnippet__actions .post_more .action_label {
 	margin-left: 0;
+	display: inline-block;
 }
 .post_more::after {
 	display: inline-block;
@@ -261,7 +262,6 @@
 }
 .AudioPlaylistSnippet__actions .post_share .action_icon {
 	margin: 0;
-	margin-right: 2px;
 }
 .AudioPlaylistSnippet__audioPartRow {
 	height: 36px;
