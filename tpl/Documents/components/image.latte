@@ -4,7 +4,7 @@
 {var $scroll_context = $scroll_context ?? false}
 {var $embed = $embed ?? false}
 
-<a href="/doc{$doc->getPrettyId()}?key={$doc->getAccessKey()}" n:class="docMainItem, viewerOpener, docGalleryItem, $scroll_context ? scroll_node, $embed ? embeddable" data-id="{$doc->getPrettiestId()}">
+<a href="/doc{$doc->getPrettyId()}?key={$doc->getAccessKey()}" n:class="docMainItem, viewerOpener, docGalleryItem, $scroll_context ? scroll_node, $embed ? embeddable" data-id="{$doc->getPrettiestId()}" n:attr="data-uniqueid => $scroll_context ? ('doc-' . $doc->getPrettiestId()) : null">
     <img class="docGalleryItem_main_preview" loading="lazy" src="{$preview->getURLBySizeId('medium')}" alt="gallery photo">
     {if $embed}
         <div class="play-button">

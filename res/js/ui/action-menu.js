@@ -132,6 +132,7 @@ vkify.once('uiActionsMenu', function () {
       data(el, 'dummyMenu', newWrap);
       data(newWrap, 'origMenu', el);
       data(newWrap, 'appendParentCls', options.appendParentCls);
+      if (options.align) data(newWrap, 'uiActionsMenuAlign', options.align);
       el = newWrap;
 
       data(menu, 'top', intval(getStyle(menu, 'top')));
@@ -442,6 +443,12 @@ vkify.once('uiActionsMenu', function () {
       }
 
       if (willShow) {
+        if (!options.align) {
+          options.align = data(el, 'uiActionsMenuAlign')
+            || data(origEl, 'uiActionsMenuAlign')
+            || origEl?.dataset?.align
+            || el?.dataset?.align;
+        }
         if (menu) removeClass(menu, 'ui_actions_menu_hiding');
         if (options.menuId) {
           ensureMenu(el, options.menuId);
@@ -648,6 +655,8 @@ vkify.once('uiActionsMenu', function () {
           if (appendMatch) opts.appendParentCls = appendMatch[1];
         }
         if (wrap.dataset.menuId) opts.menuId = wrap.dataset.menuId;
+        if (wrap.dataset.align) opts.align = wrap.dataset.align;
+        if (wrap.dataset.appendParentCls) opts.appendParentCls = wrap.dataset.appendParentCls;
         uiActionsMenu.toggle(wrap, null, opts);
       }
     }

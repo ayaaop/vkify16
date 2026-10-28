@@ -92,15 +92,15 @@
                 </a>
             {/if}
             {if $x->getSubscriptionStatus($thisUser) == false}
-                <a href="javascript:void(0)" onclick="this.closest('.ui_actions_menu').querySelector('form[data-action=add]').submit()">{_join_community}</a>
-                <form style="display: none" data-action="add" action="/setSub/club" method="post">
+                <a href="javascript:void(0)" onclick="this.closest('.ui_actions_menu').querySelector('form[data-action=add]').requestSubmit()">{_join_community}</a>
+                <form style="display: none" class="vk-friend-action" data-action="add" action="/setSub/club" method="post">
                     <input type="hidden" name="act" value="add" />
                     <input type="hidden" name="id" value="{$x->getId()}" />
                     <input type="hidden" name="hash" value="{$csrfToken}" />
                 </form>
             {else}
-                <a href="javascript:void(0)" onclick="this.closest('.ui_actions_menu').querySelector('form[data-action=rem]').submit()">{_leave_community}</a>
-                <form style="display: none" data-action="rem" action="/setSub/club" method="post">
+                <a href="javascript:void(0)" onclick="this.closest('.ui_actions_menu').querySelector('form[data-action=rem]').requestSubmit()">{_leave_community}</a>
+                <form style="display: none" class="vk-friend-action" data-action="rem" action="/setSub/club" method="post">
                     <input type="hidden" name="act" value="rem" />
                     <input type="hidden" name="id" value="{$x->getId()}" />
                     <input type="hidden" name="hash" value="{$csrfToken}" />

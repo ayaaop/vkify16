@@ -17,6 +17,7 @@ body #im_container .crp-list .crp-entry--message---av img,
 .chat-invite-member-ava, .chat-invite-avatar,
 .messenger-app--messages---message .ava,
 .messenger-app--messages---message .msg-attach-wall-card .wall-card-avatar,
+.messenger-app--messages---message ._content .reply-msg-container .reply-avatar,
 .messenger-app--messages---message .fwd-avatar,
 .fwd-modal-content .fwd-avatar,
 .pinned-message-ava,
@@ -34,4 +35,9 @@ body #im_container .crp-list .crp-entry--message---av img,
     border-radius: 0 !important;
     bottom: -2px;
     right: -2px;
+}
+
+body #im_container .crp-list .crp-entry .crp-entry--message.unread {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
 }

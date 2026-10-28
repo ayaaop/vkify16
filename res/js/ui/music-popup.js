@@ -578,10 +578,10 @@ async function initMusicPopupTippyOnce() {
 <div class="bigPlayer ctx_place">
 <div class="bigPlayerWrapper">
     <div class="playButtons">
-        <div onmousedown="this.classList.add('pressed')" onmouseup="this.classList.remove('pressed')" class="playButton musicIcon" data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr('play_tip')}"><div class="playIcon"></div></div>
+        <div onmousedown="this.classList.add('pressed')" onmouseup="this.classList.remove('pressed')" class="playButton musicIcon" data-title="${tr('play_tip')}" onmouseover="showTitle(this, null, null, {dir:'up'})"><div class="playIcon"></div></div>
         <div class="arrowsButtons">
-            <div class="nextButton musicIcon" data-tip="simple-black" data-align="bottom-start" data-tiptitle=""></div>
-            <div class="backButton musicIcon" data-tip="simple-black" data-align="bottom-start" data-tiptitle=""></div>
+            <div class="nextButton musicIcon" data-title="" onmouseover="showTitle(this, null, null, {dir:'up'})"></div>
+            <div class="backButton musicIcon" data-title="" onmouseover="showTitle(this, null, null, {dir:'up'})"></div>
         </div>
     </div>
 
@@ -622,15 +622,15 @@ async function initMusicPopupTippyOnce() {
     </div>
 
     <div class="additionalButtons">
-        <div class="repeatButton musicIcon" data-tip="simple-black" data-align="bottom-end" data-tiptitle="${tr('repeat_tip')}"></div>
-        <div class="shuffleButton musicIcon" data-tip="simple-black" data-align="bottom-end" data-tiptitle="${tr('shuffle_tip')}"></div>
-        <div class="deviceButton musicIcon" data-tip="simple-black" data-align="bottom-end" data-tiptitle="${tr('mute_tip')}"></div>
+        <div class="repeatButton musicIcon" onmouseover="showTitle(this, null, null, {dir:'up', align:'end'})" data-title="${tr('repeat_tip')}"></div>
+        <div class="shuffleButton musicIcon" onmouseover="showTitle(this, null, null, {dir:'up', align:'end'})" data-title="${tr('shuffle_tip')}"></div>
+        <div class="deviceButton musicIcon" onmouseover="showTitle(this, null, null, {dir:'up', align:'end'})" data-title="${tr('mute_tip')}"></div>
         <form name="status_popup_form" style="display: none !important;">
             <input type="text" name="status" size="50" value="${escapeHtml(window.openvk?.status || '')}">
             <input type="checkbox" name="broadcast" ${window.openvk?.broadcast_music ? 'checked' : ''}>
             <input type="hidden" name="hash" value="${vkify.getCsrf()}">
         </form>
-        <div class="statusButton musicIcon${window.openvk?.broadcast_music ? ' pressed' : ''}" data-tip="simple-black" data-align="bottom-end" data-tiptitle="${tr('broadcast_audio')}"></div>
+        <div class="statusButton musicIcon${window.openvk?.broadcast_music ? ' pressed' : ''}" onmouseover="showTitle(this, null, null, {dir:'up', align:'end'})" data-title="${tr('broadcast_audio')}"></div>
     </div>
 </div>
 </div>

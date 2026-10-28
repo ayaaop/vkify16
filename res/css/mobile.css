@@ -70,7 +70,7 @@
         display: none !important;
     }
     .page_body {
-        margin-top: var(--header-height);
+        margin-top: calc(var(--header-height) + var(--top-popups-height, 0px));
     }
     .page_body, center span:only-child, .post-content .text, .post-content, .edit_link, table, .video-wowzer {
         font-size: 14px;
@@ -87,7 +87,7 @@
         background-color: var(--accent-color);
         color: var(--accent-text-color);
         position: fixed;
-        top: 0;
+        top: var(--top-popups-height, 0px);
         left: 0;
         width: 100%;
         z-index: 198;
@@ -104,19 +104,30 @@
         --accent-color: var(--module-header-background-color);
         --accent-text-color: var(--text-color);
     }
-    .appbar .hamburger {
+    .appbar :is(.hamburger, .appbar-back, .appbar-extra-btn),
+    #__feed_settings_link.appbar-extra-btn {
         width: 48px;
         height: 48px;
         margin: 0;
-        flex-shrink: 0;
-        cursor: pointer;
+        flex: 0 0 48px;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--accent-text-color);
+        cursor: pointer;
     }
-    .appbar .hamburger svg {
-        fill: var(--accent-text-color);
+    .appbar :is(.hamburger, .appbar-back, .appbar-title)[hidden] {
+        display: none !important;
+    }
+    body.body_im #im_container .im_page:not(.hidden) .peer-back.button {
+        display: none;
+    }
+    .appbar :is(.hamburger, .appbar-back, .appbar-extra-btn) svg {
+        fill: currentColor;
     }
     .appbar .hamburger-badge {
         position: absolute;
@@ -157,19 +168,6 @@
         display: flex;
         align-items: center;
     }
-    .appbar-extra-btn,#__feed_settings_link.appbar-extra-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--accent-text-color);
-    }
-    .appbar-extra-btn svg {
-        fill: var(--accent-text-color);
-    }
     .appbar--transparent {
         background-color: transparent !important;
         box-shadow: none !important;
@@ -178,19 +176,14 @@
         background-color: color-mix(in srgb, var(--accent-color) calc(var(--appbar-bg-alpha) * 100%), transparent) !important;
         box-shadow: none !important;
     }
-    .appbar--transparent .hamburger svg,
     .appbar--transparent .appbar-title,
-    .appbar--extra-btn svg,
-    .appbar--transparent .appbar-extra-btn svg {
-        fill: #fff !important;
+    .appbar--transparent :is(.hamburger, .appbar-back, .appbar-extra-btn) {
         color: #fff !important;
     }
     .appbar--transparent .appbar-title {
-        color: #fff !important;
         text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
-    .appbar--transparent .hamburger svg,
-    .appbar--transparent .appbar-extra-btn svg {
+    .appbar--transparent :is(.hamburger, .appbar-back, .appbar-extra-btn) svg {
         filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
     }
     .appbar--scrolled,
@@ -290,7 +283,7 @@
         opacity: 0.9;
     }
     .appbar-tabs-menu-item--subitem.appbar-tabs-menu-item--active .appbar-tabs-menu-label {
-        color: var(--accent-color);
+        color: var(--link-color);
         font-weight: 500;
         opacity: 1;
     }
@@ -318,16 +311,6 @@
     .appbar-extra-btn-wrap {
         display: flex;
         align-items: center;
-    }
-    .appbar-extra-btn-wrap .appbar-extra-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--accent-text-color);
     }
     .appbar-extra-btn-wrap .archive_actions_icon {
         display: block;
@@ -413,7 +396,7 @@
     body.menu-expanded {
         overflow: hidden;
     }
-    html:has(body.dimmed) {
+    html:has(body.dimmed),body.dimmed {
         overflow-y: hidden!important;
         scrollbar-gutter: stable;
     }
@@ -970,7 +953,7 @@
         margin-left: 0;
     }
     #login_form, .form_field input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"]), .form_field:not(.settings_privacy_row) select, .form_field textarea,
-    input[type="email"], input[type="number"], input[type="password"], input[type="phone"], input[type="text"], input[type~="date"], input[type~="time"], input[type~="datetime-local"], input[type~="email"], input[type~="password"], input[type~="phone"], input[type~="text"], input[type="url"], input[type~="url"], select, textarea:not(.expanded-textarea), .PE_playlistEditPage textarea[name="description"] {
+    input[type="email"], input[type="number"], input[type="password"], input[type="phone"], input[type="text"]:not(.ui_search_field,.vouncher_input), input[type~="date"], input[type~="time"], input[type~="datetime-local"], input[type~="email"], input[type~="password"], input[type~="phone"], input[type~="text"]:not(.ui_search_field,.vouncher_input), input[type="url"], input[type~="url"], select, textarea:not(.expanded-textarea), .PE_playlistEditPage textarea[name="description"] {
         width: 100%!important;
     }
 
@@ -979,7 +962,7 @@
     #login_form input:not([type="submit"], [type="checkbox"], [type="radio"], [type="button"], [type="hidden"]),
     .form_field select,
     .form_field textarea, textarea:not(.expanded-textarea),
-    input[type="email"], input[type="number"], input[type="password"], input[type="phone"], input[type="text"], input[type~="date"], input[type~="time"], input[type~="datetime-local"], input[type~="email"], input[type~="password"], input[type~="phone"], input[type~="text"], input[type="url"], input[type~="url"], select, .PE_playlistEditPage textarea[name="description"], .emoji-input-wrap {
+    input[type="email"], input[type="number"], input[type="password"], input[type="phone"], input[type="text"]:not(.ui_search_field,.vouncher_input), input[type~="date"], input[type~="time"], input[type~="datetime-local"], input[type~="email"], input[type~="password"], input[type~="phone"], input[type~="text"]:not(.ui_search_field,.vouncher_input), input[type="url"], input[type~="url"], select, .PE_playlistEditPage textarea[name="description"], .emoji-input-wrap {
         height: 44px;
         padding: 11px 0 8px;
         font-size: 16px;
@@ -1245,7 +1228,8 @@
     .ovk-msg-sheet .ovk-diag-head a {
         color: var(--muted-text-color-2);
     }
-    .ovk-msg-sheet .ovk-diag-head-close {
+    .ovk-msg-sheet .ovk-diag-head-close,
+    .ovk-diag-cont .ovk-diag-head .picker-header-back {
         float: none;
         order: -1;
         flex: none;
@@ -1254,10 +1238,19 @@
         justify-content: center;
         width: 48px;
         height: 48px;
+        max-width: none;
         padding: 0;
-        margin-right: 4px;
+        margin: 0 4px 0 0;
+        border-radius: 0;
         background: none;
         color: var(--muted-text-color-2);
+    }
+    .ovk-diag-head:has(.picker-header-back) .ovk-diag-head-close,
+    .ovk-diag-head .picker-header-back .picker-header-back-label {
+        display: none;
+    }
+    .ovk-diag-cont .ovk-diag-head .picker-header-back:hover {
+        background-color: transparent;
     }
     .ovk-msg-sheet .ovk-diag-head-close-icon {
         display: block;
@@ -1326,18 +1319,6 @@
     .ovk-msg-sheet .ovk-diag-action > .picker-bottom-cancel {
         display: none;
     }
-    .ovk-msg-sheet .ovk-diag-head .picker-header-back {
-        float: none;
-        margin: 0;
-        padding: 0 8px 0 22px;
-        height: auto;
-        line-height: 20px;
-        color: var(--text-color);
-        background: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2217%22%20viewBox%3D%220%200%2010%2017%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23656565%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20d%3D%22M8.5%201.5L1.5%208.5l7%207%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") no-repeat 4px center / 9px 15px;
-    }
-    .ovk-msg-sheet .ovk-diag-head .picker-header-back:hover {
-        background-color: transparent;
-    }
     .video_choose_upload_area_cont {
         margin: -8px -16px 12px;
     }
@@ -1347,6 +1328,13 @@
         flex: 0 0 50%;
         padding: 8px 6px;
         font-size: 13px;
+    }
+
+    .audios_search_container {
+        flex-direction: column;
+    }
+    .audios_search_container .ui_search.ui_search_new {
+        width: 100%;
     }
 
     .ovk-diag-body .audiosInsert {
@@ -1776,7 +1764,7 @@
         height: 12px;
         opacity: 0.95;
     }
-    .post-buttons .vertical-attachment .vertical-attachment-remove:not(.lagged) {
+    :is(.post-buttons, .post-vertical) .vertical-attachment .vertical-attachment-remove:not(.lagged) {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1892,34 +1880,9 @@
     }
 
     /* search */
-    .ui_search {
-        padding: 8px 16px;
-    }
-    .ui_search input.ui_search_field {
-        height: 40px;
-        padding: 10px 40px 10px 38px;
-        font-size: 16px;
-        line-height: 20px;
-        color: var(--text-color);
-        border: none;
-        border-radius: 8px;
-        background-color: var(--module-background-color--secondary);
-        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%221284%20207%2024%2024%22%3E%3Cg%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M1298.5%20222.9C1297.5%20223.6%201296.3%20224%201295%20224%201291.7%20224%201289%20221.3%201289%20218%201289%20214.7%201291.7%20212%201295%20212%201298.3%20212%201301%20214.7%201301%20218%201301%20219.3%201300.6%20220.5%201299.9%20221.5L1302.7%20224.2C1303%20224.6%201303.1%20225.3%201302.7%20225.7%201302.3%20226%201301.6%20226%201301.2%20225.7L1298.5%20222.9ZM1295%20222C1297.2%20222%201299%20220.2%201299%20218%201299%20215.8%201297.2%20214%201295%20214%201292.8%20214%201291%20215.8%201291%20218%201291%20220.2%201292.8%20222%201295%20222Z%22%20fill%3D%22%239299A6%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
-        background-repeat: no-repeat;
-        background-position: 12px center;
-        background-size: 20px 20px;
-        box-sizing: border-box;
-    }
-    body.dark-mode .ui_search input.ui_search_field {
-        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%221284%20207%2024%2024%22%3E%3Cg%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M1298.5%20222.9C1297.5%20223.6%201296.3%20224%201295%20224%201291.7%20224%201289%20221.3%201289%20218%201289%20214.7%201291.7%20212%201295%20212%201298.3%20212%201301%20214.7%201301%20218%201301%20219.3%201300.6%20220.5%201299.9%20221.5L1302.7%20224.2C1303%20224.6%201303.1%20225.3%201302.7%20225.7%201302.3%20226%201301.6%20226%201301.2%20225.7L1298.5%20222.9ZM1295%20222C1297.2%20222%201299%20220.2%201299%20218%201299%20215.8%201297.2%20214%201295%20214%201292.8%20214%201291%20215.8%201291%20218%201291%20220.2%201292.8%20222%201295%20222Z%22%20fill%3D%22%239198A5%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
-    }
     .ui_search input.ui_search_field:focus {
         border-bottom-color: transparent;
         box-shadow: none;
-    }
-    .ui_search .ui_search_reset {
-        right: 4px;
-        width: 34px;
     }
     /* the tabs-overlay search stays a plain full-bleed bar, not a pill */
     .ui_tab_search_wrap .ui_search input.ui_search_field,
@@ -1950,28 +1913,6 @@
         border-radius: 0 !important;
         box-shadow: none !important;
         background: transparent !important;
-    }
-    /* picker search */
-    .ui_search.ui_search_new {
-        padding: 0;
-    }
-    .ui_search_new .ui_search_input_inner {
-        border: none;
-        border-radius: 0;
-    }
-    .ui_search_new .ui_search_button_search,
-    .ui_search_new.ui_search_field_empty .ui_search_button_search,
-    .ui_search_new .ui_search_button_search:hover {
-        width: 40px;
-        height: 40px;
-        margin-left: 8px;
-        border: none;
-        border-radius: 8px;
-        background-color: var(--module-background-color--secondary);
-    }
-    .ui_tabs_search_opened .ui_search .ui_search_input_block {
-        border-radius: 0;
-        background-color: var(--module-background-color);
     }
     .tabs_header:not(.mobile-rmenu-tabs) .ui_tabs.ui_tabs_search_opened {
         overflow: hidden;
@@ -2050,6 +1991,9 @@
     .attachment_selector .choose_upload_area {
         margin: -8px -8px 8px;
     }
+    .attachment_selector .choose_upload_area.video_choose_upload_area {
+        margin: 0;
+    }
     #albums_content {
         margin-bottom: 16px;
     }
@@ -2115,7 +2059,7 @@
         grid-row: 1 / span 2;
         margin-right: 0;
     }
-    .picker-title-text {
+    .ovk-diag-head:has(.toggle_link) .picker-title-text {
         grid-column: 2;
         grid-row: 1;
         font-size: 15px;
@@ -2501,6 +2445,7 @@
     }
 
     .audiosSideContainer .scroll_node:not(:last-child) .audioEmbed,
+    .attachments .audios_attachment:not(:last-child),
     .AudioPlaylistSnippet__audioRow:not(:last-child),.AudioPlaylistSnippet .ActionButton--shuffle,
      .ovk-msg-sheet .audio_attachment_header {
         margin-bottom: 10px;
@@ -2949,7 +2894,7 @@
     .mobile-scroll-card .module_body {
         width: 100%;
         height: 87px;
-        padding: 0;
+        padding: 0!important;
         overflow: hidden;
         position: relative;
         display: block;
@@ -3012,7 +2957,7 @@
         justify-content: center;
         width: 30px;
         height: 30px;
-        border-radius: 3px;
+        border-radius: 0;
         background-color: #77a5d6;
         color: #fff;
         text-align: center;
@@ -3435,7 +3380,7 @@
     /* chat header overlays the appbar while a conversation is open */
     body.body_im .messenger-app--header.messages--peers-header-peer-name {
         position: fixed;
-        top: 0;
+        top: var(--top-popups-height, 0px);
         left: 0;
         right: 0;
         width: auto;
@@ -3756,7 +3701,7 @@
         height: auto !important;
         margin: 0;
         display: block;
-        border-radius: var(--module-border-radius);
+        border-radius: 0;
         overflow: hidden;
     }
 
@@ -3906,7 +3851,8 @@
     .ui_tab, .ui_tab *, .ui_tab_plain, .ui_tab_plain *,
     .sidebar_inner .link, .sidebar_inner .link *,
     .mobile-info-row, .mobile-info-row *, .mobile-scroll-card, .mobile-scroll-card *,
-    .appbar .hamburger, .appbar .hamburger *, .appbar-extra-btn, .appbar-extra-btn *, .msg-dropdown-menu *,
+    .appbar :is(.hamburger, .appbar-back, .appbar-extra-btn),
+    .appbar :is(.hamburger, .appbar-back, .appbar-extra-btn) *, .msg-dropdown-menu *,
     .messenger-app--header--back a, .messenger-app--header--back a *,
     .messenger-app--header--name a, .messenger-app--header--name a *,
     .messenger-app--header--ava, .messenger-app--header--ava *,
@@ -3915,6 +3861,7 @@
     .ovk-msg-fullscreen .ovk-diag-head-apply, .ovk-msg-fullscreen .ovk-diag-head-apply *,
     .ovk-msg-sheet .ovk-diag-head-close, .ovk-msg-sheet .ovk-diag-head-close *,
     .ovk-msg-sheet .ovk-diag-head-apply, .ovk-msg-sheet .ovk-diag-head-apply *,
+    .ovk-diag-head .picker-header-back, .ovk-diag-head .picker-header-back *,
     .ovk-modal-video-window .video_top_button, .ovk-modal-video-window .video_top_button * {
         -webkit-touch-callout: none;
         -webkit-user-select: none;

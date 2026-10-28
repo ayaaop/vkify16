@@ -6,9 +6,41 @@ window.isMobileAndExpanded = function() {
     return window.isMobile() && document.body.classList.contains('menu-expanded');
 };
 
+vkify.ready(() => {
+    let notices = null;
+    const syncHeight = () => {
+        const height = `${notices?.getBoundingClientRect().height || 0}px`;
+        if (document.documentElement.style.getPropertyValue('--top-popups-height') !== height) {
+            document.documentElement.style.setProperty('--top-popups-height', height);
+            requestAnimationFrame(() => {
+                window.updateLeftMenuInit?.();
+                window.updateNarrow?.();
+            });
+        }
+    };
+    const resizeObserver = new ResizeObserver(syncHeight);
+    const observeNotices = () => {
+        const current = document.querySelector('.site-notices');
+        if (current !== notices) {
+            resizeObserver.disconnect();
+            notices = current;
+            if (notices) resizeObserver.observe(notices);
+        }
+        syncHeight();
+    };
+    const layout = document.querySelector('.layout');
+    if (layout) new MutationObserver(observeNotices).observe(layout, { childList: true });
+    new MutationObserver(syncHeight).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['style']
+    });
+    observeNotices();
+});
+
 window.router = new class Router {
     constructor() {
         this.managedStyleLinks = new Map();
+        this.managedRouteScripts = new Map();
         this._loadedScriptPaths = new Set();
         this._pendingScripts = new Map();
         this._activeNavigation = null;
@@ -34,6 +66,10 @@ window.router = new class Router {
         for (const script of document.querySelectorAll('script[src]')) {
             const path = this._normalizeScriptPath(script.src);
             if (path) this._loadedScriptPaths.add(path);
+        }
+        for (const script of document.querySelectorAll('script[data-vkify-route-script]')) {
+            const key = script.getAttribute('data-vkify-route-script');
+            if (key) this.managedRouteScripts.set(key, script);
         }
     }
 
@@ -79,15 +115,18 @@ window.router = new class Router {
         const appbar = document.querySelector('.appbar');
         if (!pageBody || !header || !appbar) return;
 
-        const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"][data-vkify-route-style]'))
+        const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"][data-vkify-route-style], style[data-vkify-route-style]'))
             .map(l => l.outerHTML).join('');
+        const routeScripts = Array.from(document.querySelectorAll('script[data-vkify-route-script]'))
+            .filter(s => !pageBody.contains(s))
+            .map(s => s.outerHTML).join('');
         const backdrop = document.querySelector('#backdrop');
         const runtimeConfig = document.getElementById('_js_ep_script')?.outerHTML || '';
         const title = document.title.replace(/&/g, '&amp;').replace(/</g, '&lt;');
         const bodyClasses = ['no-sidebar', 'logged-out'].filter(cls => document.body.classList.contains(cls));
         const bodyClass = bodyClasses.length ? ` class="${bodyClasses.join(' ')}"` : '';
         const html = `<!doctype html><html><head><title>${title}</title><meta name="vkify-router" content="vkify16"><meta name="csrf" content="${this.csrf}">${styles}</head>` +
-            `<body data-themepack="vkify16"${bodyClass}>${pageBody.outerHTML}${sidebar ? sidebar.outerHTML : ''}${header.outerHTML}${appbar.outerHTML}${backdrop ? backdrop.outerHTML : ''}${runtimeConfig}</body></html>`;
+            `<body data-themepack="vkify16"${bodyClass}>${pageBody.outerHTML}${sidebar ? sidebar.outerHTML : ''}${header.outerHTML}${appbar.outerHTML}${backdrop ? backdrop.outerHTML : ''}${runtimeConfig}${routeScripts}</body></html>`;
         this._pageCacheSet(url, html);
     }
 
@@ -189,9 +228,15 @@ window.router = new class Router {
                 newScript.id = script.id;
             }
             if (script.getAttribute('type')) {
-                newScript.type = script.type;
+                newScript.type = script.getAttribute('type');
             }
-
+            if (script.hasAttribute('data-vkify-route-script')) {
+                const routeKey = script.getAttribute('data-vkify-route-script');
+                newScript.setAttribute('data-vkify-route-script', routeKey);
+                this.managedRouteScripts.set(routeKey, newScript);
+            } else if (!script.src) {
+                newScript.setAttribute('data-vkify-page-script', '');
+            }
             if (script.src) {
                 const scriptPath = this._normalizeScriptPath(script.src);
                 newScript.async = false;
@@ -237,15 +282,26 @@ window.router = new class Router {
     }
 
     _captureExistingManagedStyles() {
-        document.querySelectorAll('link[rel="stylesheet"][data-vkify-route-style]').forEach(link => {
-            const key = link.getAttribute('data-vkify-route-style') || link.href;
+        document.querySelectorAll('link[rel="stylesheet"][data-vkify-route-style], style[data-vkify-route-style]').forEach(node => {
+            const key = node.getAttribute('data-vkify-route-style') || node.href;
             if (key && !this.managedStyleLinks.has(key)) {
-                this.managedStyleLinks.set(key, link);
+                this.managedStyleLinks.set(key, node);
             }
         });
     }
 
     _cloneManagedLink(source, key) {
+        if (source.tagName === 'STYLE') {
+            const style = document.createElement('style');
+            Array.from(source.attributes).forEach(({ name, value }) => {
+                if (name !== 'data-vkify-route-style') {
+                    style.setAttribute(name, value);
+                }
+            });
+            style.setAttribute('data-vkify-route-style', key);
+            style.textContent = source.textContent;
+            return style;
+        }
         const link = document.createElement('link');
         link.rel = source.rel || 'stylesheet';
         Array.from(source.attributes).forEach(({ name, value }) => {
@@ -260,34 +316,136 @@ window.router = new class Router {
     async _syncManagedStyles(parsed_content) {
         if (!parsed_content) return;
 
-        const desiredStyles = Array.from(parsed_content.querySelectorAll('link[rel="stylesheet"][data-vkify-route-style]')).map(link => {
+        const desiredStyles = Array.from(parsed_content.querySelectorAll('link[rel="stylesheet"][data-vkify-route-style], style[data-vkify-route-style]')).map(link => {
             const key = link.getAttribute('data-vkify-route-style') || link.href;
             return key ? { key, link } : null;
         }).filter(Boolean);
         const desiredKeys = new Set(desiredStyles.map(item => item.key));
+        const desiredHrefs = new Set(
+            Array.from(parsed_content.querySelectorAll('link[rel="stylesheet"][href]'))
+                .map(link => this._normalizeScriptPath(link.getAttribute('href')))
+                .filter(Boolean)
+        );
+        const desiredIds = new Set(
+            Array.from(parsed_content.querySelectorAll('link[rel="stylesheet"][id], style[id]'))
+                .map(node => node.id)
+                .filter(Boolean)
+        );
+        const persistentStyleIds = new Set(['dark-mode-css', '2018-mode-css', 'vkify-style-square_avatars']);
 
-        for (const key of this.managedStyleLinks.keys()) {
-            if (!desiredKeys.has(key)) {
-                this.managedStyleLinks.get(key)?.remove();
+        document.querySelectorAll('.vkify_style').forEach(node => {
+            if (persistentStyleIds.has(node.id)) return;
+            const routeKey = node.getAttribute('data-vkify-route-style')
+                || (node.id?.startsWith('vkify-style-') ? node.id.slice('vkify-style-'.length)
+                    : (node.id?.startsWith('vkify_style_') ? node.id.slice('vkify_style_'.length) : ''));
+            const href = node.href ? this._normalizeScriptPath(node.getAttribute('href') || node.href) : null;
+            const inNextPage = (routeKey && desiredKeys.has(routeKey))
+                || (node.id && desiredIds.has(node.id))
+                || (href && desiredHrefs.has(href));
+
+            if (inNextPage) {
+                if (routeKey && desiredKeys.has(routeKey) && !this.managedStyleLinks.has(routeKey)) {
+                    node.setAttribute('data-vkify-route-style', routeKey);
+                    this.managedStyleLinks.set(routeKey, node);
+                }
+            } else if (node.id && typeof window.vkify?.unloadStyle === 'function') {
+                window.vkify.unloadStyle(node.id);
+            } else {
+                node.remove();
+            }
+        });
+
+        for (const [key, existingNode] of Array.from(this.managedStyleLinks.entries())) {
+            const href = existingNode?.href ? this._normalizeScriptPath(existingNode.getAttribute('href') || existingNode.href) : null;
+            const inNextPage = desiredKeys.has(key)
+                || (existingNode?.id && desiredIds.has(existingNode.id))
+                || (href && desiredHrefs.has(href));
+            if (!inNextPage) {
+                if (existingNode?.id && typeof window.vkify?.unloadStyle === 'function') {
+                    window.vkify.unloadStyle(existingNode.id);
+                } else {
+                    existingNode?.remove();
+                }
                 this.managedStyleLinks.delete(key);
             }
         }
 
         await Promise.all(desiredStyles.map(({ key, link }) => {
-            if (this.managedStyleLinks.has(key)) return Promise.resolve();
+            const existing = this.managedStyleLinks.get(key);
+            if (existing && existing.isConnected) {
+                if (existing.tagName === 'STYLE' && link.tagName === 'STYLE' && existing.textContent !== link.textContent) {
+                    existing.textContent = link.textContent;
+                }
+                return Promise.resolve();
+            }
             const managedLink = this._cloneManagedLink(link, key);
             this.managedStyleLinks.set(key, managedLink);
-            return new Promise(resolve => {
-                managedLink.addEventListener('load', resolve, { once: true });
-                managedLink.addEventListener('error', resolve, { once: true });
-                const anchor = document.getElementById('dark-mode-css') || document.getElementById('2018-mode-css') || document.querySelector('link[href*="/resource/css/mobile.css"]');
+            const anchor = document.getElementById('dark-mode-css') || document.getElementById('2018-mode-css') || document.querySelector('link[href*="/resource/css/mobile.css"]');
+            const insertNode = () => {
                 if (anchor && anchor.parentNode === document.head) {
                     document.head.insertBefore(managedLink, anchor);
                 } else {
                     document.head.appendChild(managedLink);
                 }
+            };
+            if (managedLink.tagName === 'STYLE') {
+                insertNode();
+                return Promise.resolve();
+            }
+            return new Promise(resolve => {
+                managedLink.addEventListener('load', resolve, { once: true });
+                managedLink.addEventListener('error', resolve, { once: true });
+                insertNode();
             });
         }));
+    }
+
+    _syncManagedScripts(parsed_content) {
+        const incomingScripts = Array.from(parsed_content.querySelectorAll('.page_body script, script[data-vkify-route-script], body > script[src], head > script[type="module"][src]'));
+        const desiredRouteMap = new Map();
+        const desiredScriptPaths = new Set();
+        const desiredInlineTexts = new Set();
+
+        for (const script of incomingScripts) {
+            const routeKey = script.getAttribute('data-vkify-route-script');
+            if (routeKey) desiredRouteMap.set(routeKey, script);
+            const path = script.src ? this._normalizeScriptPath(script.getAttribute('src') || script.src) : null;
+            if (path) desiredScriptPaths.add(path);
+            else if (script.textContent) desiredInlineTexts.add(script.textContent.trim());
+        }
+
+        for (const [key, existingScript] of Array.from(this.managedRouteScripts.entries())) {
+            const nextScript = desiredRouteMap.get(key);
+            if (!nextScript) {
+                existingScript?.remove();
+                this.managedRouteScripts.delete(key);
+                continue;
+            }
+            const existingPath = existingScript?.src ? this._normalizeScriptPath(existingScript.getAttribute('src') || existingScript.src) : null;
+            const nextPath = nextScript.src ? this._normalizeScriptPath(nextScript.getAttribute('src') || nextScript.src) : null;
+            if (!nextPath || existingPath !== nextPath) {
+                existingScript?.remove();
+                this.managedRouteScripts.delete(key);
+            }
+        }
+
+        document.querySelectorAll('body > script[data-vkify-route-script], body > script[data-vkify-page-script]').forEach(script => {
+            const routeKey = script.getAttribute('data-vkify-route-script');
+            if (routeKey) {
+                if (!desiredRouteMap.has(routeKey) || this.managedRouteScripts.get(routeKey) !== script) {
+                    script.remove();
+                }
+                return;
+            }
+            const path = script.src ? this._normalizeScriptPath(script.getAttribute('src') || script.src) : null;
+            if (path ? !desiredScriptPaths.has(path) : !desiredInlineTexts.has((script.textContent || '').trim())) {
+                script.remove();
+            } else if (!path) {
+                script.remove();
+            }
+        });
+
+        return incomingScripts.filter(script => !this._isScriptAlreadyLoaded(script));
     }
 
     _syncElementAttributes(target, source) {
@@ -324,7 +482,6 @@ window.router = new class Router {
             throw new Error(`Missing required elements: ${missingElements.join(', ')}`);
         }
 
-        const scriptsToAppend = [];
         const pageBody = u(parsed_content.querySelector('.page_body'));
         const sidebar = u(parsed_content.querySelector('.sidebar'));
         const pageHeader = u(parsed_content.querySelector('.page_header'));
@@ -345,9 +502,7 @@ window.router = new class Router {
         const searchInputValue = document.querySelector('.page_header #search_box input')?.value;
 
         window.__current_page_audio_context = null;
-        parsed_content.querySelectorAll('.page_body script, script[data-vkify-route-script], body > script[src], head > script[type="module"][src]').forEach(script => {
-            if (!this._isScriptAlreadyLoaded(script)) scriptsToAppend.push(script);
-        });
+        const scriptsToAppend = this._syncManagedScripts(parsed_content);
 
         const nextPageHeaderNode = pageHeader.nodes[0];
         const currentPageHeaderNode = document.querySelector('.page_header');

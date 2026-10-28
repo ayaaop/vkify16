@@ -1,8 +1,8 @@
-<div n:if='\OPENVK_ROOT_CONF["openvk"]["preferences"]["siteAlert"]["enable"]' class="bottom-popup red-popup global-alert-popup" style="display: none">
+<div n:if='\OPENVK_ROOT_CONF["openvk"]["preferences"]["siteAlert"]["enable"]' class="site-notice global-alert-popup" style="display: none">
     <div class="contanier">
         <div class="text" id="global-alert-text">{php echo OPENVK_ROOT_CONF["openvk"]["preferences"]["siteAlert"]["text"]}</div>
         <div class="buttons" n:if='\OPENVK_ROOT_CONF["openvk"]["preferences"]["siteAlert"]["canBeDismissed"]'>
-            <div class="bottom-popup__close" onclick="dismissGlobalAlert()">
+            <div class="site-notice__close" onclick="dismissGlobalAlert()">
                 <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><use href="#cancel-24"></use></svg>
             </div>
         </div>

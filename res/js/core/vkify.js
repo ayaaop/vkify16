@@ -620,27 +620,7 @@
 
 })();
 
-window.dismissHttpWarning = function() {
-    const warningEl = document.querySelector('.http-warning-popup');
-    if (warningEl) {
-        warningEl.style.display = 'none';
-    }
-    vkify.setCookie('vkify_popup_shown_http_warn', '1', 36500);
-};
-
 vkify.ready(() => {
-    const warningEl = document.querySelector('.http-warning-popup');
-    if (warningEl) {
-        const isHttp = location.protocol === 'http:' && !location.host.includes('localhost') && !location.host.includes('127.0.0.1');
-        const isDismissed = vkify.getCookie('vkify_popup_shown_http_warn') === '1';
-        
-        if (isHttp && !isDismissed) {
-            warningEl.style.display = 'block';
-        } else {
-            warningEl.style.display = 'none';
-        }
-    }
-
     const currentTheme = document.body.getAttribute('data-themepack');
     if (currentTheme !== 'vkify16') {
         if (typeof NewNotification === 'function') {

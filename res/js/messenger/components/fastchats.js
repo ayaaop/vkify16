@@ -471,9 +471,8 @@ export async function installFastChatsRenderer({ html, render, commonMod, messag
                                         class="chat_tab_wrap"
                                         id=${`chat_tab_icon_${peerId}`}
                                         href=${href}
-                                        data-tip="simple-black"
-                                        data-align="left"
-                                        data-tiptitle=${chat.title || ''}
+                                        onmouseover=${(e) => window.showTitle(e.currentTarget, null, null, {dir: 'left'})}
+                                        data-title=${chat.title || ''}
                                         onClick=${(e) => {
                                             if (e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
                                                 e.preventDefault();
@@ -695,9 +694,8 @@ export async function installFastChatsRenderer({ html, render, commonMod, messag
                                 <div class="fc_clist_online_wrap">
                                     <div
                                         class="fc_clist_online fc_toggle_offline_btn ${!showAll ? 'fc_clist_online_active' : ''}"
-                                        data-tip="simple-black"
-                                        data-align="top"
-                                        data-tiptitle=${!showAll
+                                        onmouseover=${(e) => window.showTitle(e.currentTarget, null, null, {dir: 'down'})}
+                                        data-title=${!showAll
                                             ? tr('show_all_friends', allFriends.length || onlineCount)
                                             : tr('show_online_only', onlineCount)}
                                         onClick=${(e) => {

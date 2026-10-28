@@ -4,30 +4,32 @@
 const Hb = window.Handlebars;
 
 const loadingTpl = Hb.compile(
-    `<div class='like_tooltip_wrapper'>
+    `<div class="like_tt_wrap like_tt_loading">
         <div class="pr pr_baw"><div class="pr_bt"></div><div class="pr_bt"></div><div class="pr_bt"></div></div>
     </div>`
 );
 
 const bodyTpl = Hb.compile(
-    `<div class='like_tooltip_wrapper'>
-        <a href="/{{final_type}}/{{id}}/likes" class='like_tooltip_head'>
-            <span>{{{count_label}}}</span>
+    `<div class="like_tt_wrap">
+        <a href="/{{final_type}}/{{id}}/likes" class="like_tt_header">
+            {{count_label}}
         </a>
-        <div class='like_tooltip_body'>
-            <div class='like_tooltip_body_grid'>
+        <div class="like_tt_content">
+            <div class="like_tt_hider">
+                <div class="like_tt_owners">
                 {{#each items}}
-                <a title="{{first_name}} {{last_name}}" href='/id{{id}}'>
-                    <img class="object_fit_ava" src='{{photo_50}}' alt='.'>
+                <a class="like_tt_owner" title="{{first_name}} {{last_name}}" href="/id{{id}}">
+                    <img class="like_tt_image" src="{{photo_50}}" alt="{{first_name}} {{last_name}}">
                 </a>
                 {{/each}}
+                </div>
             </div>
         </div>
     </div>`
 );
 
 const errorTpl = Hb.compile(
-    `<div class='like_tooltip_wrapper'><div style='padding: 10px;'>{{message}}</div></div>`
+    `<div class="like_tt_wrap"><div class="like_tt_header">{{message}}</div></div>`
 );
 
 window.formatCompactCount = window.formatCompactCount || function (n) {
@@ -199,8 +201,11 @@ vkify.bindOnce('likeHandlers', () => {
         counter.text(nextLikes ? window.formatCompactCount(nextLikes) : '');
         if (isPost) btn.toggleClass('my_like', !isLiked);
 
-        const tip = hasLikesTooltip && btn.first()?._tippy;
-        if (tip) nextLikes <= 0 ? (tip.hide(), tip.destroy()) : tip.enable();
+        const tip = hasLikesTooltip && btn.first()?.tt;
+        if (tip) {
+            tip.hide({ fasthide: true });
+            if (nextLikes <= 0) tip.destroy();
+        }
 
         const cacheKey = btn.attr('data-type') && btn.attr('data-id')
             ? `${btn.attr('data-type')}:${btn.attr('data-id')}` : null;
@@ -240,92 +245,54 @@ vkify.bindOnce('likeHandlers', () => {
 });
 
 vkify.bindOnce('likesTooltip', () => {
-    window.tippy.delegate(document.body, {
-        animation: 'up_down',
-        target: `.post_like[data-type]:not([data-type="note"]):not([data-type="audio_playlist"]):not([data-likes="0"]), .video_like_button[data-type]:not([data-likes="0"])`,
-        theme: 'special vk',
-        placement: 'top-start',
-        content: '',
-        delay: 400,
-        allowHTML: true,
-        interactive: true,
-        interactiveDebounce: 350,
-        zIndex: 99,
-        onCreate: async function (that) {
-            that._vkifyLikesKey = null;
-            that._vkifyLoadingLikesTooltip = false;
-        },
-        onHidden: function (that) {
-            try {
-                if (that && that._vkifyLoadingLikesTooltip) {
-                    that._vkifyLoadingLikesTooltip = false;
-                }
-                if (that) {
-                    that._vkifyLikesKey = null;
-                }
-            } catch (e) { }
-        },
-        onShow: function (that) {
-            if (window.isMobile && window.isMobile()) return false;
-            const likesNow = that.reference?.getAttribute('data-likes');
-            if (!likesNow || likesNow === '0') return false;
-            if (that.popper) {
-                that.popper.style.zIndex = that.reference?.closest('.ovk-msg-all') ? '9999' : '99';
-            }
-        },
-        onMount: async function (that) {
-            if (!vkify.requireAuth()) {
-                that.setContent(errorTpl({ message: tr('login_required_error') }));
-                return;
-            }
-
-            const id = that.reference.dataset.id;
-            const type = that.reference.dataset.type;
-            let final_type = type;
-            if (type === 'post') final_type = 'wall';
-
-            const cacheKey = `${type}:${id}`;
-            that._vkifyLikesKey = cacheKey;
-
-            try {
-                that._vkifyLoadingLikesTooltip = true;
-
-                let likesList = _likesCache.get(cacheKey);
-                if (!likesList) {
-                    try { that.setContent(loadingTpl({})); } catch (e) { }
-                    likesList = await window.OVKAPI.call('likes.getList', {
-                        extended: 1,
-                        count: 6,
-                        type: type,
-                        owner_id: id.split('_')[0],
-                        item_id: id.split('_')[1]
-                    });
-                    _likesCacheSet(cacheKey, likesList);
-                }
-
-                // if the user already moved to another target, don't overwrite
-                if (that._vkifyLikesKey !== cacheKey) {
-                    return;
-                }
-
-                that.setContent(bodyTpl({
-                    final_type,
-                    id,
-                    count_label: tr('liked_by_x_people', likesList.count),
-                    items: likesList.items || []
-                }));
-                return;
-            } catch (e) {
-                that.setContent(errorTpl({ message: tr('error') }));
-                return;
-            } finally {
-                try {
-                    that._vkifyLoadingLikesTooltip = false;
-                } catch (e) { }
-            }
+    async function loadLikes(el, tt) {
+        const { id, type } = el.dataset;
+        const cacheKey = `${type}:${id}`;
+        tt._vkifyLikesKey = cacheKey;
+        if (!vkify.isLoggedIn()) {
+            tt.setContent(errorTpl({ message: tr('login_required_error') }));
+            return;
         }
-    });
+        try {
+            let likesList = _likesCache.get(cacheKey);
+            if (!likesList) {
+                likesList = await window.OVKAPI.call('likes.getList', {
+                    extended: 1,
+                    count: 6,
+                    type,
+                    owner_id: id.split('_')[0],
+                    item_id: id.split('_')[1]
+                });
+                _likesCacheSet(cacheKey, likesList);
+            }
+            if (el.tt !== tt || tt._vkifyLikesKey !== cacheKey) return;
+            tt.setContent(bodyTpl({
+                final_type: type === 'post' ? 'wall' : type,
+                id,
+                count_label: tr('liked_by_x_people', likesList.count),
+                items: likesList.items || []
+            }));
+        } catch (e) {
+            if (el.tt === tt && tt._vkifyLikesKey === cacheKey) tt.setContent(errorTpl({ message: tr('error') }));
+        }
+    }
 
+    // VK calls Wall.likesShow from the like button's inline onmouseover.
+    window.vkifyLikesShow = (el) => {
+        if (!el || window.isMobile?.() || !Number(el.dataset.likes)) return;
+        const tt = window.showTooltip(el, {
+            content: loadingTpl({}),
+            dir: 'auto',
+            slide: 15,
+            typeClass: 'like_tt',
+            shift: [11, 7, 7],
+            showdt: 400,
+            hidedt: 200,
+            onShowStart: (tip) => loadLikes(el, tip),
+            onHide: (tip) => { tip._vkifyLikesKey = null; },
+        });
+        if (tt) loadLikes(el, tt);
+    };
 });
 
 })();

@@ -50,7 +50,7 @@
                     </div>
                 </div>
             </div>
-            <div class="post reply" id="_ticket{$id}">
+            <div class="post reply" id="_ticket{$id}" data-owner-id="{$ticket->getUser()->getId()}" data-mention-name="{$ticket->getUser()->getFirstName()}">
                 <div class="reply_wrap">
                     <a class="reply_image" href="/id{$ticket->getUser()->getId()}">
                         {include '../components/avatar.latte', author => $ticket->getUser(), size => 'miniscule', width => 30, class => 'reply_img'}
@@ -84,7 +84,7 @@
             </div>
                 <p n:if="!$comments">{_no_comments}</p>
                 {var $printedSupportGreeting = false}
-                <div n:foreach="$comments as $comment" class="post reply" id="_comment{$comment->getId()}" data-comment-id="{$comment->getId()}">
+                <div n:foreach="$comments as $comment" class="post reply" id="_comment{$comment->getId()}" data-comment-id="{$comment->getId()}" data-owner-id="{$comment->getUType() === 0 ? $comment->getUser()->getId() : 100}" data-mention-name="{$comment->getUType() === 0 ? $comment->getUser()->getFirstName() : str_replace('#', '', $comment->getAuthorName())}">
                     <div class="reply_wrap">
                         <a class="reply_image" href="{if $comment->getUType() === 0}{$comment->getUser()->getURL()}{/if}">
                             {if $comment->getUType() === 0}
@@ -96,7 +96,7 @@
                         <div class="reply_content">
                             <div class="fl_r reply_actions_wrap">
                                 <div class="reply_actions" n:if="isset($thisUser)">
-                                    <a n:if="$comment->getUType() === 0" class="reply_action reply_delete_action" href="/support/comment/{$comment->getId()}/delete?hash={rawurlencode($csrfToken)}" data-tip="simple-black" data-tiptitle="{_delete}"></a>
+                                    <a n:if="$comment->getUType() === 0" class="reply_action reply_delete_action" href="/support/comment/{$comment->getId()}/delete?hash={rawurlencode($csrfToken)}" data-title="{_delete}" onmouseover="showTitle(this)"></a>
                                 </div>
                             </div>
                             <div class="reply_author">

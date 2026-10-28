@@ -51,7 +51,7 @@ function menuEntry(html, tr, key) {
 function inlineEntry(html, tr, key) {
     const { id, cls } = ATTACHMENTS[key];
     return html`
-        <a id=${id} class=${cls} data-tip="simple-black" data-align="bottom-start" data-tiptitle="${tr(key)}">
+        <a id=${id} class=${cls} onmouseover=${(e) => window.showTitle(e.currentTarget)} data-title="${tr(key)}">
             ${attachIcon(html, key)}
         </a>
     `;

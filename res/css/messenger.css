@@ -69,10 +69,10 @@ html:has(.body_im),body.body_im,.body_im .layout {
 
 body.body_im .page_body {
 	position: fixed;
-	top: calc(var(--header-height) + 15px);
+	top: calc(var(--header-height) + 15px + var(--top-popups-height, 0px));
 	margin: 0;
-	height: calc(100dvh - var(--header-height));
-	max-height: calc(100dvh - var(--header-height));
+	height: calc(100dvh - var(--header-height) - var(--top-popups-height, 0px));
+	max-height: calc(100dvh - var(--header-height) - var(--top-popups-height, 0px));
 	float: none;
 	margin-left: 164px !important;
 }
@@ -87,8 +87,8 @@ body.body_im .page_body {
     margin: 0;
     width: 100%;
     position: relative;
-    height: calc(100dvh - var(--header-height) + 15px);
-    max-height: calc(100dvh - var(--header-height) + 15px);
+    height: calc(100dvh - var(--header-height) + 15px - var(--top-popups-height, 0px));
+    max-height: calc(100dvh - var(--header-height) + 15px - var(--top-popups-height, 0px));
 }
 
 #im_container.at_page:not(.compact) {
@@ -104,7 +104,7 @@ body.body_im .page_body {
     width: 230px;
     min-width: 0;
     max-height: calc(100vh - var(--header-height) - 15px);
-    max-height: calc(100dvh - var(--header-height) - 15px);
+    max-height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
     overflow-y: auto;
     scrollbar-width: none;
     box-sizing: border-box;
@@ -130,12 +130,12 @@ body.body_im .page_body {
 /* .messenger-app--messages is upstream's internal scroll container. */
 #im_container.at_page #im_page_containers {
     height: calc(100vh - var(--header-height) - 15px);
-    height: calc(100dvh - var(--header-height) - 15px);
+    height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
 }
 
 /* Page scrolls instead of clipping the input bar if height math is off. */
 #im_container.at_page .im_page.page-other {
-    height: calc(100dvh - var(--header-height) - 15px);
+    height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
     display: flex;
     flex-direction: column;
     scrollbar-color: var(--border-color-3) var(--module-background-color--secondary);
@@ -143,14 +143,14 @@ body.body_im .page_body {
 }
 
 #im_container.at_page .im_page:not(.hidden) {
-    height: calc(100dvh - var(--header-height) - 15px);
-    min-height: calc(100dvh - var(--header-height) - 15px);
+    height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
+    min-height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
 }
 
 /* .crp-list clips long lists unless its parent is height-constrained. */
 #im_container.at_page:not(.compact) .im_page.page-conversations {
     height: calc(100vh - var(--header-height) - 15px);
-    height: calc(100dvh - var(--header-height) - 15px);
+    height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -224,6 +224,8 @@ body.body_im .sidebar {
 }
 body:has(#im_container.at_page) .sidebar {
     scrollbar-width: none;
+    max-height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
+    overflow-y: auto;
 }
 body:has(#im_container.at_page) .sidebar::-webkit-scrollbar {
     display: none;
@@ -1158,7 +1160,7 @@ body #im_container .crp-list {
         padding: 0!important;
         min-height: 16px;
         align-self: start;
-        border-radius: 3px;
+        border-radius: 0;
         box-sizing: border-box;
         overflow: hidden;
     }
@@ -1166,6 +1168,7 @@ body #im_container .crp-list {
     .crp-entry .crp-entry--message.unread {
         max-width: 100%;
         padding: 5px 8px;
+        border-radius: 3px;
         background: var(--vk-im-bubble);
         color: var(--muted-text-color-2);
     }
@@ -1289,10 +1292,13 @@ body #im_container.compact .crp-list .crp-entry--message---av {
 
 .messenger-app--tab-friends .friends-list-side {
     border: 0;
+    position: sticky;
+    top: 0;
+    border-bottom: 1px solid var(--border-color)
 }
 
 .messenger-app--tab-friends .friends-list-top:has(.search_input) {
-    border-top: 1px solid var(--border-color);
+    border-top: 0;
     border-bottom: 1px solid var(--border-color)
 }
 
@@ -1667,7 +1673,7 @@ body #im_container.compact .crp-list .crp-entry--message---av {
 .messenger-app--messages---message--wrap .checkmark {
     width: 17px;
     height: 17px;
-    margin: 0;
+    margin: 0 8px;
     background-image: url(../icons/msg_check.png);
     background-repeat: no-repeat;
     background-position: 0 0;
@@ -1676,7 +1682,7 @@ body #im_container.compact .crp-list .crp-entry--message---av {
 
 .messenger-app--messages---message.same-author .checkmark,
 .messenger-app--messages---message.same-author .error-checkmark {
-    margin: 0;
+    margin: 0 8px;
 }
 
 /* VK */
@@ -1748,7 +1754,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     mask: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20d%3D%22M3.5%203.5l7%207m0-7l-7%207%22%2F%3E%3C%2Fsvg%3E") center no-repeat !important;
 }
 
-.messenger-app--messages---message .actions-2 .star-icon {
+.messenger-app--messages---message .actions-2 .star-icon,
+.messenger-app--messages---message.msg-important .actions-2 .star-icon, .messenger-app--messages---message .actions-2 .star-icon.active {
     width: 12px !important;
     height: 13px !important;
     background: url(../icons/m_star_small.png) no-repeat 0 0 !important;
@@ -1761,7 +1768,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 .messenger-app--messages---message.msg-important .actions-2 .star-icon,
 .messenger-app--messages---message .actions-2 .star-icon.active {
-    background-position: 0 -16px !important;
+    background: url(../icons/m_star_small.png) no-repeat 0 0 !important;
     opacity: 0.85 !important;
 }
 
@@ -1890,8 +1897,11 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 .messenger-app--messages---message ._content .reply-msg-container .reply-compact-attach {
     color: var(--muted-text-color-3);
-    border-radius: 2px;
-    background: color-mix(in srgb, var(--text-color) 4%, var(--transparent));
+    border-radius: 0;
+    background: none;
+}
+.messenger-app--messages---message ._content .reply-msg-container .reply-compact-attach:hover {
+    background: none;
 }
 
 /* Forwarded messages use the same flat im-mess_fwd model as reply quotes. */
@@ -2145,6 +2155,17 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 /* ==========================================================================
    Attachments
    ========================================================================== */
+.fc_chat_box .msg-attach-j-photo img,
+.fc_chat_box .msg-attach-j-video .compact_video,
+.fc_chat_box .msg-attach-w-doc-image img,
+.fc_chat_box .msg-attach-w-gif img,
+.fc_chat_box .docGalleryItem,
+.msg-media-tile img.media_makima,
+.msg-media-tile,
+.msg-makima-grid,
+.compact_video {
+    border-radius: 0;
+}
 
 /* Photos & Makima grid */
 .msg-media-tile,
@@ -2175,7 +2196,6 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 }
 
 .compact_video {
-    border-radius: 4px;
     overflow: hidden;
     display: block;
 }
@@ -2189,15 +2209,15 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 .msg-media-tile-video .compact_video .play-button,
 .messenger-app--messages---message .msg-attach-wall-card .attachments_b .compact_video .play-button,
 .msg-attach-w-gif .docGalleryItem .play-button {
-    width: 44px;
-    height: 44px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: var(--video-overlay-background);
     backdrop-filter: blur(2px);
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    transition: background 0.15s ease;
+    transition: transform 0.12s ease-out, background-color 100ms linear, opacity 60ms ease !important;
     pointer-events: none;
 }
 
@@ -2207,8 +2227,15 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     background: var(--video-overlay-background-hover);
 }
 
-.msg-media-tile-video .compact_video .play-button .play-button-ico
-.messenger-app--messages---message .msg-attach-wall-card .attachments_b .compact_video .play-button .play-button-ico,
+.msg-media-tile-video .compact_video .play-button .play-button-ico,
+.messenger-app--messages---message .msg-attach-wall-card .attachments_b .compact_video .play-button .play-button-ico {
+    background: url(../video_play_small.png?1) no-repeat;
+    display: inline-block;
+    height: 24px;
+    width: 17px;
+    margin-left: 2px;
+}
+
 .msg-attach-w-gif .docGalleryItem .play-button-ico {
     width: 0;
     height: 0;
@@ -2229,6 +2256,19 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     padding: 2px 5px;
     border-radius: 2px;
     line-height: 1;
+}
+
+.msg-media-tile-video .video-length {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: var(--overlay-background);
+    color: var(--white);
+    font-size: 12.5px;
+    line-height: 23px;
+    border-radius: 3px;
+    padding: 0 7px;
+    height: 23px;
 }
 
 /* Audio player */
@@ -2272,6 +2312,16 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     justify-content: normal;
     align-items: normal;
     height: auto;
+}
+
+.messenger-app--messages---message .audioEmbed.msg-attach-audio-player .audioEntry:hover .buttons,
+.ovk-attachments-modal-content .audioEmbed.msg-attach-audio-player .audioEntry:hover .buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: static;
+    height: 16px;
+    width: unset;
 }
 
 /* Documents */
@@ -2611,14 +2661,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     width: 69px;
     height: 66px;
     margin-bottom: 20px;
-    background: url(../icons/empty_icon.png) no-repeat top;
-}
-
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .im-empty-conversation--image {
-        background-image: url(../icons/empty_icon_2x.png);
-        background-size: 69px 66px;
-    }
+    background: url(../icons/empty_icon.svg) no-repeat top;
+    background-size: contain;
 }
 
 .im-empty-conversation--text {
@@ -3526,6 +3570,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 #im_container.at_page.compact {
     --sidebar-width: 318px;
+    --compact-page-height: calc(100dvh - var(--header-height) - 15px - var(--top-popups-height, 0px));
     margin: 0;
 }
 
@@ -3550,7 +3595,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 #im_container.compact .im_page.page-conversations {
     width: 316px;
     height: calc(100vh - var(--header-height) - 15px);
-    height: calc(100dvh - var(--header-height) - 15px);
+    height: var(--compact-page-height);
     display: flex !important;
     flex-direction: column;
     position: static;
@@ -3570,7 +3615,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     position: static;
     width: var(--messenger-width);
     height: calc(100vh - var(--header-height) - 15px);
-    height: calc(100dvh - var(--header-height) - 15px);
+    height: var(--compact-page-height);
     background-color: var(--module-background-color);
     border: 1px solid var(--border-color);
     border-left: 0;
@@ -4155,8 +4200,16 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
    ========================================================================== */
 
 @media (max-width: 768px) {
+    body:has(#im_container.at_page) .sidebar {
+        max-height: none;
+    }
+    #im_container.at_page.compact {
+        --compact-page-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
+    }
     .body_im .appbar {
-        position: static;
+        position: relative;
+        top: var(--top-popups-height, 0px);
+        z-index: 0;
     }
 
     /* --ovk-vv-* tracks the visual viewport on browsers where only it shrinks
@@ -4167,13 +4220,13 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     }
     body.body_im .page_body {
         margin: 0!important;
-        top: calc(var(--ovk-vv-top, 0px) + var(--header-height));
-        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
-        max-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
+        top: calc(var(--ovk-vv-top, 0px) + var(--header-height) + var(--top-popups-height, 0px));
+        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
+        max-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
     }
     body.body_im .messenger-app--header.messages--peers-header-peer-name,
     body.body_im .messages--actions {
-        top: var(--ovk-vv-top, 0px);
+        top: calc(var(--ovk-vv-top, 0px) + var(--top-popups-height, 0px));
     }
 
     #im_container.at_page:not(.compact) #im_page_tabs {
@@ -4197,8 +4250,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     }
 
     #im_container.at_page {
-        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
-        max-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
+        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
+        max-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
     }
 
     #im_container.at_page:not(.compact) .im_page.page-conversations,
@@ -4206,9 +4259,9 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     #im_container.at_page .im_page:not(.hidden),
     #im_container.at_page .im_page.page-other {
         min-height: calc(100vh - var(--header-height));
-        min-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
+        min-height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
         height: calc(100vh - var(--header-height));
-        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height));
+        height: calc(var(--ovk-vv-height, 100dvh) - var(--header-height) - var(--top-popups-height, 0px));
     }
 
     .im_mobile .msg-attachments-container:has(.msg-makima-grid) {
@@ -4263,6 +4316,8 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
 #user-send-dialog .udlg-send-right #write {
     margin-top: 0;
+    min-width: 0;
+    max-width: 100%;
 }
 
 #user-send-dialog .udlg-goto {
@@ -5428,4 +5483,3 @@ body.dark-mode #fastchats_container .rb_inactive .fc_tab_head {
 #fastchats_container .fc_fixed .chats_sp.rb_resize {
     display: none;
 }
-

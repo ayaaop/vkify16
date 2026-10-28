@@ -27,6 +27,69 @@ function logRenderErrorOnce(prefix, e) {
 const ATTACHMENT_LOADER_IMG = 'img[src$="loading_mini.gif"]';
 const ATTACHMENT_LOADER_SCOPE = '.messenger-app--messages---message ._content';
 
+function syncImAppbarBack() {
+    const appbar = document.getElementById('appbar');
+    const menu = document.getElementById('mobileMenuTrigger');
+    if (!appbar || !menu) return;
+
+    const im = window.im;
+    const onIm = isMobileViewport() && /^\/im(?:\/|$)/.test(location.pathname)
+        && !!document.querySelector('#im_container');
+    const tab = onIm ? im?.getSelectedTab?.() : null;
+    const tabId = tab?.getPageId?.();
+    const chatHasBack = tabId === 'messenger' && !!im?.messenger?.getCurrentChat?.();
+    const showBack = !!tabId && tabId !== 'conversations' && !chatHasBack;
+    const title = appbar.querySelector('.appbar-title');
+    if (title) {
+        if (tab) {
+            if (title._vkifyImOriginalHTML === undefined) title._vkifyImOriginalHTML = title.innerHTML;
+            const name = chatHasBack ? im.messenger.getCurrentChat()?.peer?.getName?.() : null;
+            title.textContent = name || tab.getName?.() || '';
+        } else if (title._vkifyImOriginalHTML !== undefined) {
+            title.innerHTML = title._vkifyImOriginalHTML;
+            delete title._vkifyImOriginalHTML;
+        }
+        title.hidden = chatHasBack;
+    }
+    let back = appbar.querySelector('.appbar-back');
+    if (!back && showBack) {
+        back = document.createElement('button');
+        back.className = 'appbar-back';
+        back.type = 'button';
+        back.setAttribute('aria-label', typeof window.tr === 'function' ? window.tr('back') : 'Back');
+        back.innerHTML = '<svg viewBox="0 0 28 28" width="28" height="28" fill="currentColor"><use href="#arrow-left-outline-28"></use></svg>';
+        appbar.insertBefore(back, menu);
+    }
+    if (back) back.hidden = !showBack;
+    menu.hidden = showBack || chatHasBack;
+}
+
+async function onImAppbarBack(e) {
+    if (!e.target.closest?.('.appbar-back')) return;
+    e.preventDefault();
+    const im = window.im;
+    if (!isMobileViewport() || !/^\/im(?:\/|$)/.test(location.pathname) || !im) return;
+
+    const tab = im.getSelectedTab?.();
+    const page = tab?.render_class;
+    const tabId = tab?.getPageId?.();
+    try {
+        if (typeof page?.onCancel === 'function') {
+            await page.onCancel(e);
+        } else if (tabId === 'contact' && im.messenger?.getCurrentChat?.()) {
+            await im.messenger.view?.togglePeerInfo?.();
+        } else if (tabId === 'friends' && page?.options?.referrer === 'add_new') {
+            const peer = im.state?.getCurrentConvo?.()?.peer;
+            await im.openTabByName('contact', false, { peer });
+        } else {
+            await im.openTabByName(im.messenger?.getCurrentChat?.() && tabId !== 'friends'
+                ? 'messenger' : 'conversations');
+        }
+    } catch (err) {
+        console.error('vkify16 | IM back failed:', err);
+    }
+}
+
 // Upstream renders a bare loading_mini.gif while a message's attachments are
 // being lazy-loaded. Hide the img in place (preact owns and removes it on the
 // next diff) and show the LoaderUtils .pr spinner instead. Runs after each
@@ -119,7 +182,7 @@ export async function installMessengerRenderer() {
             <div class="im-empty-conversation--content">
                 <div class="im-empty-conversation--image"></div>
                 <div class="im-empty-conversation--text">${tr(isForward ? 'im_forward_dialog_hint' : 'im_empty_dialog_hint')}</div>
-                ${isForward ? html`<button type="button" class="flat_button secondary im-page--cancel-fwd" onClick=${onCancel}>${tr('cancel')}</button>` : ''}
+                ${isForward ? html`<button type="button" class="button im-page--cancel-fwd" onClick=${onCancel}>${tr('cancel')}</button>` : ''}
             </div>
         </div>
     `;
@@ -131,6 +194,16 @@ export async function installMessengerRenderer() {
     await installClassicTabBar({ html, render, commonMod });
     await installConversationsRenderer({ html, render, h, Fragment, commonMod });
     await installFastChatsRenderer({ html, render, commonMod, messageMod });
+
+    const conversations = window.im?.conversations;
+    if (conversations && typeof conversations.update === 'function') {
+        const originalUpdate = conversations.update;
+        conversations.update = function vkifyConversationsUpdate() {
+            const result = originalUpdate.apply(this, arguments);
+            refreshPeerTabs(window.im?.messenger);
+            return result;
+        };
+    }
 
     // Upstream selectTab() logs a TypeError on the first tab selection because
     // getSelectedTab() is null until selectedTabId is set a few lines below.
@@ -160,9 +233,13 @@ export async function installMessengerRenderer() {
                 return origUpdateTabs.apply(this, arguments);
             } finally {
                 syncBodyPeerWindow();
+                syncImAppbarBack();
             }
         };
     }
+    window.vkify?.onPage(syncImAppbarBack);
+    window.addEventListener('resize', syncImAppbarBack);
+    document.addEventListener('click', onImAppbarBack);
 
     MessengerPage.prototype.render = async function vkifyMessengerPageRender(container, options = {}, messenger = null) {
         if (!container) {
@@ -206,11 +283,21 @@ export async function installMessengerRenderer() {
             const tabs = Array.isArray(messenger && messenger.opened_tabs) ? messenger.opened_tabs : [];
             const ids = tabs.map((t) => {
                 const id = (t && t.peer && t.peer.id != null) ? t.peer.id : ((t && t.id != null) ? t.id : '');
-                return String(id);
+                return String(id) + ':' + String(t?.unread_count || 0) + ':' + String(t?.isRead?.() ?? true);
             });
             return ids.join(',') + '|' + String(messenger && messenger.currentChatId != null ? messenger.currentChatId : '');
         } catch (e) {
             return '';
+        }
+    }
+
+    function refreshPeerTabs(messenger) {
+        const page = window.im?.getTab?.('messenger')?.render_class;
+        if (!page || window.im?.getSelectedTabId?.() !== 'messenger' || isCompactMode(window.im)) return;
+        const sig = peerTabsSignature(messenger);
+        if (sig !== page._vkifyLastPeerTabsSig) {
+            page._vkifyLastPeerTabsSig = sig;
+            window.im?.updateTabs?.();
         }
     }
 
@@ -325,6 +412,7 @@ export async function installMessengerRenderer() {
         `;
 
         render(chatPage, container);
+        syncImAppbarBack();
         syncAttachmentLoaders(container);
 
         // Mirror upstream showHook/render side effects; guarded for older upstream.
@@ -359,16 +447,9 @@ export async function installMessengerRenderer() {
             console.error('vkify16 | _updPadding failed:', e);
         }
 
-        // Re-render peer tabs only when opened_tabs/currentChatId change;
-        // updateTabs doesn't recurse into this render.
+        // The tab bar lives outside the chat render; refresh only when its data changes.
         try {
-            if (currentConv && !isCompactMode(window.im) && typeof window.im?.updateTabs === 'function') {
-                const sig = peerTabsSignature(orig_messenger);
-                if (sig !== this._vkifyLastPeerTabsSig) {
-                    this._vkifyLastPeerTabsSig = sig;
-                    window.im.updateTabs();
-                }
-            }
+            refreshPeerTabs(orig_messenger);
         } catch (e) {
             console.error('vkify16 | tab bar refresh failed:', e);
         }

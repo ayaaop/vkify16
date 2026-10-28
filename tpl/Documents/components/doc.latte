@@ -6,7 +6,7 @@
 {var $scroll_context = $scroll_context ?? false}
 {var $hideButtons = $hideButtons ?? false}
 
-<div n:class="search_row, docMainItem, docListViewItem, $scroll_context ? scroll_node" data-id="{$doc->getPrettiestId()}">
+<div n:class="search_row, docMainItem, docListViewItem, $scroll_context ? scroll_node" data-id="{$doc->getPrettiestId()}" n:attr="data-uniqueid => $scroll_context ? ('doc-' . $doc->getPrettiestId()) : null">
     <a class="viewerOpener" data-id="{$doc->getPrettiestId()}" href="/doc{$doc->getPrettyId()}?key={$doc->getAccessKey()}">
         {if $preview}
             <img class="doc_icon" alt="document_preview" src="{$preview->getURLBySizeId('tiny')}">
@@ -33,9 +33,9 @@
         </div>
     </div>
     <div class="doc_volume" n:if="!$hideButtons && $thisUser">
-        <div class="doc_action" n:if="!$modifiable" id="report_icon" data-tip="simple-black" data-tiptitle="{_report}"></div>
-        <div class="doc_action" n:if="$modifiable" id="edit_icon" data-tip="simple-black" data-tiptitle="{_edit}" onclick="window.vkifyDocEdit(event)"></div>
-        <div class="doc_action" n:if="!$copied" id="add_icon" data-tip="simple-black" data-tiptitle="{_add}"></div>
-        <div class="doc_action" n:if="$copied" id="remove_icon" data-tip="simple-black" data-tiptitle="{_remove}"></div>
+        <div class="doc_action" n:if="!$modifiable" id="report_icon" data-title="{_report}" onmouseover="showTitle(this)"></div>
+        <div class="doc_action" n:if="$modifiable" id="edit_icon" data-title="{_edit}" onmouseover="showTitle(this)" onclick="window.vkifyDocEdit(event)"></div>
+        <div class="doc_action" n:if="!$copied" id="add_icon" data-title="{_add}" onmouseover="showTitle(this)"></div>
+        <div class="doc_action" n:if="$copied" id="remove_icon" data-title="{_remove}" onmouseover="showTitle(this)"></div>
     </div>
 </div>

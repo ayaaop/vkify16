@@ -52,9 +52,10 @@
                         <span class="action_count">{if $likesCount > 0}{$likesCount}{/if}</span>
                     </a>
                 {/if}
-                <a n:if="!($forceNoCommentsLink ?? false) && $commentsCount == 0" class="action_button side_button post_reply" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">
+                <a n:if="!($forceNoCommentsLink ?? false)" class="action_button side_button post_reply" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">
                     <svg class="action_icon"><use class="i16" href="#comment-14"></use><use class="i18" href="#comment-outline-24"></use></svg>
-                    <span class="action_label">{_comment}</span>
+                    <span class="action_label">{_reply}</span>
+                    <span class="action_count">{$commentsCount}</span>
                 </a>
             </div>
         </div>

@@ -2286,7 +2286,7 @@ body:not(.dark-mode) .ovk-diag-cont.vkify-olist-dialog .ovk-diag-head .ovk-diag-
 .module_body .post-horizontal:not(:empty) {
     padding: 10px 0;
 }
-.post-buttons .vertical-attachment .vertical-attachment-content {
+:is(.post-buttons, .post-vertical) .vertical-attachment .vertical-attachment-content {
     padding: 0;
     max-height: unset;
 }
@@ -2788,7 +2788,7 @@ html.vkify-composer-dragging * {
 .post-horizontal.vkify_makima_composer > a.upload-item.thumb_wrap.single_video_thumb:hover .composer_video_item_info .video_item_title {
     text-decoration: underline;
 }
-.post-buttons .vertical-attachment.upload-item {
+:is(.post-buttons, .post-vertical) .vertical-attachment.upload-item {
     display: flex;
     align-items: center;
     width: 100%;
@@ -2797,48 +2797,48 @@ html.vkify-composer-dragging * {
     box-sizing: border-box;
     overflow: hidden;
 }
-.post-buttons .vertical-attachment .vertical-attachment-content {
+:is(.post-buttons, .post-vertical) .vertical-attachment .vertical-attachment-content {
     flex: 1 1 0%;
     min-width: 0;
     max-width: calc(100% - 24px);
     overflow: hidden;
 }
-.post-buttons .vertical-attachment .vertical-attachment-remove {
+:is(.post-buttons, .post-vertical) .vertical-attachment .vertical-attachment-remove {
     flex: 0 0 auto;
 }
-.post-buttons .vertical-attachment .attachment_doc {
+:is(.post-buttons, .post-vertical) .vertical-attachment .attachment_doc {
     width: 100%;
     max-width: 100%;
     min-width: 0;
     overflow: hidden;
 }
-.post-buttons .vertical-attachment .attachment_doc .docListViewItem {
+:is(.post-buttons, .post-vertical) .vertical-attachment .attachment_doc .docListViewItem {
     padding: 6px 0;
     border-bottom: none;
     min-width: 0;
     max-width: 100%;
 }
-.post-buttons .vertical-attachment .attachment_doc .docListViewItem .doc_content {
+:is(.post-buttons, .post-vertical) .vertical-attachment .attachment_doc .docListViewItem .doc_content {
     flex: 1 1 0%;
     min-width: 0;
     overflow: hidden;
 }
-.post-buttons .vertical-attachment .attachment_doc .docListViewItem .doc_content a,
-.post-buttons .vertical-attachment .attachment_doc .docListViewItem .doc_name {
+:is(.post-buttons, .post-vertical) .vertical-attachment .attachment_doc .docListViewItem .doc_content a,
+:is(.post-buttons, .post-vertical) .vertical-attachment .attachment_doc .docListViewItem .doc_name {
     display: block;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.post-buttons .vertical-attachment .attachment_note {
+:is(.post-buttons, .post-vertical) .vertical-attachment .attachment_note {
     display: flex;
     align-items: center;
     max-width: 100%;
     min-width: 0;
     overflow: hidden;
 }
-.post-buttons .vertical-attachment .attachment_note .attachment_note_content {
+:is(.post-buttons, .post-vertical) .vertical-attachment .attachment_note .attachment_note_content {
     flex: 1 1 0%;
     min-width: 0;
     overflow: hidden;
@@ -3040,7 +3040,7 @@ html.vkify-composer-dragging * {
     font-weight: 500;
     border-top: 1px solid var(--border-color);
     padding: 16px 25px;
-    border-radius: 0 0 4px 4px;
+    border-radius: 0 0 var(--module-border-radius) var(--module-border-radius);
 }
 
 .sort_link_icon {
@@ -3842,7 +3842,7 @@ h4.gifts_section_header {
 }
 
 .stickers_gift_selector_box {
-    border-color: var(--border-color-4);
+    border-color: var(--border-color-2);
     background: var(--module-background-color);
 }
 .stickers_gift_token {
@@ -3909,6 +3909,12 @@ h4.gifts_section_header {
 .stickers_gift_suggestion_name {
     font-size: 12.5px;
     color: var(--text-color);
+}
+.stickers_gift_top_preview div[style] {
+    color: var(--muted-text-color-2) !important;
+}
+.stickers_gift_top_preview #stickers_gift_price_value {
+    color: var(--text-color) !important;
 }
 
 /* replies */
@@ -4113,7 +4119,7 @@ h4.gifts_section_header {
     max-width: 100%;
     padding: 0;
     background: var(--module-background-color--secondary);
-    border-radius: 3px;
+    border-radius: 0;
     border: 0;
 }
 
@@ -4422,7 +4428,7 @@ h4.gifts_section_header {
 }
 .video_item .video_item_thumb_wrap {
     background-size: initial;
-    background-image: url("/web/20200518035514im_/https://vk.com/images/icons/video_empty.png");
+    background-image: url("../resource/icons/video_empty.svg");
     background-color: var(--module-header-background-color);
     background-repeat: no-repeat;
     background-position: 50%;
@@ -5065,6 +5071,9 @@ a.poll-retract-vote,
 }
 .tickets_content .reply {
     padding: 0 12px;
+}
+.tickets_content .composer.model_content_textarea .post-buttons .post-bottom-acts {
+    margin: 0;
 }
 .tickets_content .composer.model_content_textarea textarea {
     margin-left: 0;

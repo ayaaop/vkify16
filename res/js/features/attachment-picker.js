@@ -57,6 +57,9 @@ function computeComposerBoxes(containerEl, items) {
     const isFastchat = Boolean(containerEl.closest('.fc_tab_wrap, #fastchats_container, .fastchat-box'));
     const isMessenger = Boolean(isFastchat || containerEl.closest('.im-chat-input, .messenger-app--input, .messenger-layer, #im_container'));
     const isMobileModal = Boolean(containerEl.closest('#_edit_post_modal, #_new_post_modal'));
+    // Comment attachments render via getChildrenWithLayout(240), which passes
+    // maxHeight = maxWidth, so the composer preview uses the same 240x240 box.
+    const isComment = containerEl.classList.contains('post-horizontal--comment');
 
     const padKey = isMobileModal ? 'm' : 'd';
     if (!containerEl.__mkPad || containerEl.__mkPadKey !== padKey) {
@@ -81,10 +84,11 @@ function computeComposerBoxes(containerEl, items) {
             ? Math.max(240, (window.innerWidth || 360) - 32)
             : (isFastchat ? 220 : (isMessenger ? 400 : 510));
     }
-    const maxW = Math.min(isFastchat ? 240 : (isMessenger ? 420 : 510), availW);
+    const maxW = Math.min(isFastchat ? 240 : (isComment ? 240 : (isMessenger ? 420 : 510)), availW);
     const maxH = isFastchat
         ? Math.min(160, Math.round(maxW * 0.66))
-        : (isMobileModal ? Math.min(230, Math.round(maxW * 0.66)) : Math.round(maxW * 0.666));
+        : (isComment ? maxW
+            : (isMobileModal ? Math.min(230, Math.round(maxW * 0.66)) : Math.round(maxW * 0.666)));
     const GAP = 4;
 
     const visualItems = items.map((el) => {
@@ -302,13 +306,13 @@ function decorateHorizontalItem(anchorEl, opts = {}) {
                 <div class="photo_thumb_btns_container ui_thumb_extra">
                     <div class="photo_thumb_btns_overlay">
                         <div class="photo_thumb_btns">
-                            <div class="photo_thumb_btn_show ui_extra_btn_show" data-tip="simple-black" data-tiptitle="${tr('photo')}"></div>
-                            ${canEditPhoto ? `<div class="photo_thumb_btn_editor ui_extra_btn_pe" data-photo-id="${cleanPhotoId}" data-src="${opts.fullsize_url || previewSrc}" data-large-src="${opts.fullsize_url || previewSrc}" data-tip="simple-black" data-tiptitle="${vtr('pe_act_stickers', 'Effects & stickers')}"></div>` : ''}
+                            <div class="photo_thumb_btn_show ui_extra_btn_show" onmouseover="showTitle(this)" data-title="${tr('photo')}"></div>
+                            ${canEditPhoto ? `<div class="photo_thumb_btn_editor ui_extra_btn_pe" data-photo-id="${cleanPhotoId}" data-src="${opts.fullsize_url || previewSrc}" data-large-src="${opts.fullsize_url || previewSrc}" onmouseover="showTitle(this)" data-title="${vtr('pe_act_stickers', 'Effects & stickers')}"></div>` : ''}
                         </div>
                     </div>
                 </div>
             ` : ''}
-            <div class="ui_thumb_x_button upload-delete" data-tip="simple-black" data-tiptitle="${tr('detach') || tr('delete')}">
+            <div class="ui_thumb_x_button upload-delete" onmouseover="showTitle(this)" data-title="${tr('detach') || tr('delete')}">
                 <div class="ui_thumb_x"></div>
             </div>
         </div>
@@ -1342,12 +1346,27 @@ class PhotoPicker extends AttachmentPickerBase {
         const applyBtn = head.find('.ovk-diag-head-apply').nodes[0];
         head.html('');
         if (view instanceof PhotoAlbumView) {
+            const label = title || tr('paginator_back');
             const backEl = document.createElement('div');
             backEl.className = 'back picker-header-back';
             backEl.setAttribute('role', 'button');
             backEl.setAttribute('tabindex', '0');
-            backEl.textContent = title || tr('paginator_back');
-            head.nodes[0]?.appendChild(backEl);
+            backEl.setAttribute('aria-label', tr('back'));
+            const backIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            backIcon.setAttribute('class', 'mobileonly');
+            backIcon.setAttribute('viewBox', '0 0 28 28');
+            backIcon.setAttribute('width', '28');
+            backIcon.setAttribute('height', '28');
+            backIcon.setAttribute('fill', 'currentColor');
+            backIcon.innerHTML = '<use href="#arrow-left-outline-28"></use>';
+            const backLabel = document.createElement('span');
+            backLabel.className = 'picker-header-back-label';
+            backLabel.textContent = label;
+            backEl.append(backIcon, backLabel);
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'ovk-diag-head-title picker-title-text mobileonly';
+            titleSpan.textContent = label;
+            head.nodes[0]?.append(backEl, titleSpan);
         } else {
             const titleSpan = document.createElement('span');
             titleSpan.className = 'ovk-diag-head-title picker-title-text';

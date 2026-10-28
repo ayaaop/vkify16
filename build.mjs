@@ -51,6 +51,7 @@ const modules = [
     'features/player.js',
 
     'features/status-editor.js',
+    'features/friends.js',
     'features/pin-group.js',
     'features/profile.js',
     'features/likes.js',

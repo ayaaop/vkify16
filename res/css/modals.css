@@ -1250,7 +1250,7 @@ input.vkify_inline_edit_field {
 }
 .ovk-diag-head .picker-header-back:hover {
   text-decoration: none;
-  background-color: var(--accent-color-4);
+  background-color: var(--header-background-color--hover);
 }
 .ovk-diag-action .picker-bottom-cancel {
   display: inline-block;

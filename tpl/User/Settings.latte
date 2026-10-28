@@ -622,10 +622,10 @@
                                     <div class="form_label">{=vkifyTr('vkify_settings')|noescape}</div>
                                     <div class="form_data" dir="auto">
                                         <label class="checkbox"><input type="checkbox" name="theme_mode" value="1"><span>{=vkifyTr('dark_mode')|noescape}</span></label>
-                                        <label class="checkbox"><input type="checkbox" name="mode_2018" value="1"><span>{=vkifyTr('mode_2018')|noescape}</span></label>
+                                        <label class="checkbox" data-title="{=vkifyTr('mode_2018_tip')}" onmouseover="{='showTooltip(this, {text: this.dataset.title, dir: \'right\', slideX: 15, width: 260, shift: [20, 0, 0]})'|noescape}"><input type="checkbox" name="mode_2018" value="1"><span>{=vkifyTr('mode_2018')|noescape}</span></label>
                                         <label class="checkbox"><input type="checkbox" name="vkgraffiti" value="0"><span>{=vkifyTr('graffitiswitch')|noescape}</span></label>
                                         <label class="checkbox"><input type="checkbox" name="ovkhat" value="0"><span>{=vkifyTr('ovkhat')|noescape}</span></label>
-                                        <label class="checkbox"><input type="checkbox" name="post_views" value="1"><span>{=vkifyTr('post_views')|noescape}</span></label>
+                                        <label class="checkbox" data-title="{=vkifyTr('post_views_tip')}" onmouseover="{='showTooltip(this, {text: this.dataset.title, dir: \'right\', slideX: 15, width: 260, shift: [20, 0, 0]})'|noescape}"><input type="checkbox" name="post_views" value="1"><span>{=vkifyTr('post_views')|noescape}</span></label>
                                     </div>
                                 </div>
                             </form>
