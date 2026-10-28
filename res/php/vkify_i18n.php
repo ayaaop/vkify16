@@ -128,7 +128,7 @@ if (!function_exists('vkifyGetStrings')) {
                     'pe_delete_text' => 'Delete text',
                     'pe_delete_sticker' => 'Delete sticker',
                     'pe_drawing_undo' => 'Undo last action',
-                    'pe_text_placeholder' => 'Enter text...'
+                    'pe_text_placeholder' => 'Enter text...',
                 ],
                 'ru' => [
                     'add_tracks' => 'Добавить аудиозаписи',
@@ -250,7 +250,7 @@ if (!function_exists('vkifyGetStrings')) {
                     'pe_delete_text' => 'Удалить текст',
                     'pe_delete_sticker' => 'Удалить стикер',
                     'pe_drawing_undo' => 'Отменить последнее действие',
-                    'pe_text_placeholder' => 'Введите текст...'
+                    'pe_text_placeholder' => 'Введите текст...',
                 ],
                 'uk' => [
                     'add_tracks' => 'Додати аудіозаписи',
@@ -372,7 +372,7 @@ if (!function_exists('vkifyGetStrings')) {
                     'pe_delete_text' => 'Видалити текст',
                     'pe_delete_sticker' => 'Видалити стікер',
                     'pe_drawing_undo' => 'Скасувати останню дію',
-                    'pe_text_placeholder' => 'Введіть текст...'
+                    'pe_text_placeholder' => 'Введіть текст...',
                 ],
                 'kk' => [
                     'add_tracks' => 'Әндерді қосу',
@@ -494,7 +494,7 @@ if (!function_exists('vkifyGetStrings')) {
                     'pe_delete_text' => 'Мәтінді өшіру',
                     'pe_delete_sticker' => 'Стикерді өшіру',
                     'pe_drawing_undo' => 'Соңғы әрекетті болдырмау',
-                    'pe_text_placeholder' => 'Мәтінді енгізіңіз...'
+                    'pe_text_placeholder' => 'Мәтінді енгізіңіз...',
                 ],
             ];
         }

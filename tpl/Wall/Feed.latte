@@ -2,7 +2,7 @@
 {block title}{_feed}{/block}
 
 {block appbar_extra}
-<div class="mobileonly" id="feed_appbar_extra">
+<div n:if="$section !== 'comments'" class="mobileonly" id="feed_appbar_extra">
     <button class="appbar-extra-btn" id="__feed_settings_link" aria-label="{_feed_settings}" data-pagescount='{ceil($paginatorConf->count / $paginatorConf->perPage)}'>
         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><use href="#settings-24"></use></svg>
     </button>
@@ -10,17 +10,34 @@
 {/block}
 
 {block content}
-
+    {var $newsSubitems = []}
+    {foreach $availLocalSections as $tab}
+        {if $tab[0] !== 'local_posts'}
+            {var $newsSubitems[] = [
+                'url' => '/feed?section=' . $tab[0],
+                'title' => $tab[1],
+                'translate' => false,
+                'active' => $section === $tab[0],
+                'class' => 'feed_section_' . $tab[0]
+            ]}
+        {/if}
+    {/foreach}
     {var $menuItems = [
         [
             'url' => '/feed',
-            'title' => 'my_news',
-            'active' => !isset($globalFeed)
+            'title' => 'news',
+            'active' => $section === 'local_posts',
+            'showSubitems' => $section !== 'comments',
+            'subitems' => $newsSubitems
         ],
         [
-            'url' => '/feed/all',
-            'title' => 'all_news',
-            'active' => isset($globalFeed)
+            'url' => '/feed?section=comments',
+            'title' => 'comments',
+            'active' => $section === 'comments'
+        ],
+        [
+            'isSeparator' => true,
+            'condition' => $section !== 'comments'
         ],
         [
             'id' => '__feed_settings_link',
@@ -28,46 +45,110 @@
             'url' => '#',
             'title' => 'feed_settings',
             'active' => false,
+            'condition' => $section !== 'comments',
             'data-pagescount' => ceil($paginatorConf->count / $paginatorConf->perPage)
         ]
     ]}
-
+    {var $feedFetchUrl = '/feed?section=' . $section}
     {php $GLOBALS["_bigWall"] = 1}
 
     <div class="wide_column_left">
         <div class="narrow_column_wrap">
             <div class="narrow_column">
-                {include "../components/ui_rmenu.latte", items => $menuItems, additionalCssClass => 'show_as_menu_on_mobile'}
+                {include "../components/ui_rmenu.latte", items => $menuItems, additionalCssClass => 'show_as_menu_on_mobile', id => 'feed_rmenu'}
             </div>
         </div>
-
         <div class="wide_column_wrap">
             <div class="wide_column">
-                <div class="page_block postFeedWrapperMicroblog">
+                <div n:if="$isGlobal || $section === 'local_posts'" class="page_block postFeedWrapperMicroblog">
                     {include "../components/textArea.latte", route => "/wall" . $thisUser->getId() . "/makePost", graffiti => true, polls => true, notes => true, hasSource => true, geo => true}
                 </div>
-                
-                {var $feedFetchUrl = isset($globalFeed) ? '/feed/all' : '/feed'}
-                <div class='scroll_container' data-fetch-url="{$feedFetchUrl}">
-                    {if !empty($posts)}
-                        {foreach $posts as $post}
+
+                {var $mediaFeedBlock = !empty($posts) && in_array($feedType, ['photo', 'video', 'audio'])}
+                <div n:class="$mediaFeedBlock ? 'page_block' : null">
+                <div n:class="scroll_container, feed_container, ($feedType === 'photo' && !empty($posts)) ? 'page_padding album-flex feed_photos' : null, ($feedType === 'video' && !empty($posts)) ? 'video_block_layout video_items_list feed_videos' : null, ($feedType === 'audio' && !empty($posts)) ? 'audiosDiv audiosContainer feed_audios' : null" data-fetch-url="{$feedFetchUrl}">
+                    {foreach $posts as $post}
+                        {if $feedType === 'post'}
                             {include "../components/post.latte", post => $post, commentSection => true}
-                        {/foreach}
+                        {elseif $feedType === 'photo'}
+                            <div class="album-photo masonry-item scroll_node" data-uniqueid="photo-{$post->getId()}">
+                                <a href="/photo{$post->getPrettyId()}" onclick="PhotoViewer.openById('{$post->getPrettyId() . ($post->getAccessKey() ? '_' . $post->getAccessKey() : '')|noescape}', event)">
+                                    {var $pDims = vkifyPhotoDims($post)}
+                                    <img class="album-photo--image" src="{$post->getURLBySizeId('small')}" width="{$pDims[0]}" height="{$pDims[1]}" alt="{$post->getDescription()}" loading="lazy">
+                                </a>
+                            </div>
+                        {elseif $feedType === 'video'}
+                            {include "../components/video.latte", video => $post}
+                        {elseif $feedType === 'audio'}
+                            <div class="scroll_node" data-uniqueid="audio-{$post->getId()}">
+                                {include "../Audio/player.latte", audio => $post}
+                            </div>
+                        {elseif $feedType === 'note'}
+                            {include "../components/notepost.latte", note => $post, commentSection => true}
+                        {elseif $feedType === 'comment'}
+                            {var $target = $post[0]}
+                            {var $comment = $post[1]}
+                            {var $targetType = $post[2]}
+                            <div class="page_block feed_comment_item scroll_node" data-uniqueid="comment-{$comment->getId()}">
+                                {if $targetType === 'wall'}
+                                    {include "../components/post.latte", post => $target, commentSection => false, scrollNode => false}
+                                {else}
+                                    {var $targetOwner = $target->getOwner()}
+                                    <div class="post feed_comment_target_post">
+                                        <div class="post_header">
+                                            <a class="post_image{if method_exists($targetOwner, 'isOnline') && $targetOwner->isOnline()} online{/if}" href="{$targetOwner->getURL()}">
+                                                {include '../components/avatar.latte', author => $targetOwner, size => 'miniscule', width => 50, class => 'post-avatar'}
+                                            </a>
+                                            <div class="post_header_info">
+                                                <div class="post_author">
+                                                    <a class="author" href="{$targetOwner->getURL()}">{$targetOwner->getCanonicalName()}</a>
+                                                    <a class="page_verified" n:if="method_exists($targetOwner, 'isVerified') && $targetOwner->isVerified()" href="/verify"></a>
+                                                    <span class="explain">{tr('post_target_' . $targetType)}</span>
+                                                </div>
+                                                <div class="post_date">
+                                                    <a href="{$target->getPageURL()}" class="post_link">{$target->getPublicationTime()}</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="post-content">
+                                            <div class="text wall_text">
+                                                {if $targetType === 'photo' || $targetType === 'video'}
+                                                    <div class="attachments attachments_b" style="width: 510px;">
+                                                        <div class="attachment" style="float: left; width: 510px;">
+                                                            {include "../components/attachment.latte", attachment => $target, parent => $target, parentType => $targetType, tilesCount => 1}
+                                                        </div>
+                                                    </div>
+                                                {elseif $targetType === 'note'}
+                                                    <a class="wall_note_type" href="{$target->getPageURL()}">{$target->getName()}</a>
+                                                    <div n:ifcontent class="really_text wall_post_text note_text">{$target->getPreview(250)}</div>
+                                                {elseif $targetType === 'topic'}
+                                                    <a class="wall_note_type" href="{$target->getPageURL()}">{$target->getTitle()}</a>
+                                                {elseif $targetType === 'audio_playlist'}
+                                                    <a class="wall_note_type" href="{$target->getPageURL()}">{$target->getName()}</a>
+                                                {/if}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {/if}
+                                <div class="post-menu-s">
+                                    <div class="comments">
+                                        {include "../components/comment.latte", comment => $comment, compact => true, noEdit => true, no_reply_button => true}
+                                    </div>
+                                </div>
+                            </div>
+                        {/if}
                     {else}
                         {include "../components/content_error.latte", id => "none_tip", description => tr("no_posts_abstract")}
-                    {/if}
+                    {/foreach}
                 </div>
-
                 <div class="postFeedBottom">
                     <div class="postFeedPaginator">
                         {php $paginatorConf->fetchUrl = $feedFetchUrl;}
                         {include "../components/paginator.latte", conf => $paginatorConf}
                     </div>
                 </div>
+                </div>
             </div>
         </div>
     </div>
-{/block}
-
-{block bodyScripts}
 {/block}

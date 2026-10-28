@@ -41,12 +41,21 @@
             </div>
         </div>
         <div class='post_edit'></div>
-        <div class="post_full_like_wrap" n:if="$thisUser && !($forceNoCommentsLink ?? false)" n:ifcontent>
+        <div class="post_full_like_wrap" n:if="$thisUser" n:ifcontent>
             <div class="post_full_like">
-                <a class="action_button side_button post_reply" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">
+                {if !($forceNoLike ?? false)}
+                    {var $liked = $note->hasLikeFrom($thisUser)}
+                    {var $likesCount = $note->getLikesCount()}
+                    <a class="action_button post_like {if $liked}my_like{/if}" data-type="note" data-liked="{(int) $liked}" data-likes="{$likesCount}" data-id="{$note->getPrettyId()}" onmouseover="vkifyLikesShow(this)">
+                        <svg class="action_icon" id="{if $liked}liked{/if}"><use class="i16" href="#like-16"/><use class="i18" href="#like-outline-24"/><use class="i18 iact" href="#like-active-24"/></svg>
+                        <span class="action_label">{tr('mobile_like')}</span>
+                        <span class="action_count">{if $likesCount > 0}{$likesCount}{/if}</span>
+                    </a>
+                {/if}
+                <a n:if="!($forceNoCommentsLink ?? false)" class="action_button side_button post_reply" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">
                     <svg class="action_icon"><use class="i16" href="#comment-14"></use><use class="i18" href="#comment-outline-24"></use></svg>
                     <span class="action_label">{_reply}</span>
-                    <span class="action_count">{$commentsCount}</span>
+                    <span class="action_count">{if $commentsCount > 0}{$commentsCount}{/if}</span>
                 </a>
             </div>
         </div>

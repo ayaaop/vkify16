@@ -1873,6 +1873,38 @@ table,
     text-decoration: none !important;
 }
 
+.feed_container.feed_photos {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+.feed_videos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 20px;
+}
+.feed_videos .video_item {
+    margin: 0;
+}
+.feed_audios .scroll_node + .scroll_node {
+    margin-top: 2px;
+}
+.feed_comment_item > .post {
+    margin: 0;
+    padding-bottom: 12px;
+    border-radius: var(--module-border-radius) var(--module-border-radius) 0 0;
+    box-shadow: none;
+}
+.feed_comment_item > .post .post-content {
+    margin-bottom: 0;
+}
+.feed_comment_item > .post .post_full_like_wrap {
+    display: none;
+}
+.feed_comment_item .post-menu-s .comments {
+    border-bottom: 0;
+}
+
 #pageSelect {
     width: auto;
 }
@@ -3819,6 +3851,24 @@ h4.gifts_section_header {
     border: 0;
 }
 
+.album-flex .album-photo.deleted_mark {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 185px;
+    background: var(--album-background-color);
+    color: var(--muted-text-color-3);
+}
+
+.album-flex .album-photo.deleted_mark::before {
+    content: "";
+    width: 60px;
+    height: 48px;
+    margin-bottom: 12px;
+    background: url(../resource/camera_big.png) no-repeat center / contain;
+}
+
 .attachment_selector #attachment_insert .photosList .album-photo {
     position: relative;
     text-align: center;
@@ -4348,13 +4398,6 @@ h4.gifts_section_header {
     margin: 0;
 }
 
-.post_add .action_icon,
-.post_remove .action_icon,
-.post_edit .action_icon {
-	opacity: 0.85;
-    width: 13px;
-    height: 13px;
-}
 .post_download .action_icon {
     width: 12px;
     height: 14px;
@@ -4363,14 +4406,10 @@ h4.gifts_section_header {
 
 .AudioPlaylistSnippet__actions .post_add .action_icon,
 .AudioPlaylistSnippet__actions .post_remove .action_icon {
-	background-image: url(../resource/icons/video_actions.png);
-	background-repeat: no-repeat;
-}
-.AudioPlaylistSnippet__actions .post_add .action_icon {
-	background-position: 0 -15px;
+	width: 14px;
 }
 .AudioPlaylistSnippet__actions .post_remove .action_icon {
-	background-position: 0 -29px;
+    opacity: 1;
 }
 .document_actions .post_add .action_icon,
 .document_actions .post_remove .action_icon,
@@ -4390,10 +4429,6 @@ h4.gifts_section_header {
 .document_actions .post_download .action_icon {
 	background-image: url(../resource/icons/download_icon.png);
 	background-repeat: no-repeat;
-}
-
-.AudioPlaylistSnippet__actions .post_share .action_icon {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%20style%3D%22fill%3A%233D6899%3B%22%3E%3Cpath%20d%3D%22M0%205.5L0%206.5C0%208%201.6%209%203%209L8%209C8.4%209%209.1%209.2%2010.7%2010.3%2011.7%2011.1%2012.9%2012%2012.9%2012L14%2012%2014%206%2014%206%2014%206%2014%200%2012.9%200C12.9%200%2011.7%200.9%2010.7%201.7%209.1%202.8%208.4%203%208%203L3%203C1.6%203%200%204%200%205.5ZM7.5%2012L6.4%209%204%209%205.3%2014C7.3%2014%207.5%2013.3%207.5%2012Z%22%2F%3E%3C%2Fsvg%3E");
 }
 
 /* discussion boards */

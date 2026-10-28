@@ -6,14 +6,15 @@
     'posts' => '/wall',
     'topics' => '/topic',
     'notes' => '/note',
+    'audio_playlists' => '/playlist',
     default => null
 }}
-{var $commentsFetchUrl = $parentPrefix && isset($parent) ? ($parentPrefix . $parent->getPrettyId() . (isset($sort) && $sort ? ('?sort=' . $sort) : '')) : null}
+{var $commentsFetchUrl = $parentPrefix && isset($parent) ? ($parentPrefix . $parent->getPrettyId() . ($model === 'audio_playlists' ? '?act=comments' . (isset($sort) && $sort ? '&sort=' . $sort : '') : (isset($sort) && $sort ? '?sort=' . $sort : ''))) : null}
 {if sizeof($comments) > 0 || $thisUser}
     <div id="replies" class="page_block comments">
         {if isset($sort) && !is_null($sort) && $count > 5}
             <div class="post_replies_header">
-            <a class="sort_link" n:attr="href => $sort == 'desc' ? '?sort=asc' : '?sort=desc'">
+            <a class="sort_link" n:attr="href => $model === 'audio_playlists' ? '?act=comments&sort=' . ($sort == 'desc' ? 'asc' : 'desc') : ($sort == 'desc' ? '?sort=asc' : '?sort=desc')">
                 {if $sort == 'desc'}
                     {_new_first}
                 {else}

@@ -229,14 +229,15 @@
 	color: var(--link-color);
 	overflow: hidden;
 }
-.AudioPlaylistSnippet__actions .action_button .action_label {
-	vertical-align: middle;
+.AudioPlaylistSnippet__actions .action_button:not(.post_remove,.post_add,.post_more) .action_label {
+	display: none;
 }
 .post_more .action_icon {
 	display: none;
 }
-.post_more .action_label {
+.AudioPlaylistSnippet__actions .post_more .action_label {
 	margin-left: 0;
+	display: inline-block;
 }
 .post_more::after {
 	display: inline-block;
@@ -261,7 +262,6 @@
 }
 .AudioPlaylistSnippet__actions .post_share .action_icon {
 	margin: 0;
-	margin-right: 2px;
 }
 .AudioPlaylistSnippet__audioPartRow {
 	height: 36px;
@@ -338,4 +338,13 @@
 }
 .AudioPlaylistSnippet__covers:not(.AudioPlaylistSnippet__covers--playing) .AudioPlaylistSnippet__stop {
 	display: none !important;
+}
+.AudioPlaylistSnippet__comments #replies.page_block {
+	margin-bottom: 0;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+.AudioPlaylistSnippet__comments #replies.page_block:last-child {
+	border-bottom-left-radius: var(--module-border-radius);
+	border-bottom-right-radius: var(--module-border-radius);
 }

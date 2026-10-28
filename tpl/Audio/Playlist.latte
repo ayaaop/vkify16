@@ -34,6 +34,9 @@
             page: {$page}
         }
     </script>
+    {var $playlistAudios = $audios ?? iterator_to_array($playlist->fetch($page, 10))}
+    {var $playlistSort = $sort ?? ($_GET['sort'] ?? 'asc')}
+    {var $playlistComments = $comments ?? iterator_to_array($playlist->getComments($page, null, $playlistSort == 'asc' ? 'ASC' : 'DESC'))}
     <div class="_playlist_page_content_block">
         {include "../components/page_crumb_header.latte", crumbs: [
             ['href' => $owner->getURL(), 'title' => $owner->getCanonicalName()],
@@ -84,15 +87,27 @@
 
                 <div class="post_full_like_wrap AudioPlaylistSnippet__actions" n:ifset="$thisUser">
                     <div class="post_full_like">
-                        <a class="action_button {if $isBookmarked}post_remove{else}post_add{/if}" id="{if $isBookmarked}unbookmarkPlaylist{else}bookmarkPlaylist{/if}" data-id="{$playlist->getId()}">
-                            <i class="action_icon"></i>
-                            <span class="action_label">{if $isBookmarked}{_unbookmark}{else}{_bookmark}{/if}</span>
+                        {var $liked = $playlist->hasLikeFrom($thisUser)}
+                        {var $likesCount = $playlist->getLikesCount()}
+                        <a class="action_button post_like {if $liked}my_like{/if}" data-type="audio_playlist" data-liked="{(int) $liked}" data-likes="{$likesCount}" data-id="{$playlist->getPrettyId()}">
+                            <svg class="action_icon" id="{if $liked}liked{/if}"><use class="i16" href="#like-16"/><use class="i18" href="#like-outline-24"/><use class="i18 iact" href="#like-active-24"/></svg>
+                            <span class="action_label">{tr('mobile_like')}</span>
+                            <span class="action_count">{if $likesCount > 0}{$likesCount}{/if}</span>
+                        </a>
+                        <a class="action_button post_reply" href="#replies" onclick="document.getElementById('replies')?.scrollIntoView({ behavior: 'smooth' }); return false;">
+                            <svg class="action_icon"><use class="i16" href="#comment-14"/><use class="i18" href="#comment-outline-24"/></svg>
+                            <span class="action_label">{_comments}</span>
+                            <span class="action_count">{if $cCount > 0}{$cCount}{/if}</span>
                         </a>
                         <a class="action_button post_share" onclick="shareAudioPlaylist(event, {$playlist->getOwner()->getId()}, {$playlist->getId()}); event.preventDefault(); event.stopPropagation(); return false;">
-                            <i class="action_icon"></i>
+                            <svg class="action_icon"><use class="i16" href="#share-14"/><use class="i18" href="#share-arrow-24"/></svg>
                             <span class="action_label">{_share}</span>
                         </a>
-                        <div class="ui_actions_menu_wrap" n:if="$canEdit" onmouseover="{='uiActionsMenu.show(this, null, {appendParentCls: \"body\"});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
+                        <a class="action_button {if $isBookmarked}post_remove{else}post_add{/if}" id="{if $isBookmarked}unbookmarkPlaylist{else}bookmarkPlaylist{/if}" data-id="{$playlist->getId()}">
+                            <svg class="action_icon"><use class="i16 i-add" href="#video-action-plus-14"/><use class="i16 i-check" href="#video-action-checkmark-14"/><use class="i18 i-add" href="#add-24"/><use class="i18 i-check" href="#check-24"/></svg>
+                            <span class="action_label">{if $isBookmarked}{_unbookmark}{else}{_bookmark}{/if}</span>
+                        </a>
+                        <div class="ui_actions_menu_wrap" n:if="$canEdit" onmouseover="uiActionsMenu.show(this, null, { appendParentCls: 'body' });" onmouseout="uiActionsMenu.hide(this);">
                             <a class="action_button post_more" id="playlist_more_actions_trigger">
                                 <i class="action_icon"></i>
                                 <span class="action_label">{_show_more}</span>
@@ -115,14 +130,14 @@
                         {if $count < 1}
                             {include "../components/content_error.latte", icon => "no_music.svg", description => tr("empty_playlist")}
                         {else}  
-                            <div class="AudioPlaylistSnippet__audioRow scroll_node" data-uniqueid="audio-{$audio->getId()}" n:foreach="$audios as $audio">
+                            <div class="AudioPlaylistSnippet__audioRow scroll_node" data-uniqueid="audio-{$audio->getId()}" n:foreach="$playlistAudios as $audio">
                                 {include "player.latte", audio => $audio}
                             </div>
 
                             {include "../components/paginator.latte", conf => (object) [
                                 "page"     => $page,
                                 "count"    => $count,
-                                "amount"   => sizeof($audios),
+                                "amount"   => sizeof($playlistAudios),
                                 "perPage"  => $perPage ?? \OPENVK_DEFAULT_PER_PAGE,
                                 "atBottom" => true,
                                 'tidy'     => true
@@ -132,6 +147,12 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="AudioPlaylistSnippet__comments">
+        {include "../components/comments.latte",
+            comments => $playlistComments, count => $cCount, page => $page,
+            model => "audio_playlists", parent => $playlist, sort => $playlistSort}
     </div>
 
     <script>

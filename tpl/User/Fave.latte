@@ -11,6 +11,7 @@
     {var $isComments = $section === 'comments'}
     {var $isPhotos   = $section === 'photos'}
     {var $isVideos   = $section === 'videos'}
+    {var $isNotes    = $section === 'notes'}
 
     {var $menuItems = [
         [
@@ -32,6 +33,11 @@
             'url' => '/fave?section=videos',
             'title' => 's_videos',
             'active' => $isVideos
+        ],
+        [
+            'url' => '/fave?section=notes',
+            'title' => 'notes',
+            'active' => $isNotes
         ]
     ]}
 
@@ -46,12 +52,22 @@
                 <div class="page_block wall_posts_tabs">
                     {include "../components/page_block_header.latte", title => "bookmarks_tab"}
                 </div>
-                <div n:class="scroll_container, ($section == 'photos' && $count > 0 ? 'page_block page_padding' : ''), ($section == 'videos' && $count > 0 ? 'page_block video_block_layout video_items_list' : '')">
+                <div n:class="($count > 0 && ($isPhotos || $section === 'videos')) ? 'page_block' : null">
+                <div n:class="scroll_container, ($isPhotos && $count > 0 ? 'page_padding album-flex' : ''), ($section == 'videos' && $count > 0 ? 'video_block_layout video_items_list' : '')">
                     {if $count > 0}
-                        {if $section == 'photos' && $count > 0}
-                            <div class="album-flex">
-                        {/if}
-                        {foreach $data as $dat}
+                        {foreach $isPhotos ? $data : [] as $dat}
+                                {if $dat->isDeleted()}
+                                    <div class="deleted_mark album-photo masonry-item scroll_node" data-uniqueid="photo-{$dat->getId()}"><span>[deleted]</span></div>
+                                {else}
+                                    <div class="album-photo masonry-item scroll_node" data-uniqueid="photo-{$dat->getId()}">
+                                        <a href="/photo{$dat->getPrettyId()}" onclick="PhotoViewer.openById('{$dat->getPrettyId() . ($dat->getAccessKey() ? '_' . $dat->getAccessKey() : '')|noescape}', event)">
+                                            {var $pDims = vkifyPhotoDims($dat)}
+                                            <img class="album-photo--image" src="{$dat->getURLBySizeId('small')}" width="{$pDims[0]}" height="{$pDims[1]}" alt="{$dat->getDescription()}" loading="lazy">
+                                        </a>
+                                    </div>
+                                {/if}
+                        {/foreach}
+                        {foreach $isPhotos ? [] : $data as $dat}
                             {if $dat->isDeleted()}
                                 <div n:class="page_block, page_padding, deleted_mark, $section == 'photos' ? album-photo : deleted_mark_average">
                                     <span>[deleted]</span>
@@ -65,28 +81,22 @@
                                             {include "../components/comment.latte", comment => $dat, correctLink => true, no_reply_button => true}
                                         </div>
                                     </div>
-                                {elseif $section == "photos"}
-                                    <div class="album-photo masonry-item scroll_node" data-uniqueid="photo-{$dat->getId()}">
-                                        <a href="/photo{$dat->getPrettyId()}" onclick="PhotoViewer.openById('{= $dat->getPrettyId() . ($dat->getAccessKey() ? '_' . $dat->getAccessKey() : '') |noescape}', event)">
-                                            <img class="album-photo--image" src="{$dat->getURLBySizeId('small')}" alt="{$dat->getDescription()}" loading="lazy" />
-                                        </a>
-                                    </div>
                                 {elseif $section == "videos"}
                                     <div class="scroll_node" data-uniqueid="video-{$dat->getVirtualId()}">
                                         {include "../components/video.latte", video => $dat}
                                     </div>
+                                {elseif $section == "notes"}
+                                    {include "../components/notepost.latte", note => $dat, forceNoCommentsLink => true}
                                 {/if}
                             {/if}
                         {/foreach}
-                        {if $section == 'photos' && $count > 0}
-                            </div> {* close album-flex *}
-                        {/if}
                     {else}
                         <div class="page_block">
-                            {include "../components/content_error.latte", icon => false, description => tr("faves_".$section."_empty_tip")}
+                            {include "../components/content_error.latte", icon => false, description => $isNotes ? tr("no_notes") : tr("faves_".$section."_empty_tip")}
                         </div>
                     {/if}
-                    {include "../components/paginator.latte", conf => $extendedPaginatorConf}
+                </div>
+                {include "../components/paginator.latte", conf => $extendedPaginatorConf}
                 </div>
             </div>
         </div>
