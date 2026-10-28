@@ -174,5 +174,6 @@ function initAlbumMasonry() {
         requestAnimationFrame(() => vkify.paginator?.scheduleCheck?.());
     }
 }
+window.initAlbumMasonry = initAlbumMasonry;
 
 vkify.onPage(initAlbumMasonry);

@@ -57,7 +57,7 @@
                         <div n:if="$isPhotos" class="album-flex">
                             {foreach $data as $dat}
                                 {if $dat->isDeleted()}
-                                    <div class="page_block page_padding deleted_mark album-photo"><span>[deleted]</span></div>
+                                    <div class="deleted_mark album-photo masonry-item scroll_node" data-uniqueid="photo-{$dat->getId()}"><span>[deleted]</span></div>
                                 {else}
                                     <div class="album-photo masonry-item scroll_node" data-uniqueid="photo-{$dat->getId()}">
                                         <a href="/photo{$dat->getPrettyId()}" onclick="PhotoViewer.openById('{$dat->getPrettyId() . ($dat->getAccessKey() ? '_' . $dat->getAccessKey() : '')|noescape}', event)">

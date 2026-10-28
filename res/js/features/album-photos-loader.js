@@ -157,12 +157,7 @@ vkify.once("initAlbumPhotosLoader", () => {
         };
 
         const initMasonry = () => {
-            window.Masonry?.initAll('.album-flex', {
-                itemSelector: '.masonry-item',
-                columns: 3,
-                gap: 10,
-                breakpoints: { 600: 2, 450: 1 }
-            });
+            window.initAlbumMasonry?.();
         };
 
         const fetchPhotos = async (offset) => {

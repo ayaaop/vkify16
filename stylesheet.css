@@ -1895,15 +1895,11 @@ table,
     border-radius: var(--module-border-radius) var(--module-border-radius) 0 0;
     box-shadow: none;
 }
+.feed_comment_item > .post .post-content {
+    margin-bottom: 0;
+}
 .feed_comment_item > .post .post_full_like_wrap {
     display: none;
-}
-.feed_comment_target_post .wall_note_type {
-    display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--link-color);
-    margin-top: 4px;
 }
 .feed_comment_item .post-menu-s .comments {
     border-bottom: 0;
@@ -3853,6 +3849,24 @@ h4.gifts_section_header {
     background: var(--module-background-color--secondary);
     border-radius: 0;
     border: 0;
+}
+
+.album-flex .album-photo.deleted_mark {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 185px;
+    background: var(--album-background-color);
+    color: var(--muted-text-color-3);
+}
+
+.album-flex .album-photo.deleted_mark::before {
+    content: "";
+    width: 60px;
+    height: 48px;
+    margin-bottom: 6px;
+    background: url(../resource/camera_big.png) no-repeat center / contain;
 }
 
 .attachment_selector #attachment_insert .photosList .album-photo {
