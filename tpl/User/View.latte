@@ -52,7 +52,7 @@
     {var $canSeeNotes    = $notesCount   > 0 && $user->getPrivacyPermission('notes.read',   $thisUser ?? NULL)}
     {var $canSeeAlbums   = $albumsCount  > 0 && $user->getPrivacyPermission('photos.read',  $thisUser ?? NULL)}
     {var $giftCount      = $user->getGiftCount()}
-    {var $canSeeGifts    = \OPENVK_ROOT_CONF['openvk']['preferences']['commerce'] && $giftCount > 0}
+    {var $canSeeGifts    = \OPENVK_ROOT_CONF['openvk']['preferences']['commerce'] && $giftCount > 0 && $user->getPrivacyPermission('gifts.read', $thisUser ?? NULL)}
     {var $stripHasContent = $canSeeVideos || $canSeeAudios || $canSeeGroups || $canSeeMeetings || $canSeeAlbums || $canSeeGifts}
     {var $basicInfoFields = [
         ['label' => tr('pronouns'), 'value' => ($user->isFemale() ? tr('female') : ($user->isNeutral() ? tr('neutral') : tr('male')))],
@@ -561,7 +561,7 @@
 							<div class="count" id="profile_photos_counter_val">{=vkifyFormatCount((new \openvk\Web\Models\Repositories\Photos())->getUserPhotosCount($user))}</div>
 							<div class="label">{tr("mobile_photos")}</div>
 						</a>
-						<a class="page_counter" n:if="\OPENVK_ROOT_CONF['openvk']['preferences']['commerce'] && $giftCount > 0" href="/gifts{$user->getId()}">
+						<a class="page_counter" n:if="\OPENVK_ROOT_CONF['openvk']['preferences']['commerce'] && $giftCount > 0 && $user->getPrivacyPermission('gifts.read', $thisUser ?? NULL)" href="/gifts{$user->getId()}">
 							<div class="count">{=vkifyFormatCount($giftCount)}</div>
 							<div class="label">{tr("gifts", $giftCount)|replaceRE: '/^[^\s]+\s+/', ''}</div>
 						</a>
