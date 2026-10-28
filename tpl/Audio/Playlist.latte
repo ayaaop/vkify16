@@ -104,7 +104,7 @@
                             <span class="action_label">{_share}</span>
                         </a>
                         <a class="action_button {if $isBookmarked}post_remove{else}post_add{/if}" id="{if $isBookmarked}unbookmarkPlaylist{else}bookmarkPlaylist{/if}" data-id="{$playlist->getId()}">
-                            <svg class="action_icon"><use class="i-add" href="#add-24"/><use class="i-check" href="#check-24"/></svg>
+                            <svg class="action_icon"><use class="i16 i-add" href="#video-action-plus-14"/><use class="i16 i-check" href="#video-action-checkmark-14"/><use class="i18 i-add" href="#add-24"/><use class="i18 i-check" href="#check-24"/></svg>
                             <span class="action_label">{if $isBookmarked}{_unbookmark}{else}{_bookmark}{/if}</span>
                         </a>
                         <div class="ui_actions_menu_wrap" n:if="$canEdit" onmouseover="uiActionsMenu.show(this, null, { appendParentCls: 'body' });" onmouseout="uiActionsMenu.hide(this);">

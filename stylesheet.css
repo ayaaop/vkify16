@@ -4384,19 +4384,19 @@ h4.gifts_section_header {
     margin: 0;
 }
 
-.post_add .action_icon,
-.post_remove .action_icon,
-.post_edit .action_icon {
-	opacity: 0.85;
-    width: 13px;
-    height: 13px;
-}
 .post_download .action_icon {
     width: 12px;
     height: 14px;
     opacity: .85;
 }
 
+.AudioPlaylistSnippet__actions .post_add .action_icon,
+.AudioPlaylistSnippet__actions .post_remove .action_icon {
+	width: 14px;
+}
+.AudioPlaylistSnippet__actions .post_remove .action_icon {
+    opacity: 1;
+}
 .document_actions .post_add .action_icon,
 .document_actions .post_remove .action_icon,
 .document_actions .post_edit .action_icon {

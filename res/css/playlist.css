@@ -229,7 +229,7 @@
 	color: var(--link-color);
 	overflow: hidden;
 }
-.AudioPlaylistSnippet__actions .action_button .action_label {
+.AudioPlaylistSnippet__actions .action_button:not(.post_remove,.post_add,.post_more) .action_label {
 	display: none;
 }
 .post_more .action_icon {
