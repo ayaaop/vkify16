@@ -183,7 +183,7 @@ vkify.bindOnce('likeHandlers', () => {
         const isPost = btn.hasClass('post_like');
         const type = btn.attr('data-type');
         const hasLikesTooltip = (isPost || btn.hasClass('video_like_button'))
-            && type !== 'note' && type !== 'audio_playlist';
+            && type !== 'audio_playlist';
 
         let counter = btn.find('.action_count');
         if (counter.length < 1) {
