@@ -1,5 +1,4 @@
 {extends "../@layout.latte"}
-{php if (!function_exists('vkifyGetFeedSources')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
 {block title}{_feed}{/block}
 
 {block appbar_extra}
@@ -11,40 +10,6 @@
 {/block}
 
 {block content}
-    {var $feedListsArray = is_array($feedLists) ? $feedLists : iterator_to_array($feedLists)}
-    {var $feedListsClient = array_map(fn($item) => $item->toVkApiStructOfFeed($thisUser), $feedListsArray)}
-    {var $feedSourcesClient = vkifyGetFeedSources($thisUser)}
-    <script>
-        window.__vkifyFeedLists = {=json_encode(array_values($feedListsClient), 15)|noescape};
-        window.__vkifyFeedSources = {=json_encode(array_values($feedSourcesClient), 15)|noescape};
-    </script>
-    {capture $feedAddListMenu}
-        <div id="feed_add_list_menu" class="ui_actions_menu">
-            <a class="ui_actions_menu_item feed_new_list" href="#" onclick="window.vkifyFeedLists?.openEditor(-1); return false;">{=vkifyTr('feed_add_list')}</a>
-            <div class="ui_actions_menu_sep"></div>
-            <div class="ui_actions_menu_sublist">
-                {foreach $availLocalSections as $tab}
-                    {if $tab[0] !== 'local_posts'}
-                        <a class="ui_actions_menu_item" href="/feed?section={$tab[0]}">
-                            <span class="ui_actions_menu_item_label">{$tab[1]}</span>
-                        </a>
-                    {/if}
-                {/foreach}
-                {foreach $feedListsArray as $item}
-                    <a class="ui_actions_menu_item feed_custom_list feed_filter_list{$item->getId()}" href="#" onclick="window.vkifyFeedLists?.openEditor({$item->getId()}); return false;">
-                        <div class="ui_actions_menu_hide" onclick="window.vkifyFeedLists?.toggleSubscription({$item->getId()}, 0, event); return false;"></div>
-                        <span class="ui_actions_menu_item_label">{$item->getTitle()}</span>
-                    </a>
-                {/foreach}
-            </div>
-        </div>
-    {/capture}
-    {var $newsExtraItem = [
-        'url' => '#',
-        'class' => 'feed_lists_extra',
-        'content' => '<span id="feed_add_list_icon" class="feed_lists_icon ui_actions_menu_wrap" onclick="uiActionsMenu.toggle(this, null, {menuId: \'feed_add_list_menu\', align: \'right\', appendParentCls: \'page_body\'}); event.stopPropagation();" onmouseover="uiActionsMenu.show(this, null, {menuId: \'feed_add_list_menu\', align: \'right\', appendParentCls: \'page_body\'});" onmouseout="uiActionsMenu.hide(this);"><span class="ui_actions_menu_icons"></span></span>',
-        'onclick' => 'event.preventDefault(); event.stopPropagation();'
-    ]}
     {var $newsSubitems = []}
     {foreach $availLocalSections as $tab}
         {if $tab[0] !== 'local_posts'}
@@ -52,35 +17,17 @@
                 'url' => '/feed?section=' . $tab[0],
                 'title' => $tab[1],
                 'translate' => false,
-                'active' => !$list && $section === $tab[0],
+                'active' => $section === $tab[0],
                 'class' => 'feed_section_' . $tab[0]
             ]}
         {/if}
-    {/foreach}
-    {foreach $feedListsArray as $item}
-        {var $isListActive = $list && $item->getId() == $list}
-        {var $newsSubitems[] = [
-            'url' => '/feed?list=' . $item->getId(),
-            'title' => $item->getTitle(),
-            'translate' => false,
-            'active' => $isListActive,
-            'class' => 'feed_section_list' . $item->getId(),
-            'extraItem' => [
-                'url' => '#',
-                'class' => 'feed_list_edit_extra',
-                'condition' => $isListActive && $item->canBeEditedBy($thisUser),
-                'content' => '<span class="feed_filter_icon" title="' . htmlspecialchars(vkifyTr('feed_edit_list'), \ENT_QUOTES) . '"></span>',
-                'onclick' => 'event.preventDefault(); event.stopPropagation(); window.vkifyFeedLists?.openEditor(' . $item->getId() . ');'
-            ]
-        ]}
     {/foreach}
     {var $menuItems = [
         [
             'url' => '/feed',
             'title' => 'news',
-            'active' => !$list && $section === 'local_posts',
+            'active' => $section === 'local_posts',
             'showSubitems' => $section !== 'comments',
-            'extraItem' => $newsExtraItem,
             'subitems' => $newsSubitems
         ],
         [
@@ -102,10 +49,9 @@
             'data-pagescount' => ceil($paginatorConf->count / $paginatorConf->perPage)
         ]
     ]}
-    {var $feedFetchUrl = '/feed' . ($list ? '?list=' . $list : '?section=' . $section)}
+    {var $feedFetchUrl = '/feed?section=' . $section}
     {php $GLOBALS["_bigWall"] = 1}
 
-    {$feedAddListMenu|noescape}
     <div class="wide_column_left">
         <div class="narrow_column_wrap">
             <div class="narrow_column">
@@ -114,7 +60,7 @@
         </div>
         <div class="wide_column_wrap">
             <div class="wide_column">
-                <div n:if="$isGlobal || ($section === 'local_posts' && !$list)" class="page_block postFeedWrapperMicroblog">
+                <div n:if="$isGlobal || $section === 'local_posts'" class="page_block postFeedWrapperMicroblog">
                     {include "../components/textArea.latte", route => "/wall" . $thisUser->getId() . "/makePost", graffiti => true, polls => true, notes => true, hasSource => true, geo => true}
                 </div>
 

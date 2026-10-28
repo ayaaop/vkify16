@@ -386,6 +386,16 @@
                                     </div>
                                 </div>
                                 <div class="form_field settings_privacy_row">
+                                    <div class="form_label">{_privacy_setting_send_gifts}</div>
+                                    <div class="form_data">
+                                        <select name="gifts.send">
+                                            <option value="3" {if $user->getPrivacySetting('gifts.send') == 3}selected{/if}>{_privacy_value_anybody}</option>
+                                            <option value="1" {if $user->getPrivacySetting('gifts.send') == 1}selected{/if}>{_privacy_value_friends}</option>
+                                            <option value="0" {if $user->getPrivacySetting('gifts.send') == 0}selected{/if}>{_privacy_value_nobody}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_add_to_friends}</div>
                                     <div class="form_data">
                                         <select name="friends.add">
