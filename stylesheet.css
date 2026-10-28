@@ -3865,7 +3865,7 @@ h4.gifts_section_header {
     content: "";
     width: 60px;
     height: 48px;
-    margin-bottom: 6px;
+    margin-bottom: 12px;
     background: url(../resource/camera_big.png) no-repeat center / contain;
 }
 
