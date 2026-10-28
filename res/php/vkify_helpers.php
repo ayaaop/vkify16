@@ -86,3 +86,15 @@ if (!function_exists('vkifyPhotoEditReferences')) {
         return ['editable' => true, 'posts' => array_values(array_unique($posts))];
     }
 }
+
+if (!function_exists('vkifyPhotoDims')) {
+    function vkifyPhotoDims(\openvk\Web\Models\Entities\Photo $photo, string $size = 'small'): array
+    {
+        $sizeObj = ($photo->getSizes() ?? [])[$size] ?? null;
+        if ($sizeObj && $sizeObj->width) {
+            return [(int) $sizeObj->width, (int) $sizeObj->height];
+        }
+
+        return $photo->getDimensions();
+    }
+}

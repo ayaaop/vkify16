@@ -64,14 +64,17 @@
                     {include "../components/textArea.latte", route => "/wall" . $thisUser->getId() . "/makePost", graffiti => true, polls => true, notes => true, hasSource => true, geo => true}
                 </div>
 
-                <div n:class="scroll_container, feed_container, ($feedType === 'photo' && !empty($posts)) ? 'page_block page_padding album-flex feed_photos' : null, ($feedType === 'video' && !empty($posts)) ? 'page_block video_block_layout video_items_list feed_videos' : null, ($feedType === 'audio' && !empty($posts)) ? 'page_block audiosDiv audiosContainer feed_audios' : null" data-fetch-url="{$feedFetchUrl}">
+                {var $mediaFeedBlock = !empty($posts) && in_array($feedType, ['photo', 'video', 'audio'])}
+                <div n:class="$mediaFeedBlock ? 'page_block' : null">
+                <div n:class="scroll_container, feed_container, ($feedType === 'photo' && !empty($posts)) ? 'page_padding album-flex feed_photos' : null, ($feedType === 'video' && !empty($posts)) ? 'video_block_layout video_items_list feed_videos' : null, ($feedType === 'audio' && !empty($posts)) ? 'audiosDiv audiosContainer feed_audios' : null" data-fetch-url="{$feedFetchUrl}">
                     {foreach $posts as $post}
                         {if $feedType === 'post'}
                             {include "../components/post.latte", post => $post, commentSection => true}
                         {elseif $feedType === 'photo'}
                             <div class="album-photo masonry-item scroll_node" data-uniqueid="photo-{$post->getId()}">
                                 <a href="/photo{$post->getPrettyId()}" onclick="PhotoViewer.openById('{$post->getPrettyId() . ($post->getAccessKey() ? '_' . $post->getAccessKey() : '')|noescape}', event)">
-                                    <img class="album-photo--image" src="{$post->getURLBySizeId('small')}" alt="{$post->getDescription()}" loading="lazy">
+                                    {var $pDims = vkifyPhotoDims($post)}
+                                    <img class="album-photo--image" src="{$post->getURLBySizeId('small')}" width="{$pDims[0]}" height="{$pDims[1]}" alt="{$post->getDescription()}" loading="lazy">
                                 </a>
                             </div>
                         {elseif $feedType === 'video'}
@@ -143,6 +146,7 @@
                         {php $paginatorConf->fetchUrl = $feedFetchUrl;}
                         {include "../components/paginator.latte", conf => $paginatorConf}
                     </div>
+                </div>
                 </div>
             </div>
         </div>

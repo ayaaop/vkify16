@@ -25,8 +25,8 @@ vkify.once('masonry', () => {
                 return (img.naturalHeight / img.naturalWidth) * colWidth;
             }
 
-            if (img.complete && img.offsetHeight > 0) {
-                return item.offsetHeight;
+            if (img.offsetHeight > 0) {
+                return img.offsetHeight;
             }
 
             return 150;

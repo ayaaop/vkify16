@@ -52,21 +52,21 @@
                 <div class="page_block wall_posts_tabs">
                     {include "../components/page_block_header.latte", title => "bookmarks_tab"}
                 </div>
-                <div n:class="scroll_container, ($section == 'photos' && $count > 0 ? 'page_block page_padding' : ''), ($section == 'videos' && $count > 0 ? 'page_block video_block_layout video_items_list' : '')">
+                <div n:class="($count > 0 && ($isPhotos || $section === 'videos')) ? 'page_block' : null">
+                <div n:class="scroll_container, ($isPhotos && $count > 0 ? 'page_padding album-flex' : ''), ($section == 'videos' && $count > 0 ? 'video_block_layout video_items_list' : '')">
                     {if $count > 0}
-                        <div n:if="$isPhotos" class="album-flex">
-                            {foreach $data as $dat}
+                        {foreach $isPhotos ? $data : [] as $dat}
                                 {if $dat->isDeleted()}
                                     <div class="deleted_mark album-photo masonry-item scroll_node" data-uniqueid="photo-{$dat->getId()}"><span>[deleted]</span></div>
                                 {else}
                                     <div class="album-photo masonry-item scroll_node" data-uniqueid="photo-{$dat->getId()}">
                                         <a href="/photo{$dat->getPrettyId()}" onclick="PhotoViewer.openById('{$dat->getPrettyId() . ($dat->getAccessKey() ? '_' . $dat->getAccessKey() : '')|noescape}', event)">
-                                            <img class="album-photo--image" src="{$dat->getURLBySizeId('small')}" alt="{$dat->getDescription()}" loading="lazy">
+                                            {var $pDims = vkifyPhotoDims($dat)}
+                                            <img class="album-photo--image" src="{$dat->getURLBySizeId('small')}" width="{$pDims[0]}" height="{$pDims[1]}" alt="{$dat->getDescription()}" loading="lazy">
                                         </a>
                                     </div>
                                 {/if}
-                            {/foreach}
-                        </div>
+                        {/foreach}
                         {foreach $isPhotos ? [] : $data as $dat}
                             {if $dat->isDeleted()}
                                 <div n:class="page_block, page_padding, deleted_mark, $section == 'photos' ? album-photo : deleted_mark_average">
@@ -95,7 +95,8 @@
                             {include "../components/content_error.latte", icon => false, description => $isNotes ? tr("no_notes") : tr("faves_".$section."_empty_tip")}
                         </div>
                     {/if}
-                    {include "../components/paginator.latte", conf => $extendedPaginatorConf}
+                </div>
+                {include "../components/paginator.latte", conf => $extendedPaginatorConf}
                 </div>
             </div>
         </div>

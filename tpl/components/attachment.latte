@@ -1,7 +1,7 @@
 {if $attachment instanceof \openvk\Web\Models\Entities\Photo}
     {if !$attachment->isDeleted()}
         {var $link = "/photo" . ($attachment->isAnonymous() ? ("s/" . base_convert((string) $attachment->getId(), 10, 32)) : $attachment->getPrettyId())}
-        {var $photoDims = $attachment->getDimensions()}
+        {var $photoDims = vkifyPhotoDims($attachment, 'normal')}
         {var $photoViewerId = $attachment->getPrettyId() . ($attachment->getAccessKey() ? '_' . $attachment->getAccessKey() : '')}
         {var $photoContext = $parent ?? $post ?? null}
         {var $photoContextType = $parentType ?? 'post'}
