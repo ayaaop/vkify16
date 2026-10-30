@@ -241,7 +241,7 @@
 .pv_right {
   width: 310px;
   max-height: 900px;
-  background-color: var(--module-background-color);
+  background-color: var(--page-background-color);
   position: relative;
   float: right;
   display: flex;
@@ -271,7 +271,7 @@
 .pv_author_block {
   border-radius: 0 3px 0 0;
   padding: 13px 20px 10px 15px;
-  background-color: var(--module-header-background-color);
+  background-color: var(--page-header-background-color);
   white-space: nowrap;
 }
 .pv_author_img img {
@@ -291,7 +291,7 @@
 }
 .pv_author_date {
   margin-top: 4px;
-  color: var(--muted-text-color);
+  color: var(--text-color--secondary);
 }
 .pv_right .post_full_like_wrap {
   margin: 0;
@@ -327,11 +327,11 @@
   overflow-wrap: break-word;
 }
 .pv_no_description {
-  color: var(--muted-text-color);
+  color: var(--text-color--secondary);
 }
 .pv_desc .pv_can_edit:hover,
 .pv_desc .pv_can_edit:focus-visible {
-  background: var(--module-background-color--secondary);
+  background: var(--page-background-color--secondary);
   text-decoration: none;
   outline: none;
 }
@@ -344,9 +344,9 @@
 .vkify_inline_edit_field {
   width: 100%;
   box-sizing: border-box;
-  border: 1px solid var(--border-color-3);
+  border: 1px solid var(--border-color--tertiary);
   border-radius: var(--button-border-radius);
-  background: var(--module-background-color);
+  background: var(--page-background-color);
   color: var(--text-color);
   font-family: inherit;
   font-size: inherit;
@@ -419,15 +419,15 @@ input.vkify_inline_edit_field {
   right: 0;
 }
 .pv_photo :is(.pv_nav_left, .pv_nav_right) .pv_nav_arrow {
-  --nav_btn_icon_height: 32px;
-  --nav_btn_icon_margin: calc(var(--nav_btn_icon_height) * -1/2);
-  height: var(--nav_btn_icon_height);
+  --nav-button-icon-height: 32px;
+  --nav-button-icon-margin: calc(var(--nav-button-icon-height) * -1/2);
+  height: var(--nav-button-icon-height);
   width: 20px;
   background-image: url(../icons/pv_layer_controls.png);
   background-position: 0-25px;
   position: absolute;
   top: 50%;
-  margin-top: var(--nav_btn_icon_margin);
+  margin-top: var(--nav-button-icon-margin);
 }
 .pv_photo .pv_nav_left .pv_nav_arrow {
   left: 30px;
@@ -525,7 +525,8 @@ input.vkify_inline_edit_field {
 .pv_right #standaloneCommentBox {
   border-bottom-left-radius: 0;
 }
-.pv_right .composer.model_content_textarea textarea {
+.pv_right .composer.model_content_textarea textarea,
+.pv_right .composer.model_content_textarea .content-editable {
   margin-left: 40px;
   padding: 16px 15px 16px 12px;
 }
@@ -601,7 +602,7 @@ input.vkify_inline_edit_field {
 }
 /* Video modal */
 .ovk-modal-player-window #ovk-player-info {
-  background: var(--module-background-color);
+  background: var(--page-background-color);
   padding: 0;
 }
 .ovk-modal-video-window {
@@ -687,7 +688,7 @@ input.vkify_inline_edit_field {
   position: static;
   height: auto;
   display: block;
-  background: var(--module-background-color--secondary);
+  background: var(--page-background-color--secondary);
   width: 0;
   max-height: 100%;
   overflow: hidden;
@@ -962,7 +963,7 @@ input.vkify_inline_edit_field {
 }
 .video_info_author_date {
   padding-top: 4px;
-  color: var(--muted-text-color);
+  color: var(--text-color--secondary);
 }
 .video_info_description {
   margin-top: 15px;
@@ -1170,7 +1171,7 @@ input.vkify_inline_edit_field {
   overflow: unset;
 }
 .choose_upload_area {
-  background-color: var(--module-background-color--secondary);
+  background-color: var(--page-background-color--secondary);
   opacity: 0.7;
   margin: -20px -25px 15px;
   padding: 13px 25px 14px;
@@ -1191,7 +1192,7 @@ input.vkify_inline_edit_field {
 .video_choose_upload_area_cont {
   display: flex;
   margin: -20px -25px 15px;
-  background-color: var(--module-background-color--secondary);
+  background-color: var(--page-background-color--secondary);
 }
 .video_choose_upload_area_cont .video_choose_upload_area {
   margin: 0;
@@ -1225,7 +1226,7 @@ input.vkify_inline_edit_field {
   left: 0;
   top: 8.5px;
   bottom: 8.5px;
-  background-color: var(--border-color-3);
+  background-color: var(--border-color--tertiary);
 }
 .video_add_external_icon {
   background: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%2F%3E%3Cpath%20stroke%3D%22%239EB4CC%22%20stroke-width%3D%221.75%22%20d%3D%22M10%2014l4-4%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20stroke%3D%22%239EB4CC%22%20stroke-width%3D%221.75%22%20d%3D%22M16.5%2013.5c3-3%203.5-5.5%201.5-7.5s-4.5-1.5-7.5%201.5M7.5%2010.5C4.5%2013.5%204%2016%206%2018s4.5%201.5%207.5-1.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") no-repeat 0 center / 24px 24px;
@@ -1242,7 +1243,7 @@ input.vkify_inline_edit_field {
               no-repeat 13px 18px / 10px 17px;
   float: left;
   cursor: pointer;
-  border-radius: var(--module-border-radius) 0 0 0;
+  border-radius: var(--page-border-radius) 0 0 0;
   max-width: calc(100% - 60px);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1275,9 +1276,9 @@ input.vkify_inline_edit_field {
   right: 6px;
   bottom: 6px;
   left: 6px;
-  border: 2px dashed rgba(var(--accent-color--rgb), 0.55);
-  border-radius: var(--module-border-radius);
-  background-color: rgba(var(--accent-color--rgb), 0.08);
+  border: 2px dashed rgba(var(--accent-color-rgb), 0.55);
+  border-radius: var(--page-border-radius);
+  background-color: rgba(var(--accent-color-rgb), 0.08);
   pointer-events: none;
   z-index: 50;
 }
@@ -1322,7 +1323,7 @@ input.vkify_inline_edit_field {
 }
 .photos_choose_row {
   position: relative;
-  background: var(--module-background-color--secondary);
+  background: var(--page-background-color--secondary);
   width: 100%;
   height: 96px;
   overflow: hidden;
@@ -1442,7 +1443,7 @@ input.vkify_inline_edit_field {
   flex: 1;
 }
 .notes_titles small {
-	color: var(--muted-text-color);
+	color: var(--text-color--secondary);
 	font-size: 12px;
 }
 .attachAudio {
@@ -1474,7 +1475,7 @@ input.vkify_inline_edit_field {
   padding-bottom: 20px;
 }
 .picker-items > .document_attachment_header:hover {
-  background: var(--module-background-color--secondary);
+  background: var(--page-background-color--secondary);
 }
 .attachDocument {
   float: right;
@@ -1482,7 +1483,7 @@ input.vkify_inline_edit_field {
   width: unset;
   height: unset;
   line-height: 53px;
-  color: var(--muted-text-color);
+  color: var(--text-color--secondary);
   opacity: 0;
   cursor: pointer;
 }
@@ -1565,7 +1566,7 @@ body:not(.dark-mode) {
   align-items: center;
   gap: 10px;
   padding: 13px 20px 10px 15px;
-  background: var(--module-header-background-color);
+  background: var(--page-header-background-color);
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -1587,7 +1588,7 @@ body:not(.dark-mode) {
 }
 
 .itemPostTime {
-  color: var(--muted-text-color);
+  color: var(--text-color--secondary);
 }
 
 .ovk-vid-details {
@@ -1621,13 +1622,13 @@ body:not(.dark-mode) {
 .ovk-calendar-widget {
   max-width: 280px;
   padding: 0;
-  background: var(--module-background-color);
-  border: 1px solid var(--border-color-2);
+  background: var(--page-background-color);
+  border: 1px solid var(--border-color--secondary);
   border-radius: 6px;
   overflow: hidden;
 }
 .ovk-cal-header {
-  background: var(--accent-color-2);
+  background: var(--accent-color--secondary);
   margin-bottom: 0;
   padding: 0 4px;
 }
@@ -1666,7 +1667,7 @@ body:not(.dark-mode) {
   gap: 0;
 }
 .ovk-cal-weekday {
-  background: var(--accent-color-2);
+  background: var(--accent-color--secondary);
   color: var(--accent-text-color);
   font-size: 11px;
   padding: 4px 0;
@@ -1680,22 +1681,22 @@ body:not(.dark-mode) {
   border-radius: 0;
 }
 .ovk-cal-day:hover {
-  background: var(--module-background-color--secondary);
+  background: var(--page-background-color--secondary);
 }
 .ovk-cal-day.ovk-cal-day-other,
 .ovk-cal-day.ovk-cal-day-other:hover {
-  background: var(--module-background-color--secondary);
-  color: var(--muted-text-color);
+  background: var(--page-background-color--secondary);
+  color: var(--text-color--secondary);
 }
 .ovk-cal-day.ovk-cal-day-today {
-  background: var(--module-background-color--secondary);
+  background: var(--page-background-color--secondary);
   font-weight: 500;
   border: 0;
-  box-shadow: inset 0 0 0 1px var(--border-color-3);
+  box-shadow: inset 0 0 0 1px var(--border-color--tertiary);
 }
 .ovk-cal-day.ovk-cal-day-selected,
 .ovk-cal-day.ovk-cal-day-selected:hover {
-  background: var(--accent-color-2);
+  background: var(--accent-color--secondary);
   color: var(--accent-text-color) !important;
   font-weight: 500;
   box-shadow: none;

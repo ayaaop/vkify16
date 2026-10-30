@@ -20,7 +20,7 @@
 }
 
 .form_label {
-    color: var(--muted-text-color-2);
+    color: var(--text-color--tertiary);
     width: 145px;
     padding: 5px 0 0;
     line-height: 18px;
@@ -54,7 +54,7 @@
 
 .page_block_footer {
     border-top: 1px solid var(--border-color);
-    background: var(--module-header-background-color);
+    background: var(--page-header-background-color);
     line-height: 140%;
     padding: 15px 0 17px;
     border-bottom-left-radius: inherit;
@@ -173,7 +173,7 @@ label.checkbox .nobold {
 .vertical .form_label {
 	width: 100%;
 	padding: 0 0 6px;
-	color: var(--muted-text-color-2);
+	color: var(--text-color--tertiary);
 	font-weight: 500;
 }
 .vertical .form_data {
@@ -205,8 +205,8 @@ label.checkbox .nobold {
         border-color: var(--border-color);
     }
     50% {
-        background-color: var(--message-warning-background);
-        border-color: var(--message-warning-border);
+        background-color: var(--message-warning-background-color);
+        border-color: var(--message-warning-border-color);
     }
     100% {
         background-color: transparent;

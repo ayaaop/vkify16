@@ -217,7 +217,7 @@ vkify.once("graffiti", function () {
         }
     </style>
 </head>
-<body ${window.vkify.getSetting("darkMode") ? 'class="dark-mode"' : ""} style="background: var(--module-background-color); margin: 0;">
+<body ${window.vkify.getSetting("darkMode") ? 'class="dark-mode"' : ""} style="background: var(--page-background-color); margin: 0;">
     <div style="background-color: var(--body-background-color); padding-bottom: 1px;">
         <div id="graffiti_topbar">
             <a href="#" onclick="Graffiti.backHistory(); return false;">${window.vkifylang ? window.vkifylang.graffitibackhistory : "Undo"}</a>

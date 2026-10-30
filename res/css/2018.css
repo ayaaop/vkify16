@@ -6,13 +6,13 @@ body {
 	--header-background-color--active: #335e8f;
 	--button-background-color--active: #dae2ea;
 	--button-background-color--light: #e5ebf1;
-	--link-color-2: #2a5885;
-	--search-color: #224b7a;
+	--link-color--secondary: #2a5885;
+	--search-background-color: #224b7a;
 	--accent-color: #5181b8;
 	--accent-color--hover: #5b88bd;
 	--accent-color--active: #4b77a8;
-	--accent-color--rgb: 74, 118, 168;
-	--accent-color-3: #5b88bd;
+	--accent-color-rgb: 74, 118, 168;
+	--accent-color--tertiary: #5b88bd;
 	--post-meta-color: #67707a;
 }
 
@@ -79,7 +79,7 @@ body {
 }
 
 .action_icon {
-	color: var(--muted-text-color-3);
+	color: var(--text-color--quaternary);
 }
 .action_icon use.i16 {
 	display: none;
@@ -202,7 +202,7 @@ body.dark-mode .button:not(.post_like, .button_light) i {
 	margin-right: 21px;
 	background: none;
 	border-radius: 0;
-	color: var(--muted-text-color-2);
+	color: var(--text-color--tertiary);
 	position: relative;
 	outline: 0;
 	font-size: 14px;

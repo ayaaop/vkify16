@@ -8,12 +8,12 @@
 
 .vkify-pe-dialog .ovk-diag-body {
   padding: 0 !important;
-  background: var(--module-background-color);
+  background: var(--page-background-color);
 }
 
 .pe_tabs_panel {
   position: relative;
-  background: var(--module-background-color--secondary);
+  background: var(--page-background-color--secondary);
   padding: 14px 19px;
   overflow: hidden;
   border-top: 1px solid var(--border-color);
@@ -66,7 +66,7 @@
 }
 
 .pe_params_back {
-  background-color: var(--border-color-3);
+  background-color: var(--border-color--tertiary);
   width: 100%;
   position: relative;
 }
@@ -142,7 +142,7 @@
   text-align: center;
   position: relative;
   padding: 20px 16px;
-  background: var(--module-background-color);
+  background: var(--page-background-color);
 }
 
 .pe_canvas_wrap {
@@ -162,7 +162,7 @@
 }
 
 .pe_actions {
-  background-color: var(--elevator-bg-color);
+  background-color: var(--elevator-background-color);
   position: absolute;
   bottom: 24px;
   left: 24px;
@@ -228,7 +228,7 @@
 .pe_blur_input,
 .pe_text_input {
   position: absolute;
-  background-color: var(--elevator-bg-color);
+  background-color: var(--elevator-background-color);
   border-radius: var(--button-border-radius);
   z-index: 999;
   user-select: none;
@@ -482,12 +482,12 @@
   padding: 5px;
   position: relative;
   cursor: pointer;
-  border-radius: var(--module-border-radius);
+  border-radius: var(--page-border-radius);
   flex-shrink: 0;
 }
 
 .pe_filter_thumb.pe_filter_selected {
-  background-color: var(--border-color-3);
+  background-color: var(--border-color--tertiary);
 }
 
 .pe_filter_thumb > canvas,
@@ -592,7 +592,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  background: var(--module-background-color);
+  background: var(--page-background-color);
 }
 
 .pe_editor .pe_tabs {
@@ -653,7 +653,7 @@
 }
 
 .pe_editor .pe_tabs .pe_tab_text {
-  color: var(--muted-text-color);
+  color: var(--text-color--secondary);
   font-size: 12px;
   margin-top: 2px;
 }
@@ -670,7 +670,7 @@
 }
 
 .pe_editor .pe_sticker_packs_tabs {
-  background-color: var(--module-background-color--secondary);
+  background-color: var(--page-background-color--secondary);
   white-space: nowrap;
   overflow-x: auto;
   position: relative;
@@ -710,7 +710,7 @@
 }
 
 .pe_editor .pe_sticker_pack_tab.pe_selected {
-  background-color: var(--module-background-color);
+  background-color: var(--page-background-color);
 }
 
 .pe_editor .pe_sticker_pack_list_wrap {
@@ -747,13 +747,13 @@
 }
 
 .pe_editor .pe_sticker_preview:hover {
-  background-color: var(--module-background-color--secondary);
+  background-color: var(--page-background-color--secondary);
 }
 
 .pe_editor .pe_empty_stickers {
   padding: 40px 16px;
   text-align: center;
-  color: var(--muted-text-color);
+  color: var(--text-color--secondary);
 }
 
 .pe_editor #pe_tab_content_draw,
@@ -790,7 +790,7 @@
 }
 
 .pe_editor .pe_drawing_color_white {
-  border: 2px solid var(--border-color-2);
+  border: 2px solid var(--border-color--secondary);
 }
 
 .pe_editor .pe_drawing_color.pe_selected::after {
@@ -840,7 +840,7 @@
 }
 
 .pe_editor .pe_drawing_undo:hover {
-  background-color: var(--module-background-color--secondary);
+  background-color: var(--page-background-color--secondary);
 }
 
 .pe_editor .pe_text_fonts {
@@ -909,7 +909,7 @@
 }
 
 .pe_editor .pe_label {
-  color: var(--muted-text-color-2);
+  color: var(--text-color--tertiary);
   padding: 0 0 6px;
   font-size: 12.5px;
 }
@@ -921,7 +921,7 @@
   width: 100%;
   box-sizing: border-box;
   flex-shrink: 0;
-  background: var(--module-background-color);
+  background: var(--page-background-color);
   display: flex;
   justify-content: flex-end;
   gap: 8px;
@@ -1162,7 +1162,7 @@
 
 @media (max-width: 768px) {
   .vkify-pe-dialog.ovk-msg-fullscreen .ovk-diag {
-    background: var(--module-background-color);
+    background: var(--page-background-color);
   }
 
   .vkify-pe-dialog.ovk-msg-fullscreen .ovk-diag-body {
@@ -1216,7 +1216,7 @@
     padding: 6px 8px;
     box-sizing: border-box;
     border-radius: 18px;
-    background: var(--elevator-bg-color);
+    background: var(--elevator-background-color);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
   }
 
@@ -1260,7 +1260,7 @@
     overflow-y: auto;
     border: 1px solid var(--border-color);
     border-radius: 16px;
-    background: var(--module-background-color);
+    background: var(--page-background-color);
     box-shadow: 0 8px 36px rgba(0, 0, 0, 0.4);
     visibility: hidden;
     pointer-events: none;
@@ -1535,7 +1535,7 @@
     max-height: min(40dvh, 330px);
     overflow-y: auto;
     border-radius: 16px;
-    background: var(--module-background-color);
+    background: var(--page-background-color);
     box-shadow: 0 8px 36px rgba(0, 0, 0, 0.45);
     visibility: hidden;
     pointer-events: none;
@@ -1552,8 +1552,24 @@
   .pv_wrapper.pv_pe .pe_editor .pe_tab_content .pe_mobile_sheet_close {
     position: sticky;
     float: right;
-    top: 6px;
-    margin: 6px;
+    top: 0;
+    right: 0;
+    margin: 0;
+  }
+
+  .pv_wrapper.pv_pe .pe_editor #pe_tab_content_stickers.pe_tab_content .pe_mobile_sheet_close {
+    border-radius: 0;
+    height: 43px;
+    width: 44px;
+    background-color: var(--page-background-color--secondary);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .pe_editor .pe_sticker_packs_tabs {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 2;
   }
 
   .pv_wrapper.pv_pe .pe_editor .pe_sticker_preview {
@@ -1568,13 +1584,26 @@
 
   .pv_wrapper.pv_pe .pe_editor #pe_tab_content_draw,
   .pv_wrapper.pv_pe .pe_editor #pe_tab_content_text {
-    padding: 12px 16px;
+    padding: 12px;
   }
 
   .pv_wrapper.pv_pe .pe_editor .pe_drawing_color {
     width: 38px;
     height: 38px;
     margin: 4px;
+  }
+
+  .pe_editor .pe_drawing_undo {
+    display: none !important;
+  }
+
+  .pe_editor .pe_drawing_sliders {
+    display: flex;
+    align-items: center;
+  }
+
+  .pe_editor .pe_drawing_slider_wrap {
+    width: 100%;
   }
 
   .pe_canvas {

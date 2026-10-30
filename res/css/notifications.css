@@ -199,7 +199,7 @@
 	height: 50px;
 	border-radius: 50%;
 	-moz-force-broken-image-icon: 0;
-	background-color: var(--module-background-color--secondary);
+	background-color: var(--page-background-color--secondary);
 	position: relative;
 	vertical-align: top;
 	object-fit: cover;
@@ -218,7 +218,7 @@
 .feedback_footer {
 	font-size: 12.5px;
 	padding: 2px 0;
-	color: var(--muted-text-color);
+	color: var(--text-color--secondary);
 	overflow: hidden;
 	line-height: 1.417;
 }
@@ -259,7 +259,7 @@
 	line-height: 1;
 	border-top: 1px solid var(--border-color);
 	text-align: center;
-	border-radius: 0 0 var(--module-border-radius) var(--module-border-radius);
+	border-radius: 0 0 var(--page-border-radius) var(--page-border-radius);
 }
 .top_notify_show_all:hover {
 	background-color: var(--button-background-color--light);

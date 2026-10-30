@@ -5,13 +5,13 @@
 .audio_pl_edit_box {
     display: flex;
     flex-direction: column;
-    background-color: var(--module-background-color);
-    border-radius: var(--module-border-radius);
+    background-color: var(--page-background-color);
+    border-radius: var(--page-border-radius);
     gap: 0;
 }
 
 .audio_pl_edit_box .ape_header {
-    background-color: var(--module-background-color);
+    background-color: var(--page-background-color);
     border-bottom: 1px solid var(--border-color);
     padding: 20px 24px;
     display: flex;
@@ -92,7 +92,7 @@
 
 .audio_pl_edit_box .ape_pl_stat {
     font-size: 12px;
-    color: var(--muted-text-color);
+    color: var(--text-color--secondary);
 }
 
 .audio_pl_edit_box .ape_add_audios_btn {
@@ -107,13 +107,13 @@
     font-size: 13px;
     text-align: left;
     font-weight: 500;
-    color: var(--accent-color-2);
+    color: var(--accent-color--secondary);
     line-height: 19px;
-    background-color: var(--module-background-color);
+    background-color: var(--page-background-color);
 }
 
 .audio_pl_edit_box .ape_add_audios_btn:hover {
-    background-color: var(--audio-background-color-2);
+    background-color: var(--audio-background-color--secondary);
     text-decoration: none;
 }
 
@@ -122,7 +122,7 @@
     position: absolute;
     left: 29px;
     top: 13px;
-    color: var(--accent-color-2);
+    color: var(--accent-color--secondary);
 }
 
 .audio_pl_edit_box .ape_add_audios_btn .ape_add_audios_btn_chevron_icon {
@@ -130,7 +130,7 @@
     position: absolute;
     right: 20px;
     top: 13px;
-    color: var(--border-color-2);
+    color: var(--border-color--secondary);
 }
 
 .audio_pl_edit_box .ape_item_list {
@@ -138,7 +138,7 @@
     padding: 10px 20px;
     height: 400px;
     display: block;
-    background-color: var(--module-background-color);
+    background-color: var(--page-background-color);
     overflow-y: auto;
 }
 
@@ -147,7 +147,7 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    color: var(--muted-text-color);
+    color: var(--text-color--secondary);
     font-size: 13px;
     padding: 40px 20px;
     text-align: center;
@@ -157,7 +157,7 @@
 
 .audio_pl_edit_box .ape_audios_empty_list .ape_audios_empty_list_icon {
     margin-bottom: 12px;
-    color: var(--border-color-2);
+    color: var(--border-color--secondary);
 }
 
 /* Control buttons wrap */
@@ -166,11 +166,11 @@
 }
 .audio_pl_edit_box .box_controls {
     height: 32px;
-    background-color: var(--module-header-background-color);
+    background-color: var(--page-header-background-color);
     border-top: 1px solid var(--border-color);
     padding: 16px 20px;
-    border-bottom-left-radius: var(--module-border-radius);
-    border-bottom-right-radius: var(--module-border-radius);
+    border-bottom-left-radius: var(--page-border-radius);
+    border-bottom-right-radius: var(--page-border-radius);
     text-align: left;
 }
 

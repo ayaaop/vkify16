@@ -71,10 +71,10 @@
                                         var v = cs.getPropertyValue(name);
                                         return v ? v.trim() : fallback;
                                     }
-                                    var chartLineColor = cssVar('--accent-color-4', '#597da3');
-                                    var chartFillColor = 'rgba(' + cssVar('--accent-color-4--rgb', '89, 125, 163') + ', 0.12)';
-                                    var chartTickColor = cssVar('--muted-text-color-2', '#777');
-                                    var chartGridColor = cssVar('--module-background-color--secondary', '#f0f2f5');
+                                    var chartLineColor = cssVar('--accent-color--quaternary', '#597da3');
+                                    var chartFillColor = 'rgba(' + cssVar('--accent-color--quaternary-rgb', '89, 125, 163') + ', 0.12)';
+                                    var chartTickColor = cssVar('--text-color--tertiary', '#777');
+                                    var chartGridColor = cssVar('--page-background-color--secondary', '#f0f2f5');
                                     var chartZeroColor = cssVar('--border-color', '#e7ecf0');
 
                                     function renderPlot(days) {

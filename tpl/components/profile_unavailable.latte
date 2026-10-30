@@ -7,7 +7,7 @@
   @param statusClass        (optional) class on .page_status, e.g. 'profile_deleted';
                             without it the status is rendered in muted color
   @param statusStyle        (optional) inline style for .page_status, default
-                            'color: var(--muted-text-color);'
+                            'color: var(--text-color--secondary);'
   @param body               Message markup, rendered unescaped
   @param bodyClassDesktop   Wrapper class for the desktop message
                             (e.g. 'msg msg_yellow', 'profile_deleted_text')
@@ -54,7 +54,7 @@
                         {ifset $statusClass}
                             <div class="page_status {$statusClass}">{$status}</div>
                         {else}
-                            <div class="page_status" style="{$statusStyle ?? 'color: var(--muted-text-color);'}">{$status}</div>
+                            <div class="page_status" style="{$statusStyle ?? 'color: var(--text-color--secondary);'}">{$status}</div>
                         {/ifset}
                     </div>
                 </div>

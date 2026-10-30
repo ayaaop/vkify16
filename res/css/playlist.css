@@ -14,9 +14,9 @@
 	flex-direction: row;
 	padding: 20px 16px 16px 20px;
 	box-sizing: border-box;
-	background: var(--module-background-color);
-	border-bottom-left-radius: var(--module-border-radius);
-	border-bottom-right-radius: var(--module-border-radius);
+	background: var(--page-background-color);
+	border-bottom-left-radius: var(--page-border-radius);
+	border-bottom-right-radius: var(--page-border-radius);
 }
 .AudioPlaylistSnippet__left {
 	width: 200px;
@@ -148,7 +148,7 @@
 .AudioPlaylistSnippet__info {
 	font-size: 13px;
 	line-height: 1.38;
-	color: var(--muted-text-color);
+	color: var(--text-color--secondary);
 }
 .AudioPlaylistSnippet__title {
 	margin: 4px 0 6px;
@@ -164,7 +164,7 @@
 	margin: 0;
 }
 .AudioPlaylistSnippet h2.AudioPlaylistSnippet__title--main {
-	color: var(--heading-color);
+	color: var(--heading-text-color);
 }
 .AudioPlaylistSnippet .AudioPlaylistSnippet__title--explicit {
 	display: inline-block;
@@ -268,7 +268,7 @@
 	padding: 0 17px;
 	font-size: 13px;
 	line-height: 36px;
-	color: var(--muted-text-color-3);
+	color: var(--text-color--quaternary);
 }
 .AudioPlaylistSnippet .ActionButton--shuffle {
 	width: 100%;
@@ -281,7 +281,7 @@
 	margin: 0 8px 0 6px;
 }
 .AudioPlaylistSnippet .ActionButton--shuffle:hover {
-	background-color: var(--audio-background-color-2);
+	background-color: var(--audio-background-color--secondary);
 }
 .AudioPlaylistSnippet .ActionButton--all {
 	margin: 12px 0 0;
@@ -345,6 +345,6 @@
 	border-bottom-right-radius: 0;
 }
 .AudioPlaylistSnippet__comments #replies.page_block:last-child {
-	border-bottom-left-radius: var(--module-border-radius);
-	border-bottom-right-radius: var(--module-border-radius);
+	border-bottom-left-radius: var(--page-border-radius);
+	border-bottom-right-radius: var(--page-border-radius);
 }

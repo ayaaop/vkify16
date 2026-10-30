@@ -109,7 +109,7 @@
             const heroHeight = hero ? hero.offsetHeight : 200;
             const scrollY = window.scrollY || window.pageYOffset;
             const progress = Math.min(scrollY / Math.max(heroHeight - 56, 1), 1);
-            appbar.style.setProperty('--appbar-bg-alpha', progress);
+            appbar.style.setProperty('--appbar-background-alpha', progress);
             if (progress <= 0) {
                 appbar.classList.add('appbar--transparent');
                 appbar.classList.remove('appbar--scrolled');
@@ -177,7 +177,7 @@
         const appbar = document.getElementById('appbar');
         if (appbar) {
             appbar.classList.remove('appbar--transparent', 'appbar--scrolled', 'appbar--elevated');
-            appbar.style.removeProperty('--appbar-bg-alpha');
+            appbar.style.removeProperty('--appbar-background-alpha');
         }
     }
 

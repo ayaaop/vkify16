@@ -7,7 +7,7 @@
         background-color: #0a0a0a;
     }
     html.platform-ios:has(body.body_im) {
-        background-color: var(--module-background-color, #fff);
+        background-color: var(--page-background-color, #fff);
     }
     html.platform-ios:has(body.body_im.dark-mode) {
         background-color: #19191a;
@@ -15,7 +15,7 @@
     html.platform-ios body {
         -webkit-tap-highlight-color: transparent;
         --header-height: 44px;
-        --module-border-radius: 10px !important;
+        --page-border-radius: 10px !important;
         --button-border-radius: 10px !important;
         --tooltip-border-radius: 12px !important;
     }
@@ -48,7 +48,7 @@
     }
     .platform-ios #xhead {
         height: var(--header-height);
-        background-color: var(--module-background-color);
+        background-color: var(--page-background-color);
         position: absolute;
         width: 100%;
         left: 0;
@@ -63,7 +63,7 @@
     .platform-ios .appbar:not(.appbar--transparent):not(.appbar--scrolled):not(.appbar--elevated),
     .platform-ios .appbar--scrolled,
     .platform-ios .appbar--elevated {
-        background-color: color-mix(in srgb, var(--module-background-color) 80%, transparent) !important;
+        background-color: color-mix(in srgb, var(--page-background-color) 80%, transparent) !important;
     }
     .platform-ios .appbar--scrolled,
     .platform-ios .appbar--elevated {
@@ -74,14 +74,14 @@
     }
     .platform-ios .appbar:not(.appbar--transparent) :is(.hamburger, .appbar-back, .appbar-extra-btn),
     .platform-ios .appbar:not(.appbar--transparent) :is(.hamburger, .appbar-back, .appbar-extra-btn) svg {
-        color: var(--accent-color-2);
-        fill: var(--accent-color-2);
+        color: var(--accent-color--secondary);
+        fill: var(--accent-color--secondary);
     }
     /* same iOS bar material on modal headers and the chat header */
     .platform-ios .ovk-modal-video-window #video_top_controls,
     .platform-ios .ovk-msg-fullscreen .ovk-diag-head,
     .platform-ios .body_im .messenger-app--header.messages--peers-header-peer-name {
-        background-color: color-mix(in srgb, var(--module-background-color) 80%, transparent);
+        background-color: color-mix(in srgb, var(--page-background-color) 80%, transparent);
         -webkit-backdrop-filter: blur(20px) saturate(1.8);
         backdrop-filter: blur(20px) saturate(1.8);
         color: var(--text-color);
@@ -92,17 +92,17 @@
     .platform-ios .ovk-msg-fullscreen .ovk-diag-head-apply,
     .platform-ios .ovk-diag-cont .ovk-diag-head .picker-header-back,
     .platform-ios .body_im .messenger-app--header--back a {
-        color: var(--accent-color-2);
+        color: var(--accent-color--secondary);
     }
     .platform-ios .body_im .messenger-app--header--name a {
         color: var(--text-color);
     }
     .platform-ios .body_im .messenger-app--header--info .messenger-app--header--online {
-        color: var(--muted-text-color);
+        color: var(--text-color--secondary);
         opacity: 1;
     }
     .platform-ios .body_im .messenger-app--header--ava .messenger-app--header--online {
-        border-color: var(--module-background-color);
+        border-color: var(--page-background-color);
     }
     .platform-ios body.body_im:not(.dark-mode) .messenger-app-header--more-actions--trigger {
         filter: brightness(0);
@@ -217,7 +217,7 @@
     .platform-ios .ovk-msg-dialog .ovk-diag {
         border-radius: 14px;
         overflow: hidden;
-        background: color-mix(in srgb, var(--module-background-color) 80%, transparent);
+        background: color-mix(in srgb, var(--page-background-color) 80%, transparent);
         -webkit-backdrop-filter: blur(20px) saturate(1.8);
         backdrop-filter: blur(20px) saturate(1.8);
         box-shadow: 0 0 0 0.5px rgba(0,0,0,.12), 0 20px 60px rgba(0,0,0,.25);
@@ -248,7 +248,7 @@
         font-weight: 400;
         text-transform: none;
         border-radius: 0;
-        color: var(--accent-color-2) !important;
+        color: var(--accent-color--secondary) !important;
     }
     .platform-ios .ovk-msg-dialog .ovk-diag-action > .ovk-msg-btn:first-child {
         font-weight: 600;
@@ -269,13 +269,13 @@
      .platform-ios .ovk-msg-dialog .ovk-diag-action > .ovk-msg-btn:hover,
      .platform-ios .ovk-msg-dialog .ovk-diag-action > .ovk-msg-btn:active {
         background-color: color-mix(in srgb, var(--text-color) 8%, transparent) !important;
-        color: var(--accent-color-2) !important;
+        color: var(--accent-color--secondary) !important;
     }
     /* iOS menus are translucent blurred cards with hairline separators */
     .platform-ios .ui_actions_menu,
     .platform-ios .msg-dropdown-menu {
         padding: 0;
-        background: color-mix(in srgb, var(--module-background-color) 88%, transparent);
+        background: color-mix(in srgb, var(--page-background-color) 88%, transparent);
         -webkit-backdrop-filter: blur(20px) saturate(1.8);
         backdrop-filter: blur(20px) saturate(1.8);
         border: none;
@@ -385,11 +385,11 @@
     .platform-ios textarea:not(.expanded-textarea):not(.small-textarea):focus,
     .platform-ios input[type="email"]:focus, .platform-ios input[type="number"]:focus, .platform-ios input[type="password"]:focus, .platform-ios input[type="phone"]:focus, .platform-ios input[type="text"]:not(.ui_search_field,.vouncher_input):focus, .platform-ios input[type~="date"]:focus, .platform-ios input[type~="time"]:focus, .platform-ios input[type~="datetime-local"]:focus, .platform-ios input[type~="email"]:focus, .platform-ios input[type~="password"]:focus, .platform-ios input[type~="phone"]:focus, .platform-ios input[type~="text"]:not(.ui_search_field,.vouncher_input):focus, .platform-ios input[type="url"]:focus, .platform-ios input[type~="url"]:focus, .platform-ios select:focus, .platform-ios .PE_playlistEditPage textarea[name="description"]:focus, .platform-ios .emoji-input-wrap:focus-within {
         border-bottom-color: transparent;
-        box-shadow: inset 0 0 0 1px var(--accent-color-2);
+        box-shadow: inset 0 0 0 1px var(--accent-color--secondary);
     }
     .platform-ios input[type="checkbox"],
     .platform-ios input[type="radio"] {
-        accent-color: var(--accent-color-2);
+        accent-color: var(--accent-color--secondary);
     }
     /* iOS navigation bars are 44pt; shrink the 48px hit targets to match */
     .platform-ios .appbar :is(.hamburger, .appbar-back, .appbar-extra-btn),
@@ -500,11 +500,11 @@
         height: 44px;
     }
     .platform-ios .body_im .messenger-app .im-send-btn {
-        color: var(--accent-color-2);
+        color: var(--accent-color--secondary);
     }
     /* iPad-style sidebar */
     .platform-ios .sidebar {
-        background-color: color-mix(in srgb, var(--module-background-color) 80%, transparent);
+        background-color: color-mix(in srgb, var(--page-background-color) 80%, transparent);
         -webkit-backdrop-filter: blur(20px) saturate(1.8);
         backdrop-filter: blur(20px) saturate(1.8);
     }
@@ -525,14 +525,14 @@
         background-color: color-mix(in srgb, var(--text-color) 8%, transparent);
     }
     .platform-ios .sidebar_inner .link .link_icon {
-        color: var(--accent-color-2);
+        color: var(--accent-color--secondary);
     }
     .platform-ios body.dark-mode .sidebar_inner .link .link_icon {
-        color: var(--accent-color-2);
+        color: var(--accent-color--secondary);
     }
     .platform-ios .sidebar .home_button {
         background-color: transparent;
-        color: var(--accent-color-2);
+        color: var(--accent-color--secondary);
     }
 
     /* gift recipient multiselect */
@@ -544,7 +544,7 @@
         background: color-mix(in srgb, var(--text-color) 5%, transparent);
     }
     .platform-ios .stickers_gift_selector_box:focus-within {
-        box-shadow: inset 0 0 0 1px var(--accent-color-2);
+        box-shadow: inset 0 0 0 1px var(--accent-color--secondary);
     }
     .platform-ios .stickers_gift_selector_arrow {
         right: 12px;
@@ -579,7 +579,7 @@
         padding: 4px 2px 4px 10px;
     }
     .platform-ios .stickers_gift_token_remove {
-        color: var(--muted-text-color-2);
+        color: var(--text-color--tertiary);
         padding: 6px 8px;
         opacity: 1;
     }
@@ -589,7 +589,7 @@
         margin-top: 4px;
         padding: 0;
         overflow: hidden;
-        background: var(--module-background-color);
+        background: var(--page-background-color);
         box-shadow: 0 4px 20px rgba(0, 0, 0, .18);
     }
     .platform-ios .stickers_gift_suggestion_item {
