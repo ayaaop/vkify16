@@ -17,7 +17,7 @@
                                 <div>
                                     <a href="/language?lg={$language['code']}&hash={urlencode($csrfToken)}" 
                                     n:class="language_title, $language['code'] === getLanguage() ? language_selected"
-                                    onmouseover="{='showTitle(this.querySelector("span"), null, [0, 8], {dir: "down"})'|noescape}"
+                                    onmouseover="{='showTitle(this.querySelector("span"), null, [0, 8], {dir: "down", nohide: true})'|noescape}"
                                     onmouseout="{='tooltips.hide(this.querySelector("span"))'|noescape}">
                                         <span data-title="{$language['name']}">{$language['native_name']}</span>
                                     </a>

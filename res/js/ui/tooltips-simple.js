@@ -136,7 +136,10 @@ vkify.once('simpleTooltips', () => {
         create(el, options = {}) {
             if (el.tt && el.tt.el) return el.tt;
             if (!el.tthide) {
-                el.tthide = () => { el.showing = false; tooltips.hide(el); };
+                el.tthide = (event) => {
+                    if (el.contains(event.relatedTarget)) return;
+                    tooltips.hide(el);
+                };
                 if (!options.nohide) el.addEventListener('mouseout', el.tthide);
             }
             const container = document.createElement('div');
@@ -158,9 +161,6 @@ vkify.once('simpleTooltips', () => {
             if (!options.nohideover && (!options.text || options.hasover)) {
                 container.addEventListener('mouseover', () => tooltips.show(el));
                 container.addEventListener('mouseleave', () => tooltips.hide(el));
-            } else {
-                container.addEventListener('mouseover', () => tooltips.show(el));
-                container.addEventListener('mouseleave', () => tooltips.hide(el));
             }
             el.tt = tt;
             instances.add(tt);
@@ -170,6 +170,10 @@ vkify.once('simpleTooltips', () => {
         },
         show(el, options = {}) {
             if (!el || el._vkNoTooltip || el.tt === 'loadingstat') return;
+            if (!el.isConnected) {
+                tooltips.destroy(el);
+                return;
+            }
             el.showing = true;
             const tt = (el.tt && el.tt.el) ? el.tt : tooltips.create(el, options);
             tt.opts = { ...tt.opts, ...options };
@@ -189,7 +193,9 @@ vkify.once('simpleTooltips', () => {
                 return tt;
             }
             el.ttimer = setTimeout(() => {
-                if (!el.isConnected || el.showing === false || !setContent(tt, tt.opts)) return;
+                el.ttimer = null;
+                if (!el.isConnected) return tooltips.destroy(el);
+                if (el.showing === false || !setContent(tt, tt.opts)) return;
                 const opts = tt.opts;
                 if (opts.width) tt.container.style.width = `${opts.width}px`;
                 if (opts.maxWidth) tt.container.style.maxWidth = `${opts.maxWidth}px`;
@@ -229,9 +235,14 @@ vkify.once('simpleTooltips', () => {
         hide(el, options = {}) {
             if (!el || el.tt === 'loadingstat') return;
             const tt = el.tt;
+            el.showing = false;
             clearTimeout(el.ttimer);
+            el.ttimer = null;
             clearTimeout(el.hidetimer);
+            tt?._hideAnim?.cancel();
+            if (tt) tt._hideAnim = null;
             el.hidetimer = setTimeout(() => {
+                el.hidetimer = null;
                 if (!tt || !tt.container) return;
                 const opts = tt.opts || {};
                 const sp = opts.showsp !== undefined ? opts.showsp : 200;
@@ -266,9 +277,14 @@ vkify.once('simpleTooltips', () => {
             clearTimeout(el.ttimer);
             clearTimeout(el.hidetimer);
             if (el.tthide) el.removeEventListener('mouseout', el.tthide);
+            el.tt._showAnim?.cancel();
+            el.tt._hideAnim?.cancel();
             el.tt.container.remove();
             instances.delete(el.tt);
             delete el.tt;
+            delete el.tthide;
+            el.ttimer = el.hidetimer = null;
+            el.showing = false;
         },
         destroyAll(ancestor) {
             for (const tt of [...instances]) {
@@ -309,6 +325,17 @@ vkify.once('simpleTooltips', () => {
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') tooltips.hideAll();
     });
+    document.addEventListener('mousemove', (event) => {
+        for (const tt of instances) {
+            if (!tt.el.showing || tt.opts.nohide || tt.el.contains(event.target) || tt.el.matches(':hover')) continue;
+            if (!tt.opts.nohideover && (!tt.opts.text || tt.opts.hasover)
+                && (tt.container.contains(event.target) || tt.container.matches(':hover'))) continue;
+            tooltips.hide(tt.el);
+        }
+    }, true);
+    vkify.observeDOM(() => {
+        for (const tt of instances) if (!tt.el.isConnected) tooltips.destroy(tt.el);
+    }, { filter: (mutation) => mutation.removedNodes.length > 0 });
     window.addEventListener('scroll', () => tooltips.rePositionAll(), true);
     window.addEventListener('resize', () => tooltips.rePositionAll());
     document.addEventListener('fullscreenchange', () => {
