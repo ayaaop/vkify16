@@ -1511,6 +1511,9 @@ body.scrolled .toTop:hover #wrap {
     background-color: var(--sidebar-count-background-color);
     color: var(--sidebar-count-text-color);
 }
+.sidebar .sidebar_inner .link object[type="internal/link"].shown {
+    display: inline-block!important;
+}
 .sidebar .sidebar_inner .link object[type="internal/link"] a {
     display: block;
     margin: -4px -6px;
