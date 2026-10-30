@@ -84,7 +84,7 @@
             </div>
                 <p n:if="!$comments">{_no_comments}</p>
                 {var $printedSupportGreeting = false}
-                <div n:foreach="$comments as $comment" class="post reply" id="_comment{$comment->getId()}" data-comment-id="{$comment->getId()}" data-owner-id="{$comment->getUType() === 0 ? $comment->getUser()->getId() : 100}" data-mention-name="{$comment->getUType() === 0 ? $comment->getUser()->getFirstName() : str_replace('#', '', $comment->getAuthorName())}">
+                <div n:foreach="$comments as $comment" class="post reply" id="_comment{$comment->getId()}" data-comment-id="{$comment->getId()}" data-owner-id="{$comment->getUType() === 0 ? $comment->getUser()->getId() : 100}" data-mention-name="{$comment->getUType() === 0 ? $comment->getUser()->getFirstName() : $comment->getAuthorName()}">
                     <div class="reply_wrap">
                         <a class="reply_image" href="{if $comment->getUType() === 0}{$comment->getUser()->getURL()}{/if}">
                             {if $comment->getUType() === 0}

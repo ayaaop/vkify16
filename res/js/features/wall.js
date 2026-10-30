@@ -1905,7 +1905,7 @@ u(document).on('click', '.post.reply', function(e) {
     let comment   = u(this);
     let authorId  = comment.data('owner-id');
     let commentId = comment.data('comment-id');
-    let authorNm  = (comment.data('mention-name') || '').replace(/#/g, '').trim();
+    let authorNm  = (comment.data('mention-name') || '').replace(/[^\p{Lu}\p{Ll}\p{Lt}\p{Lo}\p{Mn} 0-9.\-`'@]/gu, '').trim() || 'id' + authorId;
     let fromGroup = comment.attr('data-from-group') === 'true';
     let postId    = comment.data('post-id');
     let inputbox  = postId == null ? u('#standaloneCommentBox textarea') : u('#wall-post-input' + postId);
