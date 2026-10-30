@@ -48,7 +48,7 @@ vkify.bindOnce('pinGroupHandler', () => {
             } else {
                 thisButton.html(tr('remove_from_left_menu'));
                 const newLink = u(`
-                    <a href="${groupUrl}" class="link group_link">
+                    <a href="${groupUrl}" class="link group_link pinned_club">
                         <svg class="link_icon" viewBox="0 0 16 11" style="--icon-w:16px;--icon-h:11px"><use href="#menu-my-groups"/></svg>
                         <span>${groupName}</span>
                     </a>

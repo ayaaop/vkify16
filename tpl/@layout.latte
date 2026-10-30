@@ -245,7 +245,7 @@
                             <a n:if="$thisUser->getLeftMenuItemStatus('messages')" href="/im" class="link my_messages">
                                 <svg class="link_icon" viewBox="0 0 16 12.02" style="--icon-w:16px;--icon-h:12.02px"><use href="#menu-my-messages"/></svg>
                                 <span>{_mobile_messages}</span>
-                                <object type="internal/link" n:if="$thisUser->getUnreadMessagesCount() > 0">
+                                <object type="internal/link" n:class="'imc counter', $thisUser->getUnreadMessagesCount() > 0 ? 'shown' : 'zero_counter'">
                                     <b>{$thisUser->getUnreadMessagesCount()}</b>
                                 </object>
                             </a>
@@ -325,7 +325,7 @@
                             <div id="_groupListPinnedGroups">
                                 <div n:if="$thisUser->getPinnedClubCount() > 0" class="menu_divider"></div>
 
-                                <a n:foreach="$thisUser->getPinnedClubs() as $pinnedClub" href="{$pinnedClub->getURL()}" class="link group_link">
+                                <a n:foreach="$thisUser->getPinnedClubs() as $pinnedClub" href="{$pinnedClub->getURL()}" class="link group_link pinned_club">
                                     <svg class="link_icon" viewBox="0 0 16 11" style="--icon-w:16px;--icon-h:11px"><use href="#menu-my-groups"/></svg>
                                     <span>{ovk_proc_strtr($pinnedClub->getName(), 28)}</span>
 

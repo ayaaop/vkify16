@@ -530,6 +530,18 @@ window.router = new class Router {
         } else {
             currentSidebarNode?.remove();
         }
+        try {
+            const im = window.im_variants?.getCurrent();
+            if (im?.state && typeof im.state._updateCounter === "function") {
+                im.state._updateCounter(im.state.getUnreadCounter());
+            }
+            const userIm = window.im_variants?.getCurrentUser() || window.im;
+            if (userIm?.state && typeof userIm.state.renderPinnedGroupsCounters === "function") {
+                userIm.state.renderPinnedGroupsCounters();
+            }
+        } catch (e) {
+            console.error(e);
+        }
         document.body.classList.toggle('no-sidebar', Boolean(parsed_content.body?.classList.contains('no-sidebar') || !nextSidebarNode));
         document.body.classList.toggle('logged-out', Boolean(parsed_content.body?.classList.contains('logged-out')));
 
@@ -762,12 +774,13 @@ function resetVkifyComposer(form) {
     const textarea = formNode.querySelector('textarea[name="text"]');
     if (textarea) {
         textarea.value = '';
+        textarea._contentEditable?.el?.classList.remove('expanded-textarea');
         textarea.classList.remove('expanded-textarea');
         window.vkifyTextareaAutosize?.apply?.(textarea);
     }
 
     const container = formNode.closest('.model_content_textarea');
-    if (container) container.classList.remove('shown');
+    if (container) container.classList.remove('shown', 'expanded-textarea');
 
     const root = formNode.closest('#write');
     if (root) {
