@@ -105,6 +105,11 @@ vkify.once('uiActionsMenu', function () {
     return false;
   }
 
+  function isBlockedPortal(el, options) {
+    return document.body.classList.contains('dimmed') &&
+      (options.appendParentCls || hasClass(el, 'ui_actions_menu_dummy_wrap') || data(el, 'dummyMenu'));
+  }
+
   function applyAppendParent(el, options) {
     let menu = geByClass1('ui_actions_menu', el);
     if (menu && hasClass(el, 'ui_actions_menu_dummy_wrap')) {
@@ -423,6 +428,7 @@ vkify.once('uiActionsMenu', function () {
 
       const isShown = hasClass(el, 'shown');
       const willShow = (s === undefined || s === null) ? !isShown : !!s;
+      if (willShow && isBlockedPortal(origEl, options)) return;
       let menu = geByClass1('ui_actions_menu', el);
       const noAnimate = !!options.noAnimate;
       const immediate = !!options.immediate;
@@ -529,6 +535,7 @@ vkify.once('uiActionsMenu', function () {
         el.remove();
         return;
       }
+      if (isBlockedPortal(el, options)) return;
 
       // cancel any pending hide
       let ht = data(el, 'hidetimer');
