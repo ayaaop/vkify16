@@ -65,13 +65,13 @@
         {/if}
 
         <div class="textareas">
-            <textarea
-                id="wall-post-input{$textAreaId}"
-                name="text"
-                class="small-textarea"
-                style="resize: none;"
-                placeholder="{ifset $placeholder}{$placeholder}{else}{_write}{/ifset}"
-            ></textarea>
+            {include "content-editable.latte",
+                id => "wall-post-input" . $textAreaId,
+                name => "text",
+                placeholder => ($placeholder ?? tr("write")),
+                class => "small-textarea",
+                style => "resize: none;"
+            }
             <div class="emoji_picker_entrypoint emoji_smile" role="button" n:attr="data-stickers => $isPostComposer ? '0' : null">
                 <div class="emoji_smile_icon_vector emoji_smile_icon"></div>
             </div>

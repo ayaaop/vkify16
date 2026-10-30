@@ -130,7 +130,7 @@ function renderEditMenuLayout(apiPost, type, postId) {
         <div class='edit_menu module_body'>
             <form id="${editFormId}">
                 <div class="edit-menu-textarea">
-                <textarea placeholder="${tr('edit')}" name="text" style="width: 100%;resize: none;" class="expanded-textarea small-textarea">${apiPost.text}</textarea>
+                <textarea placeholder="${tr('edit')}" name="text" style="width: 100%;resize: none;" class="expanded-textarea small-textarea content-editable-fallback">${apiPost.text}</textarea>
                 <div class="emoji_picker_entrypoint emoji_smile" role="button">
                     <div class="emoji_smile_icon_vector emoji_smile_icon"></div>
                 </div>
@@ -199,13 +199,16 @@ function resetWallComposer(form) {
 
     const textarea = form.querySelector('textarea.small-textarea');
     if (textarea) {
+        textarea._contentEditable?.clear();
+        textarea._contentEditable?.el?.classList.remove('expanded-textarea');
+        textarea._contentEditable?.el?.blur();
         textarea.classList.remove('expanded-textarea');
         textarea.blur();
     }
 
     const composer = form.closest('.model_content_textarea');
     if (composer) {
-        composer.classList.remove('shown');
+        composer.classList.remove('shown', 'expanded-textarea');
     }
 
     const horizontal = form.querySelector('.post-horizontal');
@@ -464,13 +467,15 @@ vkify.once('initTextareaInteraction', () => {
             : window.matchMedia('(max-width: 768px)').matches);
 
         const showComposer = (target) => {
-            if (target.tagName === 'TEXTAREA' || target.classList?.contains('submit_post_field')) {
-                const box = target.closest('.model_content_textarea');
-                if (isMobileView() && isMobileTeaserComposerEl(box)) return;
-                box?.classList.add('shown');
-                if (target.classList?.contains('small-textarea')) {
-                    target.classList.add('expanded-textarea');
-                }
+            const field = target.tagName === 'TEXTAREA' || target.classList?.contains('submit_post_field')
+                ? target
+                : target.closest?.('.content-editable');
+            if (!field) return;
+            const box = field.closest('.model_content_textarea');
+            if (isMobileView() && isMobileTeaserComposerEl(box)) return;
+            box?.classList.add('shown');
+            if (field.classList?.contains('small-textarea')) {
+                field.classList.add('expanded-textarea');
             }
         };
 

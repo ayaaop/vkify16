@@ -10,7 +10,7 @@ window.toggle_comment_textarea = window.toggle_comment_textarea || function (id)
     if (!el.classList.contains('hidden')) {
         el.classList.add('hidden');
         if (wi) {
-            wi.blur();
+            (wi._contentEditable?.el || wi).blur();
         }
     } else {
         el.classList.remove('hidden');
