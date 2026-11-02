@@ -4,10 +4,7 @@
     {else}
         <style>
             #reported_msg_context .reportedMsg {
-                outline: 2px solid #e64646;
-            }
-            #reported_msg_context .deletedMsg {
-                opacity: 0.75;
+                outline: 2px solid #e646466b
             }
             #reported_msg_context .deletedBadge {
                 display: inline-block;
@@ -22,48 +19,55 @@
             <p>{_reported_msg_1}: {$message->getPeerId()}</p>
             <p>{_reported_msg_2}: {$message->getSenderId()}</p>
             <p>{_reported_msg_3}</p>
-
             <hr>
-
+            {var $prevSenderId = null}
+            {var $prevTime = 0}
             {foreach $message->getContext(0) as $item}
                 {var $owner = $item->getOwner()}
-                <div n:class="'messenger-app--messages---message', $item->getId() == $message->getId() ? reportedMsg, $item->isDeleted() ? deletedMsg">
+                {var $sendTs = $item->getSendTime()->format('U', true)}
+                <div n:class="'messenger-app--messages---message messenger-layer msg-hoverable', $item->isUnread() ? 'unread' : 'msg-read', $prevSenderId === $item->getSenderId() && ($sendTs - $prevTime) < 600 ? 'same-author', $item->getId() == $message->getId() ? 'reportedMsg', $item->isDeleted() ? 'msg-deleted', $item->getEditTime() ? 'msg-edited'">
                     <div class="messenger-app--messages---message--wrap">
                         <div class="inlines _avatar">
                             {if $owner}
                                 <img class="ava" src="{$owner->getAvatarUrl()}" />
                             {else}
-                                <div class="ava" style="background: #e1e4eb; border-radius: 50%; width: 32px; height: 32px;"></div>
+                                <div class="ava" style="background: var(--page-background-color--secondary); border-radius: 50%; width: 36px; height: 36px;"></div>
                             {/if}
                         </div>
-                        <div class="inlines _content post-content">
+                        <div class="inlines _content">
+                            <div class="msg-header-right">
+                                <div class="time"><span>{$item->getSendTimeHumanized()}</span></div>
+                            </div>
                             {if $owner}
                                 <a class="_sender" target="_blank" href="{$owner->getURL()}">
-                                    <strong style="font-size: 11px;">{$owner->getCanonicalName()}</strong>
+                                    <strong>{$owner->getCanonicalName()}</strong>
                                 </a>
                             {else}
-                                <strong style="font-size: 11px; color: #777;">ID: {$item->getSenderId()}</strong>
+                                <span class="_sender"><strong>ID: {$item->getSenderId()}</strong></span>
                             {/if}
                             {if $item->isDeleted()}
                                 <span class="deletedBadge">({_deleted})</span>
                             {/if}
-                            <div class="time"><span>{$item->getSendTimeHumanized()}</span></div>
                             <p class="normalText text">{$item->getText()}</p>
+                            <p n:if="$item->getEditTime()" class="msg-modificators"><p class="modificator-edited">{_edit_action_past}</p></p>
                             {var $attachmentsLayout = $item->getChildrenWithLayout(200)}
-                            <div n:ifcontent class="attachments attachments_b" style="height: {$attachmentsLayout->height|noescape}; width: {$attachmentsLayout->width|noescape};">
-                                <div class="attachment" n:foreach="$attachmentsLayout->tiles as $attachment" style="float: {$attachment[3]|noescape}; width: {$attachment[0]|noescape}; height: {$attachment[1]|noescape};">
-                                    {include "../../components/attachment.latte", attachment => $attachment[2], tilesCount => sizeof($attachmentsLayout->tiles)}
+                            <div n:ifcontent class="msg-attachments-container">
+                                <div n:ifcontent class="attachments attachments_b" style="height: {$attachmentsLayout->height|noescape}; width: {$attachmentsLayout->width|noescape};">
+                                    <div class="attachment" n:foreach="$attachmentsLayout->tiles as $attachment" style="float: {$attachment[3]|noescape}; width: {$attachment[0]|noescape}; height: {$attachment[1]|noescape};">
+                                        {include "../../components/attachment.latte", attachment => $attachment[2], tilesCount => sizeof($attachmentsLayout->tiles)}
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div n:ifcontent class="attachments attachments_m">
-                                <div class="attachment" n:foreach="$attachmentsLayout->extras as $attachment">
-                                    {include "../../components/attachment.latte", attachment => $attachment}
+                                <div n:ifcontent class="attachments">
+                                    <div class="attachment" n:foreach="$attachmentsLayout->extras as $attachment">
+                                        {include "../../components/attachment.latte", attachment => $attachment}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                {var $prevSenderId = $item->getSenderId()}
+                {var $prevTime = $sendTs}
             {/foreach}
         </div>
     {/if}
