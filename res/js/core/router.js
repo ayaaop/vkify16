@@ -586,8 +586,39 @@ window.router = new class Router {
         const nextPageHeaderNode = pageHeader.nodes[0];
         const currentPageHeaderNode = document.querySelector('.page_header');
         if (currentPageHeaderNode) {
-            this._syncElementAttributes(currentPageHeaderNode, nextPageHeaderNode);
-            currentPageHeaderNode.innerHTML = nextPageHeaderNode.innerHTML;
+            const currentInner = currentPageHeaderNode.querySelector('.page_header_inner');
+            const nextInner = nextPageHeaderNode.querySelector('.page_header_inner');
+            const currentNav = currentInner?.querySelector('.home_navigation');
+            const nextNav = nextInner?.querySelector('.home_navigation');
+            const currentMusic = currentNav?.querySelector('#headerMusicLinkDiv');
+            const nextMusic = nextNav?.querySelector('#headerMusicLinkDiv');
+            if (previousUserId > 0 && previousUserId === Number(window.openvk?.current_id || 0)
+                && currentInner?.parentElement === currentPageHeaderNode && nextInner?.parentElement === nextPageHeaderNode
+                && currentNav?.parentElement === currentInner && nextNav?.parentElement === nextInner
+                && currentMusic?.parentElement === currentNav && nextMusic?.parentElement === nextNav) {
+                // Refresh the surrounding markup without detaching the live music control.
+                for (const [currentParent, nextParent, currentChild, nextChild] of [
+                    [currentPageHeaderNode, nextPageHeaderNode, currentInner, nextInner],
+                    [currentInner, nextInner, currentNav, nextNav],
+                    [currentNav, nextNav, currentMusic, nextMusic],
+                ]) {
+                    this._syncElementAttributes(currentParent, nextParent);
+                    for (const node of Array.from(currentParent.childNodes)) {
+                        if (node !== currentChild) node.remove();
+                    }
+                    let beforeChild = true;
+                    for (const node of nextParent.childNodes) {
+                        if (node === nextChild) {
+                            beforeChild = false;
+                        } else {
+                            currentParent.insertBefore(node.cloneNode(true), beforeChild ? currentChild : null);
+                        }
+                    }
+                }
+            } else {
+                this._syncElementAttributes(currentPageHeaderNode, nextPageHeaderNode);
+                currentPageHeaderNode.innerHTML = nextPageHeaderNode.innerHTML;
+            }
         } else {
             document.querySelector('.appbar')?.insertAdjacentHTML('afterend', nextPageHeaderNode.outerHTML);
         }
