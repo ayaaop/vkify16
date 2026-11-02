@@ -217,7 +217,60 @@ window.router = new class Router {
         return promise;
     }
 
-    _appendScript(script) {
+    _reportAssetError(type, url, navigation) {
+        const key = `${type}:${url}`;
+        if (navigation?.failedAssets.has(key) || navigation?.controller.signal.aborted) return;
+        navigation?.failedAssets.add(key);
+        if (typeof makeError === 'function') makeError(`Failed to load ${type}: ${url}`);
+        console.warn(`Failed to load ${type}:`, url);
+    }
+
+    async _preloadPageAssets(parsedContent, navigation) {
+        const scripts = parsedContent.querySelectorAll('.page_body script[src], script[data-vkify-route-script][src], body > script[src], head > script[type="module"][src]');
+        const styles = parsedContent.querySelectorAll('link[rel="stylesheet"][data-vkify-route-style][href]');
+        const assets = new Map();
+
+        for (const script of scripts) {
+            if (!this._isScriptAlreadyLoaded(script)) {
+                assets.set(`script:${script.src}`, { type: 'script', url: script.src, source: script });
+            }
+        }
+        for (const style of styles) {
+            const key = style.getAttribute('data-vkify-route-style') || style.href;
+            const existing = this.managedStyleLinks.get(key);
+            if (!existing?.isConnected || existing.href !== style.href) {
+                assets.set(`style:${style.href}`, { type: 'style', url: style.href, source: style });
+            }
+        }
+
+        await Promise.all(Array.from(assets.values(), ({ type, url, source }) => new Promise(resolve => {
+            const link = document.createElement('link');
+            link.rel = type === 'script' && source.type === 'module' ? 'modulepreload' : 'preload';
+            link.as = type;
+            link.href = url;
+            if (type === 'script') link.crossOrigin = 'anonymous';
+            else if (source.hasAttribute('crossorigin')) link.crossOrigin = source.crossOrigin;
+            if (source.integrity) link.integrity = source.integrity;
+            if (source.referrerPolicy) link.referrerPolicy = source.referrerPolicy;
+
+            const finish = failed => {
+                navigation.controller.signal.removeEventListener('abort', abort);
+                link.onload = null;
+                link.onerror = null;
+                link.remove();
+                if (failed) this._reportAssetError(type, url, navigation);
+                resolve();
+            };
+            const abort = () => finish(false);
+            link.onload = () => finish(false);
+            link.onerror = () => finish(true);
+            navigation.controller.signal.addEventListener('abort', abort, { once: true });
+            if (navigation.controller.signal.aborted) abort();
+            else document.head.appendChild(link);
+        })));
+    }
+
+    _appendScript(script, navigation) {
         return new Promise((resolve, reject) => {
             const newScript = document.createElement('script');
             newScript.crossOrigin = 'anonymous';
@@ -229,6 +282,9 @@ window.router = new class Router {
             }
             if (script.getAttribute('type')) {
                 newScript.type = script.getAttribute('type');
+            }
+            if (script.referrerPolicy) {
+                newScript.referrerPolicy = script.referrerPolicy;
             }
             if (script.hasAttribute('data-vkify-route-script')) {
                 const routeKey = script.getAttribute('data-vkify-route-script');
@@ -246,7 +302,12 @@ window.router = new class Router {
                     resolve();
                 };
                 newScript.onerror = () => {
-                    console.warn('Failed to load external script:', script.src);
+                    this._reportAssetError('script', script.src, navigation);
+                    newScript.remove();
+                    const routeKey = script.getAttribute('data-vkify-route-script');
+                    if (routeKey && this.managedRouteScripts.get(routeKey) === newScript) {
+                        this.managedRouteScripts.delete(routeKey);
+                    }
                     resolve();
                 };
             } else {
@@ -313,7 +374,7 @@ window.router = new class Router {
         return link;
     }
 
-    async _syncManagedStyles(parsed_content) {
+    async _syncManagedStyles(parsed_content, navigation) {
         if (!parsed_content) return;
 
         const desiredStyles = Array.from(parsed_content.querySelectorAll('link[rel="stylesheet"][data-vkify-route-style], style[data-vkify-route-style]')).map(link => {
@@ -372,12 +433,15 @@ window.router = new class Router {
 
         await Promise.all(desiredStyles.map(({ key, link }) => {
             const existing = this.managedStyleLinks.get(key);
-            if (existing && existing.isConnected) {
+            const sameStyle = existing?.tagName === link.tagName
+                && (link.tagName === 'STYLE' || existing.href === link.href);
+            if (existing?.isConnected && sameStyle) {
                 if (existing.tagName === 'STYLE' && link.tagName === 'STYLE' && existing.textContent !== link.textContent) {
                     existing.textContent = link.textContent;
                 }
                 return Promise.resolve();
             }
+            existing?.remove();
             const managedLink = this._cloneManagedLink(link, key);
             this.managedStyleLinks.set(key, managedLink);
             const anchor = document.getElementById('dark-mode-css') || document.getElementById('2018-mode-css') || document.querySelector('link[href*="/resource/css/mobile.css"]');
@@ -393,9 +457,23 @@ window.router = new class Router {
                 return Promise.resolve();
             }
             return new Promise(resolve => {
-                managedLink.addEventListener('load', resolve, { once: true });
-                managedLink.addEventListener('error', resolve, { once: true });
-                insertNode();
+                const finish = failed => {
+                    navigation.controller.signal.removeEventListener('abort', abort);
+                    managedLink.onload = null;
+                    managedLink.onerror = null;
+                    if (failed || navigation.controller.signal.aborted) {
+                        if (failed) this._reportAssetError('style', managedLink.href, navigation);
+                        managedLink.remove();
+                        if (this.managedStyleLinks.get(key) === managedLink) this.managedStyleLinks.delete(key);
+                    }
+                    resolve();
+                };
+                const abort = () => finish(false);
+                managedLink.onload = () => finish(false);
+                managedLink.onerror = () => finish(true);
+                navigation.controller.signal.addEventListener('abort', abort, { once: true });
+                if (navigation.controller.signal.aborted) abort();
+                else insertNode();
             });
         }));
     }
@@ -474,7 +552,7 @@ window.router = new class Router {
         }
     }
 
-    async _appendPage(parsed_content) {
+    async _appendPage(parsed_content, navigation) {
         const requiredElements = ['.page_body', '.page_header', '.appbar'];
         const missingElements = requiredElements.filter(selector => !parsed_content.querySelector(selector));
         if (missingElements.length > 0) {
@@ -489,7 +567,8 @@ window.router = new class Router {
         const appbar = u(parsed_content.querySelector('.appbar'));
 
         const previousUserId = Number(window.openvk?.current_id || 0);
-        await this._syncManagedStyles(parsed_content);
+        await this._syncManagedStyles(parsed_content, navigation);
+        if (navigation.controller.signal.aborted) return;
         this._syncRuntimeConfig(parsed_content);
         if (Number(window.openvk?.current_id || 0) !== previousUserId) {
             this._pageCache.clear();
@@ -570,7 +649,8 @@ window.router = new class Router {
         window.setBaseTitle(parsed_content.title)
 
         for (const script of scriptsToAppend) {
-            await this._appendScript(script);
+            if (navigation.controller.signal.aborted) return;
+            await this._appendScript(script, navigation);
         }
     }
 
@@ -662,6 +742,7 @@ window.router = new class Router {
         const navigation = {
             id: ++this._navigationId,
             controller: new AbortController(),
+            failedAssets: new Set(),
         };
         this._activeNavigation = navigation;
 
@@ -669,13 +750,18 @@ window.router = new class Router {
             const isGet = (params.method || 'GET') === 'GET';
             const cachedHtml = params.history === 'none' && isGet ? this._pageCache.get(resolvedUrl.href) : null;
             if (cachedHtml) {
+                const parsedContent = new DOMParser().parseFromString(cachedHtml, 'text/html');
+                await this._preloadPageAssets(parsedContent, navigation);
+                if (this._activeNavigation !== navigation) return { aborted: true };
                 const oldPageBody = document.querySelector('.page_body');
                 await window.vkify?.runPageLifecycle?.('beforePageLeave', { container: document, pageBody: oldPageBody });
+                if (this._activeNavigation !== navigation) return { aborted: true };
                 this._closeMsgs();
                 this._snapshotCurrentPage(this._currentUrl || location.href);
-                await this._appendPage(new DOMParser().parseFromString(cachedHtml, 'text/html'));
+                await this._appendPage(parsedContent, navigation);
                 if (this._activeNavigation !== navigation) return { aborted: true };
                 await this._integratePage(params.scrolling ?? 0);
+                if (this._activeNavigation !== navigation) return { aborted: true };
                 this._currentUrl = resolvedUrl.href;
                 this.completeNavigation();
                 return { committed: true, url: resolvedUrl.href };
@@ -697,6 +783,7 @@ window.router = new class Router {
             }
 
             const responseText = await response.text();
+            if (this._activeNavigation !== navigation) return { aborted: true };
             const parsedContent = new DOMParser().parseFromString(responseText, 'text/html');
             if (!parsedContent.querySelector('meta[name="vkify-router"][content="vkify16"]')) {
                 return { fullLoad: true, url: response.redirected ? response.url : resolvedUrl.href };
@@ -705,8 +792,11 @@ window.router = new class Router {
             const finalUrl = new URL(response.redirected ? response.url : resolvedUrl, location.origin);
             finalUrl.searchParams.delete('al');
             finalUrl.searchParams.delete('hash');
+            await this._preloadPageAssets(parsedContent, navigation);
+            if (this._activeNavigation !== navigation) return { aborted: true };
             const oldPageBody = document.querySelector('.page_body');
             await window.vkify?.runPageLifecycle?.('beforePageLeave', { container: document, pageBody: oldPageBody });
+            if (this._activeNavigation !== navigation) return { aborted: true };
             this._closeMsgs();
             if (params.history !== 'none') this._saveScrollForCurrentEntry();
             this._snapshotCurrentPage(this._currentUrl || location.href);
@@ -720,10 +810,11 @@ window.router = new class Router {
                 }
             }
 
-            await this._appendPage(parsedContent);
+            await this._appendPage(parsedContent, navigation);
             if (this._activeNavigation !== navigation) return { aborted: true };
 
             await this._integratePage(params.scrolling ?? 0);
+            if (this._activeNavigation !== navigation) return { aborted: true };
             this._currentUrl = finalUrl.href;
 
             this.completeNavigation();
