@@ -174,11 +174,11 @@
 					<div class="group_counters_wrap clear_fix">
 						<div class="group_counters full">
 							<a class="page_counter" href="/club{$club->getId()}/followers">
-								<div class="count">{=vkifyFormatCount($club->getFollowersCount())}</div>
+								<div class="count">{=vkifyFormatCountSpaced($club->getFollowersCount())}</div>
 								<div class="label">{_event_comers}</div>
 							</a>
 							<a class="page_counter" href="/club{$club->getId()}/followers?mightcome=1">
-								<div class="count">{=vkifyFormatCount($club->getPotentialFollowersCount())}</div>
+								<div class="count">{=vkifyFormatCountSpaced($club->getPotentialFollowersCount())}</div>
 								<div class="label">{_event_potential_comers}</div>
 							</a>
 						</div>
@@ -225,7 +225,7 @@
 												class="page_album_thumb" loading="lazy" />
 										</div>
 										<div class="page_album_title">
-											<div class="page_album_size">{$album->getPhotosCount()}</div>
+											<div class="page_album_size">{=vkifyFormatCountSpaced($album->getPhotosCount())}</div>
 											<div class="page_album_title_text">{$album->getName()}</div>
 										</div>
 									</a>

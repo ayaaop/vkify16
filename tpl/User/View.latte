@@ -296,7 +296,7 @@
 												class="page_album_thumb" loading="lazy" />
 										</div>
 										<div class="page_album_title">
-											<div class="page_album_size">{$album->getPhotosCount()}</div>
+											<div class="page_album_size">{=vkifyFormatCountSpaced($album->getPhotosCount())}</div>
 											<div class="page_album_title_text">{$album->getName()|truncate:50}</div>
 										</div>
 									</a>
@@ -554,23 +554,23 @@
 					</div>
 					<div class="counts_module" n:ifcontent>
 						<a class="page_counter" n:if="$user->getFollowersCount() > 0 && $user->getPrivacyPermission('friends.read', $thisUser ?? NULL)" href="/friends{$user->getId()}?act=incoming">
-							<div class="count">{=vkifyFormatCount($user->getFollowersCount())}</div>
+							<div class="count">{=vkifyFormatCountSpaced($user->getFollowersCount())}</div>
 							<div class="label">{tr("followers", $user->getFollowersCount())|replaceRE: '/^[^\s]+\s+/', ''}</div>
 						</a>
 						<a class="page_counter" n:if="(new \openvk\Web\Models\Repositories\Photos())->getUserPhotosCount($user) > 0 && $user->getPrivacyPermission('photos.read', $thisUser ?? NULL)" href="/albums{$user->getId()}">
-							<div class="count" id="profile_photos_counter_val">{=vkifyFormatCount((new \openvk\Web\Models\Repositories\Photos())->getUserPhotosCount($user))}</div>
+							<div class="count" id="profile_photos_counter_val">{=vkifyFormatCountSpaced((new \openvk\Web\Models\Repositories\Photos())->getUserPhotosCount($user))}</div>
 							<div class="label">{tr("mobile_photos")}</div>
 						</a>
 						<a class="page_counter" n:if="\OPENVK_ROOT_CONF['openvk']['preferences']['commerce'] && $giftCount > 0 && $user->getPrivacyPermission('gifts.read', $thisUser ?? NULL)" href="/gifts{$user->getId()}">
-							<div class="count">{=vkifyFormatCount($giftCount)}</div>
+							<div class="count">{=vkifyFormatCountSpaced($giftCount)}</div>
 							<div class="label">{tr("gifts", $giftCount)|replaceRE: '/^[^\s]+\s+/', ''}</div>
 						</a>
 						<a class="page_counter" n:if="(new \openvk\Web\Models\Repositories\Videos())->getUserVideosCount($user) > 0 && $user->getPrivacyPermission('videos.read', $thisUser ?? NULL)" href="/videos{$user->getId()}">
-							<div class="count">{=vkifyFormatCount((new \openvk\Web\Models\Repositories\Videos())->getUserVideosCount($user))}</div>
+							<div class="count">{=vkifyFormatCountSpaced((new \openvk\Web\Models\Repositories\Videos())->getUserVideosCount($user))}</div>
 							<div class="label">{tr("videos", (new \openvk\Web\Models\Repositories\Videos())->getUserVideosCount($user))|replaceRE: '/^[^\s]+\s+/', ''}</div>
 						</a>
 						<a class="page_counter" n:if="$audiosCount > 0 && $user->getPrivacyPermission('audios.read', $thisUser ?? NULL)" href="/audios{$user->getId()}">
-							<div class="count">{=vkifyFormatCount($audiosCount)}</div>
+							<div class="count">{=vkifyFormatCountSpaced($audiosCount)}</div>
 							<div class="label">{tr("audios_count", $audiosCount)|replaceRE: '/^[^\s]+\s+/', ''}</div>
 						</a>
 					</div>
@@ -579,7 +579,7 @@
 					<a class="module_header" href="/albums{$user->getId()}" {if $photoCount == 0}style="display: none"{/if} id="page_photos_module_header">
 						<div class="header_top clear_fix">
 							<span class="header_label fl_l">{_mobile_photos}</span>
-							<span class="header_count fl_l" id="page_photos_module_count">{$photoCount}</span>
+							<span class="header_count fl_l" id="page_photos_module_count">{=vkifyFormatCountSpaced($photoCount)}</span>
 							<span class="a fl_r" n:if="isset($thisUser) && $user->getId() == $thisUser->getId()" onclick="event.stopPropagation(); event.preventDefault(); document.getElementById('page_photos_upload_input').click();">{_add_photos}</span>
 						</div>
 					</a>
@@ -606,6 +606,9 @@
 
 	<script n:if="isset($thisUser) && $user->getId() == $thisUser->getId()" data-vkify-route-script="user-view">
 		(function() {
+			var fmtCount = function(n) {
+				return n >= 1000 ? String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0') : String(n);
+			};
 			var input = document.getElementById('page_photos_upload_input');
 			if (!input) return;
 			input.addEventListener('change', function() {
@@ -642,8 +645,8 @@
 								}
 
 								if (header) header.style.display = '';
-								if (count) count.textContent = parseInt(count.textContent || 0) + 1;
-								if (profileCount) profileCount.textContent = parseInt(profileCount.textContent || 0) + 1;
+								if (count) count.textContent = fmtCount(parseInt(count.textContent.replace(/\D/g, '') || '0', 10) + 1);
+								if (profileCount) profileCount.textContent = fmtCount(parseInt(profileCount.textContent.replace(/\D/g, '') || '0', 10) + 1);
 								if (label) label.style.display = 'none';
 
 								var a = document.createElement('a');

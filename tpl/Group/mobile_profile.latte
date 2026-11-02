@@ -323,7 +323,7 @@
 	<a href="/club{$club->getId()}/followers?onlyAdmins=1" class="module_header">
 		<h3 class="header_top clear_fix">
 			<span class="header_label fl_l">{_administrators}</span>
-			<span class="header_count fl_l">{$managersCount}</span>
+			<span class="header_count fl_l">{=vkifyFormatCountSpaced($managersCount)}</span>
 		</h3>
 	</a>
 

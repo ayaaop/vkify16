@@ -1,3 +1,4 @@
+{php if (!function_exists('vkifyFormatCountSpaced')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
 {*
   Profile sidebar module header link.
 
@@ -11,12 +12,12 @@
     {if ($tag ?? 'h3') === 'h3'}
         <h3 class="header_top clear_fix">
             <span class="header_label fl_l">{$label}</span>
-            <span class="header_count fl_l" n:ifset="$count" n:attr="id => $countId ?? null">{$count}</span>
+            <span class="header_count fl_l" n:ifset="$count" n:attr="id => $countId ?? null">{=vkifyFormatCountSpaced($count)}</span>
         </h3>
     {else}
         <div class="header_top clear_fix">
             <span class="header_label fl_l">{$label}</span>
-            <span class="header_count fl_l" n:ifset="$count" n:attr="id => $countId ?? null">{$count}</span>
+            <span class="header_count fl_l" n:ifset="$count" n:attr="id => $countId ?? null">{=vkifyFormatCountSpaced($count)}</span>
         </div>
     {/if}
 </a>
