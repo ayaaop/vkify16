@@ -19,7 +19,7 @@
                 <br />
                 <b>{_comment}:</b> {$report->getReason()}
             </p>
-            {include "ViewContent.latte", type => $report->getContentType(), object => $report->getContentObject()}
+            {include "ViewContent.latte", type => $report->getContentType(), object => $report->getContentObject(true)}
             <form action="/admin/reportAction{$report->getId()}" method="post">
                 <div class="buttons_row">
                     <form n:if="$report->getContentType() != 'group'" action="/admin/reportAction{$report->getId()}" method="post">

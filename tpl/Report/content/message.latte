@@ -1,25 +1,70 @@
 {block content}
-    <div class="page_block report_message_page">
-        {if !$message}
-            {include "../../components/error.latte", description => tr("reported_message_display_error")}
-        {else}
-            <div class="report_message_content">
-                <p class="report_message_text">
-                    <b>{tr("reported_message_contains_2")}</b>:
-                    {$message->getText()}
-                </p>
-                <p class="report_message_attachments">
-                    <b>{tr("reported_message_contains_1")}</b>:
-                    {$message->getAttachmentsString()}
-                </p>
-                <p class="report_message_meta">
-                    {tr("reported_message_contains_3", $message->getSenderId(), $message->getPeerId())}
-                </p>
+    {if !$message}
+        {include "../../components/content_error.latte", title => tr("no_data"), description => tr("reported_message_display_error")}
+    {else}
+        <style>
+            #reported_msg_context .reportedMsg {
+                outline: 2px solid #e64646;
+            }
+            #reported_msg_context .deletedMsg {
+                opacity: 0.75;
+            }
+            #reported_msg_context .deletedBadge {
+                display: inline-block;
+                font-size: 10px;
+                color: #d9534f;
+                margin-left: 5px;
+                vertical-align: middle;
+            }
+        </style>
 
-                <div id="msg_context_place" class="report_message_actions">
-                    <input onclick="window.im_class.reportShowMessageContext(event, {$report->getId()}, {$message->getPeerId()}, {$message->getId()}, {$report->authorId()})" type="button" class="button" value="{_resolve_message_context} (BETA)">
+        <div id="reported_msg_context">
+            <p>{_reported_msg_1}: {$message->getPeerId()}</p>
+            <p>{_reported_msg_2}: {$message->getSenderId()}</p>
+            <p>{_reported_msg_3}</p>
+
+            <hr>
+
+            {foreach $message->getContext(0) as $item}
+                {var $owner = $item->getOwner()}
+                <div n:class="'messenger-app--messages---message', $item->getId() == $message->getId() ? reportedMsg, $item->isDeleted() ? deletedMsg">
+                    <div class="messenger-app--messages---message--wrap">
+                        <div class="inlines _avatar">
+                            {if $owner}
+                                <img class="ava" src="{$owner->getAvatarUrl()}" />
+                            {else}
+                                <div class="ava" style="background: #e1e4eb; border-radius: 50%; width: 32px; height: 32px;"></div>
+                            {/if}
+                        </div>
+                        <div class="inlines _content post-content">
+                            {if $owner}
+                                <a class="_sender" target="_blank" href="{$owner->getURL()}">
+                                    <strong style="font-size: 11px;">{$owner->getCanonicalName()}</strong>
+                                </a>
+                            {else}
+                                <strong style="font-size: 11px; color: #777;">ID: {$item->getSenderId()}</strong>
+                            {/if}
+                            {if $item->isDeleted()}
+                                <span class="deletedBadge">({_deleted})</span>
+                            {/if}
+                            <div class="time"><span>{$item->getSendTimeHumanized()}</span></div>
+                            <p class="normalText text">{$item->getText()}</p>
+                            {var $attachmentsLayout = $item->getChildrenWithLayout(200)}
+                            <div n:ifcontent class="attachments attachments_b" style="height: {$attachmentsLayout->height|noescape}; width: {$attachmentsLayout->width|noescape};">
+                                <div class="attachment" n:foreach="$attachmentsLayout->tiles as $attachment" style="float: {$attachment[3]|noescape}; width: {$attachment[0]|noescape}; height: {$attachment[1]|noescape};">
+                                    {include "../../components/attachment.latte", attachment => $attachment[2], tilesCount => sizeof($attachmentsLayout->tiles)}
+                                </div>
+                            </div>
+
+                            <div n:ifcontent class="attachments attachments_m">
+                                <div class="attachment" n:foreach="$attachmentsLayout->extras as $attachment">
+                                    {include "../../components/attachment.latte", attachment => $attachment}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        {/if}
-    </div>
+            {/foreach}
+        </div>
+    {/if}
 {/block}

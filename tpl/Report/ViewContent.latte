@@ -33,6 +33,8 @@
             {include "../Audio/player.latte", audio => $object}
         {elseif $type == "doc"}
             {include "../Documents/components/doc.latte", doc => $object}
+        {elseif $type == "message"}
+            {include "./content/message.latte", message => $object}
         {else}
             {include "../components/content_error.latte", title => tr("no_data"), description => tr("version_incompatibility")}
         {/if}
