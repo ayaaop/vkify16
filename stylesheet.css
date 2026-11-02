@@ -527,6 +527,10 @@ body.scrolled .toTop:hover #wrap {
     opacity: 1;
 }
 
+.upLeftErrors .upLeftError {
+    color: #000;
+}
+
 .error_block {
     text-align: center;
     color: var(--text-color--tertiary);
@@ -1016,6 +1020,7 @@ body.scrolled .toTop:hover #wrap {
 .audioEntry .buttons {
     gap: 6px;
     right: 8px;
+    clip-path: unset;
 }
 .audioEntry .buttons .musicIcon {
     background: url(../resource/icons/common.png) no-repeat;

@@ -145,7 +145,7 @@
 {/block}
 
 {block bodyScripts}
-    <script src="/themepack/vkify16/{$theme->getVersion()}/resource/js/features/suggestions.js"></script>
+    {script "js/suggestions.js"}
     <script n:if='$type == "search" && sizeof($posts) > 0 && !empty($_GET["q"])' data-vkify-route-script="wall-search-highlight">
         function __scrollHook(page) {
             highlightText({$_GET["q"]}, '.content', ['.wall_post_text'])

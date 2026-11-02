@@ -1922,6 +1922,7 @@ select:focus,.content-editable:focus {
 /* Info boxes */
 .accent-box,
 .information,
+.user-alert,
 #_addAudioAdditional #_tip {
     padding: 7px 18px 9px;
     margin: 15px 20px;
@@ -1929,6 +1930,7 @@ select:focus,.content-editable:focus {
     line-height: 150%;
     background-color: var(--page-background-color--secondary);
     border: 1px solid var(--dropdown-border-color);
+    color: var(--text-color);
 }
 .error,
 .msg {
@@ -1941,7 +1943,8 @@ select:focus,.content-editable:focus {
 .msg:first-child {
     margin-top: 0;
 }
-.msg.msg_yellow {
+.msg.msg_yellow,
+.user-alert {
     background: var(--message-warning-background-color)
     url(../icons/msg_error.png) no-repeat 12px
     12px;
@@ -1952,6 +1955,12 @@ select:focus,.content-editable:focus {
 }
 .msg.msg_yellow p {
     line-height: 150%;
+}
+
+.user-alert {
+    margin: 0 0 15px;
+    min-height: auto;
+    font-weight: 400;
 }
 
 .page_info_wrap .msg,

@@ -404,17 +404,14 @@ table.ugc-table * {
   vertical-align: top;
 }
 
-.ugc-table td {
+.ugc-table tr > td {
+  font-size: 13px;
   padding: 5px 0 0;
   line-height: 150%;
 }
 
 .ugc-table .data {
   width: 100% !important;
-}
-
-.ugc-table tr > td:nth-of-type(2) {
-  font-size: 13px;
 }
 
 .no_info {
@@ -453,6 +450,7 @@ table.ugc-table * {
 }
 .audioStatus a {
   font-weight: 400;
+  color: var(--link-color)
 }
 
 #basicInfo {
@@ -691,6 +689,7 @@ div.avatar_block:hover .avatar_variants {
 .profile_actions {
   padding-top: 10px;
   min-height: 30px;
+  width: 100%;
 }
 
 .profile_msg_split .cut_left,
