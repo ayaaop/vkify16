@@ -6,7 +6,7 @@
         {include "../components/page_crumb_header.latte", crumbs: [
             ['href' => "/support?act=list", 'title' => tr("support_tickets")],
             ['title' => $ticket->getName()]
-        ]}
+        ], class => 'nomobile'}
     <script>
         function markAnswer(id, mark) {
             let url = "/support/comment/" + id + "/rate/" + mark + "?hash=" + {urlencode($csrfToken)};

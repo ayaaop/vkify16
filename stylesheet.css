@@ -2818,7 +2818,7 @@ html.vkify-composer-dragging * {
 }
 .post-replyto #remove_reply_button {
   float: right;
-  margin: 2px 0 0 3px;
+  margin: 0 0 0 3px;
 }
 
 .post-buttons .post-bottom-acts + .post-replyto {

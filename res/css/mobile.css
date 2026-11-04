@@ -198,6 +198,7 @@
         min-width: 0;
     }
     .appbar .appbar-title.appbar-title--tabs-menu {
+        height: 100%;
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -1043,8 +1044,6 @@
 
     .tickets_header {
         padding: 12px 16px;
-        margin-top: 12px;
-        border-top: 1px solid var(--border-color);
     }
     .tickets_content .reply,.reply {
         padding: 0 16px;

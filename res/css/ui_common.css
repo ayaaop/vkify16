@@ -1953,10 +1953,10 @@ select:focus,.content-editable:focus {
     background: var(--message-warning-background-color)
     url(../icons/msg_error.png) no-repeat 12px
     12px;
-    padding-left: 55px;
     border-color: var(--message-warning-border-color);
-    min-height: 55px;
-    line-height: 38px;
+    padding: 12px 6px 12px 55px;
+    min-height: 32px !important;
+    box-sizing: content-box;
 }
 .msg.msg_yellow p {
     line-height: 150%;

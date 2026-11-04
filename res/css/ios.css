@@ -137,9 +137,7 @@
         top: env(safe-area-inset-top);
         bottom: 0;
         transform: translateX(-50%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        line-height: 43px;
         max-width: calc(100% - 132px);
         box-sizing: border-box;
     }
