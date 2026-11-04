@@ -1767,13 +1767,18 @@ vkify.bindOnce('ignoreFeedFix', () => {
                 post.classList.remove('post-hidden');
                 return;
             }
-            await morphPostContents(post, `<div class="vkify-post-restore-wrap">${originalHTML}</div>`, originalCls);
+            const cleanedWrap = document.createElement('div');
+            cleanedWrap.innerHTML = originalHTML;
+            cleanedWrap.querySelectorAll('.content-editable-wrap > .content-editable').forEach(el => el.remove());
+            await morphPostContents(post, `<div class="vkify-post-restore-wrap">${cleanedWrap.innerHTML}</div>`, originalCls);
 
             const wrap = post.querySelector(':scope > .vkify-post-restore-wrap');
             if (wrap) {
                 while (wrap.firstChild) post.appendChild(wrap.firstChild);
                 wrap.remove();
             }
+            window.ContentEditable?.initAll?.(post);
+            window.bsdnHydrate?.();
         }
     }, true);
 });

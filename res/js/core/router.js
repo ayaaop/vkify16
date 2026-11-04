@@ -115,6 +115,22 @@ window.router = new class Router {
         const appbar = document.querySelector('.appbar');
         if (!pageBody || !header || !appbar) return;
 
+        const snapshotBody = pageBody.cloneNode(true);
+        const snapshotEditables = snapshotBody.querySelectorAll('.content-editable');
+        const editableCopies = new Map(Array.from(pageBody.querySelectorAll('.content-editable'), (el, index) => [el, snapshotEditables[index]]));
+        const snapshotTextareas = snapshotBody.querySelectorAll('textarea');
+        // Restore the fallback in the snapshot; OpenVK will enhance it again on insertion.
+        pageBody.querySelectorAll('textarea').forEach((textarea, index) => {
+            const editable = textarea._contentEditable;
+            const snapshotEditable = editableCopies.get(editable?.el);
+            if (!snapshotEditable) return;
+
+            const snapshotTextarea = snapshotTextareas[index];
+            snapshotEditable.remove();
+            snapshotTextarea.style.removeProperty('display');
+            snapshotTextarea.textContent = editable.getText();
+        });
+
         const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"][data-vkify-route-style], style[data-vkify-route-style]'))
             .map(l => l.outerHTML).join('');
         const routeScripts = Array.from(document.querySelectorAll('script[data-vkify-route-script]'))
@@ -126,7 +142,7 @@ window.router = new class Router {
         const bodyClasses = ['no-sidebar', 'logged-out'].filter(cls => document.body.classList.contains(cls));
         const bodyClass = bodyClasses.length ? ` class="${bodyClasses.join(' ')}"` : '';
         const html = `<!doctype html><html><head><title>${title}</title><meta name="vkify-router" content="vkify16"><meta name="csrf" content="${this.csrf}">${styles}</head>` +
-            `<body data-themepack="vkify16"${bodyClass}>${pageBody.outerHTML}${sidebar ? sidebar.outerHTML : ''}${header.outerHTML}${appbar.outerHTML}${backdrop ? backdrop.outerHTML : ''}${runtimeConfig}${routeScripts}</body></html>`;
+            `<body data-themepack="vkify16"${bodyClass}>${snapshotBody.outerHTML}${sidebar ? sidebar.outerHTML : ''}${header.outerHTML}${appbar.outerHTML}${backdrop ? backdrop.outerHTML : ''}${runtimeConfig}${routeScripts}</body></html>`;
         this._pageCacheSet(url, html);
     }
 
@@ -628,6 +644,7 @@ window.router = new class Router {
         }
 
         u('.page_body').html(pageBody.html());
+        window.ContentEditable?.initAll(document.querySelector('.page_body'));
         const nextSidebarNode = sidebar.nodes[0];
         const currentSidebarNode = document.querySelector('.sidebar');
         if (nextSidebarNode) {
@@ -932,6 +949,7 @@ u(document).on('submit', 'form', async (e) => {
 
             try {
                 await window.ajax_posting(e, target);
+                window.bsdnHydrate?.();
             } catch (err) {
                 console.error('ajax_posting failed:', err);
                 u('#ajloader').removeClass('shown');

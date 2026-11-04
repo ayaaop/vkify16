@@ -138,6 +138,50 @@ test('waits for assets when restoring a cached page', async ({ page }) => {
     await expect(page.locator('.page_body')).toHaveText('cached page');
 });
 
+test('restores content-editable composers once with their current text on back navigation', async ({ page }) => {
+    const contentEditableScript = fs.readFileSync(path.join(__dirname, '../../../Web/static/js/content-editable.js'), 'utf8');
+    await page.evaluate(() => {
+        document.querySelector('.page_body').innerHTML = `
+            <form id="composer"><div class="content-editable-wrap">
+                <textarea id="first" name="text" class="small-textarea content-editable-fallback" placeholder="Write"></textarea>
+            </div></form>
+            <div class="content-editable-wrap">
+                <textarea id="second" class="content-editable-fallback"></textarea>
+            </div>
+            <div id="standalone" class="content-editable" contenteditable="true">Standalone</div>`;
+    });
+    await page.addScriptTag({ content: contentEditableScript });
+    await expect(page.locator('#composer .content-editable')).toHaveCount(1);
+    await page.evaluate(() => {
+        document.querySelector('#first')._contentEditable.setText('Draft <&>\n[id1|Name]');
+        document.querySelector('#second')._contentEditable.setText('Second draft');
+    });
+    await page.route(`${origin}/next`, route => route.fulfill({
+        contentType: 'text/html', body: pageHtml('next page'),
+    }));
+
+    expect(await page.evaluate(() => router.route({ url: '/next' }))).toMatchObject({ committed: true });
+    await page.goBack();
+    await expect(page.locator('#composer .content-editable')).toHaveCount(1);
+    await expect(page.locator('.page_body .content-editable')).toHaveCount(3);
+    await expect.poll(() => page.evaluate(() => document.querySelector('#first')?._contentEditable?.getText()))
+        .toBe('Draft <&>\n[id1|Name]');
+    expect(await page.evaluate(() => document.querySelector('#second').value)).toBe('Second draft');
+    expect(await page.evaluate(() => new FormData(document.querySelector('#composer')).get('text')))
+        .toBe('Draft <&>\n[id1|Name]');
+    await expect(page.locator('#standalone')).toHaveText('Standalone');
+
+    await page.locator('#composer .content-editable').fill('Updated draft');
+    await page.goForward();
+    await expect(page.locator('.page_body')).toHaveText('next page');
+    await page.goBack();
+    await expect(page.locator('#composer .content-editable')).toHaveCount(1);
+    await expect.poll(() => page.evaluate(() => document.querySelector('#first')?._contentEditable?.getText()))
+        .toBe('Updated draft');
+    expect(await page.evaluate(() => new FormData(document.querySelector('#composer')).get('text')))
+        .toBe('Updated draft');
+});
+
 test('waits for module scripts and executes them after the swap', async ({ page }) => {
     let release;
     const gate = new Promise(resolve => { release = resolve; });
