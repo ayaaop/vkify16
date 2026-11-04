@@ -1826,6 +1826,11 @@ select:focus,.content-editable:focus {
 
 .tt_w.like_tt .like_tt_owners {
     margin-left: -6px;
+    transition: margin 0.2s ease;
+}
+
+.tt_w.like_tt .like_tt_owners.me_hidden {
+    margin-left: -47px;
 }
 
 .tt_w.like_tt .like_tt_owner {

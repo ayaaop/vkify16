@@ -1508,37 +1508,6 @@ input.vkify_inline_edit_field {
   background: none;
   border: 0;
 }
-body:not(.dark-mode) {
-  .ovk-diag-head .ui_tab,
-  .ovk-diag-head .ui_tabs .ui_tab {
-    color: var(--accent-text-color);
-    opacity: 0.5;
-  }
-  .ovk-diag-head .ui_tab_sel,
-  .ovk-diag-head .ui_tabs .ui_tab_sel,
-  .ovk-diag-head .ui_tabs_box .ui_tab_sel {
-    color: var(--accent-text-color);
-    opacity: 1;
-  }
-  .ovk-diag-head .ui_tab_sel,
-  .ovk-diag-head .ui_tab_sel:hover,
-  .ovk-diag-head .ui_tabs .ui_tab_sel,
-  .ovk-diag-head .ui_tabs .ui_tab_sel:hover,
-  .ovk-diag-head .ui_tabs_box .ui_tab_sel,
-  .ovk-diag-head .ui_tabs_box .ui_tab_sel:hover,
-  .ovk-diag-head .ui_tab:hover,
-  .ovk-diag-head .ui_tabs .ui_tab:hover {
-    border-bottom: 2px solid var(--accent-text-color);
-  }
-  .ovk-diag-head .ui_tab,
-  .ovk-diag-head .ui_tab_plain {
-    margin-bottom: 0;
-  }
-  .ovk-diag-head .ui_tabs.ui_tabs_sliding .ui_tabs_slider {
-    bottom: 0;
-    background-color: var(--accent-text-color);
-  }
-}
 
 .picker-items--user:not(.picker-items--active),
 .picker-items--group:not(.picker-items--active) {
@@ -1619,6 +1588,75 @@ body:not(.dark-mode) {
 
 .ovk-msg-sheet #repost_signs {
   display: none !important;
+}
+
+/* Likers box */
+.ovk-diag-cont.vkify_likes_box {
+  width: 638px;
+  top: calc(50% - 54px);
+}
+.ovk-diag-cont.vkify_likes_box .ovk-diag-head {
+  background-color: var(--page-header-background-color);
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color)
+}
+.ovk-diag-cont.vkify_likes_box .ovk-diag-head-close {
+  filter: invert(30%);
+}
+.ovk-diag-cont.vkify_likes_box .ovk-diag-body {
+  padding: 0 !important;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.ovk-diag-cont.vkify_likes_box .ovk-diag-head .ui_tabs {
+  padding-left: 19px;
+}
+.ovk-diag-cont.vkify_likes_box .ovk-diag-head .ui_tab_count {
+  color: inherit;
+  opacity: 0.7;
+  padding-left: 6px;
+}
+.fans_rows {
+  padding: 25px 14px 5px;
+}
+.fans_fan_row {
+  display: inline-block;
+  vertical-align: top;
+  width: 100px;
+  height: 100px;
+  padding: 0 11px 55px;
+  overflow: hidden;
+  box-sizing: content-box;
+}
+.fans_fanph_wrap {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.fans_fan_ph {
+  height: 100px;
+  display: block;
+}
+.fans_fan_img {
+  vertical-align: top;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.fans_fan_name {
+  padding-top: 6px;
+  font-size: 12.5px;
+  line-height: 140%;
+  text-align: center;
+}
+.fans_fan_lnk {
+  color: var(--link-color);
+}
+#wk_likes_more_link {
+  margin: 0 25px 20px;
 }
 
 

@@ -150,7 +150,7 @@ vkify.bindOnce('messageBoxOverrides', () => {
             };
 
             // themepack dialogs opt in directly via addClass at creation
-            const SHEET_BODY_MARKERS = '.stickers_pack_modal, .audiosInsert, [id^="poll_editor"], #osm-map, #upload_container, #repostMsgInput, #_fast_video_upload, .message-viewers-modal-loader, .message-viewers-list-wrap, .pinned-message-modal-content';
+            const SHEET_BODY_MARKERS = '.stickers_pack_modal, .audiosInsert, [id^="poll_editor"], #osm-map, #upload_container, #repostMsgInput, #_fast_video_upload, .message-viewers-modal-loader, .message-viewers-list-wrap, .pinned-message-modal-content, #wk_likes_content';
             const FULLSCREEN_BODY_MARKERS = '#_fullyDeleteAudio, #_edit_post_modal, #_new_post_modal, .chat-permissions-desc, .stickers_gift_dialog_body';
             const classifyDialog = (el) => {
                 el.querySelectorAll('.ovk-diag-action > .button, .ovk-diag-action > button, .ovk-diag-action > input[type="button"], .ovk-diag-action > input[type="submit"]')

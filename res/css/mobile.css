@@ -3684,6 +3684,45 @@
         padding-right: 16px;
     }
 
+    .ovk-diag-cont.vkify_likes_box {
+        width: 100%;
+    }
+    .ovk-msg-sheet.vkify_likes_box .ovk-diag-head .ui_tabs {
+        margin-left: 0;
+        padding-left: 0;
+        background: none;
+    }
+    .ovk-msg-sheet.vkify_likes_box .ovk-diag-head .ui_tab,
+    .ovk-msg-sheet.vkify_likes_box .ovk-diag-head .ui_tab_sel {
+        padding: 0;
+        margin: 0;
+        height: auto;
+        line-height: normal;
+        border-bottom: 0;
+        font-size: 16px;
+        color: var(--text-color--tertiary);
+    }
+    .ovk-msg-sheet.vkify_likes_box .fans_rows {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+        gap: 12px 8px;
+        padding: 12px 16px;
+    }
+    .ovk-msg-sheet.vkify_likes_box .fans_fan_row {
+        width: auto;
+        height: auto;
+        padding: 0;
+    }
+    .ovk-msg-sheet.vkify_likes_box .fans_fanph_wrap,
+    .ovk-msg-sheet.vkify_likes_box .fans_fan_ph,
+    .ovk-msg-sheet.vkify_likes_box .fans_fan_img {
+        width: 72px;
+        height: 72px;
+    }
+    .ovk-msg-sheet.vkify_likes_box #wk_likes_more_link {
+        margin: 4px 16px 16px;
+    }
+
     /* notes */
 
     #noteFactory .post_full_like_wrap {
