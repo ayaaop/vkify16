@@ -49,7 +49,7 @@
             }
         }, true);
 
-        u(document).on('click', '.sidebar a:not([href^="javascript:"])', () => {
+        u(document).on('click', '.sidebar a:not([href^="javascript:"]), #moreOptionsContent a:not([href^="javascript:"])', () => {
             if (body.classList.contains('menu-expanded')) {
                 closeSidebar();
             }
@@ -61,8 +61,13 @@
         }
 
         function closeSidebar() {
+            document.querySelectorAll('.sidebar .ui_actions_menu_wrap.shown').forEach(w => {
+                window.uiActionsMenu?.toggle?.(w, false, { immediate: true });
+            });
             body.classList.remove('menu-expanded');
-            body.classList.remove('dimmed');
+            if (!window.messagebox_stack?.length) {
+                body.classList.remove('dimmed');
+            }
         }
 
         function updateHamburgerBadge() {

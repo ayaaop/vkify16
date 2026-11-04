@@ -106,8 +106,15 @@ vkify.once('uiActionsMenu', function () {
   }
 
   function isBlockedPortal(el, options) {
-    return document.body.classList.contains('dimmed') &&
-      (options.appendParentCls || hasClass(el, 'ui_actions_menu_dummy_wrap') || data(el, 'dummyMenu'));
+    if (!document.body.classList.contains('dimmed')) return false;
+    const source = data(el, 'origMenu') || el;
+    if (source?.closest?.('.ovk-msg-all, .ovk-diag-cont, .ovk-photo-view-dimmer')) {
+      return false;
+    }
+    if (document.body.classList.contains('menu-expanded') && source?.closest?.('.sidebar')) {
+      return false;
+    }
+    return Boolean(options.appendParentCls || hasClass(el, 'ui_actions_menu_dummy_wrap') || data(el, 'dummyMenu'));
   }
 
   function applyAppendParent(el, options) {
@@ -415,7 +422,7 @@ vkify.once('uiActionsMenu', function () {
 
     toggle(el, s, options = {}) {
       const dummyMenu = data(el, 'dummyMenu');
-      const origEl = el;
+      const origEl = data(el, 'origMenu') || el;
       if (dummyMenu) el = dummyMenu;
 
       // clicking inside an open menu should close it — but only when the
@@ -680,11 +687,12 @@ vkify.once('uiActionsMenu', function () {
 
     // outside click
     document.querySelectorAll('.ui_actions_menu_wrap.shown').forEach(openWrap => {
-      if (!openWrap.contains(ev.target)) {
-        const dummy = data(openWrap, 'dummyMenu');
-        if (dummy && dummy.contains(ev.target)) return;
-        uiActionsMenu.toggle(openWrap, false);
-      }
+      const orig = data(openWrap, 'origMenu');
+      const dummy = data(openWrap, 'dummyMenu');
+      if (openWrap.contains(ev.target)) return;
+      if (orig && orig.contains(ev.target)) return;
+      if (dummy && dummy.contains(ev.target)) return;
+      uiActionsMenu.toggle(orig || openWrap, false);
     });
   }, true);
 
