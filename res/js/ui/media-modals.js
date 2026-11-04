@@ -895,6 +895,7 @@ vkify.once('mediaModals', function () {
 
         this._getCurrentEntryCacheNode().last().innerHTML = entry.cached;
         this.modal.getNode().find('#ovk-player-info .bsdn').nodes.forEach(item => bsdnInitElement(item));
+        window.bsdnHydrate?.();
     };
 
     PostViewer.prototype.createMsgbox = function () {

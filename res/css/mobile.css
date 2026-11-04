@@ -2293,18 +2293,19 @@
         display: block;
     }
 
-    /* bsdn player */
-    .bsdn-player .bsdn_controls {
+    /* video player */
+    .videoplayer .videoplayer_controls {
         height: 52px;
     }
-    .bsdn-player .bsdn_soundControl {
+    .videoplayer .videoplayer_volume {
         display: none;
     }
-    .bsdn-player .bsdn_terebilkaBrick {
+    .videoplayer .videoplayer_slider ._handle {
+        visibility: visible;
         opacity: 1;
         transform: scale(1);
     }
-    .bsdn-player .bsdn_contextMenuElement {
+    .videoplayer .videoplayer_context_menu ._item {
         padding: 12px 20px;
     }
     .video_info {
@@ -2916,6 +2917,7 @@
     .module.video_module .video {
         width: 100%;
         height: 100%;
+        border-radius: 0;
     }
 
     .msm-grid {

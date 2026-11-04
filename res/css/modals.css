@@ -645,20 +645,22 @@ input.vkify_inline_edit_field {
   aspect-ratio: 16 / 9;
 }
 
-.ovk-modal-video-window #player-infos .center-part .bsdn_video {
+.ovk-modal-video-window #player-infos .center-part .bsdn_video,
+.ovk-modal-video-window #player-infos .center-part .videoplayer,
+.ovk-modal-video-window #player-infos .center-part .videoplayer_media {
   width: 100%;
   height: 100%;
 }
 
-.ovk-modal-video-window #player-infos .center-part .bsdn_video > video {
+.ovk-modal-video-window #player-infos .center-part .bsdn_video > video,
+.ovk-modal-video-window #player-infos .center-part .videoplayer_media_provider {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
 .ovk-modal-video-window #player-infos .bottom-part {
-  height: auto;
-  flex: 0 0 auto;
+  display: none;
 }
 
 .ovk-modal-player-window #ovk-player-part {
@@ -751,7 +753,8 @@ input.vkify_inline_edit_field {
   font-weight: 400;
 }
 
-.ovk-modal-video-window .ovk-vid-details .video_info {
+.ovk-modal-video-window .ovk-vid-details .video_info,
+.video_block_layout .wl_post_reply_form_forbidden {
   padding: 20px;
 }
 
@@ -866,7 +869,8 @@ input.vkify_inline_edit_field {
 
 .ovk-photo-view-dimmer.ovk-msg-minimized .ovk-modal-video-window .center-part iframe,
 .ovk-photo-view-dimmer.ovk-msg-minimized .ovk-modal-video-window .center-part .bsdn,
-.ovk-photo-view-dimmer.ovk-msg-minimized .ovk-modal-video-window .center-part .bsdn-player {
+.ovk-photo-view-dimmer.ovk-msg-minimized .ovk-modal-video-window .center-part .bsdn-player,
+.ovk-photo-view-dimmer.ovk-msg-minimized .ovk-modal-video-window .center-part .videoplayer {
   width: 100% !important;
   height: 100% !important;
   position: relative !important;
