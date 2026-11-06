@@ -188,7 +188,7 @@
                                             1 => ['act' => 'rem', 'label' => tr('leave_community'), 'class' => 'button_gray']
                                         ]}
                                         {if isset($actions[$subStatus ? 1 : 0])}
-                                            <form action="/setSub/club" method="post" class="profile_link_form fl_l" style="width: 100%">
+                                            <form action="/setSub/club" method="post" class="profile_link_form vk-friend-action fl_l" style="width: 100%">
                                                 <input type="hidden" name="act" value="{$actions[$subStatus ? 1 : 0]['act']}" />
                                                 <input type="hidden" name="id"  value="{$dat->getId()}" />
                                                 <input type="hidden" name="hash" value="{$csrfToken}" />

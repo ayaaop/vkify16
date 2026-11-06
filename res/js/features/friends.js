@@ -15,7 +15,7 @@ vkify.bindOnce('friendActions', () => {
         const pageUrl = location.href;
         const controls = row.querySelector('.action_links');
         if (controls?.dataset.pending === '1') return;
-        if (button) button.disabled = true;
+        if (button) window.LoaderUtils?.showInButton(button);
         if (controls) controls.dataset.pending = '1';
         controls?.classList.add('action_progress');
 
@@ -75,7 +75,7 @@ vkify.bindOnce('friendActions', () => {
             console.error('[vkify16] Friend action:', error);
             if (typeof showSystemMsg === 'function') showSystemMsg(window.tr?.('error') || 'Error', 'err');
         } finally {
-            if (button) button.disabled = false;
+            if (button) window.LoaderUtils?.restoreButton(button);
             controls?.classList.remove('action_progress');
             if (controls) delete controls.dataset.pending;
         }
