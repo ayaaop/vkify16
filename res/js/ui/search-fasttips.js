@@ -48,7 +48,7 @@ const audioModuleTpl = Hb.compile(
         '<div class="module_body clear_fix">' +
             '<div class="content_list long">' +
                 '{{#each items}}' +
-                    '<div id="audioEmbed-fasttip-{{id}}" data-realid="{{id}}" data-name="{{name}}" data-genre="{{genre}}" class="audioEmbed ctx_place{{#if isWithdrawn}} withdrawn{{/if}}" data-length="{{length}}" data-keys="{{{keysJson}}}" data-url="{{url}}">' +
+                    '<div id="audioEmbed-fasttip-{{id}}" data-realid="{{id}}" data-name="{{name}}" data-genre="{{genre}}" class="audioEmbed ctx_place{{#if isWithdrawn}} withdrawn{{/if}}" data-length="{{length}}" data-keys="{{keysJson}}" data-url="{{url}}">' +
                         '<audio class="audio"></audio>' +
                         '<div id="miniplayer" class="audioEntry">' +
                             '<div class="audioEntryWrapper" draggable="true">' +
@@ -163,6 +163,75 @@ const resultsTpl = Hb.compile(
     '{{/if}}'
 );
 
+document.addEventListener('click', async (e) => {
+    const button = e.target.closest('.audioEntry .playerButton > .playIcon');
+    const embed = button?.closest('.audioEmbed');
+    const pageList = embed?.closest('.page_search.audiosContainer');
+    const tipList = embed?.closest('#searchBoxFastTips .audio_module .content_list');
+    const player = window.player;
+    if ((!pageList && !tipList) || !player?.audioPlayer || !embed || !button) return;
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    const id = Number(embed.dataset.realid);
+    if (!id || embed.matches('.processed, .withdrawn')) return;
+    const url = location.pathname + location.search;
+
+    if (pageList) {
+        const pageContext = window.__current_page_audio_context;
+        if (!pageContext) return;
+        if (player.context.object?.url !== url || player.context.object?.name !== pageContext.name) {
+            player.__resetContext();
+            player.context.object = { url, ...pageContext };
+            await player.loadContext(pageContext.page ?? 1);
+        }
+
+        const context = player.context;
+        let high = context.playedPages.length ? Math.max(...context.playedPages) : 0;
+        let low = context.playedPages.length ? Math.min(...context.playedPages) : 1;
+        while (!player.hasTrackWithId(id) && (high < context.pagesCount || low > 1)) {
+            if (high < context.pagesCount) await player.loadContext(++high, true);
+            if (!player.hasTrackWithId(id) && low > 1) await player.loadContext(--low, false);
+        }
+    } else if (player.__container_node !== tipList || player.context.object?.name !== 'fasttip_search' || !player.hasTrackWithId(id)) {
+        player.__resetContext();
+        player.__container_node = tipList;
+        player.connectionType = '.content_list';
+        player.context.object = { url, name: 'fasttip_search' };
+        player.context.pagesCount = 1;
+        player.context.playedPages = [1];
+        tipList.querySelectorAll('.audioEmbed:not(.withdrawn):not(.processed)').forEach(row => {
+            const trackId = Number(row.dataset.realid);
+            if (!trackId || player.hasTrackWithId(trackId)) return;
+            const [performer, ...title] = (row.dataset.name || '').split(' — ');
+            player.appendTrack({
+                id: trackId,
+                name: title.join(' — '),
+                performer,
+                length: Number(row.dataset.length),
+                url: row.dataset.url,
+                keys: JSON.parse(row.dataset.keys || '{}'),
+                available: true,
+            });
+        });
+    }
+
+    if (!player.hasTrackWithId(id)) return;
+    const changed = player.current_track_id != id;
+    if (changed) await player.setTrack(id);
+    if (changed || player.audioPlayer.paused) {
+        await player.play();
+    } else {
+        player.pause();
+    }
+    if (tipList || !player.isAtAudiosPage()) {
+        player.linkPlayer(u(embed));
+        u('.audioEntry .subTracks.shown').removeClass('shown');
+        u(embed).find('.subTracks').addClass('shown');
+    }
+}, true);
+
 vkify.once("initializeSearchFastTips", () => {
     vkify.initializeSearchFastTipsSafe = function () {
         const searchInput = u('#search_box input[type="search"]');
@@ -255,7 +324,7 @@ vkify.once("initializeSearchFastTips", () => {
                             count: audiosd.count,
                             items: (audiosd.items || []).slice(0, 3).map(item => ({
                                 id: item.id,
-                                name: Hb.escapeExpression(item.artist + ' — ' + item.title),
+                                name: item.artist + ' — ' + item.title,
                                 performer: item.artist,
                                 title: item.title,
                                 length: item.duration,
@@ -322,23 +391,6 @@ vkify.once("initializeSearchFastTips", () => {
                         }));
 
                         setTimeout(() => {
-                            if (window.player && audiosd.count > 0) {
-                                window.player.tracks = audiosd.items.map(item => ({
-                                    id: item.id,
-                                    name: item.title,
-                                    performer: item.artist,
-                                    length: item.duration,
-                                    url: item.manifest || item.url,
-                                    keys: item.keys
-                                }));
-                                window.player.context.object = {
-                                    url: location.pathname + location.search
-                                };
-                                window.player.context.pagesCount = 1;
-                                window.player.context.count = audiosd.count;
-                                window.player.context.playedPages = [1];
-                            }
-
                             u('#searchBoxFastTips a').on('click', function () {
                                 hideFastTips();
                             });

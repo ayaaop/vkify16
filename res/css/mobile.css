@@ -2490,7 +2490,8 @@
     .audiosSideContainer .scroll_node:not(:last-child) .audioEmbed,
     .attachments .audios_attachment:not(:last-child),
     .AudioPlaylistSnippet__audioRow:not(:last-child),.AudioPlaylistSnippet .ActionButton--shuffle,
-     .ovk-msg-sheet .audio_attachment_header {
+     .ovk-msg-sheet .audio_attachment_header,
+     .search_content:not(:last-child) .audioEmbed {
         margin-bottom: 10px;
     }
     .musfooter {
