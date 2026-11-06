@@ -127,6 +127,7 @@ input[type="radio"] {
     vertical-align: middle;
     background-repeat: no-repeat;
     flex-shrink: 0;
+    border-radius: 0!important;
 }
 
 label.field {
@@ -1221,12 +1222,14 @@ input.ui_search_field::-webkit-search-results-decoration {
 }
 input.ui_search_field::placeholder,
 input[type~="text"]::placeholder,
-textarea::placeholder {
+textarea::placeholder,
+.content-editable:empty::before {
     color: var(--input-placeholder-color);
 }
 input.ui_search_field:focus::placeholder,
 input[type~="text"]:focus::placeholder,
-textarea:focus::placeholder {
+textarea:focus::placeholder
+.content-editable:empty:focus::before {
     color: var(--input-placeholder-color--focus);
 }
 body .ui_search_reset {

@@ -455,6 +455,9 @@ input.vkify_inline_edit_field {
 }
 
 /* telegram photo viewer */
+.ovk-photo-view-dimmer.with-roll {
+  padding: 0; /* evidently not implemented properly yet */
+}
 .ovk-photo-view-dimmer.mode-tg .ovk-photo-view-window {
   min-width: 0;
   max-width: none;

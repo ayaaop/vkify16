@@ -487,6 +487,7 @@ table.ugc-table * {
   font-size: 13px;
   width: fit-content !important;
   text-transform: lowercase;
+  margin: 0 auto;
 }
 
 .page_counter:hover .label {

@@ -1127,7 +1127,6 @@ body #im_container .crp-list {
         grid-area: name;
         justify-self: end;
         align-self: center;
-        margin-right: 2px;
     }
 
     .crp-entry--excess {
@@ -1136,6 +1135,8 @@ body #im_container .crp-list {
         margin: 0;
         flex-direction: row;
         gap: 0;
+        min-width: 70px;
+        text-align: right;
 
         span {
             font-size: 12.5px;
@@ -1306,6 +1307,12 @@ body #im_container.compact .crp-list .crp-entry--message---av {
 
 .messenger-app--tab-friends .friends-list .friends-list-item img {
     border-radius: 50%;
+}
+
+.messenger-app--tab-friends .friends-list .friends-list-online {
+    color: var(--text-color--secondary);
+    display: block;
+    margin: 2px 0 0;
 }
 
 .friends-list-top>div[style^="display: grid"] {
@@ -4164,6 +4171,11 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 #im_container.compact .peer-window .peer-back,
 #im_container.compact .peer-window .peer-info,
 #im_container.compact .peer-window .peer-block {
+    border-left: 0;
+}
+
+#im_container.compact .peer-window .peer-back {
+    border: 1px solid var(--border-color);
     border-left: 0;
 }
 

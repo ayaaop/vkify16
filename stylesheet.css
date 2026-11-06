@@ -1311,6 +1311,9 @@ body.scrolled .toTop:hover #wrap {
     margin: 0;
     height: unset;
 }
+.audioEntry .status strong {
+    color: var(--text-color--tertiary)
+}
 
 #upload_container,
 #audio_upload {

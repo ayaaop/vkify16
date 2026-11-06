@@ -779,10 +779,6 @@
         line-height: 1;
         margin: 0;
     }
-    body:not(.mode-2018).no-post-views {
-        width: 100%;
-        padding: 14px 6px;
-    }
     body.mode-2018 .post_full_like .action_count {
         width: 33px;
         display: inline-block;
@@ -3100,11 +3096,12 @@
     .ovk-msg-sheet .group_info_row {
         font-size: 14px;
         line-height: 20px;
+        padding-left: 0;
         position: relative;
         cursor: text;
     }
     .ovk-msg-sheet .group_info_row::before {
-        top: 1px;
+        display: none
     }
     .ovk-msg-sheet .group_info_row .line_value {
         position: relative;

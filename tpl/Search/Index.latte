@@ -128,7 +128,7 @@
                                         <div class="labeled" n:if="$dat->getCity()">
                                             {$dat->getCity()}
                                         </div>
-                                        <div claass="labeled">
+                                        <div class="labeled">
                                             {$dat->isFemale() ? tr("female") : ($dat->isNeutral() ? tr("neutral") : tr("male"))}
                                         </div>
                                     </div>
@@ -170,6 +170,9 @@
                                         <div class="labeled name">
                                             <a href="{$dat->getURL()}">
                                                 {$dat->getCanonicalName()}
+                                                {if $order == "id"}
+                                                    (id{$dat->getId()})
+                                                {/if}
                                             </a>
                                             <a class="page_verified"
                                                 n:if="$dat->isVerified()" href="/verify"></a>
@@ -217,6 +220,9 @@
                                         <div class="labeled name">
                                             <a href="{$dat->getURL()}">
                                                 {$dat->getCanonicalName()}
+                                                {if $order == "id"}
+                                                    (id{$dat->getId()})
+                                                {/if}
                                             </a>
                                             <a class="page_verified"
                                                 n:if="$dat->isVerified()" href="/verify"></a>
@@ -266,7 +272,9 @@
                                 </script>
                             {elseif $section === 'posts'}
                                 {foreach $data as $dat}
-                                    {if !$dat || $dat->getWallOwner()->isHideFromGlobalFeedEnabled()}
+                                    {var $wallOwner = $dat ? $dat->getWallOwner() : null}
+                                    {var $postOwner = $dat ? $dat->getOwner() : null}
+                                    {if !$dat || !$wallOwner || !$postOwner || $wallOwner->isHideFromGlobalFeedEnabled()}
                                         <div class="page_block page_padding">
                                             <div class="closedWallPost">{_closed_group_post}.</div>
                                         </div>
