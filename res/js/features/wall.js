@@ -48,7 +48,11 @@ function renderEditMenuLayout(apiPost, type, postId) {
         ? `<label class="checkbox"><input type="checkbox" name="as_group" ${apiPost.from_id < 0 ? 'checked' : ''} /><span>${tr('post_as_group')}</span></label>`
         : '';
 
-    const postOptsItems = `${nsfwOpt}${asGroupOpt}`;
+    const sourceOpt = type === 'post'
+        ? `<div class="separator"></div><a id="__sourceAttacher" class="attach_source">${attachIcon('source')}${tr('set_source')}</a>`
+        : '';
+
+    const postOptsItems = `${nsfwOpt}${asGroupOpt}${sourceOpt}`;
     const postOptsTrigger = type === 'post' && postOptsItems
         ? `<div class="post-opts-trigger ui_actions_menu_wrap" onclick="if (event.target.closest('.ui_actions_menu')) return; uiActionsMenu.toggle(this, null, {autopos: true});" onmouseover="uiActionsMenu.show(this);" onmouseout="uiActionsMenu.hide(this);">
             <div class="post_settings" id="postOptsTrigger${postId}" role="button">
@@ -88,10 +92,6 @@ function renderEditMenuLayout(apiPost, type, postId) {
             <a class="attach_note" id="__notesAttachment">
                 ${attachIcon('note')}
                 ${tr('note')}
-            </a>
-            <a class="attach_source" id="__sourceAttacher">
-                ${attachIcon('source')}
-                ${tr('source')}
             </a>
         `
         : `
@@ -518,6 +518,70 @@ function bindSourceButtonOrderFix() {
     });
 }
 
+function bindEditMenuSourceAttacher() {
+    if (!vkify.bindOnce('editMenuSourceAttacher', bindEditMenuSourceAttacher)) return;
+    document.addEventListener('click', (e) => {
+        const attacher = e.target.closest?.('#__sourceAttacher');
+        const menu = attacher?.closest?.('.edit_menu');
+        if (!menu) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        MessageBox(tr('add_source'), `
+            <div id='source_flex_kunteynir'>
+                <span>${tr('set_source_tip')}</span>
+                <input type='text' maxlength='400' placeholder='...'>
+            </div>
+        `, [tr('cancel')], [Function.noop]);
+
+        const removeDialog = () => {
+            u('body').removeClass('dimmed');
+            document.querySelector('html').style.overflowY = 'scroll';
+            u('.ovk-diag-cont').remove();
+        };
+
+        u('.ovk-diag-action').prepend(`<button class='button' id='__setsrcbutton'>${tr('set_source')}</button>`);
+
+        u('#__setsrcbutton').on('click', async (ev) => {
+            const sourceInput = u('#source_flex_kunteynir input[type="text"]');
+            const sourceValue = sourceInput.nodes[0]?.value ?? '';
+            if (sourceValue.length < 1) return;
+
+            ev.target.classList.add('lagged');
+
+            const res = await fetch(`/method/wall.checkCopyrightLink?auth_mechanism=roaming&link=${encodeURIComponent(sourceValue)}`);
+            const check = await res.json();
+
+            if (check.error_code) {
+                removeDialog();
+                const key = { 3103: 'error_adding_source_long', 3104: 'error_adding_source_sus' }[check.error_code] || 'error_adding_source_regex';
+                fastError(tr(key));
+                return;
+            }
+
+            removeDialog();
+
+            const sourceOutput = menu.querySelector("input[name='source']");
+            const escaped = escapeHtml(sourceValue);
+            const postSource = menu.querySelector('.post-source');
+            if (sourceOutput) {
+                sourceOutput.setAttribute('value', sourceValue);
+                sourceOutput.value = sourceValue;
+            }
+            if (postSource) {
+                postSource.innerHTML = `
+                    <span>${tr('source')}: <a target='_blank' href='${escaped}'>${ovk_proc_strtr(escaped, 50)}</a></span>
+                    <div id='remove_source_button'></div>
+                `;
+                postSource.querySelector('#remove_source_button').onclick = () => {
+                    postSource.innerHTML = '';
+                    if (sourceOutput) sourceOutput.value = 'none';
+                };
+            }
+        });
+    }, true);
+}
+
 function vkifyDeleteModalComment(link) {
     const msgbox = link.closest('.ovk-msg-all');
     const comment = link.closest('.post');
@@ -648,6 +712,7 @@ function bindWallBeforeUnloadGuard() {
 
 bindCommentCancelOnce();
 bindSourceButtonOrderFix();
+bindEditMenuSourceAttacher();
 bindWallAjaxActions();
 bindAjaxPostCleanup();
 bindWallBeforeUnloadGuard();
