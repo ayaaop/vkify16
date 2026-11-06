@@ -4088,7 +4088,9 @@ h4.gifts_section_header {
     margin-top: 0;
 }
 .search_option_content input + input,
-.search_option_content label select {
+.search_option_content label select,
+.search_option_content label:not(.checkbox,.radio,:first-child),
+.search_option_content :is(select,input) + label {
     margin-top: 10px;
 }
 

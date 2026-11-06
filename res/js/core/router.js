@@ -1114,6 +1114,55 @@ window.initializeSearchOptions = function () {
         };
         resetButton.addEventListener('click', resetButton._searchResetHandler);
     }
+
+    const filterFab = ge('search_filter_fab');
+    if (filterFab) {
+        filterFab.onclick = () => {
+            if (window.messagebox_stack?.some(box => box.unique_name === 'search_filters_sheet')) return;
+
+            const filters = searchOptionsContainer.cloneNode(true);
+            filters.removeAttribute('id');
+            filters.removeAttribute('style');
+            filters.className = 'search_filters_sheet';
+            filters.querySelector('#search_reset')?.remove();
+
+            const originalControls = [...searchOptionsContainer.querySelectorAll('input:not([type="button"]), select')];
+            const sheetControls = [...filters.querySelectorAll('input, select')];
+            sheetControls.forEach((control, index) => {
+                control.removeAttribute('form');
+                control.value = originalControls[index].value;
+                if (control.type === 'checkbox' || control.type === 'radio') {
+                    control.checked = originalControls[index].checked;
+                }
+            });
+
+            const sheet = new CMessageBox({
+                title: tr('search'),
+                body: '<div class="search_filters_sheet"></div>',
+                unique_name: 'search_filters_sheet',
+                close_on_buttons: false,
+                buttons: [tr('apply'), tr('reset')],
+                callbacks: [
+                    () => {
+                        sheetControls.forEach((control, index) => {
+                            originalControls[index].value = control.value;
+                            if (control.type === 'checkbox' || control.type === 'radio') {
+                                originalControls[index].checked = control.checked;
+                            }
+                        });
+                        sheet.close();
+                        performAjaxSearch();
+                    },
+                    () => {
+                        sheet.close();
+                        resetButton?.click();
+                    }
+                ]
+            });
+            sheet.getNode().addClass('ovk-msg-sheet', 'search_filters_dialog');
+            sheet.getNode().nodes[0].querySelector('.search_filters_sheet').replaceWith(filters);
+        };
+    }
 };
 
 window.initializeSearchOptionToggle = function () {
@@ -1173,3 +1222,7 @@ vkify.onPageLifecycle('afterPageReady', () => {
         window.initializeSearchOptionToggle?.();
     }
 }, 'after');
+
+vkify.onPageLifecycle('beforePageLeave', () => {
+    window.messagebox_stack?.find(box => box.unique_name === 'search_filters_sheet')?.close();
+});
