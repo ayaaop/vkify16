@@ -1765,7 +1765,6 @@
     .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-horizontal,
     .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-horizontal {
         flex: none;
-        margin: 8px 16px 0 !important;
         padding: 0 !important;
     }
     .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-vertical,
@@ -1831,16 +1830,17 @@
     .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-repost:not(:empty),
     .ovk-msg-fullscreen #_edit_post_modal .post-buttons .post-source:not(:empty),
     .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-has-geo:not(:empty),
+    .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-has-poll:not(:empty),
     .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-source:not(:empty),
     .ovk-msg-fullscreen #_new_post_modal .post-buttons .post-replyto:not(:empty) {
-        padding: 4px 16px;
+        padding: 0 16px;
     }
     .ovk-msg-fullscreen #_edit_post_modal .post-bottom-acts,
     .ovk-msg-fullscreen #_new_post_modal .post-bottom-acts {
         flex: none;
         margin-top: auto;
         padding: 16px 0 calc(16px + env(safe-area-inset-bottom, 0px)) !important;
-        margin: 16px 16px 0;
+        margin: 0 16px 0;
         border-top: 1px solid var(--border-color);
         background-color: var(--page-background-color);
     }
@@ -1970,10 +1970,14 @@
         height: auto !important;
         float: none !important;
     }
+    .attachment .media,
+    .attachments .docGalleryItem.embeddable img {
+        max-height: clamp(320px, 60svh, 900px);
+    }
     .attachments_b:not(.makima) .attachment img.media_makima {
         width: 100% !important;
         height: auto !important;
-        max-height: 70vh !important;
+        max-height: 70svh !important;
         object-fit: contain !important;
     }
     .attachments_b:not(.makima) .attachment .compact_video {
@@ -2367,7 +2371,7 @@
 
     /* audio page */
     .audiosDiv {
-        padding: 16px!important;
+        padding: 16px 7px 16px 16px!important;
     }
     .audioEntry .audioEntryWrapper,
     .messenger-app--messages---message .audioEmbed.msg-attach-audio-player .audioEntryWrapper,

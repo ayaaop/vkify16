@@ -454,6 +454,20 @@ input.vkify_inline_edit_field {
   transition: 0.2s;
 }
 
+.pv_right .wl_post_reply_form_forbidden {
+  text-align: center;
+  background: none;
+}
+
+.pv_right .page_block.comments:not(:has(> .scroll_container)) > .wl_post_reply_form_forbidden {
+  border-top: 0;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* telegram photo viewer */
 .ovk-photo-view-dimmer.with-roll {
   padding: 0; /* evidently not implemented properly yet */
@@ -976,11 +990,6 @@ input.vkify_inline_edit_field {
   margin-top: 15px;
   line-height: 1.46em;
 }
-.video_like_wrap.my_like .video_like_button .action_icon {
-  opacity: 1;
-  -webkit-filter: none;
-  filter: none;
-}
 .video_like_button .action_count {
   margin: 0;
   color: var(--accent-text-color);
@@ -988,41 +997,20 @@ input.vkify_inline_edit_field {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-.video_like_button .action_icon {
-  background: url(../icons/video_actions.png?8)
-    no-repeat 0 0;
-  float: left;
-  height: 10px;
-  width: 13px;
-  opacity: 0.4;
-  transition: opacity 0.2s ease;
-}
-@media (min-resolution: 192dpi) {
-  .video_like_button .action_icon {
-    background-image: url(../icons/video_actions_2x.png?8);
-    background-size: 19px 199px;
-  }
-}
 .video_like_button .action_label {
   float: left;
   margin-left: 0;
   margin-top: 0;
 }
-
-.video_share_button .action_icon {
-  background: url(../icons/video_actions.png?8)
-    no-repeat 0 -44px;
-  height: 13px;
-  width: 12px;
-  margin-bottom: -2px;
-  display: inline-block;
-  position: relative;
+body:not(.mode-2018) .video_info_actions .video_like_button .action_icon {
+  width: 13px !important;
+  height: 10px !important;
+  color: #fff;
+  opacity: .4;
 }
-@media (min-resolution: 192dpi) {
-  .video_share_button .action_icon {
-    background-image: url(../icons/video_actions_2x.png?8);
-    background-size: 19px 199px;
-  }
+body:not(.mode-2018) .video_info_actions .video_share_button .action_icon {
+  width: 12px !important;
+  height: 13px !important;
 }
 .video_edit_button .action_icon {
   background: url(../icons/video_actions.png?8)
@@ -1426,18 +1414,24 @@ input.vkify_inline_edit_field {
 .ovk-diag-body .audios_tab_content {
   padding: 5px 0;
 }
-.audio_search_type {
-  width: 140px;
-  padding: 10px 9px 9px;
-  margin-left: 10px;
+.audios_search_container .audio_search_type {
+  position: absolute;
+  top: 50%;
+  right: 94px;
+  transform: translateY(-50%);
+  z-index: 5;
 }
 .audios_search_container {
   margin-bottom: 10px;
   display: flex;
   align-items: center;
+  position: relative;
 }
 .audios_search_container .ui_search.ui_search_new {
   flex: 1 1 0;
+}
+.audios_search_container .ui_search_new input.ui_search_field {
+  padding-right: 160px;
 }
 .ovk-diag-body .audiosInsert {
   height: unset;

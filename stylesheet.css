@@ -673,7 +673,8 @@ body.scrolled .toTop:hover #wrap {
 }
 .top_audio_player.audio_top_btn_active,
 .shown .top_nav_btn,
-#userMenuTrigger.shown {
+.end_navigation .ui_actions_menu_wrap.shown .link,
+.home_navigation #top_notify_btn_div[aria-expanded="true"] .top_nav_btn {
     background-color: var(--header-background-color--active);
 }
 .top_nav_btn#headerMusicBtn .top_nav_btn_icon {
@@ -692,7 +693,8 @@ body.scrolled .toTop:hover #wrap {
     background-position: -35px -32px;
 }
 .shown .top_nav_btn#top_notify_btn .top_nav_btn_icon,
-.top_nav_btn#top_notify_btn.has_notify .top_nav_btn_icon {
+.top_nav_btn#top_notify_btn.has_notify .top_nav_btn_icon,
+.home_navigation #top_notify_btn_div[aria-expanded="true"] .top_nav_btn .top_nav_btn_icon {
     background-position: -65px -32px;
 }
 
@@ -2007,7 +2009,7 @@ table,
         .post-has-geo.appended-geo
     ) {
     padding: 0 20px 0;
-    margin: 0;
+    margin: 0 0 10px;
 }
 .composer.model_content_textarea .post-horizontal:not(:empty) + .post-vertical:not(:empty) {
     margin-top: 10px;
@@ -2015,6 +2017,7 @@ table,
 .composer.model_content_textarea :is(.post-vertical, .post-source, .post-repost):not(:empty),
 .post-buttons :is(.post-vertical, .post-source, .post-repost):not(:empty) {
     margin-top: 10px;
+    margin-bottom: 10px;
 }
 .vertical-attachment.upload-item {
     gap: 10px;
@@ -2246,7 +2249,6 @@ table,
     padding-top: 5px;
 }
 .composer.model_content_textarea.shown .post-bottom-acts {
-    margin-top: 10px;
     background-color: var(--page-header-background-color);
     padding: 15px 20px;
     border-top: 1px solid var(--border-color);
@@ -2279,6 +2281,7 @@ body:not(.body_im) .post-geo::before {
     opacity: 0.7;
     content: "";
     display: inline-block;
+    margin-left: 0;
     margin-right: 4px;
     background-color: var(--post-attach-icon-color);
     -webkit-mask-image: var(--post-icon-mask);
@@ -2337,7 +2340,7 @@ body:not(.body_im) .post-upload::before {
     display: block !important;
 }
 .composer.model_content_textarea .post-horizontal.vkify_makima_composer:not(:empty) {
-    margin: 6px 20px 0;
+    margin: 0 20px 10px;
     padding: 0;
 }
 .module_body .post-horizontal.vkify_makima_composer:not(:empty) {
@@ -2542,6 +2545,13 @@ html.vkify-composer-dragging * {
     min-width: 0;
     box-sizing: border-box;
     overflow: hidden;
+}
+@media (min-width: 768px) { 
+    :is(.post-buttons, .post-vertical) .vertical-attachment.upload-item[data-type="audio"] {
+        margin-left: -10px;
+        width: calc(100% + 10px);
+        max-width: calc(100% + 10px);
+    }
 }
 :is(.post-buttons, .post-vertical) .vertical-attachment .vertical-attachment-content {
     flex: 1 1 0%;

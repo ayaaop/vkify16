@@ -126,7 +126,7 @@ vkify.once("initNotificationsPopup", () => {
                     paginator.remove();
                 }
             }
-            return notificationsContainer.innerHTML + `<a href="/notifications" class="top_notify_show_all">${tr('show_more')}</a>`;
+            return notificationsContainer.innerHTML + `<a href="/notifications;" onclick="window.router.route('/notifications'); return false;" class="top_notify_show_all">${tr('show_more')}</a>`;
         }
 
         return `<div class="no_notifications">${tr('no_data_description')}</div>`;

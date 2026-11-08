@@ -248,12 +248,32 @@ textarea,
     line-height: 16px;
 }
 
+input[type="email"],
+input[type="number"],
+input[type="password"],
+input[type="phone"],
+input[type="text"],
+input[type~="date"],
+input[type~="time"],
+input[type~="datetime-local"],
+input[type~="email"],
+input[type~="password"],
+input[type~="phone"],
+input[type~="text"],
+input[type="url"], input[type~="url"],
+select,
+textarea {
+    height: 31px;
+    box-sizing: border-box;
+}
+
 textarea {
     background-color: var(--page-background-color);
     color: var(--text-color);
     margin: 0;
     border: 1px solid var(--border-color--tertiary);
-    min-height: 60px;
+    height: 62px;
+    min-height: 62px;
 }
 
 input.big_text {
@@ -1199,6 +1219,7 @@ a.ui_crumb {
     border-radius: 2px 2px 0 0;
 }
 input.ui_search_field {
+    height: unset;
     padding: 14px 44px 13px 48px;
     font-size: 13px;
     box-sizing: border-box;
@@ -1311,14 +1332,11 @@ body .ui_search_field_empty .ui_search_reset {
     margin: 15px;
     border-bottom: none;
 }
-.ui_search_new .ui_search_input_block {
-    overflow: hidden;
-}
 .ui_search_new .ui_search_input_inner {
     border: 1px solid var(--border-color--tertiary);
     border-right: none;
-    border-radius: 2px 0 0 2px;
-    overflow: hidden;
+    border-radius: var(--page-border-radius) 0 0 var(--page-border-radius);
+    width: calc(100% - 48px);
     position: relative;
 }
 .ui_search_new input.ui_search_field {
@@ -1349,7 +1367,7 @@ body .ui_search_field_empty .ui_search_reset {
     margin: 0;
     float: right;
     border: 1px solid var(--border-color--tertiary);
-    border-radius: 0 2px 2px 0;
+    border-radius: 0 var(--page-border-radius) var(--page-border-radius) 0;
     cursor: pointer;
 }
 .ui_search_new .ui_search_button_search:hover {
