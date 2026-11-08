@@ -39,12 +39,12 @@
                         {var $liked = $video->hasLikeFrom($thisUser)}
                         {var $likesCount = $video->getLikesCount()}
                         <a href="/video{$video->getPrettyId()}/like?hash={rawurlencode($csrfToken)}" class="video_like_button button video_like_wrap" onmouseover="vkifyLikesShow(this)" data-liked="{(int) $liked}" data-likes="{$likesCount}" data-id="{$video->getPrettyId()}" data-type='video'>
-                            <i class="action_icon" id="{if $liked}liked{/if}"></i>
+                            <svg class="action_icon" id="{if $liked}liked{/if}"><use class="i16" href="#like-16" width="100%" height="100%"/><use class="i18" href="#like-outline-24" width="100%" height="100%"/><use class="i18 iact" href="#like-active-24" width="100%" height="100%"/></svg>
                             <span class="action_label">{tr('mobile_like')}</span>
                             <span class="action_count">{if $likesCount > 0}{=vkifyFormatCountSpaced($likesCount)}{/if}</span>
                         </a>
                         <a onclick="javascript:repost({$video->getPrettyId()}, 'video')" class="video_share_button button button_light">
-                            <i class="action_icon"></i>
+                            <svg class="action_icon"><use class="i16" href="#share-14" width="100%" height="100%"/><use class="i18" href="#share-arrow-24" width="100%" height="100%"/></svg>
                             <span class="action_label">{tr('share')}</span>
                         </a>
                         <span class="video_info_more_actions ui_actions_menu_wrap" onmouseover="{='uiActionsMenu.show(this, null, {appendParentCls: "body"});'|noescape}" onmouseout="uiActionsMenu.hide(this);">
