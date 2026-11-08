@@ -318,6 +318,10 @@ body.vkify-force-classic label:has(> input#im\.modern_mode) {
     color: var(--im-back-text-color--hover);
 }
 
+.messenger-app-header--more-actions .ui_actions_menu {
+    --ui-actions-menu-distance: 0px;
+}
+
 .messenger-app--header--info {
     width: 70%;
     box-sizing: border-box;
@@ -3698,6 +3702,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 }
 
 .peer-window {
+    --peer-pencil-icon: url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M3%2011l2%202-.6.6-2.2.4c-.1%200-.2-.1-.2-.2l.4-2.2.6-.6zm1.5-1.5l7.2-7.2c.4-.4%201-.4%201.4%200l.6.6c.4.4.4%201%200%201.4l-7.2%207.2-2-2z%22%2F%3E%3C%2Fsvg%3E');
     max-width: none;
     margin: 0;
     padding: 0;
@@ -3764,6 +3769,24 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
 
     .peer-side .peer-info .peer-name .peer-link:hover {
         text-decoration: none;
+    }
+
+    .peer-side .peer-info .peer-name .peer-link.peer-title-editable::after {
+        content: '';
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        margin-left: 6px;
+        vertical-align: -2px;
+        background: var(--text-color--quaternary);
+        -webkit-mask: var(--peer-pencil-icon) center / contain no-repeat;
+        mask: var(--peer-pencil-icon) center / contain no-repeat;
+        opacity: 0.4;
+        transition: opacity 0.15s ease-in-out;
+    }
+
+    .peer-side .peer-info .peer-name .peer-link.peer-title-editable:hover::after {
+        opacity: 1;
     }
 
     /* seamless title editor */
@@ -3899,7 +3922,7 @@ body:not(.im_mobile) #im_container:not(.compact) .messenger-app--messages---mess
     }
 
     .peer-rows li#ava a::before {
-        background: var(--im-icon-color--blue) url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M3%2011l2%202-.6.6-2.2.4c-.1%200-.2-.1-.2-.2l.4-2.2.6-.6zm1.5-1.5l7.2-7.2c.4-.4%201-.4%201.4%200l.6.6c.4.4.4%201%200%201.4l-7.2%207.2-2-2z%22%2F%3E%3C%2Fsvg%3E') 50% no-repeat;
+        background: var(--im-icon-color--blue) var(--peer-pencil-icon) 50% no-repeat;
     }
 
     .peer-rows li#notify_toggle a::before {
