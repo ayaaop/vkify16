@@ -116,6 +116,13 @@ function isProcessingUrl(url) {
     return Boolean(url && String(url).includes('/video/rendering.'));
 }
 
+function videoPageUrl(videoId, timecode = null) {
+    const id = String(videoId || '');
+    const path = '/video' + (id.includes('_') && typeof idUrlFromArray === 'function' ? idUrlFromArray(id) : id);
+    if (!timecode) return path;
+    return path + (path.includes('?') ? '&' : '?') + 't=' + timecode;
+}
+
 function syncNotificationsHost() {
     const wrap = document.querySelector('.notifications_global_wrap');
     if (!wrap) return;
@@ -535,7 +542,7 @@ class VKVideoPlayer {
         this.titleEl.style.display = 'none';
         this.titleLink = document.createElement('a');
         this.titleLink.className = 'videoplayer_title_link' + (this.videoId ? ' _clickable' : '');
-        if (this.videoId) this.titleLink.href = `/video${this.videoId}`;
+        if (this.videoId) this.titleLink.href = videoPageUrl(this.videoId);
         this.titleLink.textContent = this.titleText;
         this.titleEl.appendChild(this.titleLink);
         this.uiEl.appendChild(this.titleEl);
@@ -840,7 +847,7 @@ class VKVideoPlayer {
         }
 
         if (!this.videoId) return;
-        const expectedPath = '/video' + this.videoId;
+        const expectedPath = videoPageUrl(this.videoId).split('?')[0];
         if (window.location.pathname !== expectedPath) return;
         const tMatch = window.location.search.match(/[?&]t=([^&]+)/);
         if (!tMatch) return;
@@ -1120,10 +1127,10 @@ class VKVideoPlayer {
             const action = item.dataset.action;
             this.hideContextMenu();
             if (action === 'copy_link' && this.videoId) {
-                this._copyUrl(`${window.location.origin}/video${this.videoId}`, vkifyText('link_copied_vk', 'Video link copied'));
+                this._copyUrl(`${window.location.origin}${videoPageUrl(this.videoId)}`, vkifyText('link_copied_vk', 'Video link copied'));
             } else if (action === 'copy_timecoded_link' && this.videoId) {
                 const t = formatTimeParam(this.video.currentTime);
-                this._copyUrl(`${window.location.origin}/video${this.videoId}?t=${t}`, vkifyText('link_copied_time', 'Video link at current time copied'));
+                this._copyUrl(`${window.location.origin}${videoPageUrl(this.videoId, t)}`, vkifyText('link_copied_time', 'Video link at current time copied'));
             } else if (action === 'copy_direct_link') {
                 this._ensureVideoSrc();
                 this._copyUrl(this.video.currentSrc || this.video.src || this.src, vkifyText('link_copied_direct', 'Direct video link copied'));
@@ -1400,7 +1407,7 @@ class VKVideoPlayer {
         if (openLink) {
             openLink.click();
         } else {
-            const url = `/video${this.videoId}` + (curTime > 0 ? `?t=${formatTimeParam(curTime)}` : '');
+            const url = videoPageUrl(this.videoId, curTime > 0 ? formatTimeParam(curTime) : null);
             if (window.router?.route) {
                 window.router.route(url);
             } else {
