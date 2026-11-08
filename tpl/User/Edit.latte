@@ -112,7 +112,7 @@
                             <div class="form_field">
                                 <div class="form_label">{_relationship}</div>
                                 <div class="form_data">
-                                    <select name="marialstatus" onChange="toggleMaritalStatus(this)">
+                                    <select name="marialstatus" onChange="toggleMaritalStatus(this)" data-vkify-dropdown>
                                         <option n:foreach="range(0, 8) as $i" n:attr="selected => ($user->getMaritalStatus() == $i)" value="{$i}">
                                             {if $user->isFemale()}
                                                 {var $str = "relationship_$i"}
@@ -139,7 +139,7 @@
                             <div class="form_field">
                                 <div class="form_label">{_politViews}</div>
                                 <div class="form_data">
-                                    <select name="politViews">
+                                    <select name="politViews" data-vkify-dropdown>
                                         <option n:foreach="range(0, 9) as $i" n:attr="selected => ($user->getPoliticalViews() == $i)" value="{$i}">
                                             {tr("politViews_" . $i)}
                                         </option>
@@ -149,7 +149,7 @@
                             <div class="form_field">
                                 <div class="form_label">{_pronouns}</div>
                                 <div class="form_data">
-                                    <select name="pronouns">
+                                    <select name="pronouns" data-vkify-dropdown>
                                         <option value="0" {if $user->getPronouns() == 0}selected{/if}>{_male}</option>
                                         <option value="1" {if $user->getPronouns() == 1}selected{/if}>{_female}</option>
                                         <option value="2" {if $user->getPronouns() == 2}selected{/if}>{_neutral}</option>
@@ -160,7 +160,7 @@
                                 <div class="form_label">{_birth_date}</div>
                                 <div class="form_data">
                                     <input max={date('Y-m-d')} name="birthday" value={is_null($user->getBirthday()) ? NULL : $user->getBirthday()->format('%Y-%m-%d')} type="date" style="margin-bottom: 7px;" />
-                                    <select name="birthday_privacy">
+                                    <select name="birthday_privacy" data-vkify-dropdown>
                                         <option value="0" {if $user->getBirthdayPrivacy() == 0}selected{/if}>{_show_my_birthday}</option>
                                         <option value="1" {if $user->getBirthdayPrivacy() == 1}selected{/if}>{_show_only_month_and_day}</option>
                                     </select>
@@ -373,7 +373,7 @@
                                                 {_additional_field_place}
                                             </td>
                                             <td>
-                                                <select name="place_{$f_iterator}">
+                                                <select name="place_{$f_iterator}" data-vkify-dropdown>
                                                     <option value="0" n:attr="selected => $field->isContact()">{_additional_field_place_contacts}</option>
                                                     <option value="1" n:attr="selected => !$field->isContact()">{_additional_field_place_interests}</option>
                                                 </select>

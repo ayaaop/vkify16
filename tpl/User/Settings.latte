@@ -280,7 +280,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_access_page}</div>
                                     <div class="form_data">
-                                        <select name="page.read">
+                                        <select name="page.read" data-vkify-dropdown>
                                             <option value="3" {if $user->getPrivacySetting('page.read') == 3}selected{/if}>{_privacy_value_anybody_dative}</option>
                                             <option value="2" {if $user->getPrivacySetting('page.read') == 2}selected{/if}>{_privacy_value_users}</option>
                                         </select>
@@ -289,7 +289,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_read_info}</div>
                                     <div class="form_data">
-                                        <select name="page.info.read">
+                                        <select name="page.info.read" data-vkify-dropdown>
                                             <option value="3" {if $user->getPrivacySetting('page.info.read') == 3}selected{/if}>{_privacy_value_anybody_dative}</option>
                                             <option value="2" {if $user->getPrivacySetting('page.info.read') == 2}selected{/if}>{_privacy_value_users}</option>
                                             <option value="1" {if $user->getPrivacySetting('page.info.read') == 1}selected{/if}>{_privacy_value_friends_dative}</option>
@@ -300,7 +300,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_see_online}</div>
                                     <div class="form_data">
-                                        <select name="page.online.read">
+                                        <select name="page.online.read" data-vkify-dropdown>
                                             <option value="3" {if $user->getPrivacySetting('page.online.read') == 3}selected{/if}>{_privacy_value_anybody_short}</option>
                                             <option value="2" {if $user->getPrivacySetting('page.online.read') == 2}selected{/if}>{_privacy_value_users_nominative}</option>
                                             <option value="1" {if $user->getPrivacySetting('page.online.read') == 1}selected{/if}>{_privacy_value_friends}</option>
@@ -311,7 +311,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_see_groups}</div>
                                     <div class="form_data">
-                                        <select name="groups.read">
+                                        <select name="groups.read" data-vkify-dropdown>
                                             <option value="3" {if $user->getPrivacySetting('groups.read') == 3}selected{/if}>{_privacy_value_anybody_dative}</option>
                                             <option value="2" {if $user->getPrivacySetting('groups.read') == 2}selected{/if}>{_privacy_value_users}</option>
                                             <option value="1" {if $user->getPrivacySetting('groups.read') == 1}selected{/if}>{_privacy_value_friends_dative}</option>
@@ -322,7 +322,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_see_photos}</div>
                                     <div class="form_data">
-                                        <select name="photos.read">
+                                        <select name="photos.read" data-vkify-dropdown>
                                             <option value="3" {if $user->getPrivacySetting('photos.read') == 3}selected{/if}>{_privacy_value_anybody_dative}</option>
                                             <option value="2" {if $user->getPrivacySetting('photos.read') == 2}selected{/if}>{_privacy_value_users}</option>
                                             <option value="1" {if $user->getPrivacySetting('photos.read') == 1}selected{/if}>{_privacy_value_friends_dative}</option>
@@ -333,7 +333,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_see_videos}</div>
                                     <div class="form_data">
-                                        <select name="videos.read">
+                                        <select name="videos.read" data-vkify-dropdown>
                                             <option value="3" {if $user->getPrivacySetting('videos.read') == 3}selected{/if}>{_privacy_value_anybody_dative}</option>
                                             <option value="2" {if $user->getPrivacySetting('videos.read') == 2}selected{/if}>{_privacy_value_users}</option>
                                             <option value="1" {if $user->getPrivacySetting('videos.read') == 1}selected{/if}>{_privacy_value_friends_dative}</option>
@@ -344,7 +344,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_view_audio}</div>
                                     <div class="form_data">
-                                        <select name="audios.read">
+                                        <select name="audios.read" data-vkify-dropdown>
                                             <option value="3" {if $user->getPrivacySetting('audios.read') == 3}selected{/if}>{_privacy_value_anybody_dative}</option>
                                             <option value="2" {if $user->getPrivacySetting('audios.read') == 2}selected{/if}>{_privacy_value_users}</option>
                                             <option value="1" {if $user->getPrivacySetting('audios.read') == 1}selected{/if}>{_privacy_value_friends_dative}</option>
@@ -355,7 +355,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_see_notes}</div>
                                     <div class="form_data">
-                                        <select name="notes.read">
+                                        <select name="notes.read" data-vkify-dropdown>
                                             <option value="3" {if $user->getPrivacySetting('notes.read') == 3}selected{/if}>{_privacy_value_anybody_dative}</option>
                                             <option value="2" {if $user->getPrivacySetting('notes.read') == 2}selected{/if}>{_privacy_value_users}</option>
                                             <option value="1" {if $user->getPrivacySetting('notes.read') == 1}selected{/if}>{_privacy_value_friends_dative}</option>
@@ -366,7 +366,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_see_friends}</div>
                                     <div class="form_data">
-                                        <select name="friends.read">
+                                        <select name="friends.read" data-vkify-dropdown>
                                             <option value="3" {if $user->getPrivacySetting('friends.read') == 3}selected{/if}>{_privacy_value_anybody_dative}</option>
                                             <option value="2" {if $user->getPrivacySetting('friends.read') == 2}selected{/if}>{_privacy_value_users}</option>
                                             <option value="1" {if $user->getPrivacySetting('friends.read') == 1}selected{/if}>{_privacy_value_friends_dative}</option>
@@ -377,7 +377,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_view_gifts}</div>
                                     <div class="form_data">
-                                        <select name="gifts.read">
+                                        <select name="gifts.read" data-vkify-dropdown>
                                             <option value="3" {if $user->getPrivacySetting('gifts.read') == 3}selected{/if}>{_privacy_value_anybody_dative}</option>
                                             <option value="2" {if $user->getPrivacySetting('gifts.read') == 2}selected{/if}>{_privacy_value_users}</option>
                                             <option value="1" {if $user->getPrivacySetting('gifts.read') == 1}selected{/if}>{_privacy_value_friends_dative}</option>
@@ -388,7 +388,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_send_gifts}</div>
                                     <div class="form_data">
-                                        <select name="gifts.send">
+                                        <select name="gifts.send" data-vkify-dropdown>
                                             <option value="3" {if $user->getPrivacySetting('gifts.send') == 3}selected{/if}>{_privacy_value_anybody}</option>
                                             <option value="1" {if $user->getPrivacySetting('gifts.send') == 1}selected{/if}>{_privacy_value_friends}</option>
                                             <option value="0" {if $user->getPrivacySetting('gifts.send') == 0}selected{/if}>{_privacy_value_nobody}</option>
@@ -398,7 +398,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_add_to_friends}</div>
                                     <div class="form_data">
-                                        <select name="friends.add">
+                                        <select name="friends.add" data-vkify-dropdown>
                                             <option value="3" {if $user->getPrivacySetting('friends.add') == 2}selected{/if}>{_privacy_value_anybody}</option>
                                             <option value="0" {if $user->getPrivacySetting('friends.add') == 0}selected{/if}>{_privacy_value_nobody}</option>
                                         </select>
@@ -407,7 +407,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_write_wall}</div>
                                     <div class="form_data">
-                                        <select name="wall.write">
+                                        <select name="wall.write" data-vkify-dropdown>
                                             <option value="2" {if $user->getPrivacySetting('wall.write') == 2}selected{/if}>{_privacy_value_anybody}</option>
                                             <option value="1" {if $user->getPrivacySetting('wall.write') == 1}selected{/if}>{_privacy_value_friends}</option>
                                             <option value="0" {if $user->getPrivacySetting('wall.write') == 0}selected{/if}>{_privacy_value_only_me}</option>
@@ -417,7 +417,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_write_messages}</div>
                                     <div class="form_data">
-                                        <select name="messages.write">
+                                        <select name="messages.write" data-vkify-dropdown>
                                             <option value="2" {if $user->getPrivacySetting('messages.write') == 2}selected{/if}>{_privacy_value_anybody}</option>
                                             <option value="1" {if $user->getPrivacySetting('messages.write') == 1}selected{/if}>{_privacy_value_friends}</option>
                                             <option value="0" {if $user->getPrivacySetting('messages.write') == 0}selected{/if}>{_privacy_value_nobody}</option>
@@ -428,7 +428,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_add_in_chats}</div>
                                     <div class="form_data">
-                                        <select name="messages.add_to_chats">
+                                        <select name="messages.add_to_chats" data-vkify-dropdown>
                                             <option value="1" {if $user->getPrivacySetting('messages.add_to_chats') == 1}selected{/if}>{_privacy_value_friends}</option>
                                             <option value="0" {if $user->getPrivacySetting('messages.add_to_chats') == 0}selected{/if}>{_privacy_value_nobody}</option>
                                         </select>
@@ -437,7 +437,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_privacy_setting_see_likes}</div>
                                     <div class="form_data">
-                                        <select name="likes.read">
+                                        <select name="likes.read" data-vkify-dropdown>
                                             <option value="2" {if $user->getPrivacySetting('likes.read') == 2}selected{/if}>{_privacy_value_anybody}</option>
                                             <option value="0" {if $user->getPrivacySetting('likes.read') == 0}selected{/if}>{_privacy_value_only_me_dative}</option>
                                         </select>
@@ -446,7 +446,7 @@
                                 <div class="form_field settings_privacy_row">
                                     <div class="form_label">{_profile_type}</div>
                                     <div class="form_data">
-                                        <select name="profile_type">
+                                        <select name="profile_type" data-vkify-dropdown>
                                             <option value="0" {if $user->getProfileType() == 0}selected{/if}>{_profile_type_open}</option>
                                             <option value="1" {if $user->getProfileType() == 1}selected{/if}>{_profile_type_closed}</option>
                                         </select>
@@ -544,7 +544,7 @@
                                 <div class="form_field">
                                     <div class="form_label">{_avatars_style}</div>
                                     <div class="form_data">
-                                        <select name="style_avatar">
+                                        <select name="style_avatar" data-vkify-dropdown>
                                             <option value="0" {if $user->getStyleAvatar() == 0}selected{/if}>{_arbitrary_avatars} ({_default})</option>
                                             <option value="1" {if $user->getStyleAvatar() == 1}selected{/if}>{_cut}</option>
                                             <option value="2" {if $user->getStyleAvatar() == 2}selected{/if}>{_round_avatars}</option>
@@ -554,7 +554,7 @@
                                 <div class="form_field">
                                     <div class="form_label">{_style}</div>
                                     <div class="form_data">
-                                        <select name="style">
+                                        <select name="style" data-vkify-dropdown>
                                             <option n:foreach="$themes as $id => $themeName"
                                                     n:attr="selected => $user->getStyle() === $id"
                                                     value="{$id}">
@@ -572,7 +572,7 @@
                                 <div class="form_field">
                                     <div class="form_label">{_ui_settings_nsfw_content}</div>
                                     <div class="form_data">
-                                        <select name="nsfw">
+                                        <select name="nsfw" data-vkify-dropdown>
                                             <option value="0" {if $user->getNsfwTolerance() === 0}selected{/if}>{_ui_settings_nsfw_content_dont_show}</option>
                                             <option value="1" {if $user->getNsfwTolerance() === 1}selected{/if}>{_ui_settings_nsfw_content_blur}</option>
                                             <option value="2" {if $user->getNsfwTolerance() === 2}selected{/if}>{_ui_settings_nsfw_content_show}</option>
@@ -582,7 +582,7 @@
                                 <div class="form_field">
                                     <div class="form_label">{_ui_settings_main_page}</div>
                                     <div class="form_data">
-                                        <select name="main_page">
+                                        <select name="main_page" data-vkify-dropdown>
                                             <option value="0" {if !$user->getMainPage()}selected{/if}>{_my_page}</option>
                                             <option value="1" {if $user->getMainPage()}selected{/if}>{_my_feed}</option>
                                         </select>
@@ -647,7 +647,7 @@
                             <div class="form_field">
                                 <div class="form_label">{_ui_settings_timezone}</div>
                                 <div class="form_data">
-                                    <select id="timezone">
+                                    <select id="timezone" data-vkify-dropdown>
                                         {foreach TIMEZONES_ARRAY as $tz}
                                             <option {if intval($isTimezoned) == $tz}selected{/if} value="{$tz}">{tr('timezone-'.$tz)}</option>
                                         {/foreach}
@@ -724,4 +724,3 @@
         </div>
     </div>
 {/block}
-

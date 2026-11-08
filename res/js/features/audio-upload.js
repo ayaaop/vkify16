@@ -43,7 +43,7 @@ const audioFrameTpl = Hb.compile(
                 </tr>
                 <tr>
                     <td width="120" valign="top"><span class="nobold">{{lbl_genre}}:</span></td>
-                    <td><select name="genre">
+                    <td><select name="genre" data-vkify-dropdown>
                         {{#each genres}}
                         <option {{#if selected}}selected{{/if}} value='{{value}}'>{{value}}</option>
                         {{/each}}

@@ -1647,10 +1647,7 @@ const AudioAdapter = {
             <div class='audios_tab_content'>
                 <div class='audios_search_container clear_fix'>
                     ${buildSearchUI('header_search', 'text')}
-                    <select class="audio_search_type picker-search-type">
-                        <option value="by_name">${tr("by_name")}</option>
-                        <option value="by_performer">${tr("by_performer")}</option>
-                    </select>
+                    <span class="audio_search_type picker-search-type" name="audio_search_type"></span>
                 </div>
                 <div class="picker-content audiosInsert">
                     ${buildDualContainers(activeKey, hasClub, itemsHTML, emptyHTML)}
@@ -1686,10 +1683,16 @@ const AudioAdapter = {
             });
         });
 
-        node.on('change', '.picker-search-type', (e) => {
-            picker._searchType = e.target.value;
-            picker.page = 0;
-            picker.load();
+        new vkify.InlineDropdown(node.find('.picker-search-type').nodes[0], {
+            items: [['by_name', tr('by_name')], ['by_performer', tr('by_performer')]],
+            withArrow: true,
+            selected: 'by_name',
+            onSelect: async (value) => {
+                picker._searchType = value;
+                picker.page = 0;
+                await picker.load();
+                picker._infiniteScroll?.reset();
+            }
         });
 
         // mobile: tap the row itself to mark it instead of the text button;

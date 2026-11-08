@@ -360,7 +360,7 @@
             {_s_order_by}
         </div>
         <div class="search_option_content">
-            <select name="order" form="real_search_form" data-default='id'>
+            <select name="order" form="real_search_form" data-default='id' data-vkify-dropdown>
                 {if $section == "users"}
                     <option value="id" n:attr="selected => $order == 'id'">{_s_order_by_reg_date}</option>
                     
@@ -421,7 +421,7 @@
         <div class="search_option_content">
             <label class="field">
                 {_politViews}
-                <select name="polit_views" form="real_search_form" data-default='0'>
+                <select name="polit_views" form="real_search_form" data-default='0' data-vkify-dropdown>
                     <option n:foreach="range(0, 9) as $i" value="{$i}" n:attr="selected => ($_REQUEST['polit_views'] ?? null) == $i">
                         {tr("politViews_".$i)}
                     </option>
@@ -429,7 +429,7 @@
             </label>
             <label class="field">
                 {_relationship}
-                <select name="marital_status" form="real_search_form" data-default='0'>
+                <select name="marital_status" form="real_search_form" data-default='0' data-vkify-dropdown>
                     <option n:foreach="range(0, 8) as $i" value="{$i}" n:attr="selected => ($_REQUEST['marital_status'] ?? null) == $i">
                         {tr("relationship_".$i)}
                     </option>
@@ -452,7 +452,7 @@
             {_s_type}
         </div>
         <div class="search_option_content">
-            <select name="type" form="real_search_form" data-default='0'>
+            <select name="type" form="real_search_form" data-default='0' data-vkify-dropdown>
                 <option n:foreach="range(0, 8) as $i" value="{$i}" n:attr="selected => ($_REQUEST['type'] ?? null) == $i">
                     {tr("document_type_".$i)}
                 </option>
@@ -472,7 +472,7 @@
             </label>
             <label class="field">
                 {_genre}
-                <select name='genre' form="real_search_form" data-default='any'>
+                <select name='genre' form="real_search_form" data-default='any' data-vkify-dropdown>
                     <option n:attr="selected: empty($_REQUEST['genre'])" value="any">{_s_any_single}</option>
                     <option n:foreach='\openvk\Web\Models\Entities\Audio::genres as $genre' n:attr="selected: ($_REQUEST['genre'] ?? null) == $genre" value="{$genre}">
                         {$genre}

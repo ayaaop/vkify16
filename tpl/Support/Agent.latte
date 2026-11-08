@@ -71,7 +71,7 @@
                             <div class="form_field">
                                 <div class="form_label">{_helpdesk_show_number}?</div>
                                 <div class="form_data">
-                                    <select name="number">
+                                    <select name="number" data-vkify-dropdown>
                                         <option value="1" n:attr="selected => $agent->isShowNumber() === 1 ? true : false">{_yes}</option>
                                         <option value="0" n:attr="selected => $agent->isShowNumber() === 0 ? true : false">{_no}</option>
                                     </select>
@@ -111,7 +111,7 @@
                 <div class="form_field">
                     <div class="form_label">{_helpdesk_show_number}?</div>
                     <div class="form_data">
-                        <select name="number">
+                        <select name="number" data-vkify-dropdown>
                             <option value="1">{_yes}</option>
                             <option value="0">{_no}</option>
                         </select>

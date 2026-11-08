@@ -53,7 +53,7 @@
             {/if}
             {include "../components/ui_rmenu.latte", items => $tabMenuItems, additionalCssClass => 'docs_tabs', id => 'docs_tabs', ownblockData => isset($group) ? $group : null}
             <div n:if="$count > 3" class="page_block module_body">
-                    <select name="docs_sort">
+                    <select name="docs_sort" data-vkify-dropdown>
                         <option n:attr="selected => $order == 0" value="0">{_documents_sort_add}</option>
                         <option n:attr="selected => $order == 1" value="1">{_documents_sort_alphabet}</option>
                         <option n:attr="selected => $order == 2" value="2">{_documents_sort_size}</option>

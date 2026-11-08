@@ -33,7 +33,7 @@
                     <td>
                         <div style="display: flex; gap: 8px; justify-content: space-between;">
                             <div id="add-model" class="noSpamIcon noSpamIcon-Add" style="display: none;" />
-                            <select name="model" id="model" class="model initialModel" style="margin-left: -2px;">
+                            <select name="model" id="model" class="model initialModel" style="margin-left: -2px;" data-vkify-dropdown>
                                 <option selected value="none">{_relationship_0}</option>
                                 <option n:foreach="$models as $model" value="{$model}">{$model}</option>
                             </select>
@@ -107,7 +107,7 @@
                             <span class="nobold">{_block_params}:</span>
                         </td>
                         <td>
-                            <select name="ban_type" id="noSpam-ban-type" style="width: 140px;">
+                            <select name="ban_type" id="noSpam-ban-type" style="width: 140px;" data-vkify-dropdown>
                                 <option value="1">{_only_rollback}</option>
                                 <option value="2">{_only_block}</option>
                                 <option value="3">{_rollback_and_block}</option>
@@ -326,7 +326,7 @@
                     <td>
                         <div style="display: flex; gap: 8px; justify-content: space-between;">
                             <div class="noSpamIcon noSpamIcon-Delete" onClick="deleteModelSelect(${ $('.model').length});"></div>
-                            <select name="model" class="model" style="margin-left: -2px;" onChange="selectChange($(this).val())">
+                            <select name="model" class="model" style="margin-left: -2px;" onChange="selectChange($(this).val())" data-vkify-dropdown>
                                 <option selected value="none">{_relationship_0}</option>
                                 {foreach $models as $model}
                                     <option value={$model}>{$model|noescape}</option>

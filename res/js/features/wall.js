@@ -1401,7 +1401,7 @@ vkify.once('shareAudioPlaylist', () => {
                                 <span>${tr("in_group")}</span>
                             </label>
 
-                            <select class="dark" name="selected_repost_club" style='display:none; margin-top: 5px; width: 100%;'></select>
+                            <select class="dark" name="selected_repost_club" style='display:none; margin-top: 5px; width: 100%;' data-vkify-dropdown></select>
                         </div>
 
                         <b style="margin-top: 12px; margin-bottom: 6px;">${tr('your_comment')}</b>

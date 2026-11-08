@@ -27,7 +27,7 @@ const modules = [
     'ui/choice-labels.js',
 
     'ui/sidebar-affix.js',
-    'ui/custom-select.js',
+    'ui/vk-dropdown.js',
     'ui/tab-slider.js',
     'ui/masonry.js',
     'ui/tooltips-simple.js',
