@@ -19,6 +19,125 @@
         document.addEventListener('touchstart', () => {}, { passive: true });
     }
 
+    window.matchMedia('(max-width: 768px)').addEventListener('change', () => {
+        window.vkify.updateDropdowns?.();
+    });
+
+    function audioLyrics(player) {
+        const edit = player.querySelector('.edit-icon');
+        if (edit) return edit.dataset.lyrics || '';
+        const lyrics = player.querySelector('.lyrics')?.cloneNode(true);
+        if (!lyrics) return '';
+        lyrics.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
+        return lyrics.textContent || '';
+    }
+
+    async function openAudioPlaylist(player) {
+        const trackId = Number(player.dataset.realid);
+        const audios = await window.OVKAPI.call('audio.getById', { audios: trackId });
+        const audio = audios.items[0];
+        if (!audio) return;
+        const albumId = String(audio.album_id || '').split('_').pop();
+        if (!audio.editable) {
+            if (Number(albumId)) window.router.route('/playlist' + albumId);
+            return;
+        }
+
+        const albums = await window.OVKAPI.call('audio.getAlbums', {
+            count: 100,
+            owner_id: Number(player.dataset.ownerId) || audio.owner_id
+        });
+        const options = albums.items.map(album =>
+            `<option value="${Number(album.id)}" ${String(album.id) === albumId ? 'selected' : ''}>${escapeHtml(album.title)}</option>`
+        ).join('');
+        const msg = new CMessageBox({
+            title: tr('audio_edit_album'),
+            body: `<div><span>${tr('album')}</span> <select id="playlist_id"><option value="0">${tr('none')}</option>${options}</select></div>`,
+            buttons: [tr('ok'), tr('cancel')],
+            callbacks: [async () => {
+                try {
+                    await window.OVKAPI.call('audio.moveToAlbum', {
+                        do_link: 1,
+                        audio_ids: trackId,
+                        album_id: msg.getNode().find('#playlist_id').nodes[0].value
+                    });
+                } catch (error) {
+                    makeError(error.message);
+                }
+            }, () => {}]
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!window.isMobile?.() || !(e.target instanceof Element)) return;
+        const trigger = e.target.closest('.audio_mobile_actions .mobile_actions_trigger');
+        if (trigger) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            const wrap = trigger.closest('.audio_mobile_actions');
+            const player = wrap.closest('.audioEmbed');
+            const library = wrap.querySelector('[data-audio-action="library"]');
+            const libraryIcon = player.querySelector('.buttons > .remove-icon, .buttons > .add-icon');
+            if (library) {
+                library.hidden = !libraryIcon;
+                if (libraryIcon) library.textContent = tr(libraryIcon.classList.contains('remove-icon') ? 'remove' : 'add');
+            }
+            const removeGroup = wrap.querySelector('[data-audio-action="remove-group"]');
+            if (removeGroup) removeGroup.hidden = !player.querySelector('.buttons > .remove-icon-group');
+            const lyrics = wrap.querySelector('[data-audio-action="lyrics"]');
+            if (lyrics) lyrics.hidden = !audioLyrics(player);
+            document.querySelectorAll('.ui_actions_menu_wrap.shown').forEach(open => {
+                if (open !== wrap) window.uiActionsMenu.toggle(open, false, { immediate: true });
+            });
+            window.uiActionsMenu.toggle(wrap);
+            return;
+        }
+
+        const action = e.target.closest('.audio_mobile_actions [data-audio-action]');
+        if (action) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            const wrap = action.closest('.audio_mobile_actions');
+            const player = wrap.closest('.audioEmbed');
+            window.uiActionsMenu.toggle(wrap, false, { immediate: true });
+            const type = action.dataset.audioAction;
+            const icon = {
+                library: '.buttons > .remove-icon, .buttons > .add-icon',
+                'remove-group': '.buttons > .remove-icon-group',
+                download: '.buttons > .download-icon',
+                edit: '.buttons > .edit-icon',
+                report: '.buttons > .report-icon'
+            }[type];
+            if (icon) {
+                player.querySelector(icon)?.click();
+            } else if (type === 'lyrics') {
+                const msg = new CMessageBox({
+                    title: '',
+                    body: '',
+                    buttons: [tr('close')],
+                    callbacks: [() => {}]
+                });
+                const body = msg.getNode().find('.ovk-diag-body').nodes[0];
+                body.textContent = audioLyrics(player);
+                body.style.whiteSpace = 'pre-wrap';
+            } else if (type === 'copy') {
+                copyToClipboard(location.origin + '/audio' + player.dataset.prettyid);
+            } else if (type === 'playlist') {
+                openAudioPlaylist(player).catch(error => makeError(error.message));
+            } else if (type === 'add-group' || type === 'add-playlist') {
+                __showAudioAddDialog(Number(player.dataset.realid), type === 'add-playlist' ? 'playlist' : 'club');
+            }
+            return;
+        }
+
+        const title = e.target.closest('.audioEmbed .title.withLyrics');
+        if (title) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            title.closest('.audioEmbed').querySelector('.playerButton > .playIcon')?.click();
+        }
+    }, true);
+
     let profileAppbarScrollHandler = null;
     let appbarElevationScrollHandler = null;
 

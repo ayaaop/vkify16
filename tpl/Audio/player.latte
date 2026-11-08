@@ -4,7 +4,7 @@
 {php $isAvailable = $audio->isAvailable()}
 {php $performers = $audio->getPerformers()}
 {php $editable = isset($thisUser) && $audio->canBeModifiedBy($thisUser)}
-<div id="audioEmbed-{$id}" data-realid="{$audio->getId()}" data-prettyid="{$audio->getPrettyId()}" data-name="{$audio->getName()}" data-genre="{$audio->getGenre()}" n:class="audioEmbed, ctx_place, !$isAvailable ? processed, $isWithdrawn ? withdrawn" data-length="{$audio->getLength()}" data-keys="{json_encode($audio->getKeys())}" data-url="{$audio->getURL()}">
+<div id="audioEmbed-{$id}" data-realid="{$audio->getId()}" data-prettyid="{$audio->getPrettyId()}" data-owner-id="{isset($club) ? ($club->getId() * -1) : $audio->getOwner()->getId()}" data-name="{$audio->getName()}" data-genre="{$audio->getGenre()}" n:class="audioEmbed, ctx_place, !$isAvailable ? processed, $isWithdrawn ? withdrawn" data-length="{$audio->getLength()}" data-keys="{json_encode($audio->getKeys())}" data-url="{$audio->getURL()}">
     <audio class="audio" />
 
     <div id="miniplayer" class="audioEntry">
@@ -45,8 +45,24 @@
                         <div class="remove-icon-group musicIcon" data-id="{$audio->getId()}" data-club="{$club->getId()}" n:if="isset($thisUser) && isset($club) && $club->canBeModifiedBy($thisUser)" data-title="{_c_remove_from_group}" onmouseover="showTitle(this)"></div>
                         <div class="add-icon-group musicIcon hidden" data-id="{$audio->getId()}" n:if="isset($thisUser) && !$isWithdrawn" data-title="{_c_add_to_group}" onmouseover="showTitle(this)"></div>
                         <a class="download-icon musicIcon" n:if='isset($thisUser) && !$isWithdrawn && $isAvailable && \OPENVK_ROOT_CONF["openvk"]["preferences"]["music"]["exposeOriginalURLs"]' href="{$audio->getOriginalURL()}" download="{$audio->getDownloadName()}" data-title="{_download_video}" onmouseover="showTitle(this)"></a>
-                        <div class="edit-icon musicIcon" data-lyrics="{$audio->getLyrics()}" data-title="{$audio->getTitle()}" data-performer="{$audio->getPerformer()}" data-explicit="{(int)$audio->isExplicit()}" data-searchable="{(int)!$audio->isUnlisted()}" n:if="isset($thisUser) && $editable && !$isWithdrawn" onmouseover="showTitle(this, this.dataset.tipTitle)" data-tip-title="{_edit}"></div>
+                        <div class="edit-icon musicIcon" data-album-id="{$audio->getAlbumId()}" data-owner-id="{isset($club) ? ($club->getId() * -1) : $audio->getOwner()->getId()}" data-lyrics="{$audio->getLyrics()}" data-title="{$audio->getTitle()}" data-performer="{$audio->getPerformer()}" data-explicit="{(int)$audio->isExplicit()}" data-searchable="{(int)!$audio->isUnlisted()}" n:if="isset($thisUser) && $editable && !$isWithdrawn" onmouseover="showTitle(this, this.dataset.tipTitle)" data-tip-title="{_edit}"></div>
                         <div class="report-icon musicIcon" data-id="{$audio->getId()}" n:if="isset($thisUser) && !$editable && !$isWithdrawn" data-title="{_report}" onmouseover="showTitle(this)"></div>
+                        <div class="audio_mobile_actions ui_actions_menu_wrap mobileonly">
+                            <button type="button" class="mobile_actions_trigger" aria-label="{_show_more}"><svg viewBox="0 0 12 24" width="22" height="22" fill="currentColor"><use href="#more-vertical-24"></use></svg></button>
+                            <div class="ui_actions_menu">
+                                <a data-audio-action="library" n:if="isset($thisUser) && !$isWithdrawn">{$hasAudio ? tr('remove') : tr('add')}</a>
+                                <a data-audio-action="remove-group" n:if="isset($thisUser) && isset($club) && $club->canBeModifiedBy($thisUser)">{_c_remove_from_group}</a>
+                                <a data-audio-action="download" n:if='isset($thisUser) && !$isWithdrawn && $isAvailable && \OPENVK_ROOT_CONF["openvk"]["preferences"]["music"]["exposeOriginalURLs"]'>{_download_video}</a>
+                                <a data-audio-action="edit" n:if="isset($thisUser) && $editable && !$isWithdrawn">{_edit}</a>
+                                <a data-audio-action="report" n:if="isset($thisUser) && !$editable && !$isWithdrawn">{_report}</a>
+                                <a data-audio-action="lyrics" n:if="!empty($audio->getLyrics()) || $editable" n:attr="hidden => empty($audio->getLyrics()) ? true : null">{_lyrics}</a>
+                                <div class="separator"></div>
+                                <a data-audio-action="copy">{_copy_link_to_audio}</a>
+                                <a data-audio-action="playlist">{_playlist}</a>
+                                <a data-audio-action="add-group" n:if="isset($thisUser) && !$isWithdrawn">{_audio_ctx_add_to_group}</a>
+                                <a data-audio-action="add-playlist" n:if="isset($thisUser) && !$isWithdrawn">{_audio_ctx_add_to_playlist}</a>
+                            </div>
+                        </div>
                     {/if}
                 </div>
             </div>
@@ -78,6 +94,6 @@
     </div>
 
     <div class="lyrics" n:if="!empty($audio->getLyrics())">
-        {nl2br($audio->getLyrics())|noescape}
+        {nl2br(htmlspecialchars($audio->getLyrics(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'))|noescape}
     </div>
 </div>

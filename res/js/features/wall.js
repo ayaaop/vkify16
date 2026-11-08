@@ -1968,7 +1968,7 @@ window.wall.showReply = () => true;
 
 u(document).on('click', '.post.reply', function(e) {
     const target = u(e.target);
-    if (target.closest('a[href], .reply_action, .post_like, .attachment a, input, textarea, button').length) {
+    if (target.closest('a[href], .ui_actions_menu_wrap, .reply_action, .post_like, .attachment a, input, textarea, button').length) {
         return;
     }
 

@@ -214,6 +214,7 @@ export async function installMessengerRenderer() {
         const emptyTab = { getId: () => 0, getPageId: () => null };
         const origSelectTab = ImClass.prototype.selectTab;
         ImClass.prototype.selectTab = function vkifySelectTab(tab) {
+            if (this.getSelectedTabId?.() === 'messenger') window.uiActionsMenu?.closeAll?.();
             const getSelected = this.getSelectedTab;
             this.getSelectedTab = () => getSelected.call(this) || emptyTab;
             try {

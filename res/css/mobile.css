@@ -2433,6 +2433,32 @@
         font-weight: 400;
         color: var(--text-color--tertiary);
     }
+    .audioEntry .mini_timer {
+        flex-direction: row;
+        align-items: center;
+    }
+    .audioEntry:hover .mini_timer .hideOnHover {
+        display: block !important;
+    }
+    .audioEntry .buttons {
+        display: flex !important;
+        position: relative;
+        top: auto;
+        right: auto;
+        z-index: auto;
+        clip-path: none;
+        width: auto;
+        height: auto;
+    }
+    .audioEntry .buttons > .musicIcon {
+        display: none !important;
+    }
+    .audio_mobile_actions .ui_actions_menu [hidden] {
+        display: none !important;
+    }
+    .audioEmbed .lyrics.showed {
+        display: none !important;
+    }
     .audioEntry .tire {
         display: none!important;
     }
@@ -3854,6 +3880,48 @@
     .ui_actions_menu:after {
         display: none !important;
     }
+    .reply_actions {
+        display: none !important;
+    }
+    .reply_mobile_actions,
+    .audio_mobile_actions {
+        position: relative;
+        display: block !important;
+    }
+    .reply_mobile_actions .mobile_actions_trigger,
+    .audio_mobile_actions .mobile_actions_trigger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--action-button-icon-color, var(--text-color--secondary));
+        opacity: .5;
+        cursor: pointer;
+    }
+    .reply_mobile_actions.shown .mobile_actions_trigger,
+    .audio_mobile_actions.shown .mobile_actions_trigger,
+    .reply_mobile_actions .mobile_actions_trigger:active,
+    .audio_mobile_actions .mobile_actions_trigger:active {
+        opacity: 1;
+    }
+    .audio_mobile_actions .ui_actions_menu,
+    .reply_mobile_actions .ui_actions_menu {
+        max-height: calc(100dvh - 110px);
+        overflow-y: auto;
+    }
+
+     .reply_mobile_actions .mobile_actions_trigger {
+        justify-content: end;
+        align-items: start;
+     }
+
+     .reply_mobile_actions .ui_actions_menu {
+        --ui-actions-menu-distance: calc(10px * -1);
+     }
 
     /* message dropdown matches the action-menu surface and opening distance */
     .msg-dropdown-menu {

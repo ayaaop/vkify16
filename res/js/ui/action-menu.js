@@ -1,5 +1,6 @@
 vkify.once('uiActionsMenu', function () {
   const dataStore = new WeakMap();
+  const portaledMenus = new Set();
   const HIDE_DURATION = 100;
   const DEFAULT_HIDE_DELAY = 200;
   const DEFAULT_AUTOPOS_GAP = 10;
@@ -117,6 +118,19 @@ vkify.once('uiActionsMenu', function () {
     return Boolean(options.appendParentCls || hasClass(el, 'ui_actions_menu_dummy_wrap') || data(el, 'dummyMenu'));
   }
 
+  const portalObserver = new MutationObserver(() => {
+    for (const dummy of portaledMenus) {
+      const source = data(dummy, 'origMenu');
+      if (dummy.isConnected && source?.isConnected && geByClass1('ui_actions_menu', dummy)) continue;
+      if (dummy.isConnected) window.uiActionsMenu.toggle(dummy, false, { immediate: true });
+      if (source && data(source, 'dummyMenu') === dummy) data(source, 'dummyMenu', null);
+      dummy.remove();
+      dataStore.delete(dummy);
+      portaledMenus.delete(dummy);
+    }
+    if (!portaledMenus.size) portalObserver.disconnect();
+  });
+
   function applyAppendParent(el, options) {
     let menu = geByClass1('ui_actions_menu', el);
     if (menu && hasClass(el, 'ui_actions_menu_dummy_wrap')) {
@@ -145,6 +159,8 @@ vkify.once('uiActionsMenu', function () {
       data(newWrap, 'origMenu', el);
       data(newWrap, 'appendParentCls', options.appendParentCls);
       if (options.align) data(newWrap, 'uiActionsMenuAlign', options.align);
+      portaledMenus.add(newWrap);
+      portalObserver.observe(document.body, { childList: true, subtree: true });
       el = newWrap;
 
       data(menu, 'top', intval(getStyle(menu, 'top')));
@@ -620,6 +636,35 @@ vkify.once('uiActionsMenu', function () {
 
     hideDelay(el, delay) {
       data(el, 'hidedelay', delay);
+    },
+
+    closeAll() {
+      if (window.__uiActionsMenuShowTimeout) {
+        clearTimeout(window.__uiActionsMenuShowTimeout);
+        delete window.__uiActionsMenuShowTimeout;
+      }
+      document.querySelectorAll('.ui_actions_menu_wrap.shown').forEach(wrap => {
+        this.toggle(wrap, false, { immediate: true });
+      });
+      document.querySelectorAll('.ui_actions_menu_dummy_wrap').forEach(dummy => {
+        const source = data(dummy, 'origMenu');
+        if (!source) return;
+        for (const el of [dummy, source]) {
+          for (const key of ['hidetimer', 'hideTimer']) {
+            clearTimeout(data(el, key));
+            data(el, key, 0);
+          }
+        }
+        const menu = geByClass1('ui_actions_menu', dummy);
+        if (menu && source.isConnected && !geByClass1('ui_actions_menu', source)) source.appendChild(menu);
+        if (menu) menu.style.display = 'none';
+        removeClass(source, 'shown');
+        data(source, 'dummyMenu', null);
+        dummy.remove();
+        dataStore.delete(dummy);
+        portaledMenus.delete(dummy);
+      });
+      if (!portaledMenus.size) portalObserver.disconnect();
     },
 
     // new helper for dynamic menus
