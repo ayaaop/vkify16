@@ -46,14 +46,15 @@
                     ]}
                 </div>
 
-                {include "../components/notepost.latte", note => $note, forceNoCommentsLink => true}
+                {include "../components/notepost.latte", note => $note, forceNoCommentsLink => true, forceNoLike => ($forceNoLike ?? false)}
                 {include "../components/comments.latte",
                     comments => $comments,
                     count => $cCount,
                     page => $cPage,
                     model => "notes",
                     parent => $note,
-                    showTitle => false}
+                    showTitle => false,
+                    readOnly => ($readOnly ?? false)}
             </div>
         </div>
     </div>

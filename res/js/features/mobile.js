@@ -101,6 +101,7 @@
             const player = wrap.closest('.audioEmbed');
             window.uiActionsMenu.toggle(wrap, false, { immediate: true });
             const type = action.dataset.audioAction;
+            if (player.dataset.readonly === '1' && ['copy', 'add-group', 'add-playlist', 'download'].includes(type)) return;
             const icon = {
                 library: '.buttons > .remove-icon, .buttons > .add-icon',
                 'remove-group': '.buttons > .remove-icon-group',

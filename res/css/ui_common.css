@@ -2499,7 +2499,6 @@ select:focus,.content-editable:focus {
     border-color: var(--message-warning-border-color);
     padding: 12px 6px 12px 55px;
     min-height: 32px !important;
-    box-sizing: content-box;
 }
 .msg.msg_yellow p {
     line-height: 150%;

@@ -47,7 +47,7 @@
                     {var $data = is_array($iterator) ? $iterator : iterator_to_array($iterator)}
                     {if sizeof($data) > 0}
                         {foreach $data as $note}
-                            {include "../components/notepost.latte", note => $note, commentSection => true, compact => true}
+                            {include "../components/notepost.latte", note => $note, commentSection => true, compact => true, forceNoLike => ($forceNoLike ?? false)}
                         {/foreach}
 
                         {include "../components/paginator.latte", conf => (object) [

@@ -2,7 +2,9 @@
 {extends "../@layout.latte"}
 {import "mobile_profile.latte"}
 
-{var $backdrops = $user->getBackDropPictureURLs()}
+{if !$user->isBanned()}
+    {var $backdrops = $user->getBackDropPictureURLs()}
+{/if}
 
 {var $transparentAppbar = true}
 
@@ -92,7 +94,9 @@
             {_forbidden_comment}
         </div>
     {else}
-    
+    {if $moderationView ?? false}
+        {include "ModerationBanner.latte"}
+    {/if}
 
 	{include #mobileProfile, $thatIsThisUser, $hasMoreInfo, $stripHasContent, $canSeeVideos, $canSeeAudios, $canSeeGroups, $canSeeMeetings, $canSeeAlbums, $canSeeGifts, $canSeeNotes, $videos, $audios, $albums, $basicInfoFields, $contactInfoFields, $personalInfoFields}
 

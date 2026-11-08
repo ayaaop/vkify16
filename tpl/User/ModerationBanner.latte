@@ -1,0 +1,19 @@
+<div class="page_block page_padding moderation-banner">
+    <div class="moderation-banner__message">
+        <b>{_moderation_view_title}</b><br>
+        {_moderation_view_warning}
+        <div class="moderation-banner__details">
+            <div n:if="$user->isBanned()">{_moderation_view_banned} <b>{$user->getBanReason()}</b>. {_before}: <b>{$user->getUnbanTime() ?? tr('forever')}</b></div>
+            <div n:if="$user->isDeactivated()">{tr("moderation_view_deactivated", $user->getDeactivationDate()->format("d.m.Y", true))}</div>
+            <div n:if="$user->isDeleted() && !$user->isDeactivated()">{_moderation_view_deleted}</div>
+            <div n:if="$user->isClosed()">{_moderation_view_closed}</div>
+            <div n:if="$thisUser && $thisUser->isBlacklistedBy($user)">{_moderation_view_blacklisted}</div>
+            <div n:if="$thisUser && $user->isBlacklistedBy($thisUser)">{_moderation_view_blacklisted_by_viewer}</div>
+            <div>{if $canSendFriendRequest ?? false}{_moderation_view_readonly_friends}{else}{_moderation_view_readonly}{/if}</div>
+        </div>
+    </div>
+    <div class="moderation-banner__actions" n:if="$thisUser && $thisUser->getChandlerUser()->can('access')->model('admin')->whichBelongsTo(NULL) && ($user->isBanned() || $user->isDeactivated())">
+        <button n:if="$user->isBanned()" type="button" id="unbanHiddenProfile" class="button button_gray" onclick="unbanUser()">{_unban_user_action}</button>
+        <button n:if="$user->isDeactivated()" type="button" id="restoreHiddenProfile" class="button button_gray" onclick="restoreHiddenProfile()">{_moderation_view_restore}</button>
+    </div>
+</div>

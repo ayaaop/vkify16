@@ -886,6 +886,24 @@ div.avatar_block:hover .avatar_variants {
   line-height: 165%;
 }
 
+.moderation-banner {
+  box-shadow: 0 1px 0 0 var(--message-warning-border-color), 0 0 0 1px var(--message-warning-border-color);
+  background: var(--message-warning-background-color);
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+.moderation-banner__details {
+  margin-top: 12px;
+}
+
+.moderation-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
 /* groups */
 .group_info_block.info {
   overflow: hidden;

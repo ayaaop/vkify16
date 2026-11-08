@@ -1,5 +1,6 @@
 {php if (!function_exists('vkifyTr')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_i18n.php';}
-{var $canComment = $thisUser && $parent->canBeCommentedBy($thisUser)}
+{var $readOnly = $readOnly ?? false}
+{var $canComment = $thisUser && !$readOnly && $parent->canBeCommentedBy($thisUser)}
 {var $parentPrefix = match($model ?? '') {
     'photos' => '/photo',
     'videos' => '/video',
@@ -28,7 +29,7 @@
         {if sizeof($comments) > 0}
             <div class='scroll_container' n:attr="data-fetch-url => $commentsFetchUrl">
                 {foreach $comments as $comment}
-                    {include "comment.latte", comment => $comment, model => $model}
+                    {include "comment.latte", comment => $comment, model => $model, readOnly => $readOnly}
                 {/foreach}
                 {include "paginator.latte", conf => (object) ["page" => $page, "count" => $count, "amount" => sizeof($comments), "perPage" => 10, "fetchUrl" => $commentsFetchUrl]}
             </div>
@@ -36,7 +37,7 @@
             {include "../components/content_error.latte", id => "none_tip", icon => "first_comment.png", description=> tr("comments_tip")}
             <div class='scroll_container' n:attr="data-fetch-url => $commentsFetchUrl"></div>
         {/if}
-        <div class="wl_post_reply_form_forbidden" n:if="$thisUser && !$canComment">{=vkifyTr('comments_restricted')}</div>
+        <div class="wl_post_reply_form_forbidden" n:if="$thisUser && !$canComment && !$readOnly">{=vkifyTr('comments_restricted')}</div>
     </div>
 {/if}
 <div n:if="$canComment" id="standaloneCommentBox">

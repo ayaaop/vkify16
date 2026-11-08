@@ -77,7 +77,7 @@
     {/if}
 {/ifset}
 <div class="wall_module">
-    <div n:if="$canPost" class="page_block">
+    <div n:if="$canPost && !($readOnly ?? false)" class="page_block">
         {include "../components/textArea.latte", route => "/wall$owner/makePost", graffiti => true, polls => true, notes => true, hasSource => true, geo => true, docs => true, placeholder => $wallPostPlaceholder}
     </div>
     <div class="page_block wall_posts_tabs">
@@ -90,7 +90,7 @@
             {if sizeof($visiblePosts) > 0}
                 {foreach $posts as $post}
                     {continueIf isset($club) && $post->isPinned()}
-                    {include "../components/post.latte", post => $post, commentSection => true, onWallOf => true}
+                    {include "../components/post.latte", post => $post, commentSection => true, onWallOf => true, readOnly => ($readOnly ?? false)}
                 {/foreach}
                 {include "../components/paginator.latte", conf => $paginatorConf}
             {/if}
@@ -100,3 +100,10 @@
         </div>
     </div>
 </div> 
+{if $readOnly}
+    <style>
+        .no-post-views .wall_module .post .post-content {
+            padding-bottom: 10px;
+        }
+    </style>
+{/if}

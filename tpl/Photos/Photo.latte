@@ -81,17 +81,17 @@
             <div class="post_full_like_wrap" n:if="isset($thisUser)" n:ifcontent>
                 <div class="post_full_like" n:ifcontent>
                     {var $liked = $photo->hasLikeFrom($thisUser)}
-                    <a href="/photo{$photo->getPrettyId()}/like?hash={rawurlencode($csrfToken)}" class="action_button post_like {if $liked}my_like{/if}" onmouseover="vkifyLikesShow(this)" data-liked="{(int) $liked}" data-likes="{$likesCount}" data-id="{$photo->getPrettyId()}" data-type='photo'>
+                    <a n:if="!($readOnly ?? false)" href="/photo{$photo->getPrettyId()}/like?hash={rawurlencode($csrfToken)}" class="action_button post_like {if $liked}my_like{/if}" onmouseover="vkifyLikesShow(this)" data-liked="{(int) $liked}" data-likes="{$likesCount}" data-id="{$photo->getPrettyId()}" data-type='photo'>
                         <svg class="action_icon" id="{if $liked}liked{/if}"><use class="i16" href="#like-16"/><use class="i18" href="#like-outline-24"/><use class="i18 iact" href="#like-active-24"/></svg>
                         <span class="action_label">{tr('mobile_like')}</span>
                         <span class="action_count">{if $likesCount > 0}{=vkifyFormatCountSpaced($likesCount)}{/if}</span>
                     </a>
-                    <a id="comments{$photo->getPrettyId()}" class="post_reply action_button mobileonly" href="/photo{$photo->getPrettyId()}">
+                    <a n:if="!($readOnly ?? false)" id="comments{$photo->getPrettyId()}" class="post_reply action_button mobileonly" href="/photo{$photo->getPrettyId()}">
                         <svg class="action_icon"><use class="i16" href="#comment-14"/><use class="i18" href="#comment-outline-24"/></svg>
                         <span class="action_label">{tr('reply')}</span>
                         <span class="action_count" id="commentsCount{$photo->getPrettyId()}">{if $cCount > 0}{=vkifyFormatCountSpaced($cCount)}{/if}</span>
                     </a>
-                    <a id="reposts{$photo->getPrettyId()}" class="post_share action_button" href="javascript:repost('{$photo->getPrettyId()}', 'photo')">
+                    <a n:if="!($readOnly ?? false)" id="reposts{$photo->getPrettyId()}" class="post_share action_button" href="javascript:repost('{$photo->getPrettyId()}', 'photo')">
                         <svg class="action_icon"><use class="i16" href="#share-14"/><use class="i18" href="#share-arrow-24"/></svg>
                         <span class="action_label">{tr('share')}</span>
                     </a>
@@ -117,7 +117,7 @@
             </div>
             {/if}
             <div class="pv_comments"> 
-                {include "../components/comments.latte", comments => $comments, count => $cCount, page => $cPage, model => "photos", parent => $photo, attachMenuInTooltip => true}
+                {include "../components/comments.latte", comments => $comments, count => $cCount, page => $cPage, model => "photos", parent => $photo, attachMenuInTooltip => true, readOnly => ($readOnly ?? false)}
             </div>
             </div>
         </div>

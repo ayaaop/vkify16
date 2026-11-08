@@ -1,6 +1,7 @@
 {var $author = $note->getOwner()}
 {var $comments = $note->getLastComments(3)}
 {var $commentsCount = $note->getCommentsCount()}
+{var $readOnly = $readOnly ?? ($forceNoLike ?? false)}
 
 {var $commentTextAreaId = $note === NULL ? rand(1,300) : $note->getId()}
 <div class="scroll_node page_block" data-uniqueid="note-{$note->getPrettyId()}">
@@ -43,7 +44,7 @@
         <div class='post_edit'></div>
         <div class="post_full_like_wrap" n:if="$thisUser" n:ifcontent>
             <div class="post_full_like">
-                {if !($forceNoLike ?? false)}
+                {if !($forceNoLike ?? false) && !$readOnly}
                     {var $liked = $note->hasLikeFrom($thisUser)}
                     {var $likesCount = $note->getLikesCount()}
                     <a class="action_button post_like {if $liked}my_like{/if}" data-type="note" data-liked="{(int) $liked}" data-likes="{$likesCount}" data-id="{$note->getPrettyId()}" onmouseover="vkifyLikesShow(this)">
@@ -52,18 +53,18 @@
                         <span class="action_count">{if $likesCount > 0}{$likesCount}{/if}</span>
                     </a>
                 {/if}
-                <a n:if="!($forceNoCommentsLink ?? false)" class="action_button side_button post_reply" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">
+                <a n:if="!($forceNoCommentsLink ?? false) && !$readOnly" class="action_button side_button post_reply" href="javascript:window.toggle_comment_textarea({$commentTextAreaId})">
                     <svg class="action_icon"><use class="i16" href="#comment-14"></use><use class="i18" href="#comment-outline-24"></use></svg>
                     <span class="action_label">{_reply}</span>
                     <span class="action_count">{if $commentsCount > 0}{$commentsCount}{/if}</span>
                 </a>
             </div>
         </div>
-        <div n:if="!($forceNoCommentsLink ?? false)" id="commentTextArea{$commentTextAreaId}" n:class="post-menu-s, ($commentsCount == 0 ? 'hidden')">
+        <div n:if="!($forceNoCommentsLink ?? false) && !$readOnly" id="commentTextArea{$commentTextAreaId}" n:class="post-menu-s, ($commentsCount == 0 ? 'hidden')">
             <a n:if="$commentsCount > 3" href="/note{$note->getPrettyId()}" class="button button_wide button_gray expand_button">{_view_other_comments}</a>
             <div n:ifcontent class="comments">
                 {foreach $comments as $comment}
-                    {include "comment.latte", comment => $comment, $compact => true}
+                    {include "comment.latte", comment => $comment, $compact => true, readOnly => $readOnly}
                 {/foreach}
             </div>
             <div n:ifset="$thisUser" class="commentsTextFieldWrap">

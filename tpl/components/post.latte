@@ -28,9 +28,10 @@
 {var $forceNoEditLink = $forceNoEditLink ?? false}
 {var $forceNoDeleteLink = $forceNoDeleteLink ?? false}
 {var $forceNoPinLink = $forceNoPinLink ?? false}
-{var $forceNoLike = $forceNoLike ?? false}
-{var $forceNoCommentsLink = $forceNoCommentsLink ?? false}
-{var $forceNoShareLink = $forceNoShareLink ?? false}
+{var $readOnly = $readOnly ?? false}
+{var $forceNoLike = ($forceNoLike ?? false) || $readOnly}
+{var $forceNoCommentsLink = ($forceNoCommentsLink ?? false) || $readOnly}
+{var $forceNoShareLink = ($forceNoShareLink ?? false) || $readOnly}
 {var $scrollNode = $scrollNode ?? true}
 
 {var $commentTextAreaId = $post === NULL ? rand(1,300) : $post->getId()}
@@ -218,10 +219,10 @@
         <a n:if="$commentsCount > 3" href="/wall{$post->getPrettyId()}#replies" class="button button_wide button_gray expand_button post_link">{_view_other_comments}</a>
         <div n:ifcontent class="comments">
             {foreach $comments as $comment}
-                {include "comment.latte", comment => $comment, compact => true}
+                {include "comment.latte", comment => $comment, compact => true, readOnly => $readOnly}
             {/foreach}
         </div>
-        <div n:if="$thisUser && $post->canBeCommentedBy($thisUser)" class="commentsTextFieldWrap">
+        <div n:if="$thisUser && !$readOnly && $post->canBeCommentedBy($thisUser)" class="commentsTextFieldWrap">
             {var $commentsURL = "/al_comments/create/posts/" . $post->getId()}
             {var $club = is_null($club) ? ($post->getTargetWall() < 0 ? (new openvk\Web\Models\Repositories\Clubs)->get(abs($post->getTargetWall())) : NULL) : $club}
             {include "textArea.latte", route => $commentsURL, postOpts => false, graffiti => (bool) ovkGetQuirk("comments.allow-graffiti"), post => $post, club => $club}

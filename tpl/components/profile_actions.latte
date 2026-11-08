@@ -3,8 +3,9 @@
 <div class="profile_actions clear_fix nomobile">
 	{ifset $thisUser}
 		{if $user->getId() != $thisUser->getId()}
-			{var $isRestricted = $user->isClosed() || $user->isBanned() || $user->isDeactivated() || $user->isBlacklistedBy($thisUser) || $thisUser->isBlacklistedBy($user)}
-			{var $canAddFriend = !$user->isBanned() && !$user->isDeactivated() && !$user->isBlacklistedBy($thisUser) && !$thisUser->isBlacklistedBy($user)}
+			{var $subStatus = $user->getSubscriptionStatus($thisUser)}
+			{var $isRestricted = ($moderationView ?? false) || ($user->isClosed() && $subStatus !== \openvk\Web\Models\Entities\User::SUBSCRIPTION_MUTUAL) || $user->isBanned() || $user->isDeactivated() || $user->isBlacklistedBy($thisUser) || $thisUser->isBlacklistedBy($user)}
+			{var $canAddFriend = $canSendFriendRequest ?? $user->canReceiveFriendRequestsFrom($thisUser)}
 			{if !$isRestricted}
 				{if \OPENVK_ROOT_CONF['openvk']['preferences']['commerce']}
 					{if $user->getPrivacyPermission('messages.write', $thisUser) || ($thisUser && $user->hasActiveDialogueWith($thisUser))}
@@ -31,7 +32,6 @@
 					</a>
 				{/if}
 			{/if}
-			{var $subStatus = $user->getSubscriptionStatus($thisUser)}
 			{var $actions = [
 				0 => ['act' => 'add', 'label' => tr('friends_add')],
 				1 => ['act' => 'add', 'label' => tr('friends_accept'), 'class' => 'button_gray'],
@@ -39,7 +39,7 @@
 				3 => ['act' => 'rem', 'label' => tr('friends_delete'), 'class' => 'button_gray']
 			]}
 			<div class="{if !$canAddFriend && ($subStatus === 0 || $subStatus === 1)}profile_actions_standalone{else}profile_actions_split{/if}">
-				{if isset($actions[$subStatus]) && (($subStatus !== 0 && $subStatus !== 1) || $canAddFriend)}
+				{if isset($actions[$subStatus]) && (($subStatus !== 0 && $subStatus !== 1 && !($moderationView ?? false)) || $canAddFriend)}
 					<form action="/setSub/user" method="post" class="profile_link_form{if $canAddFriend} fl_l{/if}">
 						<input type="hidden" name="act" value="{$actions[$subStatus]['act']}" />
 						<input type="hidden" name="id"  value="{$user->getId()}" />
@@ -75,8 +75,11 @@
 				{_manage_user_action}
 			</a>
 			{var $isBanned = $user->isBanned()}
-			<a href="javascript:{if $isBanned}unbanUser(){else}banUser(){/if}">
-				{if $isBanned}{_unban_user_action}{else}{_ban_user_action}{/if}
+			<a n:if="!$isBanned" href="javascript:banUser()">
+				{_ban_user_action}
+			</a>
+			<a n:if="$isBanned && !($moderationView ?? false)" href="javascript:unbanUser()">
+				{_unban_user_action}
 			</a>
 			<a href="javascript:warnUser()">
 				{_warn_user_action}
@@ -99,7 +102,7 @@
 			</a>
 			<div class="separator"></div>
 		{/if}
-		{if $user->getId() != $thisUser->getId()}
+		{if $user->getId() != $thisUser->getId() && !($moderationView ?? false)}
 			{var $isBlacklisted = $user->isBlacklistedBy($thisUser)}
 			{if !$user->isDeleted() || $isBlacklisted}
 				<a id="_bl_toggler" data-name="{$user->getMorphedName('genitive', false, false)}" data-val="{if $isBlacklisted}0{else}1{/if}" data-id="{$user->getRealId()}">

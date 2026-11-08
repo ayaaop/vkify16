@@ -6,20 +6,18 @@
     <script n:if="$thisUser->getChandlerUser()->can('access')->model('admin')->whichBelongsTo(NULL)" data-vkify-route-script="user-admin">
         {if $user->isBanned()}
         function unbanUser() {
-            uUnbanMsgTxt  = "Вы собираетесь разбанить пользователя " + {$user->getCanonicalName()} + ".";
-            uUnbanMsgTxt += "<br/>Сейчас он заблокирован по причине: <strong>" + {$user->getBanReason()} + "</strong>.";
-            MessageBox("Разбанить " + {$user->getFirstName()}, uUnbanMsgTxt, ["Подтвердить", "Отмена"], [
-                (function() {
-                    xhr = new XMLHttpRequest();
-                    xhr.open("GET", "/admin/unban/" + {$user->getId()} + "?hash=" + {rawurlencode($csrfToken)}, true);
-                    xhr.onload = (function() {
-                        if(xhr.responseText.indexOf("success") === -1)
-                            MessageBox("Ошибка", "Не удалось разблокировать пользователя...", ["OK"], [Function.noop]);
+            MessageBox(tr('moderation_view_unban_title'), tr('moderation_view_unban_confirm', {$user->getCanonicalName()}), [tr('ok'), tr('cancel')], [
+                function() {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', '/admin/unban/{$user->getId()}?hash=' + {rawurlencode($csrfToken)}, true);
+                    xhr.onload = function() {
+                        if (xhr.responseText.indexOf('success') === -1)
+                            MessageBox(tr('error'), tr('error_on_server_side'), [tr('ok')], [Function.noop]);
                         else
-                            MessageBox("Операция успешна", "Пользователь разблокирован", ["OK"], [Function.noop]);
-                    });
+                            location.reload();
+                    };
                     xhr.send(null);
-                }),
+                },
                 Function.noop
             ]);
         }
@@ -46,6 +44,25 @@
                     });
                     xhr.send(null);
                 }),
+                Function.noop
+            ]);
+        }
+        {/if}
+
+        {if $user->isDeactivated()}
+        function restoreHiddenProfile() {
+            MessageBox(tr('moderation_view_restore_title'), tr('moderation_view_restore_confirm', {$user->getCanonicalName()}), [tr('ok'), tr('cancel')], [
+                function() {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', '/admin/reactivate/{$user->getId()}?hash=' + {rawurlencode($csrfToken)}, true);
+                    xhr.onload = function() {
+                        if (xhr.responseText.indexOf('success') === -1)
+                            MessageBox(tr('error'), tr('error_on_server_side'), [tr('ok')], [Function.noop]);
+                        else
+                            location.reload();
+                    };
+                    xhr.send(null);
+                },
                 Function.noop
             ]);
         }

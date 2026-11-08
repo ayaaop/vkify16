@@ -57,7 +57,7 @@
         <div class="wide_column_wrap">
             <div class="wide_column post_view_page {if $cCount > 0}with_comments{/if}">
                 <div id="post_page_main">
-                    {include "../components/post.latte", post => $post, forceNoCommentsLink => TRUE, scrollNode => false, postPage => true, commentSection => false}
+                    {include "../components/post.latte", post => $post, forceNoCommentsLink => TRUE, scrollNode => false, postPage => true, commentSection => false, readOnly => ($readOnly ?? false)}
                 </div>
                 <div id="post_page_meta">
                     {include "../components/comments.latte",
@@ -65,7 +65,8 @@
                     count => $cCount,
                     page => $cPage,
                     model => "posts",
-                    parent => $post }
+                    parent => $post,
+                    readOnly => ($readOnly ?? false) }
                 </div>
             </div>
         </div>

@@ -1,8 +1,9 @@
 {capture $actionsInner}
     {ifset $thisUser}
         {if $user->getId() != $thisUser->getId()}
-            {var $isRestricted = $user->isClosed() || $user->isBanned() || $user->isDeactivated() || $user->isBlacklistedBy($thisUser) || $thisUser->isBlacklistedBy($user)}
-            {var $canAddFriend = !$user->isBanned() && !$user->isDeactivated() && !$user->isBlacklistedBy($thisUser) && !$thisUser->isBlacklistedBy($user)}
+            {var $subStatus = $user->getSubscriptionStatus($thisUser)}
+            {var $isRestricted = ($moderationView ?? false) || ($user->isClosed() && $subStatus !== \openvk\Web\Models\Entities\User::SUBSCRIPTION_MUTUAL) || $user->isBanned() || $user->isDeactivated() || $user->isBlacklistedBy($thisUser) || $thisUser->isBlacklistedBy($user)}
+            {var $canAddFriend = $canSendFriendRequest ?? $user->canReceiveFriendRequestsFrom($thisUser)}
             {if !$isRestricted}
                 {if \OPENVK_ROOT_CONF['openvk']['preferences']['commerce']}
                     {if $user->getPrivacyPermission('messages.write', $thisUser) || ($thisUser && $user->hasActiveDialogueWith($thisUser))}
@@ -22,14 +23,13 @@
                     {/if}
                 {/if}
             {/if}
-            {var $subStatus = $user->getSubscriptionStatus($thisUser)}
             {var $actions = [
                 0 => ['act' => 'add', 'label' => tr('friends_add')],
                 1 => ['act' => 'add', 'label' => tr('friends_accept'), 'class' => 'button_gray'],
                 2 => ['act' => 'rem', 'label' => tr('friends_reject'), 'class' => 'button_gray'],
                 3 => ['act' => 'rem', 'label' => tr('friends_delete'), 'class' => 'button_gray']
             ]}
-            {if isset($actions[$subStatus]) && (($subStatus !== 0 && $subStatus !== 1) || $canAddFriend)}
+            {if isset($actions[$subStatus]) && (($subStatus !== 0 && $subStatus !== 1 && !($moderationView ?? false)) || $canAddFriend)}
                 {if !$canAddFriend}
                     <form action="/setSub/user" method="post" class="mobile_profile_action_full">
                         <input type="hidden" name="act" value="{$actions[$subStatus]['act']}" />

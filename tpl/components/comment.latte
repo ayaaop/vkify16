@@ -7,8 +7,9 @@
 {var $postId = $target ? $target->getId() : NULL}
 {var $correctLink = $correctLink ?? true}
 {var $isScrollNode = !($compact ?? false)}
-{var $canEditComment = isset($thisUser) && !($noEdit ?? false) && $comment->canBeEditedBy($thisUser)}
-{var $canDeleteComment = isset($thisUser) && $comment->canBeDeletedBy($thisUser)}
+{var $readOnly = $readOnly ?? false}
+{var $canEditComment = isset($thisUser) && !$readOnly && !($noEdit ?? false) && $comment->canBeEditedBy($thisUser)}
+{var $canDeleteComment = isset($thisUser) && !$readOnly && $comment->canBeDeletedBy($thisUser)}
 {var $canReportComment = isset($thisUser) && $thisUser->getId() != $author->getRealId()}
 <div data-id="1_{$comment->getId()}" n:class="post, reply, comment, $isScrollNode ? scroll_node" id="_comment{$comment->getId()}" data-comment-id="{$comment->getId()}" data-owner-id="{$author->getId()}" data-from-group="{$author instanceof $Club ? 'true' : 'false'}" n:attr="data-uniqueid => $isScrollNode ? ('reply_' . $comment->getId()) : null, data-post-id => $postId, data-mention-name => ($author instanceof $Club ? $author->getName() : $author->getFirstName())">
     <div class="reply_wrap">
@@ -63,7 +64,7 @@
             </div>
             <div class='post_edit'></div>
             <div class="reply_footer clear_fix" n:if="!($timeOnly ?? false)">
-                {if isset($thisUser)}
+                {if isset($thisUser) && !$readOnly}
                     {var $isLiked = $comment->hasLikeFrom($thisUser)}
                     <a class="post_like like_wrap {if $isLiked}my_like{/if}" onmouseover="vkifyLikesShow(this)" href="/comment{$comment->getId()}/like?hash={rawurlencode($csrfToken)}" data-likes='{$likesCount}' data-id="1_{$comment->getPrettyId()}" data-type='comment'>
                         <i class="action_icon" id="{if $isLiked}liked{/if}"></i>
@@ -77,7 +78,7 @@
                     </a>
                 </div>
                 <div n:if="isset($thisUser)" class="reply_link_wrap">
-                    <a n:if="!($no_reply_button ?? false)" class="reply_link" onclick="commentReply(event)">
+                    <a n:if="!($no_reply_button ?? false) && !$readOnly" class="reply_link" onclick="commentReply(event)">
                         {_reply}
                     </a>
                 </div>
