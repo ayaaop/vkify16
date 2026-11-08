@@ -522,28 +522,23 @@ function bindEditMenuSourceAttacher() {
     if (!vkify.bindOnce('editMenuSourceAttacher', bindEditMenuSourceAttacher)) return;
     document.addEventListener('click', (e) => {
         const attacher = e.target.closest?.('#__sourceAttacher');
-        const menu = attacher?.closest?.('.edit_menu');
-        if (!menu) return;
+        const composer = attacher?.closest?.('.edit_menu, #_new_post_modal #write');
+        if (!composer) return;
         e.preventDefault();
         e.stopPropagation();
 
-        MessageBox(tr('add_source'), `
+        const dialog = MessageBox(tr('add_source'), `
             <div id='source_flex_kunteynir'>
                 <span>${tr('set_source_tip')}</span>
                 <input type='text' maxlength='400' placeholder='...'>
             </div>
-        `, [tr('cancel')], [Function.noop]);
+        `, [tr('cancel')], [Function.noop], true);
+        const dialogNode = dialog.getNode();
 
-        const removeDialog = () => {
-            u('body').removeClass('dimmed');
-            document.querySelector('html').style.overflowY = 'scroll';
-            u('.ovk-diag-cont').remove();
-        };
+        dialogNode.find('.ovk-diag-action').prepend(`<button class='button' id='__setsrcbutton'>${tr('set_source')}</button>`);
 
-        u('.ovk-diag-action').prepend(`<button class='button' id='__setsrcbutton'>${tr('set_source')}</button>`);
-
-        u('#__setsrcbutton').on('click', async (ev) => {
-            const sourceInput = u('#source_flex_kunteynir input[type="text"]');
+        dialogNode.find('#__setsrcbutton').on('click', async (ev) => {
+            const sourceInput = dialogNode.find('#source_flex_kunteynir input[type="text"]');
             const sourceValue = sourceInput.nodes[0]?.value ?? '';
             if (sourceValue.length < 1) return;
 
@@ -553,17 +548,17 @@ function bindEditMenuSourceAttacher() {
             const check = await res.json();
 
             if (check.error_code) {
-                removeDialog();
+                dialog.close();
                 const key = { 3103: 'error_adding_source_long', 3104: 'error_adding_source_sus' }[check.error_code] || 'error_adding_source_regex';
                 fastError(tr(key));
                 return;
             }
 
-            removeDialog();
+            dialog.close();
 
-            const sourceOutput = menu.querySelector("input[name='source']");
+            const sourceOutput = composer.querySelector("input[name='source']");
             const escaped = escapeHtml(sourceValue);
-            const postSource = menu.querySelector('.post-source');
+            const postSource = composer.querySelector('.post-source');
             if (sourceOutput) {
                 sourceOutput.setAttribute('value', sourceValue);
                 sourceOutput.value = sourceValue;
