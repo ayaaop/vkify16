@@ -1130,7 +1130,7 @@
         display: none;
     }
     .ovk-msg-dialog.ovk-diag-no-title .ovk-diag-body {
-        padding-top: 24px;
+        padding-top: 24px!important;
     }
     .ovk-diag-body {
         height: auto !important;
