@@ -551,7 +551,7 @@ div.avatar_block:hover .avatar_variants {
 }
 
 .avatar_block_inner img {
-  height: fit-content;
+  height: auto;
   width: 100%;
   border-radius: 0;
 }
