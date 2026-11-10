@@ -389,17 +389,34 @@
             const headerTitleEl = this._els.popupHeader.querySelector('.idd_header');
             headerTitleEl.innerHTML = this._opts.keepTitle ? this._title : (this._selected ? this._selected[1] : '');
             this._els.popupEl = popupEl;
-            this._iddEl.appendChild(popupEl);
-            const itemsHeight = this._els.popupItems.firstElementChild?.offsetHeight || 0;
-            const addTop = this.openToUp ? -(itemsHeight + this._els.popupHeader.offsetHeight) : 0;
-            popupEl.style.marginTop = ((this._opts.headerTop ?? IDD_HEADER_CORRECTION_TOP) - rect.height + addTop) + 'px';
-            popupEl.style.width = (popupEl.offsetWidth + 8) + 'px';
-            popupEl.style.opacity = 1;
-            if (this._opts.alignLeft) {
-                popupEl.style.marginLeft = (rect.width - IDD_HEADER_CORRECTION_LEFT) + 'px';
+            (this._opts.portal ? this._iddEl.closest('.ovk-diag-cont') || document.body : this._iddEl).appendChild(popupEl);
+            if (this._opts.portal) {
+                popupEl.style.maxWidth = `${(window.visualViewport?.width || window.innerWidth) - 8}px`;
+                popupEl.style.width = (popupEl.offsetWidth + 8) + 'px';
+                this._positionPopup();
+                this._boundReposition ??= () => this._positionPopup();
+                window.addEventListener('resize', this._boundReposition);
+                window.visualViewport?.addEventListener('resize', this._boundReposition);
+                window.visualViewport?.addEventListener('scroll', this._boundReposition);
+                document.addEventListener('scroll', this._boundReposition, true);
+                this._popupResizeObserver = new ResizeObserver(this._boundReposition);
+                this._popupResizeObserver.observe(this._iddEl.closest('.ovk-diag') || this._iddEl);
+                this._popupDisconnectObserver = new MutationObserver(() => {
+                    if (!this._iddEl.isConnected) this._hide();
+                });
+                this._popupDisconnectObserver.observe(document.body, { childList: true });
             } else {
-                popupEl.style.marginLeft = ((this._opts.headerLeft ?? IDD_HEADER_CORRECTION_LEFT) - (this._opts.withIcon ? 20 : 0)) + 'px';
+                const itemsHeight = this._els.popupItems.firstElementChild?.offsetHeight || 0;
+                const addTop = this.openToUp ? -(itemsHeight + this._els.popupHeader.offsetHeight) : 0;
+                popupEl.style.marginTop = ((this._opts.headerTop ?? IDD_HEADER_CORRECTION_TOP) - rect.height + addTop) + 'px';
+                popupEl.style.width = (popupEl.offsetWidth + 8) + 'px';
+                if (this._opts.alignLeft) {
+                    popupEl.style.marginLeft = (rect.width - IDD_HEADER_CORRECTION_LEFT) + 'px';
+                } else {
+                    popupEl.style.marginLeft = ((this._opts.headerLeft ?? IDD_HEADER_CORRECTION_LEFT) - (this._opts.withIcon ? 20 : 0)) + 'px';
+                }
             }
+            popupEl.style.opacity = 1;
             this._unhoverItem();
             this._highlightItem();
             this._initEvents();
@@ -407,8 +424,51 @@
             if (!this._opts.disableCancelClickEvent) event?.preventDefault();
         }
 
+        _positionPopup() {
+            const popup = this._els.popupEl;
+            if (!popup?.isConnected) return;
+            if (!this._iddEl.isConnected) {
+                this._hide();
+                return;
+            }
+            const rect = this._iddEl.getBoundingClientRect();
+            const hostRect = popup.parentElement.getBoundingClientRect();
+            const viewport = window.visualViewport;
+            const top = viewport?.offsetTop || 0;
+            const left = viewport?.offsetLeft || 0;
+            const bottom = top + (viewport?.height || window.innerHeight);
+            const right = left + (viewport?.width || window.innerWidth);
+            const headerHeight = this._els.popupHeader.offsetHeight;
+            const upSpace = rect.top - top;
+            const downSpace = bottom - rect.bottom;
+            const fullHeight = this._els.popupItems.firstElementChild?.offsetHeight + headerHeight || popup.offsetHeight;
+            const up = this._opts.forceDir === 1 || this._opts.forceDir === 'up'
+                || (this._opts.forceDir !== -1 && this._opts.forceDir !== 'down' && downSpace < fullHeight && upSpace > downSpace);
+            if (up !== this.openToUp) {
+                this.openToUp = up;
+                popup.replaceChildren(...(up
+                    ? [this._els.popupItems, this._els.popupHeader]
+                    : [this._els.popupHeader, this._els.popupItems]));
+            }
+            this._els.popupItems.style.maxHeight = `${Math.max(40, Math.min(290, (up ? upSpace : downSpace) - headerHeight - 8))}px`;
+            const popupTop = up ? rect.top - popup.offsetHeight : rect.bottom;
+            const popupLeft = this._opts.alignLeft
+                ? rect.right - popup.offsetWidth
+                : rect.left + (this._opts.headerLeft ?? IDD_HEADER_CORRECTION_LEFT);
+            popup.style.top = `${Math.max(top + 4, Math.min(bottom - popup.offsetHeight - 4, popupTop)) - hostRect.top}px`;
+            popup.style.left = `${Math.max(left + 4, Math.min(right - popup.offsetWidth - 4, popupLeft)) - hostRect.left}px`;
+        }
+
         _hide() {
             if (activeIdd === this) activeIdd = null;
+            if (this._opts.portal) {
+                window.removeEventListener('resize', this._boundReposition);
+                window.visualViewport?.removeEventListener('resize', this._boundReposition);
+                window.visualViewport?.removeEventListener('scroll', this._boundReposition);
+                document.removeEventListener('scroll', this._boundReposition, true);
+                this._popupResizeObserver?.disconnect();
+                this._popupDisconnectObserver?.disconnect();
+            }
             this._els.popupEl?.remove();
             this._els.popupEl = null;
             this._hoveredItem?.classList.remove('idd_hover');
