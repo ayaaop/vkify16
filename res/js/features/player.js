@@ -1268,6 +1268,7 @@ class VKVideoPlayer {
 
     play() {
         this._ensureVideoSrc();
+        if (!this._muted) this.video.muted = false;
         if (this.video.ended) this.video.currentTime = 0;
         const p = this.video.play();
         if (p && typeof p.catch === 'function') {
@@ -1324,7 +1325,9 @@ class VKVideoPlayer {
     setVolume(vol, save = true) {
         const v = Math.max(0, Math.min(1, Number(vol) || 0));
         this.video.muted = v === 0;
-        this.video.volume = v;
+        if (!document.documentElement.classList.contains('platform-ios')) {
+            this.video.volume = v;
+        }
         if (v > 0) this._volume = v;
         this._muted = v === 0;
         if (save) Prefs.set('volume', v);

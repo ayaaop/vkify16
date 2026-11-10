@@ -275,6 +275,10 @@
     position: relative;
 }
 
+.platform-ios .videoplayer_volume {
+    display: none !important;
+}
+
 .videoplayer_volume_slider {
     width: 50px;
 }
