@@ -61,9 +61,14 @@ vkify.once('simpleTooltips', () => {
         if (!el.isConnected) return tooltips.destroy(el);
         const anchor = el.getBoundingClientRect();
         const size = container.getBoundingClientRect();
+        const mobileViewport = typeof window.isMobile === 'function'
+            ? window.isMobile()
+            : window.matchMedia('(max-width: 768px)').matches;
+        const sideFallback = mobileViewport && (opts.dir === 'left' || opts.dir === 'right');
+        const dir = sideFallback ? undefined : opts.dir;
         const rawShift = typeof opts.shift === 'function' ? opts.shift() : opts.shift;
-        const shift = rawShift || (opts.black ? [11, 8, 8] : [2, 8, 8]);
-        const side = opts.dir === 'left' || opts.dir === 'right';
+        const shift = (sideFallback ? null : rawShift) || (opts.black ? [11, 8, 8] : [2, 8, 8]);
+        const side = dir === 'left' || dir === 'right';
         const gapAbove = Number(shift[1]) || 0;
         const gapBelow = Number(shift[2] ?? shift[1]) || 0;
         let above = false;
@@ -73,11 +78,11 @@ vkify.once('simpleTooltips', () => {
         if (side) {
             const sideGap = Number(shift[0]) || 8;
             vTop = anchor.top + (anchor.height - size.height) / 2 - gapAbove;
-            vLeft = opts.dir === 'right' ? anchor.right + sideGap : anchor.left - size.width - sideGap;
+            vLeft = dir === 'right' ? anchor.right + sideGap : anchor.left - size.width - sideGap;
         } else {
-            if (opts.dir === 'down' || opts.forcetoup) {
+            if (dir === 'down' || opts.forcetoup) {
                 above = true;
-            } else if (opts.dir === 'up' || opts.forcetodown) {
+            } else if (dir === 'up' || opts.forcetodown) {
                 above = false;
             } else {
                 const fitsAbove = anchor.top >= size.height + gapAbove + 8;
@@ -123,8 +128,8 @@ vkify.once('simpleTooltips', () => {
 
         container.classList.toggle('tt_down', above && !side);
         container.classList.toggle('tt_up', !above && !side);
-        container.classList.toggle('tt_right', opts.dir === 'left');
-        container.classList.toggle('tt_left', opts.dir === 'right');
+        container.classList.toggle('tt_right', dir === 'left');
+        container.classList.toggle('tt_left', dir === 'right');
         container.classList.toggle('toleft', !side && needLeft);
         container.classList.toggle('tocenter', !!opts.center);
         container.style.top = `${top}px`;
@@ -215,7 +220,7 @@ vkify.once('simpleTooltips', () => {
                         from.top = `${pos.top + (pos.above ? -slide : slide)}px`;
                         to.top = `${pos.top}px`;
                     }
-                    if (slideX) {
+                    if (slideX && pos.side) {
                         from.left = `${pos.left + slideX}px`;
                         to.left = `${pos.left}px`;
                     }

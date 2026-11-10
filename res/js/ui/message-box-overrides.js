@@ -77,6 +77,49 @@ vkify.bindOnce('messageBoxOverrides', () => {
         if (!proto.__vkifyStackingHooked) {
             proto.__vkifyStackingHooked = true;
 
+            let scrollLock = null;
+            const syncBodyScrollLock = () => {
+                const body = document.body;
+                const visible = window.messagebox_stack?.some(msg => !msg.hidden);
+                if (visible && !scrollLock) {
+                    const ios = document.documentElement.classList.contains('platform-ios');
+                    scrollLock = {
+                        ios,
+                        y: window.scrollY,
+                        position: body.style.position,
+                        top: body.style.top,
+                        left: body.style.left,
+                        right: body.style.right,
+                        width: body.style.width,
+                        overflow: body.style.overflow,
+                    };
+                    body.style.overflow = 'hidden';
+                    if (ios) {
+                        body.style.position = 'fixed';
+                        body.style.top = `-${scrollLock.y}px`;
+                        body.style.left = '0';
+                        body.style.right = '0';
+                        body.style.width = '100%';
+                    }
+                } else if (!visible && scrollLock) {
+                    if (scrollLock.ios) {
+                        body.style.position = scrollLock.position;
+                        body.style.top = scrollLock.top;
+                        body.style.left = scrollLock.left;
+                        body.style.right = scrollLock.right;
+                        body.style.width = scrollLock.width;
+                    }
+                    body.style.overflow = scrollLock.overflow;
+                    if (scrollLock.ios) window.scrollTo(0, scrollLock.y);
+                    scrollLock = null;
+                }
+            };
+            const origCheckCount = proto._checkCount;
+            proto._checkCount = function () {
+                origCheckCount.call(this);
+                syncBodyScrollLock();
+            };
+
             const origExitDialog = proto.__exitDialog;
             proto.__exitDialog = function () {
                 const stack = window.messagebox_stack;
@@ -92,6 +135,7 @@ vkify.bindOnce('messageBoxOverrides', () => {
                     }
                 }
                 origExitDialog.call(this);
+                syncBodyScrollLock();
                 // Stock clears ?w only via viewer.close(); Escape, __closeMsgs
                 // and direct msg.close() bypass it and leave the param behind.
                 if (this._viewer && typeof this._viewer._removeW === 'function') {
@@ -476,6 +520,7 @@ vkify.bindOnce('messageBoxOverrides', () => {
                         for (const node of m.addedNodes) {
                             if (node.nodeType === 1 && node.classList?.contains('ovk-msg-all')) {
                                 window.tippy?.hideAll?.();
+                                window.tooltips?.destroyAll?.();
                                 decorateDialog(node);
                                 classifyDialog(node);
                                 watchDialogBodyScroll(node);
