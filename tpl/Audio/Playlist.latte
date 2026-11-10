@@ -1,4 +1,8 @@
 {extends "../@layout.latte"}
+{if $cover && $cover->isGeoBlocked()}
+    {var $cover = null}
+    {var $cover_url = "/assets/packages/static/openvk/img/song.jpg"}
+{/if}
 
 {block title}
     {_playlist}
@@ -34,7 +38,7 @@
             page: {$page}
         }
     </script>
-    {var $playlistAudios = $audios ?? iterator_to_array($playlist->fetch($page, 10))}
+    {var $playlistAudios = $audios ?? iterator_to_array(\openvk\Web\Util\GeoBlock::i()->filterEntities($playlist->fetch($page, 10)))}
     {var $playlistSort = $sort ?? ($_GET['sort'] ?? 'asc')}
     {var $playlistComments = $comments ?? iterator_to_array($playlist->getComments($page, null, $playlistSort == 'asc' ? 'ASC' : 'DESC'))}
     <div class="_playlist_page_content_block">

@@ -51,6 +51,9 @@
     {var $canSeeAudios   = $audiosCount  > 0 && $user->getPrivacyPermission('audios.read',  $thisUser ?? NULL)}
     {var $canSeeGroups   = $user->getClubCount() > 0 && $user->getPrivacyPermission('groups.read', $thisUser ?? NULL)}
     {var $canSeeMeetings = $user->getMeetingsCount() > 0 && $user->getPrivacyPermission('groups.read', $thisUser ?? NULL)}
+    {var $profileClubs = $canSeeGroups ? array_slice(iterator_to_array(\openvk\Web\Util\GeoBlock::i()->filterEntities($user->getClubs(1))), 0, 6) : []}
+    {var $profileMeetings = $canSeeMeetings ? array_slice(iterator_to_array(\openvk\Web\Util\GeoBlock::i()->filterEntities($user->getMeetings(1))), 0, 6) : []}
+    {var $audioStatus = $audioStatus && $audioStatus->isGeoBlocked() ? null : $audioStatus}
     {var $canSeeNotes    = $notesCount   > 0 && $user->getPrivacyPermission('notes.read',   $thisUser ?? NULL)}
     {var $canSeeAlbums   = $albumsCount  > 0 && $user->getPrivacyPermission('photos.read',  $thisUser ?? NULL)}
     {var $giftCount      = $user->getGiftCount()}
@@ -95,7 +98,7 @@
         </div>
     {else}
 
-	{include #mobileProfile, $thatIsThisUser, $hasMoreInfo, $stripHasContent, $canSeeVideos, $canSeeAudios, $canSeeGroups, $canSeeMeetings, $canSeeAlbums, $canSeeGifts, $canSeeNotes, $videos, $audios, $albums, $basicInfoFields, $contactInfoFields, $personalInfoFields}
+	{include #mobileProfile, $thatIsThisUser, $hasMoreInfo, $stripHasContent, $canSeeVideos, $canSeeAudios, $canSeeGroups, $canSeeMeetings, $canSeeAlbums, $canSeeGifts, $canSeeNotes, $videos, $audios, $albums, $basicInfoFields, $contactInfoFields, $personalInfoFields, $profileClubs, $profileMeetings}
 
     {if $moderationView ?? false}
         {include "ModerationBanner.latte"}
@@ -238,7 +241,7 @@
 						<div class="module clear page_list_module" n:if="$canSeeGroups">
 							{include '../components/module_header.latte', href => '/groups' . ($user->getId()), label => tr('groups'), count => $user->getClubCount()}
 							<div class="module_body clear_fix">
-								<div class="line_cell clear_fix" n:foreach="array_slice(iterator_to_array($user->getClubs(1)), 0, 5) as $club">
+								<div class="line_cell clear_fix" n:foreach="array_slice($profileClubs, 0, 5) as $club">
 									<div class="thumb">
 										<a href="club{$club->getId()}">
 											{include '../components/avatar.latte', author => $club, size => 'miniscule', width => 40, height => 40, alt => $club->getCanonicalName(), class => 'cell_img'}
@@ -256,7 +259,7 @@
 						<div class="module clear page_list_module" n:if="$canSeeMeetings">
 							{include '../components/module_header.latte', href => '/events' . ($user->getId()), label => tr('meetings'), count => $user->getMeetingsCount()}
 							<div class="module_body clear_fix">
-								<div class="line_cell clear_fix" n:foreach="array_slice(iterator_to_array($user->getMeetings(1)), 0, 5) as $meeting">
+								<div class="line_cell clear_fix" n:foreach="array_slice($profileMeetings, 0, 5) as $meeting">
 									<div class="thumb">
 										<a href="/event{$meeting->getId()}">
 											{include '../components/avatar.latte', author => $meeting, size => 'miniscule', width => 40, height => 40, alt => $meeting->getName(), class => 'cell_img'}
@@ -293,8 +296,9 @@
 							{include '../components/module_header.latte', href => '/albums' . ($user->getId()), label => tr('albums'), count => $albumsCount}
 							<div class="module_body clear_fix">
 								<div class="clear_fix clear page_album_row" n:foreach="array_slice(iterator_to_array($albums), 0, 3) as $album">
-									<a href="/album{$album->getPrettyId()}" class="page_album_link {if is_null($album->getCoverPhoto())}page_album_nocover{/if}">
-										{var $cover = $album->getCoverPhoto()}
+									{var $cover = $album->getCoverPhoto()}
+									{var $cover = $cover && !$cover->isGeoBlocked() ? $cover : null}
+									<a href="/album{$album->getPrettyId()}" class="page_album_link {if is_null($cover)}page_album_nocover{/if}">
 										<div class="page_album_thumb_wrap">
 											<img n:if="!is_null($cover)"
 												src="{$cover->getURLBySizeId('normal')}"

@@ -1,5 +1,5 @@
 {extends "../@listView.latte"}
-{var $iterator = $user->getClubs($page, $admin)}
+{var $iterator = \openvk\Web\Util\GeoBlock::i()->filterEntities($user->getClubs($page, $admin))}
 {var $count    = $user->getClubCount($admin)}
 
 {block title}
@@ -71,7 +71,7 @@
         <a class="page_verified" n:if="$x->isVerified()" href="/verify"></a>
     </div>
     <div class="labeled">
-         <a href="/club{$x->getId()}/followers">{tr("participants", $x->getFollowersCount())}</a></td>
+         <a href="/club{$x->getId()}/followers">{tr("participants", $x->getFollowersCount())}</a>
     </div>
 {/block}
 
@@ -151,7 +151,7 @@
                             {var $randomIds[] = $candidateId}
                         {/if}
                     {/while}
-                    {var $candidateClubs = $clubsRepo->getByIds($randomIds)}
+                    {var $candidateClubs = \openvk\Web\Util\GeoBlock::i()->filterEntities($clubsRepo->getByIds($randomIds))}
                     {var $eligibleClubs = []}
                     {foreach $candidateClubs as $clubCandidate}
                         {if $clubCandidate && !$clubCandidate->isHideFromGlobalFeedEnabled() && !$clubCandidate->isHidingFromGlobalFeedEnforced() && !$clubCandidate->isBanned() && $clubCandidate->getSubscriptionStatus($thisUser) == false}
