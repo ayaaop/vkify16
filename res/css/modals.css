@@ -1309,6 +1309,9 @@ body:not(.mode-2018) .video_info_actions .video_share_button .action_icon {
   width: 290px;
   height: 161px;
 }
+.video_item_selected_tick {
+  display: none;
+}
 
 /* photos */
 .photos_choose_rows {

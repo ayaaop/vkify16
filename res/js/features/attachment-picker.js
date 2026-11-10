@@ -899,6 +899,8 @@ class AttachmentPicker extends AttachmentPickerBase {
             const id = row.attr('data-picker-id');
             if (e.ctrlKey || e.metaKey || e.shiftKey) {
                 this.handleItemSelect(row, id, e);
+            } else if (this.type === 'video' && window.isMobile?.()) {
+                this.handleItemSelect(row, id, e);
             } else {
                 this.handleItemAttach(row, id);
             }
@@ -1528,29 +1530,12 @@ const VideoAdapter = {
             window.showFastVideoUpload?.(picker.form, e, clubId, tab);
         });
 
-        node.on('click', '.video_item__thumb_link', (e) => {
-            if (u(e.target).closest('.picker-item-select').length) return;
+        node.on('click', '.picker-items .video_item', (e) => {
+            if (!window.isMobile?.() || u(e.target).closest('.picker-item-attach, .picker-item-select').length) return;
             e.preventDefault();
             e.stopPropagation();
             const row = u(e.target).closest('[data-picker-id]');
-            const id = row.attr('data-picker-id');
-            if (e.ctrlKey || e.metaKey || e.shiftKey) {
-                picker.handleItemSelect(row, id, e);
-            } else {
-                picker.handleItemAttach(row, id);
-            }
-        });
-
-        node.on('click', '.video_item_title', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const row = u(e.target).closest('[data-picker-id]');
-            const id = row.attr('data-picker-id');
-            if (e.ctrlKey || e.metaKey || e.shiftKey) {
-                picker.handleItemSelect(row, id, e);
-            } else {
-                picker.handleItemAttach(row, id);
-            }
+            picker.handleItemSelect(row, row.attr('data-picker-id'), e);
         });
     },
 
@@ -1604,9 +1589,10 @@ const VideoAdapter = {
             </a>
             <div class="video_item_info">
                 <a class="video_item_title picker-item-attach" href="javascript:void(0)" title="${escapeHtml(video.title || '')}">${escapeHtml(video.title || '')}</a>
-                <div class="video_item_author"><a class="mem_link" href="${authorUrl}" target="_blank">${authorName}</a></div>
+                <div class="video_item_author"><a class="mem_link" href="${authorUrl}" target="_blank">${escapeHtml(authorName)}</a></div>
                 ${video.date ? `<div class="video_item_add_info"><span class="video_item_date_info"><span class="video_item_updated">${formatRelativeTime(video.date)}</span></span></div>` : ''}
             </div>
+            <svg class="video_item_selected_tick" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><use href="#done-outline-24"></use></svg>
         </div>`;
     },
 
@@ -1686,6 +1672,7 @@ const AudioAdapter = {
         new vkify.InlineDropdown(node.find('.picker-search-type').nodes[0], {
             items: [['by_name', tr('by_name')], ['by_performer', tr('by_performer')]],
             withArrow: true,
+            portal: window.isMobile?.(),
             selected: 'by_name',
             onSelect: async (value) => {
                 picker._searchType = value;
