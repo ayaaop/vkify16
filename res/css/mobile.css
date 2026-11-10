@@ -26,6 +26,41 @@
     body .really_text, body span.text, body .lyrics, body .video_info_title {
         user-select: text;
     }
+    input[type="checkbox"], input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        margin: 0 8px 0 0;
+        vertical-align: middle;
+        background-image: none !important;
+        background-position: center !important;
+        background-color: var(--text-color--secondary) !important;
+        -webkit-mask: var(--control-icon) center / 20px 20px no-repeat;
+        mask: var(--control-icon) center / 20px 20px no-repeat;
+        filter: none !important;
+    }
+    input[type="checkbox"] {
+        --control-icon: url(../icons/check_box_off_20.svg);
+    }
+    input[type="radio"] {
+        --control-icon: url(../icons/radio_off_20.svg);
+    }
+    input[type="checkbox"]:checked, input[type="radio"]:checked {
+        background-color: var(--accent-color) !important;
+    }
+    input[type="checkbox"]:checked {
+        --control-icon: url(../icons/check_box_on_20.svg);
+    }
+    input[type="radio"]:checked {
+        --control-icon: url(../icons/radio_on_20.svg);
+    }
+    input[type="checkbox"]:disabled, input[type="radio"]:disabled {
+        opacity: .5;
+        cursor: default;
+    }
+    label.checkbox > input[type="checkbox"],
+    label.radio > input[type="radio"] {
+        margin: 1px 0 0;
+    }
     .mobileonly {
         display: block !important;
     }
