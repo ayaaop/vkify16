@@ -622,8 +622,22 @@
     function syncNativeSelect(select, state) {
         if (!select.isConnected) return;
         const items = [...select.options].map(option => [
-            option.value, option.textContent.trim(), option.disabled || option.parentElement?.disabled
+            option.value, state.inline ? option.innerHTML.trim() : option.textContent.trim(),
+            option.disabled || option.parentElement?.disabled
         ]);
+        if (state.inline) {
+            const signature = JSON.stringify(items);
+            if (state.items !== signature) {
+                state.dropdown.setItems(items);
+                state.items = signature;
+            }
+            state.dropdown.select(select.value, true);
+            state.container.inert = select.disabled;
+            state.container.setAttribute('aria-disabled', String(select.disabled));
+            state.input.tabIndex = select.disabled ? -1 : 0;
+            state.container.style.display = select.style.display === 'none' || select.hidden ? 'none' : '';
+            return;
+        }
         state.dropdown.setData(items);
         state.dropdown.setAutocomplete(items.length >= searchableThreshold);
         state.dropdown.val(select.value, false);
@@ -645,8 +659,10 @@
 
     function mountNativeSelect(select) {
         if (selectInstances.has(select) || !select.parentNode || select.multiple || select.size > 1) return;
-        const input = document.createElement('input');
-        input.type = 'text';
+        const inline = select.dataset.vkifyDropdown === 'inline';
+        const input = document.createElement(inline ? 'span' : 'input');
+        if (inline) input.id = `vk_inline_select_${++nextId}`;
+        else input.type = 'text';
         input.setAttribute('aria-label', select.getAttribute('aria-label')
             || (select.id && document.querySelector(`label[for="${CSS.escape(select.id)}"]`)?.textContent.trim())
             || select.closest('label')?.textContent.trim()
@@ -656,28 +672,56 @@
         select.after(input);
         const rect = select.getBoundingClientRect();
         let state;
-        const dropdown = new Dropdown(input, [...select.options].map(option => [
+        const onChange = value => {
+            const option = [...select.options].find(option => option.value === String(value));
+            if (select.disabled || !option || option.disabled || option.parentElement?.disabled) return false;
+            select.value = value;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+        const dropdown = inline ? new InlineDropdown(input, {
+            items: [...select.options].map(option => [option.value, option.innerHTML.trim()]),
+            selected: select.value,
+            withArrow: true,
+            onSelect: onChange
+        }) : new Dropdown(input, [...select.options].map(option => [
             option.value, option.textContent.trim(), option.disabled || option.parentElement?.disabled
         ]), {
             width: rect.width || undefined,
             selectedItem: select.value,
             autocomplete: select.options.length >= searchableThreshold,
             onBeforeShow: () => syncNativeSelect(select, state),
-            onChange: value => {
-                select.value = value;
-                select.dispatchEvent(new Event('change', { bubbles: true }));
-            }
+            onChange
         });
+        const container = inline ? dropdown.getElement() : dropdown.container;
+        const focusInput = inline ? container.querySelector('.idd_selected_value') : dropdown.input;
+        if (inline) {
+            // Keep the native select as the only submitted value, including in fetched edit forms.
+            container.querySelector('input').removeAttribute('name');
+            focusInput.setAttribute('aria-label', input.getAttribute('aria-label'));
+            focusInput.addEventListener('keydown', event => {
+                if (!select.disabled && !container.querySelector('.idd_popup')
+                    && ['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(event.key)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    container.click();
+                }
+            });
+        }
         state = {
             dropdown,
+            inline,
+            container,
+            input: focusInput,
             form: select.form,
             onChange: () => syncNativeSelect(select, state),
             onReset: () => setTimeout(() => {
                 if (selectInstances.get(select) === state) syncNativeSelect(select, state);
             }, 0),
             onFocus: () => {
-                dropdown.input.focus();
-                dropdown.show();
+                if (select.disabled) return;
+                focusInput.focus();
+                if (inline) container.click();
+                else dropdown.show();
             },
             observer: new MutationObserver(() => syncNativeSelect(select, state))
         };
@@ -711,10 +755,9 @@
             const label = e.target.closest?.('label');
             const select = label?.control;
             const state = selectInstances.get(select);
-            if (!state || state.dropdown.container.contains(e.target)) return;
+            if (!state || state.container.contains(e.target)) return;
             e.preventDefault();
-            state.dropdown.input.focus();
-            state.dropdown.show();
+            state.onFocus();
         }, true);
         vkify.observeDOM(mutations => {
             for (const mutation of mutations) {

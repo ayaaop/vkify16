@@ -4,7 +4,8 @@
 {var $transparentAppbar = true}
 {var $backdrops = $club->getBackDropPictureURLs()}
 {var $canEdit = $thisUser && $club->canBeModifiedBy($thisUser)}
-{var $canReport = $thisUser->getId() != $club->getOwner()->getId()}
+{var $canView = $club->canBeViewedBy($thisUser ?? null)}
+{var $canReport = $thisUser && $thisUser->getId() != $club->getOwner()->getId()}
 {block title}{$club->getName()}{/block}
 
 {block headIncludes}
@@ -22,20 +23,20 @@
 
 
 {block content}
-    {var $audios = iterator_to_array($audios)}
-    {var $albums = iterator_to_array($albums)}
-    {var $videos = iterator_to_array($videos ?? [])}
-    {var $topics = iterator_to_array($topics)}
-    {var $docs   = iterator_to_array((new \openvk\Web\Models\Repositories\Documents())->getDocumentsByOwner($club->getRealId())->offsetLimit(0, 6))}
+    {var $audios = $canView ? iterator_to_array($audios) : []}
+    {var $albums = $canView ? iterator_to_array($albums) : []}
+    {var $videos = $canView ? iterator_to_array($videos ?? []) : []}
+    {var $topics = $canView ? iterator_to_array($topics) : []}
+    {var $docs = $canView ? iterator_to_array((new \openvk\Web\Models\Repositories\Documents())->getDocumentsByOwner($club->getRealId())->offsetLimit(0, 6)) : []}
     {var $followersCount = $club->getFollowersCount()}
     {var $potentialCount = $club->getPotentialFollowersCount()}
     {var $owner = $club->getOwner()}
     {var $descPlain = $club->getDescription() ?? ''}
     {var $descHtml = $club->getDescriptionHtml()}
-    {var $pinnedPost = (new \openvk\Web\Models\Repositories\Posts())->getPinnedPost($club->getId() * -1)}
+    {var $pinnedPost = $canView ? (new \openvk\Web\Models\Repositories\Posts())->getPinnedPost($club->getId() * -1) : null}
     {var $hasMoreInfo = $canEdit || $descPlain !== '' || $club->getWebsite() || in_array($club->getAdministratorsListDisplay(), [0, 1])}
 
-    {include #mobileProfile, $hasMoreInfo, $albums, $audios, $videos, $topics, $followersCount, $potentialCount, $pinnedPost, $descHtml, $descPlain, $docs}
+    {include #mobileProfile, $hasMoreInfo, $albums, $audios, $videos, $topics, $followersCount, $potentialCount, $pinnedPost, $descHtml, $descPlain, $docs, $canView}
 
     {if $hasMoreInfo}
     <script>
@@ -87,12 +88,7 @@
 							{/if}
 							<div class="profile_actions_split">
 								{if !$subStatus}
-									<form action="/setSub/club" method="post" class="profile_link_form fl_l">
-										<input type="hidden" name="act" value="add" />
-										<input type="hidden" name="id"  value="{$club->getId()}" />
-										<input type="hidden" name="hash" value="{$csrfToken}" />
-										<input type="submit" value="{if $club->isEvent()}{_ill_come_to_meeting}{else}{_join_community}{/if}" class="button button_wide" />
-									</form>
+									{include '../components/group_join_button.latte', formClass => 'profile_link_form fl_l', buttonClass => 'button button_wide'}
 								{else}
 									<div class="profile_sub_wrapper ui_actions_menu_wrap ui_actions_menu_no_chevron" onclick='{="uiActionsMenu.toggle(this, null, {noAnimate: true});"|noescape}'>
 										<button class="button button_wide button_gray fl_l profile_sub_btn" id="profile_sub_btn">
@@ -138,6 +134,7 @@
 									<div id="profile_actions_tooltip" class="ui_actions_menu">
 											{if $canEdit}
 												<a href="/club{$club->getId()}/edit">{_edit_group}</a>
+												<a n:if="$club->isClosed()" href="/club{$club->getId()}/followers/req">{_req}</a>
 												<a href="/club{$club->getId()}/stats" rel="nofollow">{_statistics}</a>
 												{if $club->isMessagesEnabled()}
 													<a href="/im?as={$club->getRealId()}">{_view_group_messages}</a>
@@ -168,6 +165,11 @@
 								{=vkifyTr('guest_actions_group', $club->getName())|noescape}
 							</div>
 						{/ifset}
+					</div>
+				</div>
+				<div n:if="$club->isClosed()" class="page_block module group_closed">
+					<div class="group_closed_text">
+						{_group_type_closed|explode:'.'|first}
 					</div>
 				</div>
 				<div class="page_block" id="group_counters" n:if="$thisUser && $club->isEvent()">
@@ -211,7 +213,7 @@
 							</div>
 						</div>
 				</div>
-				<div n:ifcontent class="page_block">
+				<div n:if="$canView" n:ifcontent class="page_block">
 					<div n:if="$albumsCount > 0 || $canEdit" class="module album_module">
 						{if $albumsCount > 0}
 							{include '../components/module_header.latte', href => '/albums' . ($club->getId() * -1), label => tr('albums'), count => $albumsCount}
@@ -403,7 +405,7 @@
 					{/if}
                     </div>
 				</div>
-				<div n:if="($topicsCount > 0 || $club->isEveryoneCanCreateTopics() || $canEdit) && $club->isDisplayTopicsAboveWallEnabled()"
+				<div n:if="$canView && ($topicsCount > 0 || $club->isEveryoneCanCreateTopics() || $canEdit) && $club->isDisplayTopicsAboveWallEnabled()"
 				class="page_block module topics_module nomobile">
 					{if $topicsCount > 0}
 						{include '../components/module_header.latte', href => '/board' . ($club->getId()), label => tr('discussions'), count => $topicsCount, tag => 'div'}
@@ -423,7 +425,15 @@
 							<div class="page_upload_label page_topics_upload"></div>{_create_topic}</a>
 					{/if}
 				</div>
-				{presenter "openvk!Wall->wallEmbedded", -$club->getId()}
+				{if $canView}
+					{presenter "openvk!Wall->wallEmbedded", -$club->getId()}
+				{else}
+					<div class="page_block page_padding">
+						<div class="msg msg_yellow" style="margin: 0">
+							{_forbidden_comment_group}
+						</div>
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>

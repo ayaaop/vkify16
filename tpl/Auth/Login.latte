@@ -5,6 +5,7 @@
     <div id="auth" class="page_block">
         <h2 class="login_header nomobile">{_log_in}</h2>
         <form id="login_form" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="hash" value="{$csrfToken}" />
             <input class="big_text" type="email" name="login" required placeholder="{_email}" />
             <input class="big_text" type="password" name="password" required placeholder="{_password}" />
             <div class="login_buttons_wrap">

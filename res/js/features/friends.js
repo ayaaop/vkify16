@@ -13,8 +13,11 @@ vkify.bindOnce('friendActions', () => {
         if (!row || button?.disabled) return;
 
         const pageUrl = location.href;
-        const controls = row.querySelector('.action_links');
+        const controls = row.querySelector('.action_links, .group_u_buttons') || row;
         if (controls?.dataset.pending === '1') return;
+        const buttons = Array.from(row.querySelectorAll('.vk-friend-action button[type="submit"]'));
+        const disabled = buttons.map(button => button.disabled);
+        buttons.forEach(button => { button.disabled = true; });
         if (button) window.LoaderUtils?.showInButton(button);
         if (controls) controls.dataset.pending = '1';
         controls?.classList.add('action_progress');
@@ -27,15 +30,18 @@ vkify.bindOnce('friendActions', () => {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
             });
             if (!response.ok) throw new Error('Friend action failed');
-            if (new URL(response.url, location.origin).pathname !== location.pathname) {
-                if (new URL(form.action, location.origin).pathname !== '/setSub/club') {
+            const currentUrl = new URL(pageUrl);
+            const responseUrl = new URL(response.url, location.origin);
+            if (responseUrl.pathname !== currentUrl.pathname || responseUrl.search !== currentUrl.search) {
+                if (responseUrl.pathname !== currentUrl.pathname
+                    && new URL(form.action, location.origin).pathname !== '/setSub/club') {
                     throw new Error('Friend action failed');
                 }
                 response = await fetch(pageUrl, {
                     credentials: 'same-origin',
                     headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 });
-                if (!response.ok || new URL(response.url, location.origin).pathname !== location.pathname) {
+                if (!response.ok || new URL(response.url, location.origin).pathname !== currentUrl.pathname) {
                     throw new Error('Friend action failed');
                 }
             }
@@ -76,6 +82,7 @@ vkify.bindOnce('friendActions', () => {
             if (typeof showSystemMsg === 'function') showSystemMsg(window.tr?.('error') || 'Error', 'err');
         } finally {
             if (button) window.LoaderUtils?.restoreButton(button);
+            buttons.forEach((button, index) => { button.disabled = disabled[index]; });
             controls?.classList.remove('action_progress');
             if (controls) delete controls.dataset.pending;
         }

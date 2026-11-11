@@ -25,6 +25,10 @@
                         [
                             'url' => "/club{$club->getId()}/followers",
                             'title' => 'followers',
+                            'subitems' => [
+                                ['url' => "/club{$club->getId()}/followers/req", 'title' => 'req', 'condition' => $club->isClosed(), 'active' => false],
+                                ['url' => "/club{$club->getId()}/followers?onlyAdmins=1", 'title' => 'administrators', 'active' => false]
+                            ],
                             'active' => false
                         ],
                         [
@@ -58,6 +62,15 @@
                                     <div class="form_label">{_page_address}</div>
                                     <div class="form_data">
                                         <input type="text" name="shortcode" value="{$club->getShortcode()}" />
+                                    </div>
+                                </div>
+                                <div class="form_field" n:if="!$club->isEvent()">
+                                    <div class="form_label">{_group_type}</div>
+                                    <div class="form_data">
+                                        <select name="group_type" data-vkify-dropdown="inline">
+                                            <option value="0" n:attr="selected => $club->getOpennesStatus() == 0">{_group_type_open_title}</option>
+                                            <option value="1" n:attr="selected => $club->getOpennesStatus() == 1">{_group_type_closed_title}</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form_field">

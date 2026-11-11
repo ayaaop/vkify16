@@ -986,6 +986,27 @@ div.avatar_block:hover .avatar_variants {
   margin-top: -5px;
 }
 
+
+.group_closed {
+  padding: 13px 15px;
+  font-size: 12.5px
+}
+
+.group_closed_text {
+  padding-left: 23px;
+  background: url(../icons/group_info_cons.png) no-repeat -2px -79px;
+  line-height: 15px
+}
+
+@media (-webkit-min-device-pixel-ratio: 2),
+(-o-min-device-pixel-ratio: 2/1),
+(min-resolution: 192dpi) {
+  .group_closed_text {
+    background-image: url(../icons/group_info_cons_2x.png);
+    background-size: 15px 149px
+  }
+}
+
 .topics_module .module_body {
   padding: 1px 15px 5px;
 }
