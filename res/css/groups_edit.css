@@ -69,11 +69,6 @@
     margin-top: 11px;
 }
 
-.group_l_row .group_u_reject {
-    display: inline-block;
-    padding: 7px 10px 8px;
-}
-
 .group_l_row .group_u_buttons form {
     margin: 0;
 }
@@ -84,10 +79,6 @@
     color: var(--link-color);
     font: inherit;
     cursor: pointer;
-}
-
-.group_l_row button.group_u_reject:hover:not(:disabled) {
-    text-decoration: underline;
 }
 
 .group_l_row button.group_u_reject:disabled {
@@ -141,10 +132,6 @@
         align-items: flex-start;
         flex-direction: column;
         gap: 8px;
-    }
-
-    .group_l_row .group_u_reject {
-        padding: 0;
     }
 
     .group_member_row .group_u_actions {
