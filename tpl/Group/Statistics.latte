@@ -23,6 +23,11 @@
                             'active' => false
                         ],
                         [
+                            'url' => "/club{$club->getId()}/followers/req",
+                            'title' => 'req',
+                            'condition' => $club->isClosed()
+                        ],
+                        [
                             'url' => "/club{$club->getId()}/stats",
                             'title' => 'statistics',
                             'active' => true

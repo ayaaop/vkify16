@@ -599,7 +599,7 @@ input[type="submit"].button_green:hover {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 5px;
+    gap: 8px;
 }
 .buttons_row .button.profile_more_btn {
     padding-left: 9px;

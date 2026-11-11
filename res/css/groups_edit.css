@@ -1,0 +1,140 @@
+.search_row.group_l_row {
+    align-items: flex-start;
+    min-height: 80px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.search_row.group_l_row:last-of-type {
+    padding-bottom: 0;
+}
+
+.search_row.group_l_row .img {
+    flex: 0 0 80px;
+    width: 80px;
+    height: 80px;
+    margin-right: 12px;
+    overflow: visible;
+}
+
+.group_l_row .group_u_photo,
+.group_l_row .group_u_photo_img {
+    display: block;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+.group_l_row .group_u_photo {
+    position: relative;
+}
+
+.group_l_row .group_u_photo.online::after {
+    content: '';
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+    width: 10px;
+    height: 10px;
+    border: 3px solid var(--page-background-color);
+    border-radius: 50%;
+    background: #8ac176;
+}
+
+.group_l_row .group_u_info {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-top: 9px;
+    font-size: 13px;
+    line-height: 15px;
+}
+
+.group_l_row .group_u_title {
+    font-weight: 700;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.group_l_row .group_u_desc {
+    padding-top: 6px;
+    color: var(--text-color--tertiary);
+}
+
+.group_l_row .group_u_buttons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 8px;
+    margin-top: 11px;
+}
+
+.group_l_row .group_u_buttons form {
+    margin: 0;
+}
+
+.group_l_row button.group_u_reject {
+    border: 0;
+    background: none;
+    color: var(--link-color);
+    font: inherit;
+    cursor: pointer;
+}
+
+.group_l_row button.group_u_reject:disabled {
+    cursor: default;
+    opacity: .55;
+}
+
+.group_l_row .group_u_info_row {
+    padding-top: 7px;
+}
+
+.group_l_row .group_u_level {
+    color: var(--text-color--tertiary);
+    font-weight: 700;
+    font-size: 12.5px;
+}
+
+.group_l_row .group_u_member_links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px 15px;
+}
+
+.search_row.group_member_row .controls {
+    flex: 0 0 auto;
+    width: auto;
+}
+
+.group_member_row .group_u_actions {
+    padding-top: 9px;
+}
+
+.group_member_row .profile_more_btn {
+    padding: 4px 7px;
+}
+
+@media (max-width: 768px) {
+    .search_row.group_l_row .img,
+    .group_l_row .group_u_photo,
+    .group_l_row .group_u_photo_img {
+        flex-basis: 60px;
+        width: 60px;
+        height: 60px;
+    }
+
+    .group_l_row .group_u_info {
+        padding-top: 0;
+    }
+
+    .group_l_row .group_u_buttons {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .group_member_row .group_u_actions {
+        padding-top: 0;
+    }
+}

@@ -1,0 +1,62 @@
+{extends "../@listView.latte"}
+{var $iterator = $followers}
+{var $count = $paginatorConf->count}
+{var $page = $paginatorConf->page}
+{var $perPage = 6}
+{var $row_class = 'group_l_row'}
+
+{block title}{_req} {$club->getCanonicalName()}{/block}
+
+{block headIncludes}
+    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/groups_edit.css" data-vkify-route-style="groups_edit" />
+{/block}
+
+{block tabs}
+    {include "../components/page_block_header.latte", title => "req", count => $count}
+{/block}
+
+{block narrow}
+    {var $menuItems = [
+        ['url' => "/club{$club->getId()}/edit", 'title' => 'main'],
+        ['url' => "/club{$club->getId()}/backdrop", 'title' => 'backdrop_short'],
+        [
+            'url' => "/club{$club->getId()}/followers",
+            'title' => 'followers',
+            'subitems' => [
+                ['url' => "/club{$club->getId()}/followers/req", 'title' => 'req', 'active' => true],
+                ['url' => "/club{$club->getId()}/followers?onlyAdmins=1", 'title' => 'administrators', 'active' => $onlyShowManagers]
+            ],
+            'active' => false
+        ],
+        ['url' => "/club{$club->getId()}/stats", 'title' => 'statistics']
+    ]}
+    {include "../components/ui_rmenu.latte", items => $menuItems, ownblockData => $club, additionalCssClass => 'show_as_menu_on_mobile'}
+{/block}
+
+{block link|strip|stripHtml}{$x->getURL()}{/block}
+
+{block preview}
+    <span n:class="group_u_photo, $x->isOnline() ? online">
+        {include '../components/avatar.latte', author => $x, size => 'normal', width => 80, height => 80, alt => $x->getCanonicalName(), class => 'group_u_photo_img'}
+    </span>
+{/block}
+
+{block infotable}
+    <div class="group_u_info">
+        <a class="group_u_title" href="{$x->getURL()}">{$x->getCanonicalName()}</a>
+        {var $showAge = $x->getBirthday() && $x->getBirthdayPrivacy() == 0}
+        <div class="group_u_desc" n:if="$x->getCity() || $showAge">
+            {$x->getCity()}{if $x->getCity() && $showAge}, {/if}{if $showAge}{tr('years', $x->getAge())}{/if}
+        </div>
+        <div class="group_u_buttons" n:if="$club->canBeModifiedBy($thisUser)">
+            <form class="vk-friend-action" action="/club{$club->getId()}/setFlag?user={$x->getId()}&accept=1" method="post">
+                <input type="hidden" name="hash" value="{$csrfToken}" />
+                <button type="submit" class="button">{_friends_accept}</button>
+            </form>
+            <form class="vk-friend-action" action="/club{$club->getId()}/setFlag?user={$x->getId()}&accept=0" method="post">
+                <input type="hidden" name="hash" value="{$csrfToken}" />
+                <button type="submit" class="button button_light group_u_reject">{_friends_reject}</button>
+            </form>
+        </div>
+    </div>
+{/block}

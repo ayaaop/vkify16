@@ -1,6 +1,6 @@
-{define mobileProfile, $hasMoreInfo, $albums, $audios, $videos, $topics, $followersCount, $potentialCount, $pinnedPost, $descHtml, $descPlain, $docs}
+{define mobileProfile, $hasMoreInfo, $albums, $audios, $videos, $topics, $followersCount, $potentialCount, $pinnedPost, $descHtml, $descPlain, $docs, $canView}
     {php if (!function_exists('vkifyDocGlyph')) require_once \OPENVK_ROOT . '/themepacks/vkify16/res/php/vkify_helpers.php';}
-    {include '../components/mobile_profile_hero.latte', entity => $club, name => $club->getName(), status => $club->isEvent() ? tr('event_type_open') : tr('group_type_open'), verified => $club->isVerified()}
+    {include '../components/mobile_profile_hero.latte', entity => $club, name => $club->getName(), status => $club->isEvent() ? tr($club->isClosed() ? 'event_type_closed' : 'event_type_open') : tr($club->isClosed() ? 'group_type_closed' : 'group_type_open'), verified => $club->isVerified()}
 
     <div class="mobileonly mobile-group-content">
 
@@ -17,12 +17,7 @@
                             </div>
                         {/if}
                         {if !$subStatus}
-                            <form action="/setSub/club" method="post" class="mobile_profile_action_primary">
-                                <input type="hidden" name="act" value="add" />
-                                <input type="hidden" name="id" value="{$club->getId()}" />
-                                <input type="hidden" name="hash" value="{$csrfToken}" />
-                                <input type="submit" value="{if $club->isEvent()}{_ill_come_to_meeting}{else}{_join_community}{/if}" class="button button_wide mobile_profile_action_btn" />
-                            </form>
+                            {include '../components/group_join_button.latte', formClass => 'mobile_profile_action_primary', buttonClass => 'button button_wide mobile_profile_action_btn'}
                         {else}
                             <div class="profile_sub_wrapper ui_actions_menu_wrap" onclick="uiActionsMenu.toggle(this, null);">
                             <button class="profile_sub_btn button button_wide mobile_profile_action_btn button_gray" id="mobile_profile_sub_btn">
@@ -99,7 +94,7 @@
         {var $canSeeDocs   = $docsCount   > 0}
         {var $stripHasContent = $canSeeAlbums || $canSeeVideos || $canSeeAudios || $canSeeDocs}
 
-        {if $canEdit || $club->isEveryoneCanUploadAudios() || $stripHasContent}
+        {if $canView && ($canEdit || $club->isEveryoneCanUploadAudios() || $stripHasContent)}
         <div class="page_block mobile-scroll-modules">
 
             {if $canSeeAlbums}
@@ -211,7 +206,7 @@
         </div>
         {/if}
 
-        {if $topicsCount > 0}
+        {if $canView && $topicsCount > 0}
         <div class="page_block topics_module mobile-topics-module">
             {include '../components/module_header.latte', href => '/board' . ($club->getId()), label => tr('discussions'), count => $topicsCount}
             <div class="module_body">

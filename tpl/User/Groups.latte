@@ -70,8 +70,9 @@
         <a href="{$x->getURL()}" {if mb_strlen($x->getName()) > 100}title="{$x->getName()}"{/if}>{$x->getName()|truncate:100}</a>
         <a class="page_verified" n:if="$x->isVerified()" href="/verify"></a>
     </div>
+    <div class="labeled">{_group_type}: {if $x->isClosed()}{_group_type_closed_title}{else}{_group_type_open_title}{/if}</div>
     <div class="labeled">
-         <a href="/club{$x->getId()}/followers">{tr("participants", $x->getFollowersCount())}</a></td>
+         <a href="/club{$x->getId()}/followers">{tr("participants", $x->getFollowersCount())}</a>
     </div>
 {/block}
 
@@ -89,14 +90,15 @@
                     {/if}
                 </a>
             {/if}
-            {if $x->getSubscriptionStatus($thisUser) == false}
-                <a href="javascript:void(0)" onclick="this.closest('.ui_actions_menu').querySelector('form[data-action=add]').requestSubmit()">{_join_community}</a>
+            {if !$x->isPrivate() && !$x->getSubscriptionStatus($thisUser)}
+                {var $requestSent = $x->isClosed() && $x->isJoinRequestSent($thisUser)}
+                <a href="javascript:void(0)" onclick="this.closest('.ui_actions_menu').querySelector('form[data-action=add]').requestSubmit()">{if $x->isClosed()}{if $requestSent}{_clubs_cancel_request}{else}{_clubs_sumbit_request}{/if}{else}{_join_community}{/if}</a>
                 <form style="display: none" class="vk-friend-action" data-action="add" action="/setSub/club" method="post">
-                    <input type="hidden" name="act" value="add" />
+                    <input type="hidden" name="act" value="{$requestSent ? 'rem' : 'add'}" />
                     <input type="hidden" name="id" value="{$x->getId()}" />
                     <input type="hidden" name="hash" value="{$csrfToken}" />
                 </form>
-            {else}
+            {elseif $x->getSubscriptionStatus($thisUser)}
                 <a href="javascript:void(0)" onclick="this.closest('.ui_actions_menu').querySelector('form[data-action=rem]').requestSubmit()">{_leave_community}</a>
                 <form style="display: none" class="vk-friend-action" data-action="rem" action="/setSub/club" method="post">
                     <input type="hidden" name="act" value="rem" />
