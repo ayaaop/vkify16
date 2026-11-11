@@ -496,6 +496,10 @@
                         <div class="wrap1">
                             <div id="auth" class="page-wrap">
                                 <div class="page_content">
+                                    <div class="msg msg_yellow" n:if="($geoBypass ?? false) && ($geoBlocked ?? false)">
+                                        <b>{_admin_geo}</b><br/>
+                                        {_admin_geo_bypass}
+                                    </div>
                                     <h2 n:ifset="header" class="page_block_h2">
                                         <div class="page_block_header">
                                             <div class="page_block_header_inner _header_inner">

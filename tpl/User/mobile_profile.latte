@@ -1,4 +1,4 @@
-{define mobileProfile, $thatIsThisUser, $hasMoreInfo, $stripHasContent, $canSeeVideos, $canSeeAudios, $canSeeGroups, $canSeeMeetings, $canSeeAlbums, $canSeeGifts, $canSeeNotes, $videos, $audios, $albums, $basicInfoFields, $contactInfoFields, $personalInfoFields}
+{define mobileProfile, $thatIsThisUser, $hasMoreInfo, $stripHasContent, $canSeeVideos, $canSeeAudios, $canSeeGroups, $canSeeMeetings, $canSeeAlbums, $canSeeGifts, $canSeeNotes, $videos, $audios, $albums, $basicInfoFields, $contactInfoFields, $personalInfoFields, $profileClubs, $profileMeetings}
     {var $mobileHeroStatus = $user->onlineStatus() == 2 ? tr('deceased_person') : ($user->isOnline() ? tr('online') : ($user->getOnline()->timestamp() + 2505600 > time() ? ($user->isFemale() ? tr('was_online_f') : tr('was_online_m')) . ' ' . $user->getOnline() : ''))}
     {include '../components/mobile_profile_hero.latte', entity => $user, name => $user->getFullName(), status => $mobileHeroStatus, verified => $user->isVerified()}
 	<div class="mobileonly mobile-profile-content">
@@ -116,7 +116,7 @@
 				<div class="module clear page_list_module mobile-scroll-card">
 					{include '../components/module_header.latte', href => '/groups' . ($user->getId()), label => tr('groups'), count => $user->getClubCount()}
 					<div class="module_body msm-grid">
-						{foreach array_slice(iterator_to_array($user->getClubs(1)), 0, 6) as $grp}
+						{foreach $profileClubs as $grp}
 							<a href="/club{$grp->getId()}" class="msm-grid__cell">
 								{include '../components/avatar.latte', author => $grp, size => 'miniscule', width => 50, height => 50, alt => $grp->getCanonicalName(), class => 'msm-grid__img'}
 							</a>
@@ -136,7 +136,7 @@
 				<div class="module clear page_list_module mobile-scroll-card">
 					{include '../components/module_header.latte', href => '/events' . ($user->getId()), label => tr('meetings'), count => $user->getEventsCount()}
 					<div class="module_body msm-grid">
-						{foreach array_slice(iterator_to_array($user->getEvents(1)), 0, 6) as $event}
+						{foreach $profileMeetings as $event}
 							<a href="{$event->getURL()}" class="msm-grid__cell">
 								{include '../components/avatar.latte', author => $event, size => 'miniscule', width => 50, height => 50, alt => $event->getCanonicalName(), class => 'msm-grid__img'}
 							</a>
@@ -154,11 +154,13 @@
 			{/if}
 			{if $canSeeAlbums}
 				{var $firstAlbum = $albums[0] ?? null}
+				{var $firstAlbumCover = $firstAlbum ? $firstAlbum->getCoverPhoto() : null}
+				{var $firstAlbumCover = $firstAlbumCover && !$firstAlbumCover->isGeoBlocked() ? $firstAlbumCover : null}
 				<div class="module clear album_module mobile-scroll-card">
 					{include '../components/module_header.latte', href => '/albums' . ($user->getId()), label => tr('albums'), count => $albumsCount}
-					<a href="{if $firstAlbum}/album{$firstAlbum->getPrettyId()}{else}/albums{$user->getId()}{/if}" class="module_body {if !$firstAlbum || !$firstAlbum->getCoverPhoto()}msm-placeholder{/if}">
-						{if $firstAlbum && $firstAlbum->getCoverPhoto()}
-							<img src="{$firstAlbum->getCoverPhoto()->getURLBySizeId('normal')}" class="msm-album-cover" alt="" />
+					<a href="{if $firstAlbum}/album{$firstAlbum->getPrettyId()}{else}/albums{$user->getId()}{/if}" class="module_body {if !$firstAlbumCover}msm-placeholder{/if}">
+						{if $firstAlbumCover}
+							<img src="{$firstAlbumCover->getURLBySizeId('normal')}" class="msm-album-cover" alt="" />
 						{else}
 							<svg width="40" height="40" fill="currentColor" viewBox="0 0 24 24"><use href="#picture-24"></use></svg>
 						{/if}

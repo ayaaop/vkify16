@@ -104,11 +104,13 @@
 
             {if $canSeeAlbums}
                 {var $firstAlbum = $albums[0] ?? null}
+                {var $firstAlbumCover = $firstAlbum ? $firstAlbum->getCoverPhoto() : null}
+                {var $firstAlbumCover = $firstAlbumCover && !$firstAlbumCover->isGeoBlocked() ? $firstAlbumCover : null}
                 <div class="module clear album_module mobile-scroll-card">
                     {include '../components/module_header.latte', href => '/albums' . ($club->getId() * -1), label => tr('albums'), count => $albumsCount}
-                    <a href="{if $firstAlbum}/album{$firstAlbum->getPrettyId()}{else}/albums{$club->getId() * -1}{/if}" n:class="module_body, !($firstAlbum && $firstAlbum->getCoverPhoto()) ? msm-placeholder">
-                        {if $firstAlbum && $firstAlbum->getCoverPhoto()}
-                            <img src="{$firstAlbum->getCoverPhoto()->getURLBySizeId('normal')}" class="msm-album-cover" alt="" />
+                    <a href="{if $firstAlbum}/album{$firstAlbum->getPrettyId()}{else}/albums{$club->getId() * -1}{/if}" n:class="module_body, !$firstAlbumCover ? msm-placeholder">
+                        {if $firstAlbumCover}
+                            <img src="{$firstAlbumCover->getURLBySizeId('normal')}" class="msm-album-cover" alt="" />
                         {else}
                             <svg width="28" height="28" fill="currentColor" viewBox="0 0 28 28"><use href="#camera-28"></use></svg>
                             <span class="msm-placeholder-label">{_upload_photo}</span>

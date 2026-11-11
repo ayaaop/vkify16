@@ -26,7 +26,7 @@
     {var $albums = iterator_to_array($albums)}
     {var $videos = iterator_to_array($videos ?? [])}
     {var $topics = iterator_to_array($topics)}
-    {var $docs   = iterator_to_array((new \openvk\Web\Models\Repositories\Documents())->getDocumentsByOwner($club->getRealId())->offsetLimit(0, 6))}
+    {var $docs   = iterator_to_array(\openvk\Web\Util\GeoBlock::i()->filterEntities((new \openvk\Web\Models\Repositories\Documents())->getDocumentsByOwner($club->getRealId())->offsetLimit(0, 6)))}
     {var $followersCount = $club->getFollowersCount()}
     {var $potentialCount = $club->getPotentialFollowersCount()}
     {var $owner = $club->getOwner()}
@@ -217,8 +217,9 @@
 							{include '../components/module_header.latte', href => '/albums' . ($club->getId() * -1), label => tr('albums'), count => $albumsCount}
 							<div class="module_body clear_fix">
 								<div class="clear_fix clear page_album_row" n:foreach="array_slice(iterator_to_array($albums), 0, 3) as $album">
-									<a href="/album{$album->getPrettyId()}" class="page_album_link {if is_null($album->getCoverPhoto())}page_album_nocover{/if}">
-										{var $cover = $album->getCoverPhoto()}
+									{var $cover = $album->getCoverPhoto()}
+									{var $cover = $cover && !$cover->isGeoBlocked() ? $cover : null}
+									<a href="/album{$album->getPrettyId()}" class="page_album_link {if is_null($cover)}page_album_nocover{/if}">
 										<div class="page_album_thumb_wrap">
 											<img n:if="!is_null($cover)"
 												src="{$cover->getURLBySizeId('normal')}"

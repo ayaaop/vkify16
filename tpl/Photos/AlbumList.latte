@@ -25,8 +25,9 @@
             <div n:ifcontent class="photo_items_list">
                 {foreach $iterator as $x}
                     <div class="clear_fix clear page_album_row">
-                        <a href="/album{$x->getPrettyId()}" class="page_album_link {if is_null($x->getCoverPhoto())}page_album_nocover{/if}">
-                            {var $cover = $x->getCoverPhoto()}
+                        {var $cover = $x->getCoverPhoto()}
+                        {var $cover = $cover && !$cover->isGeoBlocked() ? $cover : null}
+                        <a href="/album{$x->getPrettyId()}" class="page_album_link {if is_null($cover)}page_album_nocover{/if}">
                             <div class="page_album_thumb_wrap">
                                 <img n:if="!is_null($cover)"
                                     src="{$cover->getURLBySizeId('normal')}"
