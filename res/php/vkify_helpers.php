@@ -2,6 +2,31 @@
 
 declare(strict_types=1);
 
+if (!function_exists('vkifyGroupStatsGraphData')) {
+    function vkifyGroupStatsGraphData(?array $stats): array
+    {
+        $lines = [];
+        foreach ($stats ?? [] as $series) {
+            $points = [];
+            foreach ($series['x'] as $i => $day) {
+                // The backend numbers slots oldest (1) to newest (7), not days ago.
+                $points[] = [
+                    strtotime('-' . (8 - (int) $day) . ' day midnight'),
+                    (float) ($series['y'][$i] ?? 0),
+                ];
+            }
+            usort($points, fn($a, $b) => $a[0] <=> $b[0]);
+            $lines[] = [
+                'name' => $series['name'],
+                'c' => hexdec(ltrim($series['line']['color'], '#')),
+                'f' => isset($series['fill']),
+                'd' => $points,
+            ];
+        }
+        return $lines;
+    }
+}
+
 if (!function_exists('vkifyFormatCount')) {
     function vkifyFormatCount(int|float $n): string
     {

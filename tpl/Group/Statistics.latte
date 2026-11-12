@@ -1,6 +1,10 @@
 {extends "../@layout.latte"}
 {block title}{$club->getName()} » {_statistics}{/block}
 
+{block headIncludes}
+    <link rel="stylesheet" data-vkify-route-style="graph" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/graph.css">
+{/block}
+
 {block content}
     <div class="wide_column_left">
         <div class="wide_column_left">
@@ -43,36 +47,16 @@
                         <div class="page_padding">
                             <h4>{_coverage}</h4>
                             <p>{_coverage_this_week}</p>
-                            <div id="reachChart" style="width: 100%; height: 280px;"></div>
+                            <div id="reachChart" class="group_stats_plot" aria-label="{_coverage}" data-group-stats="{json_encode(vkifyGroupStatsGraphData($reach))}"></div>
                         
                             <h4>{_views}</h4>
                             <p>{_views_this_week}</p>
-                            <div id="viewsChart" style="width: 100%; height: 280px;"></div>
+                            <div id="viewsChart" class="group_stats_plot" aria-label="{_views}" data-group-stats="{json_encode(vkifyGroupStatsGraphData($views))}"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <style data-vkify-route-style="group-statistics">
-            .modebar-container {
-                display: none !important;
-            }
-        </style>
-        {script "js/node_modules/plotly.js-dist/plotly.js"}
-        <script data-vkify-route-script="group-statistics-2">
-            function makePlot(selector, datum) {
-                Plotly.newPlot(document.querySelector(selector), [datum.total, datum.subs, datum.viral], {
-                    margin: { t: 0 },
-                    layout: { showlegend: true, legend: { xanchor: 'center', x: 0.5, orientation: 'h' } }
-                });
-            }
-            
-            let reach = {$reach};
-            let views = {$views};
-            
-            makePlot("#reachChart", reach);
-            makePlot("#viewsChart", views);
-        </script>
     </div>
 {/block}
