@@ -97,7 +97,11 @@ const _likesCacheSet = (key, value) => {
         const oldest = _likesCache.keys().next().value;
         _likesCache.delete(oldest);
     }
-    _likesCache.set(key, value ? { ...value, _fetchedAt: Date.now() } : value);
+    _likesCache.set(key, value ? {
+        ...value,
+        _fetchedAt: Date.now(),
+        _privateLikes: Boolean(window.openvk?.private_likes),
+    } : value);
 };
 
 function normalizeAvatarUrl(url) {
@@ -172,7 +176,7 @@ function syncTooltipWithLikesList(el, tt, likesList) {
     }
     const liked = isElementLiked(el);
     if (!el._vkifyAnimateLikeIn) {
-        ownersEl.classList.toggle('me_hidden', !liked);
+        ownersEl.classList.toggle('me_hidden', Boolean(getViewerItem(items)) && !liked);
     }
     syncTooltipContentOpt(tt);
     return true;
@@ -214,7 +218,7 @@ async function refreshLikeFaces(btn, liked, likesCount, preloadedItems = null) {
             || ''
         );
         const faceSrcs = [];
-        if (liked && viewerAvatar) faceSrcs.push(viewerAvatar);
+        if (liked && !window.openvk?.private_likes && viewerAvatar) faceSrcs.push(viewerAvatar);
         for (const liker of likers) {
             if (faceSrcs.length >= 2) break;
             if (liked && liker.id == viewerId) continue;
@@ -254,7 +258,7 @@ function isElementLiked(el) {
 
 function getViewerItem(items) {
     const viewerId = Number(window.openvk?.current_id) || 0;
-    if (!viewerId) return null;
+    if (!viewerId || window.openvk?.private_likes) return null;
     const existing = Array.isArray(items)
         ? items.find(item => Number(item?.id) === viewerId)
         : null;
@@ -331,7 +335,8 @@ vkify.bindOnce('likeHandlers', () => {
         const cacheKey = type && btn.attr('data-id')
             ? `${type}:${btn.attr('data-id')}` : null;
         if (cacheKey) {
-            const cached = _likesCache.get(cacheKey);
+            const entry = _likesCache.get(cacheKey);
+            const cached = entry?._privateLikes === Boolean(window.openvk?.private_likes) ? entry : null;
             const viewerItem = getViewerItem(cached?.items);
             const viewerId = Number(window.openvk?.current_id) || 0;
             if (cached) {
@@ -363,14 +368,14 @@ vkify.bindOnce('likeHandlers', () => {
 
                 if (tip && ownersEl) {
                     if (tip.shown) {
-                        ownersEl.classList.toggle('me_hidden', !nextLiked);
+                        if (!window.openvk?.private_likes) ownersEl.classList.toggle('me_hidden', !nextLiked);
                         syncTooltipContentOpt(tip);
                     } else if (nextLiked && !window.isMobile?.()) {
-                        ownersEl.classList.add('me_hidden');
+                        if (!window.openvk?.private_likes) ownersEl.classList.add('me_hidden');
                         syncTooltipContentOpt(tip);
                         window.vkifyLikesShow?.(el, { showdt: 0, animateMeIn: true });
                     } else {
-                        ownersEl.classList.toggle('me_hidden', !nextLiked);
+                        if (!window.openvk?.private_likes) ownersEl.classList.toggle('me_hidden', !nextLiked);
                         syncTooltipContentOpt(tip);
                     }
                 } else if (nextLiked && !window.isMobile?.()) {
@@ -412,7 +417,7 @@ vkify.bindOnce('likeHandlers', () => {
                     const ownersEl = el.tt.container?.querySelector('.like_tt_owners');
                     const headerEl = el.tt.container?.querySelector('.like_tt_header');
                     if (headerEl) headerEl.textContent = tr('liked_by_x_people', currentLikes);
-                    if (ownersEl) ownersEl.classList.toggle('me_hidden', !isLiked);
+                    if (ownersEl && !window.openvk?.private_likes) ownersEl.classList.toggle('me_hidden', !isLiked);
                     syncTooltipContentOpt(el.tt);
                 }
             }
@@ -477,7 +482,9 @@ vkify.bindOnce('likesTooltip', () => {
     async function loadLikes(el, tt) {
         const { id, type } = el.dataset;
         const cacheKey = `${type}:${id}`;
-        const cached = _likesCache.get(cacheKey);
+        const entry = _likesCache.get(cacheKey);
+        const cached = entry?._privateLikes === Boolean(window.openvk?.private_likes) ? entry : null;
+        if (entry && !cached) tt.setContent(loadingTpl({}));
         const cacheFresh = Boolean(cached && (Date.now() - (cached._fetchedAt || 0) < _likesCacheTTL));
 
         if (tt._vkifyLikesKey === cacheKey && tt.container?.querySelector('.like_tt_owners') && cacheFresh) {
@@ -706,10 +713,10 @@ vkify.bindOnce('likesTooltip', () => {
 
     document.addEventListener('click', (e) => {
         if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-        const link = e.target.closest?.('.like_tt_header, .post_likes_faces');
+        const link = e.target.closest?.('a[href]');
         if (!link) return;
-        const href = link.getAttribute('href') || '';
-        const m = href.match(/^\/([^/]+)\/([^/]+)\/likes$/);
+        const m = (link.getAttribute('href') || '')
+            .match(/^\/(wall|post|comment|photo|video|note|audio_playlist)\/(-?\d+_\d+)\/likes$/);
         if (!m) return;
         e.preventDefault();
         e.stopPropagation();

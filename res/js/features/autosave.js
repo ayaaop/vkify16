@@ -292,6 +292,7 @@
                 pending = true;
                 const formData = new FormData(form);
                 const styleAvatar = formData.get('style_avatar');
+                const privateLikes = formData.get('likes.read');
                 try {
                     const response = await fetch(form.action || window.location.href, {
                         method: 'POST',
@@ -307,6 +308,7 @@
                         if (data.success) {
                             if (styleAvatar === '1') await vkify.ensureStyle('square_avatars');
                             else if (styleAvatar !== null) vkify.unloadStyle('vkify-style-square_avatars');
+                            if (privateLikes !== null && window.openvk) window.openvk.private_likes = privateLikes === '0';
                             showSavedLabel(form);
                             if (reloadAfterSave) {
                                 navigateToFreshPage();
@@ -342,6 +344,7 @@
                     } else {
                         if (styleAvatar === '1') await vkify.ensureStyle('square_avatars');
                         else if (styleAvatar !== null) vkify.unloadStyle('vkify-style-square_avatars');
+                        if (privateLikes !== null && window.openvk) window.openvk.private_likes = privateLikes === '0';
                         showSavedLabel(form, flash ? flash.title : null);
                         if (reloadAfterSave) {
                             navigateToFreshPage();

@@ -29,6 +29,7 @@
                         <a n:if="$canEditComment" id="editPost" data-id="{$comment->getId()}">{_edit}</a>
                         <a n:if="$canDeleteComment" class="delete" onclick="ajax_delete(event)" href="/comment{$comment->getId()}/delete">{_delete}</a>
                         <a n:if="$canReportComment" href="javascript:reportComment({$comment->getId()})">{_report}</a>
+                        <a href="/comment/{$postId}_{$comment->getPrettyId()}/likes">{_likers_list}</a>
                     </div>
                 </div>
             </div>

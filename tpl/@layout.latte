@@ -638,6 +638,7 @@
                 "max_attachments": {\OPENVK_ROOT_CONF["openvk"]["preferences"]["wall"]["postSizes"]["maxAttachments"] ?? 10},
                 "max_filesize_mb": 100,
                 "current_id": {isset($thisUser) ? $thisUser->getId() : 0},
+                "private_likes": {if isset($thisUser) && $thisUser->isPrivateLikes()}true{else}false{/if},
                 "coins": {ifset $thisUser}{$thisUser->getCoins()}{else}0{/ifset},
                 "status": {isset($thisUser) ? $thisUser->getStatus() : ""},
                 "broadcast_music": {isset($thisUser) ? $thisUser->isBroadcastEnabled() : false},
