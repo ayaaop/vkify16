@@ -37,36 +37,7 @@
 {* BEGIN ELEMENTS DESCRIPTION *}
 
 {block narrow}
-    {var $menuItems = [
-        [
-            'url' => "/club{$club->getId()}/edit",
-            'title' => 'main',
-            'active' => false,
-            'condition' => $club->canBeModifiedBy($thisUser)
-        ],
-        [
-            'url' => "/club{$club->getId()}/backdrop",
-            'title' => 'backdrop_short',
-            'active' => false,
-            'condition' => $club->canBeModifiedBy($thisUser)
-        ],
-        [
-            'url' => "/club{$club->getId()}/followers",
-            'title' => 'followers',
-            'subitems' => [
-                ['url' => "/club{$club->getId()}/followers/req", 'title' => 'req', 'condition' => $club->isClosed() && $canManage, 'active' => false],
-                ['url' => "/club{$club->getId()}/followers?onlyAdmins=1", 'title' => 'administrators', 'active' => $onlyShowManagers]
-            ],
-            'active' => !$onlyShowManagers
-        ],
-        [
-            'url' => "/club{$club->getId()}/stats",
-            'title' => 'statistics',
-            'active' => false,
-            'condition' => $club->canBeModifiedBy($thisUser)
-        ]
-    ]}
-    {include "../components/ui_rmenu.latte", items => $menuItems, ownblockData => $club, additionalCssClass => 'show_as_menu_on_mobile'}
+    {include "../components/group_rmenu.latte", activeItem => $onlyShowManagers ? 'administrators' : 'followers', canManage => $canManage}
 {/block}
 
 {block link|strip|stripHtml}
@@ -91,20 +62,23 @@
         <div class="group_u_desc" n:if="$user->getCity() || $showAge">
             {$user->getCity()}{if $user->getCity() && $showAge}, {/if}{if $showAge}{tr('years', $user->getAge())}{/if}
         </div>
-        <div class="group_u_info_row group_u_level" n:if="$showAdministrator">{_administrator}</div>
+        <div class="group_u_info_row" n:ifcontent>
+            <span n:if="$showAdministrator">{_administrator}</span>
+            {if $isOwner || $manager}
+                <span class="divider"></span>
+                {var $hidden = $isOwner ? $club->isOwnerHidden() : $manager->isHidden()}
+                <a href="/club{$club->getId()}/setAdmin?user={$user->getId()}&hidden={(int) !$hidden}&hash={rawurlencode($csrfToken)}">
+                    {if $hidden}{_hidden_yes|lower}{else}{_hidden_no|lower}{/if}
+                </a>
+            {/if}
+        </div>
         {if $manager && !empty($manager->getComment()) || $isOwner && !empty($club->getOwnerComment()) && (!$club->isOwnerHidden() || $canManage)}
             <div class="group_u_desc">{if $isOwner}{$club->getOwnerComment()}{else}{$manager->getComment()}{/if}</div>
         {/if}
-        <div class="group_u_info_row group_u_member_links" n:if="$canManage">
+        <div class="group_u_info_row group_u_member_links" n:if="$canManage && !$isOwner">
             <a href="/club{$club->getId()}/setAdmin?user={$user->getId()}&hash={rawurlencode($csrfToken)}" n:if="!$isOwner">
                 {if $manager}{_devote}{else}{_promote_to_admin}{/if}
             </a>
-            {if $isOwner || $manager}
-                {var $hidden = $isOwner ? $club->isOwnerHidden() : $manager->isHidden()}
-                <a href="/club{$club->getId()}/setAdmin?user={$user->getId()}&hidden={(int) !$hidden}&hash={rawurlencode($csrfToken)}">
-                    {if $hidden}{_hidden_yes}{else}{_hidden_no}{/if}
-                </a>
-            {/if}
         </div>
     </div>
 {/block}

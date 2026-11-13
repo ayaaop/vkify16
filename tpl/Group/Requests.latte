@@ -16,21 +16,7 @@
 {/block}
 
 {block narrow}
-    {var $menuItems = [
-        ['url' => "/club{$club->getId()}/edit", 'title' => 'main'],
-        ['url' => "/club{$club->getId()}/backdrop", 'title' => 'backdrop_short'],
-        [
-            'url' => "/club{$club->getId()}/followers",
-            'title' => 'followers',
-            'subitems' => [
-                ['url' => "/club{$club->getId()}/followers/req", 'title' => 'req', 'active' => true],
-                ['url' => "/club{$club->getId()}/followers?onlyAdmins=1", 'title' => 'administrators', 'active' => $onlyShowManagers]
-            ],
-            'active' => false
-        ],
-        ['url' => "/club{$club->getId()}/stats", 'title' => 'statistics']
-    ]}
-    {include "../components/ui_rmenu.latte", items => $menuItems, ownblockData => $club, additionalCssClass => 'show_as_menu_on_mobile'}
+    {include "../components/group_rmenu.latte", activeItem => 'requests'}
 {/block}
 
 {block link|strip|stripHtml}{$x->getURL()}{/block}

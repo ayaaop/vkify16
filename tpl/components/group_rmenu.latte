@@ -1,0 +1,31 @@
+{var $canManage = $canManage ?? true}
+{var $menuItems = [
+    [
+        'url' => "/club{$club->getId()}/edit",
+        'title' => 'main',
+        'active' => $activeItem === 'main',
+        'condition' => $canManage
+    ],
+    [
+        'url' => "/club{$club->getId()}/backdrop",
+        'title' => 'backdrop_short',
+        'active' => $activeItem === 'backdrop',
+        'condition' => $canManage
+    ],
+    [
+        'url' => "/club{$club->getId()}/followers",
+        'title' => 'followers',
+        'active' => $activeItem === 'followers',
+        'subitems' => [
+            ['url' => "/club{$club->getId()}/followers/req", 'title' => 'req', 'count' => $club->getPotentialFollowersCount(), 'condition' => $activeItem === 'requests' || ($club->isClosed() && $canManage), 'active' => $activeItem === 'requests'],
+            ['url' => "/club{$club->getId()}/followers?onlyAdmins=1", 'title' => 'administrators', 'active' => $activeItem === 'administrators']
+        ]
+    ],
+    [
+        'url' => "/club{$club->getId()}/stats",
+        'title' => 'statistics',
+        'active' => $activeItem === 'statistics',
+        'condition' => $canManage
+    ]
+]}
+{include "ui_rmenu.latte", items => $menuItems, ownblockData => $club, additionalCssClass => 'show_as_menu_on_mobile'}

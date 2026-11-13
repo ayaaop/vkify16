@@ -12,29 +12,7 @@
         <div class="wide_column_left">
             <div class="narrow_column_wrap">
                 <div class="narrow_column">
-                    {var $menuItems = [
-                        [
-                            'url' => "/club{$club->getId()}/edit",
-                            'title' => 'main',
-                            'active' => false
-                        ],
-                        [
-                            'url' => "/club{$club->getId()}/backdrop",
-                            'title' => 'backdrop_short',
-                            'active' => true
-                        ],
-                        [
-                            'url' => "/club{$club->getId()}/followers",
-                            'title' => 'followers',
-                            'active' => false
-                        ],
-                        [
-                            'url' => "/club{$club->getId()}/stats",
-                            'title' => 'statistics',
-                            'active' => false
-                        ]
-                    ]}
-                    {include "../components/ui_rmenu.latte", items => $menuItems, ownblockData => $club, additionalCssClass => 'show_as_menu_on_mobile'}
+                    {include "../components/group_rmenu.latte", activeItem => 'backdrop'}
                 </div>
             </div>
             <div class="wide_column_wrap">

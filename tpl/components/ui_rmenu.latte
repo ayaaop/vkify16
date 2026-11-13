@@ -13,6 +13,8 @@
                       - avatar: (optional) URL to avatar image
                       - additionalInfo: (optional) Additional info text/description
                       - isRich: (optional) Boolean indicating if this is a rich item with avatar and additional info
+                      - count: (optional) Numeric badge shown at the right edge, hidden when 0 or empty
+                      - countClass: (optional) Additional CSS classes for the count badge
                       - isSeparator: (optional) Boolean indicating if this is a separator
                       - isHeader: (optional) Boolean indicating if this is a section header
                       - subitems: (optional) Array of child items with the same shape as items
@@ -81,6 +83,9 @@
             {else}
                 <div class="ui_rmenu_item_wrap {$itemClass ?? ''}">
                     <a class="ui_rmenu_item {($item['active'] ?? false) ? 'ui_rmenu_item_sel' : ''} {$itemIsRich ? 'ui_ownblock' : ''}" href="{$item['url']}" n:attr="id => $itemId, onclick => $item['onclick'] ?? null, data-pagescount => $item['data-pagescount'] ?? null">
+                        {if !empty($item['count'])}
+                            <span class="ui_rmenu_count {$item['countClass'] ?? ''}">{$item['count']}</span>
+                        {/if}
                         {if $itemIsRich}
                             <img class="ui_ownblock_img" src="{$item['avatar']}" />
                             <div class="ui_ownblock_info">
@@ -111,6 +116,9 @@
                             {foreach $item['subitems'] as $subitem}
                                 {if !isset($subitem['condition']) || $subitem['condition']}
                                     <a class="ui_rmenu_subitem _ui_rmenu_subitem {($subitem['active'] ?? false) ? 'ui_rmenu_item_sel' : ''} {$subitem['class'] ?? ''}" href="{$subitem['url']}" n:attr="id => $subitem['id'] ?? null, onclick => $subitem['onclick'] ?? null">
+                                        {if !empty($subitem['count'])}
+                                            <span class="ui_rmenu_count {$subitem['countClass'] ?? ''}">{$subitem['count']}</span>
+                                        {/if}
                                         {if isset($subitem['extraItem']) && (!isset($subitem['extraItem']['condition']) || $subitem['extraItem']['condition'])}
                                             <span class="ui_rmenu_extra_item {$subitem['extraItem']['class']}"
                                                   data-href="{$subitem['extraItem']['url']}"
@@ -166,6 +174,9 @@
                                     <img src="{$item['avatar']}" class="ui_tab_icon ui_tab_icon--avatar">
                                 {/if}
                                 {if isset($item['translate']) && $item['translate'] === false}{$item['title']}{else}{_$item['title']}{/if}
+                                {if !empty($item['count'])}
+                                    <span class="ui_tab_count {$item['countClass'] ?? ''}">{$item['count']}</span>
+                                {/if}
                                 {if isset($item['extraItem']) && (!isset($item['extraItem']['condition']) || $item['extraItem']['condition'])}
                                     <span class="ui_tab_extra_item {$item['extraItem']['class'] ?? ''}"
                                           data-href="{$item['extraItem']['url'] ?? ''}"
@@ -181,6 +192,9 @@
                                     <li class="ui_tab_subitem_wrap">
                                         <a class="ui_tab ui_tab_subitem {($subitem['active'] ?? false) ? 'ui_tab_sel' : ''} {$subitem['class'] ?? ''}" href="{$subitem['url']}" n:attr="id => $subitem['id'] ?? null, onclick => $subitem['onclick'] ?? null">
                                             {if isset($subitem['translate']) && $subitem['translate'] === false}{$subitem['title']}{else}{_$subitem['title']}{/if}
+                                            {if !empty($subitem['count'])}
+                                                <span class="ui_tab_count {$subitem['countClass'] ?? ''}">{$subitem['count']}</span>
+                                            {/if}
                                             {if isset($subitem['extraItem']) && (!isset($subitem['extraItem']['condition']) || $subitem['extraItem']['condition'])}
                                                 <span class="ui_tab_extra_item {$subitem['extraItem']['class'] ?? ''}"
                                                       data-href="{$subitem['extraItem']['url'] ?? ''}"

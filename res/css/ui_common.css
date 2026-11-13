@@ -976,6 +976,24 @@ h2.page_block_h2.tabs_header {
     color: var(--text-color);
     padding-left: 26px;
 }
+.ui_rmenu_count {
+    display: inline-block;
+    float: right;
+    font-weight: 400;
+    text-align: center;
+    margin: 7px 10px 0 0;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background-color: var(--accent-color--secondary);
+    font-size: 11px;
+    height: 16px;
+    line-height: 17px;
+    min-width: 6px;
+    color: #fff;
+}
+.ui_rmenu_count.grey {
+    background-color: var(--text-color--quaternary);
+}
 .ui_rmenu_sublist {
     overflow: hidden;
 }
@@ -2775,6 +2793,12 @@ select:focus,.content-editable:focus {
 .ui_actions_menu .separator {
     border-top: 1px solid var(--border-color);
     margin: 4px 13px;
+}
+
+.ui_actions_menu_item_extra_label {
+    float: right;
+    color: var(--text-color--secondary);
+    font-size: 12px;
 }
 
 /* dark variant */

@@ -134,7 +134,7 @@
 									<div id="profile_actions_tooltip" class="ui_actions_menu">
 											{if $canEdit}
 												<a href="/club{$club->getId()}/edit">{_edit_group}</a>
-												<a n:if="$club->isClosed()" href="/club{$club->getId()}/followers/req">{_req}</a>
+												<a n:if="$club->isClosed()" href="/club{$club->getId()}/followers/req"><span class="ui_actions_menu_item_extra_label" n:if="$club->getPotentialFollowersCount() && $club->getPotentialFollowersCount() > 0">{$club->getPotentialFollowersCount()}</span>{_req}</a>
 												<a href="/club{$club->getId()}/stats" rel="nofollow">{_statistics}</a>
 												{if $club->isMessagesEnabled()}
 													<a href="/im?as={$club->getRealId()}">{_view_group_messages}</a>
@@ -169,7 +169,7 @@
 				</div>
 				<div n:if="$club->isClosed()" class="page_block module group_closed">
 					<div class="group_closed_text">
-						{_group_type_closed|explode:'.'|first}
+						{_group_type_closed|replaceRe:'/\s*\p{Sentence_Terminal}.*$/su', ''}
 					</div>
 				</div>
 				<div class="page_block" id="group_counters" n:if="$thisUser && $club->isEvent()">
