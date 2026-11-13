@@ -1875,7 +1875,7 @@
                     this.allowZoom(true);
                 }
                 this.showEmpty(noData);
-                if (this.leftTime == -1 || dotsVisible < 10) {
+                if (this.params.show_all || this.leftTime == -1 || dotsVisible < 10) {
                     let st = 10 * DAY;
                     if (this.XSTEP > 3 * MONTH) {
                         st = 2 * YEAR;

@@ -1768,11 +1768,6 @@ div.container_gray > form > table {
 	transform: translateX(-50%);
 }
 
-/* group statistics graph */
-.js-plotly-plot {
-    margin: 15px 0 5px;
-}
-
 /* listview */
 .list_view {
     padding: 0 20px 18px;

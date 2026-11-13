@@ -53,7 +53,7 @@ const modules = [
     'features/status-editor.js',
     'features/friends.js',
     'features/pin-group.js',
-    'features/group-statistics.js',
+    'features/statistics-graphs.js',
     'features/profile.js',
     'features/likes.js',
     'features/paginator.js',
