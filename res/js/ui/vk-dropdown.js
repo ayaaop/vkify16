@@ -37,7 +37,11 @@
             const item = this.list.children[index];
             if (!item) return;
             item.classList.add('active');
-            item.scrollIntoView({ block: 'nearest' });
+            if (item.offsetTop < this.container.scrollTop) {
+                this.container.scrollTop = item.offsetTop;
+            } else if (item.offsetTop + item.offsetHeight > this.container.scrollTop + this.container.clientHeight) {
+                this.container.scrollTop = item.offsetTop + item.offsetHeight - this.container.clientHeight;
+            }
             this.options.onItemActive?.(item);
         }
 
@@ -156,6 +160,7 @@
             this.onOutsideDown = e => {
                 if (!this.container.contains(e.target)) this.hide();
             };
+            this.onReposition = () => this.positionResults();
             this.onFocus = () => {
                 if (this.autocomplete) this.input.select();
             };
@@ -193,6 +198,7 @@
             }) : this.data;
             this.select.content(items.length ? items : [['', window.tr?.('no_results'), true]]);
             this.select.show(words.length ? '' : this.val());
+            this.positionResults();
         }
 
         setData(items) {
@@ -222,19 +228,78 @@
             if (openDropdown && openDropdown !== this) openDropdown.hide();
             openDropdown = this;
             this.container.classList.add('selector_focused');
-            this.select.container.style.width = this.container.offsetWidth + 'px';
-            this.container.classList.toggle('reverse',
-                window.innerHeight - this.container.getBoundingClientRect().bottom < 250
-                && this.container.getBoundingClientRect().top > 250);
+            this.fixedResults = false;
+            this.fixedRoot = null;
+            for (let parent = this.container.parentElement; parent && parent !== document.documentElement; parent = parent.parentElement) {
+                const style = getComputedStyle(parent);
+                if (/(auto|scroll|hidden|clip)/.test(style.overflowX + style.overflowY)) {
+                    this.fixedResults = true;
+                }
+                if (!this.fixedRoot && (style.transform !== 'none' || style.perspective !== 'none'
+                    || style.filter !== 'none' || /\b(transform|perspective|filter)\b/.test(style.willChange))) {
+                    this.fixedRoot = parent;
+                }
+            }
+            if (this.fixedResults) this.select.container.parentElement.classList.add('fixed');
             this.select.show(this.val());
+            this.positionResults();
             this.input.setAttribute('aria-expanded', 'true');
             document.addEventListener('mousedown', this.onOutsideDown, true);
+            if (this.fixedResults) {
+                document.addEventListener('scroll', this.onReposition, true);
+                window.addEventListener('resize', this.onReposition);
+                window.visualViewport?.addEventListener('resize', this.onReposition);
+                window.visualViewport?.addEventListener('scroll', this.onReposition);
+            }
+        }
+
+        positionResults() {
+            const results = this.select.container.parentElement;
+            const rect = this.container.getBoundingClientRect();
+            const viewport = window.visualViewport;
+            const dialog = this.container.closest('.ovk-diag-cont')?.querySelector('.ovk-diag');
+            const dialogRect = dialog?.getBoundingClientRect();
+            const viewportTop = viewport?.offsetTop || 0;
+            const top = Math.max(viewportTop, dialogRect?.top ?? viewportTop);
+            const bottom = Math.min(viewportTop + (viewport?.height || window.innerHeight),
+                dialogRect?.bottom ?? Infinity);
+            const up = rect.top - top;
+            const down = bottom - rect.bottom;
+            const list = this.select.container;
+            const height = Math.min(this.select.maxHeight, list.scrollHeight + 2);
+            const reverse = down < 40 && up > down;
+            this.container.classList.toggle('reverse', reverse);
+            results.classList.toggle('reverse', reverse);
+            const availableHeight = Math.max(0, Math.min(height, (reverse ? up : down) - 4));
+            list.style.maxHeight = `${availableHeight}px`;
+            list.classList.toggle('result_list_scrollable', list.scrollHeight + 2 > availableHeight);
+            if (this.fixedResults) {
+                const hostRect = this.fixedRoot?.getBoundingClientRect();
+                const listTop = reverse ? rect.top - list.offsetHeight + 1 : rect.bottom;
+                results.style.position = 'fixed';
+                results.style.left = `${rect.left - (hostRect?.left || 0)}px`;
+                results.style.top = `${listTop - (hostRect?.top || 0)}px`;
+            }
+            list.style.width = `${rect.width}px`;
+            this.select.highlight(this.select.active);
         }
 
         hide() {
             if (openDropdown === this) openDropdown = null;
             this.container.classList.remove('selector_focused');
             this.select.hide();
+            if (this.fixedResults) {
+                document.removeEventListener('scroll', this.onReposition, true);
+                window.removeEventListener('resize', this.onReposition);
+                window.visualViewport?.removeEventListener('resize', this.onReposition);
+                window.visualViewport?.removeEventListener('scroll', this.onReposition);
+            }
+            const results = this.select.container.parentElement;
+            results.removeAttribute('style');
+            results.classList.remove('fixed', 'reverse');
+            this.fixedResults = false;
+            this.fixedRoot = null;
+            this.select.container.style.maxHeight = '';
             this.input.setAttribute('aria-expanded', 'false');
             this.input.removeAttribute('aria-activedescendant');
             if (this.autocomplete) {

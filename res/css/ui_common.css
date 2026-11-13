@@ -1821,6 +1821,11 @@ body .ui_search_field_empty .ui_search_reset {
     bottom: 0;
 }
 
+.results_container.fixed.reverse .result_list {
+    top: 0;
+    bottom: auto;
+}
+
 .selector_container .result_list[hidden] {
     display: none
 }
