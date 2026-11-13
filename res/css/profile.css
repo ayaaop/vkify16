@@ -1092,6 +1092,9 @@ div.avatar_block:hover .avatar_variants {
   text-overflow: ellipsis;
   color: var(--link-color);
   cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .page_upload_label {
   background: url(../icons/group_icons.png)
@@ -1102,6 +1105,7 @@ div.avatar_block:hover .avatar_variants {
   margin-right: 12px;
   opacity: 0.75;
   transition: opacity 100ms ease;
+  flex-shrink: 0;
 }
 .narrow_column .page_module_upload {
   padding: 17px 13px 17px 17px;
