@@ -54,6 +54,7 @@ const modules = [
     'features/friends.js',
     'features/pin-group.js',
     'features/statistics-graphs.js',
+    'features/sticker-editor.js',
     'features/profile.js',
     'features/likes.js',
     'features/paginator.js',

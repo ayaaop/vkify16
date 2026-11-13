@@ -6,6 +6,10 @@
 
 {block headIncludes}
     <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/settings.css" data-vkify-route-style="settings" />
+    <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/sticker-editor.css" data-vkify-route-style="sticker-editor" />
+    {if !$isNew && $pack}
+        <link rel="stylesheet" href="/themepack/{$theme->getId()}/{$theme->getVersion()}/resource/css/graph.css" data-vkify-route-style="graph" />
+    {/if}
 {/block}
 
 {block content}
@@ -15,189 +19,60 @@
                 {include "Tabs.latte", act => 'author'}
             </div>
         </div>
-
         <div class="wide_column_wrap">
             <div class="wide_column">
-                <div class="page_block stickers_edit_page">
-                    {include "../components/page_block_header.latte", title => $isNew ? 'stickers_new_pack' : 'stickers_edit_pack'}
-                    <div class="form_group settings_padding stickers_edit_form">
+                <form id="packForm" class="sticker_editor" data-sticker-editor data-is-new="{if $isNew}true{else}false{/if}"
+                      data-withdraw-tax="{floatval($withdrawTax ?? 0)}" data-pack-id="{$pack ? $pack->getId() : 0}" data-balance="{$pack ? $pack->getBalance() : 0}"
+                      method="POST" enctype="multipart/form-data" action="{if $isNew}/stickers/new{else}/stickers/edit/{$pack->getId()}{/if}">
+                    <input type="hidden" name="hash" value="{$csrfToken}" />
+                    <div class="page_block">
+                        {include "../components/page_block_header.latte", title => $isNew ? 'stickers_new_pack' : 'stickers_edit_pack'}
                         {if !$isNew && $pack}
-                            <div class="msg information">
-                                <ul>
-                                    <li>{_stickers_pack_balance}: <b>{tr('coins', (int) round($pack->getBalance()))}</b>
-                                        {if $pack->getBalance() > 0}
-                                            (<a href="javascript:withdrawStickers({$pack->getId()}, {$pack->getBalance()})">{_stickers_withdrawal_q}</a>)
-                                        {/if}
-                                    </li>
-                                </ul>
+                            <div class="settings_block_msg">
+                                {_stickers_pack_balance}: <b>{tr('coins', (int) round($pack->getBalance()))}</b>
                                 {if $pack->getBalance() > 0}
-                                    <button type="button" class="button" onclick="withdrawStickers({$pack->getId()}, {$pack->getBalance()});">
-                                        {_stickers_withdraw_btn}
-                                    </button>
+                                    (<button type="button" class="sticker_editor_link" data-sticker-action="withdraw">{_stickers_withdrawal_q}</button>)
                                 {/if}
                             </div>
-                            <div class="stickers_stats_wrapper">
-                                <div class="stickers_stats_header">
-                                    <div class="stickers_stats_title_row">
-                                        <span class="stickers_stats_title">{_stickers_install_stats}</span>
-                                        <div class="stickers_period_switcher" id="stickerPeriodSwitcher">
-                                            <a href="javascript:void(0)" class="stickers_period_link active" data-period="14">{_stickers_period_14d}</a>
-                                            <a href="javascript:void(0)" class="stickers_period_link" data-period="30">{_stickers_period_30d}</a>
-                                            <a href="javascript:void(0)" class="stickers_period_link" data-period="90">{_stickers_period_90d}</a>
-                                        </div>
-                                    </div>
-                                    <div class="stickers_stats_total">
-                                        {_stickers_total_installs}: <b>{$totalInstalls}</b>
-                                    </div>
-                                </div>
-                                <div id="stickerInstallsChart" class="stickers_chart_container"></div>
-                            </div>
-                            <style>
-                                .modebar-container {
-                                    display: none !important;
-                                }
-                            </style>
-                            {script "js/node_modules/plotly.js-dist/plotly.js"}
-                            <script>
-                                (function() {
-                                    var rawStats = {$installStats};
-                                    var chartElem = document.querySelector('#stickerInstallsChart');
-                                    if (!rawStats || !rawStats.x || !rawStats.y || !chartElem) {
-                                        return;
-                                    }
-
-                                    var cs = getComputedStyle(document.body);
-                                    function cssVar(name, fallback) {
-                                        var v = cs.getPropertyValue(name);
-                                        return v ? v.trim() : fallback;
-                                    }
-                                    var chartLineColor = cssVar('--accent-color--quaternary', '#597da3');
-                                    var chartFillColor = 'rgba(' + cssVar('--accent-color--quaternary-rgb', '89, 125, 163') + ', 0.12)';
-                                    var chartTickColor = cssVar('--text-color--tertiary', '#777');
-                                    var chartGridColor = cssVar('--page-background-color--secondary', '#f0f2f5');
-                                    var chartZeroColor = cssVar('--border-color', '#e7ecf0');
-
-                                    function renderPlot(days) {
-                                        var xSlice = rawStats.x.slice(-days);
-                                        var ySlice = rawStats.y.slice(-days);
-                                        var maxY = Math.max.apply(null, ySlice.concat([0]));
-
-                                        var textArray = [];
-                                        for (var i = 0; i < ySlice.length; i++) {
-                                            textArray.push(tr('stickers_installs_count', ySlice[i]));
-                                        }
-
-                                        var trace = {
-                                            x: xSlice,
-                                            y: ySlice,
-                                            text: textArray,
-                                            type: 'scatter',
-                                            mode: 'lines+markers',
-                                            line: {
-                                                shape: 'spline',
-                                                smoothing: 0.8,
-                                                color: chartLineColor,
-                                                width: 2
-                                            },
-                                            marker: {
-                                                size: days > 30 ? 3 : 5,
-                                                color: chartLineColor
-                                            },
-                                            fill: 'tozeroy',
-                                            fillcolor: chartFillColor,
-                                            hoverinfo: 'x+text',
-                                            hovertemplate: '%{' + 'x|%d.%m}<br><b>%{' + 'text}</b><extra></extra>'
-                                        };
-
-                                        var layout = {
-                                            margin: { t: 8, r: 15, b: 24, l: 30 },
-                                            showlegend: false,
-                                            paper_bgcolor: 'rgba(0,0,0,0)',
-                                            plot_bgcolor: 'rgba(0,0,0,0)',
-                                            xaxis: {
-                                                type: 'date',
-                                                tickformat: '%d.%m',
-                                                tickfont: { size: 10, color: chartTickColor },
-                                                showgrid: false,
-                                                zeroline: false
-                                            },
-                                            yaxis: {
-                                                tickfont: { size: 10, color: chartTickColor },
-                                                rangemode: 'tozero',
-                                                zeroline: true,
-                                                zerolinecolor: chartZeroColor,
-                                                gridcolor: chartGridColor,
-                                                dtick: maxY <= 4 ? 1 : undefined
-                                            }
-                                        };
-
-                                        Plotly.react(chartElem, [trace], layout, {
-                                            displayModeBar: false,
-                                            responsive: true
-                                        });
-                                    }
-
-                                    renderPlot(14);
-
-                                    var switcher = document.getElementById('stickerPeriodSwitcher');
-                                    if (switcher) {
-                                        switcher.addEventListener('click', function(e) {
-                                            var target = e.target.closest('.stickers_period_link');
-                                            if (!target) return;
-                                            e.preventDefault();
-
-                                            switcher.querySelectorAll('.stickers_period_link').forEach(function(el) {
-                                                el.classList.remove('active');
-                                            });
-                                            target.classList.add('active');
-
-                                            var days = parseInt(target.getAttribute('data-period'), 10) || 14;
-                                            renderPlot(days);
-                                        });
-                                    }
-                                })();
-                            </script>
                         {/if}
-                        <form id="packForm" method="POST" enctype="multipart/form-data" action="{if $isNew}/stickers/new{else}/stickers/edit/{$pack->getId()}{/if}">
-                            <input type="hidden" name="hash" value="{$csrfToken}" />
-
+                        <div class="form_group settings_padding clear_fix label_end">
                             <div class="form_field">
-                                <div class="form_label">{_stickers_pack_name}</div>
+                                <label class="form_label" for="pack_name">{_stickers_pack_name}</label>
                                 <div class="form_data">
-                                    <input type="text" name="name" value="{$pack ? $pack->getName() : ''}" required />
+                                    <input type="text" name="name" id="pack_name" value="{$pack ? $pack->getName() : ''}" required />
                                 </div>
                             </div>
                             <div class="form_field">
-                                <div class="form_label">{_stickers_pack_slug}</div>
+                                <label class="form_label" for="pack_slug">{_stickers_pack_slug}</label>
                                 <div class="form_data">
-                                    <input type="text" name="slug" value="{$pack ? $pack->getSlug() : ''}" placeholder="my-pack-name" />
+                                    <input type="text" name="slug" id="pack_slug" value="{$pack ? $pack->getSlug() : ''}" placeholder="my-pack-name" />
                                 </div>
                             </div>
                             <div class="form_field">
-                                <div class="form_label">{_stickers_pack_desc}</div>
+                                <label class="form_label" for="pack_description">{_stickers_pack_desc}</label>
                                 <div class="form_data">
-                                    <textarea name="description" class="small-textarea">{$pack ? $pack->getDescription() : ''}</textarea>
+                                    <textarea name="description" id="pack_description" class="small-textarea">{$pack ? $pack->getDescription() : ''}</textarea>
                                 </div>
                             </div>
                             <div class="form_field">
-                                <div class="form_label">{_stickers_pack_price}</div>
+                                <label class="form_label" for="pack_price">{_stickers_pack_price}</label>
                                 <div class="form_data">
-                                    <input type="number" name="price" min="0" value="{$pack ? $pack->getPrice() : 0}" />
+                                    <input type="number" name="price" id="pack_price" min="0" value="{$pack ? $pack->getPrice() : 0}" />
                                 </div>
                             </div>
                             <div class="form_field">
-                                <div class="form_label">{_stickers_pack_author}</div>
+                                <label class="form_label" for="pack_author">{_stickers_pack_author}</label>
                                 <div class="form_data">
-                                    <input type="text" name="author" value="{$pack ? $pack->getAuthor() : ''}" placeholder="{_stickers_pack_author_placeholder}" />
+                                    <input type="text" name="author" id="pack_author" value="{$pack ? $pack->getAuthor() : ''}" placeholder="{_stickers_pack_author_placeholder}" />
                                 </div>
                             </div>
                             <div class="form_field">
-                                <div class="form_label">{_stickers_pack_author_url}</div>
+                                <label class="form_label" for="pack_author_url">{_stickers_pack_author_url}</label>
                                 <div class="form_data">
-                                    <input type="url" name="author_url" value="{$pack ? $pack->getAuthorUrl() : ''}" placeholder="https://example.com/..." />
+                                    <input type="url" name="author_url" id="pack_author_url" value="{$pack ? $pack->getAuthorUrl() : ''}" placeholder="https://example.com/..." />
                                 </div>
                             </div>
-                            <div class="form_field">
+                            <div class="form_field sticker_editor_visibility">
                                 <div class="form_data">
                                     <label class="checkbox">
                                         <input type="checkbox" name="unlisted" value="1" {if $pack && $pack->isUnlisted()}checked{/if} />
@@ -206,60 +81,33 @@
                                 </div>
                             </div>
 
-                            <div class="stickers_section_title">
-                                {_stickers_upload_title}
-                            </div>
-                            <div class="stickers_section_hint">
-                                {_stickers_upload_hint}
-                            </div>
-
-                            {if !$isNew && sizeof($existingStickers) > 0}
-                                <div class="stickers_sample_title">
-                                    {_stickers_upload_title} ({sizeof($existingStickers)}):
-                                </div>
-                                <div class="stickers_cards_grid">
-                                    {foreach $existingStickers as $stk}
-                                        <div class="existing_sticker_card" id="stk_card_{$stk->getId()}">
-                                            <div class="existing_sticker_thumb">
-                                                <img src="{$stk->getImageUrl(128)}" width="72" height="72" alt="" />
-                                            </div>
-                                            <div class="emoji-input-wrap">
-                                                <div class="content-editable-wrap">
-                                                    <textarea name="existing_emojis[{$stk->getId()}]"
-                                                            class="content-editable-fallback sticker-emoji-input"
-                                                            placeholder="{_stickers_emoji_placeholder}"
-                                                            data-submit-on-enter="false"
-                                                            data-single-line="true"
-                                                            rows="1">{$stk->getEmoji()}</textarea>
-                                                </div>
-                                                <div class="emoji_picker_entrypoint" title="{_stickers_emoji_placeholder}"></div>
-                                            </div>
-                                            <label class="existing_sticker_label_main">
-                                                <input type="radio" name="main_sticker_id" value="{$stk->getId()}" {if $pack->getMainSticker() && $pack->getMainSticker()->getId() === $stk->getId()}checked{/if} />
-                                                {_stickers_cover}
-                                            </label>
-                                            <label class="existing_sticker_label_gift">
-                                                <input type="checkbox" name="gift_stickers[]" value="{$stk->getId()}" class="sticker-gift-checkbox" {if in_array($stk->getId(), $giftStickerIds ?? [], true)}checked{/if} />
-                                                {_stickers_gift_bg_sticker}
-                                            </label>
-                                            <label class="existing_sticker_label_delete">
-                                                <input type="checkbox" name="delete_stickers[]" value="{$stk->getId()}" onchange="toggleStickerDelete(this, 'stk_card_{$stk->getId()}')" />
-                                                {_stickers_delete_sticker}
-                                            </label>
+                        </div>
+                    </div>
+                    {if !$isNew && $pack}
+                        <div class="page_block stickers_edit_page">
+                        {include "../components/page_block_header.latte", title => 'stickers_install_stats'}
+                            <div class="stickers_stats_wrapper">
+                                <div class="stickers_stats_header">
+                                    <div class="stickers_stats_title_row">
+                                        <div class="stickers_period_switcher" id="stickerPeriodSwitcher">
+                                            <button type="button" class="stickers_period_link active" data-period="14" aria-pressed="true">{_stickers_period_14d}</button>
+                                            <button type="button" class="stickers_period_link" data-period="30" aria-pressed="false">{_stickers_period_30d}</button>
+                                            <button type="button" class="stickers_period_link" data-period="90" aria-pressed="false">{_stickers_period_90d}</button>
                                         </div>
-                                    {/foreach}
+                                    </div>
+                                    <div class="stickers_stats_total">
+                                        {_stickers_total_installs}: <b>{$totalInstalls}</b>
+                                    </div>
                                 </div>
-                            {/if}
-
-                            {if !$isNew && $pack && sizeof($existingStickers) > 0}
-                                <hr class="stickers_divider" />
-                                <div class="stickers_section_title">
-                                    {_stickers_gift_box_title}
-                                </div>
-                                <div class="stickers_section_hint">
-                                    {_stickers_gift_box_hint}
-                                </div>
-
+                                <div id="stickerInstallsChart" class="stickers_chart_container" aria-label="{_stickers_install_stats}" data-sticker-stats="{json_encode($installStats)}"></div>
+                            </div>
+                        </div>
+                    {/if}
+                    {if !$isNew && $pack && sizeof($existingStickers) > 0}
+                        <div class="page_block">
+                            {include "../components/page_block_header.latte", title => 'stickers_gift_box_title'}
+                            <div class="sticker_editor_content">
+                                <p class="sticker_editor_hint">{_stickers_gift_box_hint}</p>
                                 <div class="stickers_gift_preview_block">
                                     <div class="stickers_gift_preview_thumb_wrap">
                                         {if $gift}
@@ -267,299 +115,124 @@
                                         {elseif $pack->getMainSticker()}
                                             <img src="{$pack->getMainSticker()->getImageUrl(256)}" alt="{_stickers_gift_box_title}" class="stickers_gift_preview_img" />
                                         {else}
-                                            <div class="stickers_modal_cover_placeholder" style="width: 140px; height: 140px;"></div>
+                                            <div class="stickers_modal_cover_placeholder"></div>
                                         {/if}
                                     </div>
                                     <div class="stickers_gift_preview_info">
-                                        <div class="stickers_gift_preview_slots_title">
-                                            <b>{_stickers_gift_composition}:</b>
+                                        <div class="stickers_gift_preview_slots_title"><b>{_stickers_gift_composition}:</b></div>
+                                        <div class="stickers_gift_preview_slot_item">
+                                            <span>{_stickers_gift_front_slot}</span>
+                                            <strong id="gift_front_sticker_name"></strong>
                                         </div>
                                         <div class="stickers_gift_preview_slot_item">
-                                            <span class="nobold">{_stickers_gift_front_slot}</span>
-                                        </div>
-                                        <div class="stickers_gift_preview_slot_item">
-                                            <span class="nobold">{_stickers_gift_back_slots}:</span>
+                                            <span>{_stickers_gift_back_slots}:</span>
                                             <span id="gift_selected_count">{sizeof($giftStickerIds ?? [])} / 3</span>
                                         </div>
-                                        <div class="stickers_gift_preview_note">
-                                            {_stickers_gift_save_note}
-                                        </div>
+                                        <p class="stickers_gift_preview_note">{_stickers_gift_save_note}</p>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    {/if}
+                    <div class="page_block">
+                        {include "../components/page_block_header.latte", title => 'stickers_upload_title'}
+                        <div class="docs_choose_upload_area_wrap" data-sticker-dropzone>
+                            <input type="file" id="stickers_file_input" name="stickers[]" multiple accept="image/png,image/jpeg,image/webp,image/gif,.json,.tgs" hidden />
+                            <button type="button" class="docs_choose_upload_area" data-sticker-action="upload" aria-describedby="sticker_upload_hint">
+                                <span class="docs_choose_upload_area_label">{_stickers_select_files}</span>
+                            </button>
+                        </div>
+                        <div class="sticker_editor_content">
+                            <p class="sticker_editor_hint" id="sticker_upload_hint">{_stickers_upload_hint}</p>
+                            <div class="msg error" role="alert" data-sticker-upload-error hidden>{=vkifyTr('stickers_upload_invalid')}</div>
+                            <section data-sticker-pending hidden>
+                                <h3 class="sticker_editor_section_header">{=vkifyTr('stickers_pending')} <span id="draft_counter" aria-live="polite"></span></h3>
+                                <div id="drafts_container" class="sticker_editor_items"></div>
+                            </section>
+                            <template data-sticker-draft>
+                                <article class="sticker_editor_item draft_sticker_card" data-sticker-card>
+                                    <div class="sticker_editor_item_preview">
+                                        <div class="sticker_editor_item_thumb" data-sticker-thumb></div>
+                                        <div class="photos_edit_actions">
+                                            <button type="button" data-sticker-action="remove" title="{_stickers_delete_sticker}" aria-label="{_stickers_delete_sticker}">
+                                                <span class="icon photos_action_delete" aria-hidden="true"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="sticker_editor_item_fields">
+                                        <div class="sticker_editor_filename" data-sticker-filename></div>
+                                        <div class="emoji-input-wrap">
+                                            <div class="content-editable-wrap">
+                                                <textarea name="emojis[]" class="content-editable-fallback sticker-emoji-input" rows="1"
+                                                          placeholder="{_stickers_emoji_placeholder}" aria-label="{_stickers_emoji_placeholder}"
+                                                          data-submit-on-enter="false" data-single-line="true"></textarea>
+                                            </div>
+                                            <div class="emoji_picker_entrypoint" title="{_stickers_emoji_placeholder}"></div>
+                                        </div>
+                                        <label class="radio">
+                                            <input type="radio" data-sticker-cover />
+                                            <span>{_stickers_cover}</span>
+                                        </label>
+                                    </div>
+                                </article>
+                            </template>
+                            {if !$isNew && sizeof($existingStickers) > 0}
+                                <h3 class="sticker_editor_section_header">
+                                    <span>{=vkifyTr('stickers_existing')} ({sizeof($existingStickers)})</span>
+                                    <span class="sticker_editor_gift_count">{_stickers_gift_bg_sticker}: <output data-sticker-gift-count aria-live="polite">{sizeof($giftStickerIds ?? [])} / 3</output></span>
+                                </h3>
+                                <div class="sticker_editor_items">
+                                    {foreach $existingStickers as $stk}
+                                        <div class="sticker_editor_item existing_sticker_card" id="stk_card_{$stk->getId()}" data-sticker-card>
+                                            <div class="sticker_editor_item_preview">
+                                                <div class="sticker_editor_item_thumb">
+                                                    <img src="{$stk->getImageUrl(128)}" width="128" height="128" alt="" />
+                                                </div>
+                                                <div class="photos_edit_actions">
+                                                    <label title="{_stickers_delete_sticker}">
+                                                        <input type="checkbox" name="delete_stickers[]" value="{$stk->getId()}" data-sticker-delete aria-label="{_stickers_delete_sticker}" />
+                                                        <span class="icon photos_action_delete" aria-hidden="true"></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="sticker_editor_item_fields">
+                                                <div class="emoji-input-wrap">
+                                                    <div class="content-editable-wrap">
+                                                        <textarea name="existing_emojis[{$stk->getId()}]"
+                                                                class="content-editable-fallback sticker-emoji-input"
+                                                                placeholder="{_stickers_emoji_placeholder}"
+                                                                aria-label="{_stickers_emoji_placeholder}"
+                                                                data-submit-on-enter="false"
+                                                                data-single-line="true"
+                                                                rows="1">{$stk->getEmoji()}</textarea>
+                                                    </div>
+                                                    <div class="emoji_picker_entrypoint" title="{_stickers_emoji_placeholder}"></div>
+                                                </div>
+                                                <label class="radio">
+                                                    <input type="radio" name="main_sticker_id" id="sticker_cover_{$stk->getId()}" data-sticker-cover value="{$stk->getId()}" {if $pack->getMainSticker() && $pack->getMainSticker()->getId() === $stk->getId()}checked{/if} />
+                                                    <span>{_stickers_cover}</span>
+                                                </label>
+                                                <label class="checkbox">
+                                                    <input type="checkbox" name="gift_stickers[]" value="{$stk->getId()}" class="sticker-gift-checkbox" {if in_array($stk->getId(), $giftStickerIds ?? [], true)}checked{/if} />
+                                                    <span>{_stickers_gift_bg_sticker}</span>
+                                                </label>
+                                            </div>
+                                            <div class="photos_restore" data-sticker-restore hidden>
+                                                <p data-sticker-delete-status role="status">{=vkifyTr('stickers_delete_pending')}</p>
+                                                <button type="button" class="sticker_editor_link" data-sticker-action="restore">{_restore}</button>
+                                            </div>
+                                        </div>
+                                    {/foreach}
+                                </div>
                             {/if}
-
-                            <div class="stickers_upload_actions">
-                                <input type="file" id="stickers_file_input" name="stickers[]" multiple accept="image/png,image/jpeg,image/webp,image/gif,.json,.tgs" class="stickers_upload_file_input" />
-                                <button type="button" class="button" onclick="document.getElementById('stickers_file_input').click();">
-                                    {_stickers_select_files}
-                                </button>
-                                <span id="draft_counter" class="stickers_draft_counter"></span>
-                            </div>
-
-                            <div id="drafts_container" class="stickers_cards_grid"></div>
-
-                            <div class="settings_save_footer">
-                                <button type="submit" class="button stickers_form_btn_save">
-                                    {if $isNew}{_stickers_save_pack}{else}{_save}{/if}
-                                </button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
-                    <div n:if="!$isNew" class="page_block_footer">
-                        {_you_can_also}
-                        <a onclick="confirmDeletePack(document.getElementById('packForm'));">{_stickers_delete_pack|lower}</a>.
+                    <div class="_photos_save_changes">
+                        <button type="submit" class="button">{if $isNew}{_stickers_save_pack}{else}{_save}{/if}</button>
+                        <button n:if="!$isNew" type="button" class="sticker_editor_link" data-sticker-action="delete">{_stickers_delete_pack}</button>
                     </div>
-                </div>
-                <script>
-                    (function() {
-                        window.stickersWithdrawTax = {floatval($withdrawTax ?? 0)};
-                        var draftFiles = [];
-                        window._getDraftFiles = function() { return draftFiles; };
-
-                        var fileInput = document.getElementById('stickers_file_input');
-                        var draftsContainer = document.getElementById('drafts_container');
-                        var draftCounter = document.getElementById('draft_counter');
-                        var isNewPack = {if $isNew}true{else}false{/if};
-
-                        function updateGiftCounter() {
-                            var cbs = document.querySelectorAll('.sticker-gift-checkbox:checked');
-                            var countEl = document.getElementById('gift_selected_count');
-                            if (countEl) {
-                                countEl.textContent = cbs.length + ' / 3';
-                            }
-                        }
-
-                        document.querySelectorAll('.sticker-gift-checkbox').forEach(function(cb) {
-                            cb.addEventListener('change', function() {
-                                var checked = document.querySelectorAll('.sticker-gift-checkbox:checked');
-                                if (checked.length > 3) {
-                                    this.checked = false;
-                                    if (typeof MessageBox === 'function') {
-                                        MessageBox(tr('error'), tr('stickers_gift_max_3_err'), [tr('ok')], [Function.noop]);
-                                    } else {
-                                        alert(tr('stickers_gift_max_3_err'));
-                                    }
-                                }
-                                updateGiftCounter();
-                            });
-                        });
-
-                        document.querySelectorAll('input[name="main_sticker_id"]').forEach(function(radio) {
-                            radio.addEventListener('change', function() {
-                                if (this.checked) {
-                                    var card = this.closest('.existing_sticker_card');
-                                    if (card) {
-                                        var giftCb = card.querySelector('.sticker-gift-checkbox');
-                                        if (giftCb && giftCb.checked) {
-                                            giftCb.checked = false;
-                                            updateGiftCounter();
-                                        }
-                                        var emojiText = card.querySelector('.sticker-emoji-input') ? card.querySelector('.sticker-emoji-input').value.trim() : '';
-                                        var frontNameEl = document.getElementById('gift_front_sticker_name');
-                                        if (frontNameEl) {
-                                            frontNameEl.textContent = (emojiText ? emojiText + ' ' : '') + '#' + this.value;
-                                        }
-                                    }
-                                }
-                            });
-                        });
-
-                        window.toggleStickerDelete = function(cb, cardId) {
-                            var card = document.getElementById(cardId);
-                            if (card) {
-                                card.classList.toggle('sticker_card_deleted', cb.checked);
-                            }
-                        };
-
-                        if (fileInput) {
-                            fileInput.addEventListener('change', function(e) {
-                                var files = Array.from(e.target.files);
-                                if (!files.length) return;
-
-                                draftFiles = draftFiles.concat(files);
-                                syncInputFiles();
-                                renderDrafts();
-                            });
-                        }
-
-                        function syncInputFiles() {
-                            try {
-                                var dt = new DataTransfer();
-                                draftFiles.forEach(function(f) { dt.items.add(f); });
-                                if (fileInput) {
-                                    fileInput.files = dt.files;
-                                }
-                            } catch (err) {
-                                console.error('DataTransfer error:', err);
-                            }
-                            if (draftCounter) {
-                                draftCounter.innerText = draftFiles.length > 0 ? ('(' + draftFiles.length + ')') : '';
-                            }
-                        }
-                        window.syncInputFiles = syncInputFiles;
-
-                        window.removeDraft = function(index) {
-                            draftFiles.splice(index, 1);
-                            syncInputFiles();
-                            renderDrafts();
-                        };
-
-                        function renderDrafts() {
-                            if (!draftsContainer) return;
-                            draftsContainer.innerHTML = '';
-                            if (draftFiles.length === 0) return;
-
-                            draftFiles.forEach(function(file, idx) {
-                                var card = document.createElement('div');
-                                card.className = 'draft_sticker_card';
-
-                                var imgWrapper = document.createElement('div');
-                                imgWrapper.className = 'draft_sticker_thumb';
-
-                                var isJson = file.name.endsWith('.json') || file.type === 'application/json';
-                                if (isJson) {
-                                    imgWrapper.innerHTML = '<div class="stickers_lottie_badge">LOTTIE<br/>JSON</div>';
-                                } else {
-                                    var img = document.createElement('img');
-                                    var reader = new FileReader();
-                                    reader.onload = function(evt) {
-                                        img.src = evt.target.result;
-                                    };
-                                    reader.readAsDataURL(file);
-                                    imgWrapper.appendChild(img);
-                                }
-
-                                var emojiWrap = document.createElement('div');
-                                emojiWrap.className = 'emoji-input-wrap';
-
-                                var ceWrap = document.createElement('div');
-                                ceWrap.className = 'content-editable-wrap';
-
-                                var emojiTextarea = document.createElement('textarea');
-                                emojiTextarea.name = 'emojis[]';
-                                emojiTextarea.className = 'content-editable-fallback sticker-emoji-input';
-                                emojiTextarea.placeholder = {_stickers_emoji_placeholder};
-                                emojiTextarea.title = {_stickers_emoji_placeholder};
-                                emojiTextarea.setAttribute('data-submit-on-enter', 'false');
-                                emojiTextarea.setAttribute('data-single-line', 'true');
-                                emojiTextarea.rows = 1;
-                                if (file._draftEmoji) {
-                                    emojiTextarea.value = file._draftEmoji;
-                                }
-                                emojiTextarea.addEventListener('change', function() {
-                                    file._draftEmoji = emojiTextarea.value;
-                                });
-
-                                var pickerBtn = document.createElement('div');
-                                pickerBtn.className = 'emoji_picker_entrypoint';
-                                pickerBtn.title = {_stickers_emoji_placeholder};
-
-                                ceWrap.appendChild(emojiTextarea);
-                                emojiWrap.appendChild(ceWrap);
-                                emojiWrap.appendChild(pickerBtn);
-
-                                var coverLabel = document.createElement('label');
-                                coverLabel.className = 'draft_sticker_cover_label';
-                                var coverRadio = document.createElement('input');
-                                coverRadio.type = 'radio';
-                                coverRadio.name = isNewPack ? 'main_sticker_index' : 'new_main_sticker_index';
-                                coverRadio.value = idx;
-                                if (isNewPack && idx === 0) {
-                                    coverRadio.checked = true;
-                                }
-                                coverRadio.addEventListener('change', function() {
-                                    if (coverRadio.checked) {
-                                        document.querySelectorAll('input[name="main_sticker_id"]').forEach(function(r) {
-                                            r.checked = false;
-                                        });
-                                    }
-                                });
-
-                                coverLabel.appendChild(coverRadio);
-                                coverLabel.appendChild(document.createTextNode(' ' + {_stickers_cover}));
-
-                                var delBtn = document.createElement('a');
-                                delBtn.href = 'javascript:void(0);';
-                                delBtn.className = 'draft_sticker_delete_btn';
-                                delBtn.innerText = {_stickers_delete_sticker};
-                                delBtn.onclick = function() {
-                                    window.removeDraft(idx);
-                                };
-
-                                card.appendChild(imgWrapper);
-                                card.appendChild(emojiWrap);
-                                card.appendChild(coverLabel);
-                                card.appendChild(delBtn);
-
-                                draftsContainer.appendChild(card);
-
-                                if (window.ContentEditable && typeof window.ContentEditable.enhance === 'function') {
-                                    var inst = window.ContentEditable.enhance(emojiTextarea);
-                                    if (inst && inst.el) {
-                                        inst.el.addEventListener('input', function() {
-                                            file._draftEmoji = inst.getText();
-                                        });
-                                    }
-                                }
-                            });
-                        }
-                        window.renderDrafts = renderDrafts;
-
-                        document.querySelectorAll('input[name="main_sticker_id"]').forEach(function(r) {
-                            r.addEventListener('change', function() {
-                                if (r.checked) {
-                                    document.querySelectorAll('input[name="new_main_sticker_index"]').forEach(function(dr) {
-                                        dr.checked = false;
-                                    });
-                                }
-                            });
-                        });
-
-                        var packForm = document.getElementById('packForm');
-                        if (packForm) {
-                            packForm.addEventListener('submit', function() {
-                                syncInputFiles();
-                                document.querySelectorAll('.emoji-input-wrap').forEach(function(wrap) {
-                                    var editable = wrap.querySelector('.content-editable');
-                                    var textarea = wrap.querySelector('textarea');
-                                    if (editable && textarea) {
-                                        var val = '';
-                                        if (editable._contentEditable && typeof editable._contentEditable.getText === 'function') {
-                                            val = editable._contentEditable.getText();
-                                        } else if (typeof window.ContentEditable !== 'undefined' && typeof window.ContentEditable.htmlToText === 'function') {
-                                            val = window.ContentEditable.htmlToText(editable);
-                                        } else {
-                                            val = editable.innerText || editable.textContent || '';
-                                        }
-                                        try {
-                                            var nativeSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set;
-                                            if (nativeSetter) {
-                                                nativeSetter.call(textarea, val);
-                                            } else {
-                                                textarea.value = val;
-                                            }
-                                        } catch (e) {
-                                            textarea.value = val;
-                                        }
-                                        textarea.textContent = val;
-                                    }
-                                });
-                            });
-                        }
-                    })();
-
-                    document.addEventListener('click', function(e) {
-                        var wrap = e.target.closest('.emoji-input-wrap');
-                        if (wrap && !e.target.closest('.emoji_picker_entrypoint')) {
-                            var editable = wrap.querySelector('.content-editable, textarea');
-                            if (editable && document.activeElement !== editable) {
-                                editable.focus();
-                            }
-                        }
-                    });
-                </script>
+                </form>
             </div>
         </div>
     </div>
-</div>
 {/block}

@@ -225,3 +225,19 @@ label.checkbox .nobold {
 .page_block .knowledgebase_block .page_padding {
     padding: 0!important;
 }
+
+.stickers_edit_page .stickers_chart_container {
+    height: auto;
+    min-width: 0;
+}
+
+.stickers_edit_page .stickers_stats_header {
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.stickers_period_link {
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+}

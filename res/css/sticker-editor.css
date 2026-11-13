@@ -1,0 +1,476 @@
+.sticker_editor {
+    min-width: 0;
+}
+
+.sticker_editor [hidden] {
+    display: none !important;
+}
+
+.sticker_editor_content {
+    padding: 20px;
+}
+
+.sticker_editor .form_group {
+    margin-inline: 30px;
+}
+
+.sticker_editor .form_field {
+    width: 100%;
+}
+
+.sticker_editor .form_label {
+    flex: 0 0 145px;
+}
+
+.sticker_editor .form_data {
+    min-width: 0;
+}
+
+.sticker_editor .form_data input:not([type="checkbox"]),
+.sticker_editor .form_data textarea {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+.sticker_editor .form_data textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.sticker_editor #pack_price {
+    width: 108px;
+}
+
+.sticker_editor_visibility .form_data {
+    margin-left: 160px;
+}
+
+.sticker_editor .settings_block_msg {
+    padding-inline: 30px;
+}
+
+.sticker_editor .stickers_stats_wrapper {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    border: 0;
+}
+
+.sticker_editor_hint {
+    margin: 0 0 12px;
+    color: var(--text-color--tertiary);
+    font-size: 12.5px;
+    line-height: 1.6;
+}
+
+.sticker_editor .docs_choose_upload_area {
+    background-color: var(--page-background-color--secondary);
+    padding: 13px 25px 14px;
+    text-align: center;
+    color: var(--link-color);
+    display: block
+}
+
+.sticker_editor .docs_choose_upload_area:hover {
+    background-color: var(--button-background-color--hover);
+    text-decoration: none
+}
+
+.sticker_editor .docs_choose_upload_area_label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    vertical-align: middle;
+    line-height: 18px;
+}
+
+.sticker_editor .docs_choose_upload_area_label::before {
+    content: "";
+    flex: none;
+    width: 14px;
+    height: 14px;
+    background: url(../icons/upload_icon.png) center / 14px 14px no-repeat;
+}
+
+.sticker_editor .sticker_editor_section_header {
+    background-color: var(--page-background-color);
+    padding: 19px 0 18px;
+    margin: 0 20px;
+    color: var(--heading-text-color);
+    border-top: 1px solid var(--border-color);
+    white-space: nowrap;
+    box-sizing: border-box
+}
+
+.sticker_editor .photos_edit_actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 8px;
+    padding: 3px;
+    border-radius: 3px;
+    transition: opacity 60ms linear;
+    z-index: 2;
+    color: var(--white);
+    background: var(--overlay-background-color);
+    font-size: 12.5px;
+    line-height: 0;
+    opacity: 0;
+    cursor: default
+}
+
+.sticker_editor .photos_edit_actions .icon {
+    height: 16px;
+    width: 16px;
+    background-repeat: no-repeat;
+    background-image: url(../icons/photo_edit_actions.png)
+}
+
+.sticker_editor .photos_edit_actions > :is(button, label) {
+    cursor: pointer;
+    display: inline-block;
+    padding: 3px;
+    opacity: 0.7;
+    top: 0
+}
+
+.sticker_editor .photos_edit_actions > :is(button, label):hover {
+    opacity: 1
+}
+
+.sticker_editor .photos_edit_actions > :is(button, label):active {
+    position: relative;
+    top: 1px
+}
+
+.sticker_editor .photos_edit_actions .photos_action_delete {
+    background-position: 0px -32px
+}
+
+.sticker_editor .docs_choose_upload_area {
+    box-sizing: border-box;
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    font: inherit;
+    cursor: pointer;
+}
+
+.sticker_editor .is_dragover .docs_choose_upload_area {
+    background: var(--button-background-color--hover);
+    outline: 1px dashed var(--border-color--secondary);
+    outline-offset: -5px;
+}
+
+.sticker_editor .sticker_editor_section_header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 18px;
+    white-space: normal;
+    border-bottom: 0;
+}
+
+.sticker_editor .sticker_editor_section_header span {
+    margin: 0;
+}
+
+.sticker_editor .sticker_editor_gift_count {
+    color: var(--text-color--secondary);
+}
+
+.sticker_editor .photos_edit_actions .icon {
+    display: block;
+}
+
+.sticker_editor .photos_edit_actions input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.sticker_editor .photos_edit_actions > :is(button, label) {
+    position: relative;
+    margin: 0;
+    border: 0;
+    background: none;
+}
+
+.sticker_editor .photos_edit_actions :is(button:focus-visible, label:has(input:focus-visible)) {
+    outline: 2px solid var(--white);
+    outline-offset: 1px;
+}
+
+.sticker_editor .sticker-emoji-input {
+    box-sizing: border-box;
+    width: 100%;
+    resize: none;
+}
+
+.sticker_editor_format {
+    color: var(--text-color--tertiary);
+    font-size: 15px;
+}
+
+.sticker_editor .photos_restore p {
+    margin: 0;
+}
+
+.sticker_editor .photos_deleted .photos_edit_actions {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.sticker_editor_link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--link-color);
+    font: inherit;
+    cursor: pointer;
+}
+
+.sticker_editor_link:hover {
+    text-decoration: underline;
+}
+
+.sticker_editor > .page_block:has(+ ._photos_save_changes) {
+    margin-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.sticker_editor ._photos_save_changes {
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 15px 30px;
+    padding-bottom: max(15px, env(safe-area-inset-bottom));
+    border-radius: 0 0 var(--page-border-radius) var(--page-border-radius);
+    background: var(--page-header-background-color);
+    box-shadow:
+        0 1px 0 0 var(--shadow-bottom-color),
+        0 0 0 1px var(--shadow-outline-color);
+}
+
+.sticker_editor .photos_save_button {
+    margin-left: 160px;
+}
+
+.sticker_editor .stickers_gift_preview_block {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+}
+
+.sticker_editor .stickers_gift_preview_thumb_wrap {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 140px;
+    height: 140px;
+}
+
+.sticker_editor .stickers_gift_preview_info {
+    min-width: 0;
+    margin: 0;
+}
+
+.sticker_editor .stickers_gift_preview_note {
+    color: var(--text-color--secondary);
+    line-height: 1.6;
+}
+
+@media (min-resolution: 192dpi) {
+    .sticker_editor .docs_choose_upload_area_label::before {
+        background-image: url(../icons/upload_icon_2x.png);
+        background-size: 14px 14px;
+    }
+
+    .sticker_editor .photos_edit_actions .icon {
+        background-image: url(../icons/photo_edit_actions_2x.png);
+        background-size: 16px 148px;
+    }
+}
+
+@media (hover: none) {
+    .sticker_editor .photos_edit_actions {
+        opacity: 1;
+    }
+
+    .sticker_editor .photos_edit_actions > :is(button, label) {
+        padding: 6px;
+    }
+}
+
+@media (max-width: 600px) {
+    .sticker_editor .form_group {
+        margin-inline: 20px;
+    }
+
+    .sticker_editor .form_field {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .sticker_editor .form_label {
+        flex: none;
+        width: auto;
+        text-align: left;
+    }
+
+    .sticker_editor .form_data,
+    .sticker_editor_visibility .form_data {
+        width: 100%;
+        margin: 0;
+    }
+
+    .sticker_editor .form_data input:not([type="checkbox"]),
+    .sticker_editor .form_data textarea {
+        width: 100%;
+    }
+
+    .sticker_editor .photos_save_button {
+        margin-left: 0;
+    }
+
+    .sticker_editor .stickers_gift_preview_block {
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+}
+
+.sticker_editor .sticker_editor_items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 12px;
+    padding-bottom: 10px;
+}
+
+.sticker_editor .sticker_editor_item {
+    box-sizing: border-box;
+    position: relative;
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--page-border-radius);
+    background: var(--page-background-color);
+    text-align: left;
+}
+
+.sticker_editor_item_preview {
+    position: relative;
+}
+
+.sticker_editor_item_thumb {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    background: var(--page-header-background-color);
+}
+
+.sticker_editor_item_thumb img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+}
+
+.sticker_editor_item_fields {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.sticker_editor .sticker_editor_item_fields .emoji-input-wrap {
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 6px;
+    border: 1px solid var(--border-color--tertiary);
+    border-radius: var(--page-border-radius);
+    background: var(--page-background-color);
+}
+
+.sticker_editor .sticker_editor_item_fields .emoji-input-wrap:focus-within {
+    border-color: var(--accent-color);
+}
+
+.sticker_editor .sticker_editor_item_fields > label {
+    margin: 0;
+    padding-block: 4px;
+    font-size: 12.5px;
+    cursor: pointer;
+}
+
+.sticker_editor_item_fields input {
+    accent-color: var(--accent-color);
+}
+
+.sticker_editor .sticker_editor_item_fields > label:has(input:disabled) {
+    color: var(--text-color--secondary);
+    cursor: default;
+}
+
+.sticker_editor_filename {
+    margin: 0;
+    color: var(--text-color--tertiary);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.sticker_editor_filename {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sticker_editor .sticker_editor_item:is(:hover, :focus-within) .photos_edit_actions {
+    opacity: 1;
+}
+
+.sticker_editor .sticker_editor_item .photos_restore {
+    box-sizing: border-box;
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    border-radius: inherit;
+    background: color-mix(in srgb, var(--page-background-color) 90%, transparent);
+    font-size: 12.5px;
+    text-align: center;
+}
+
+.sticker_editor .photos_deleted .sticker_editor_item_fields {
+    opacity: .4;
+    pointer-events: none;
+}
